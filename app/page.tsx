@@ -1,26 +1,40 @@
 import Link from "next/link";
 import Header from "@/components/Header";
+import { supabase } from '@/lib/supabaseClient';
 
-export default function Home() {
-  const ailments = [
-    { name: "Headache", icon: "😣", remedies: 45 },
-    { name: "Anxiety", icon: "😰", remedies: 38 },
-    { name: "Insomnia", icon: "😴", remedies: 42 },
-    { name: "Cold & Flu", icon: "🤧", remedies: 52 },
-    { name: "Allergies", icon: "🤧", remedies: 47 },
-    { name: "Joint Pain", icon: "🦴", remedies: 35 },
-    { name: "Digestion", icon: "💊", remedies: 41 },
-    { name: "Cough", icon: "😷", remedies: 44 },
-    { name: "Muscle Soreness", icon: "💪", remedies: 29 },
-    { name: "Nidal polyps", icon: "👃", remedies: 18 },
-    { name: "Sunburn", icon: "☀️", remedies: 22 },
-    { name: "Back pain", icon: "🧍", remedies: 33 },
-    { name: "High blood pressure", icon: "🩸", remedies: 31 },
-    { name: "Urinary tract infection", icon: "💧", remedies: 26 },
-    { name: "Kidney stones", icon: "🪨", remedies: 19 },
-    { name: "Cuts, bruises, and burns", icon: "🔥", remedies: 28 },
-    { name: "Swelling", icon: "🟡", remedies: 24 },
-  ];
+
+const dummyAilments = [
+  { id: "d1", name: "Headache", icon: "😣", remedies_count: 45 },
+  { id: "d2", name: "Anxiety", icon: "😰", remedies_count: 38 },
+  { id: "d3", name: "Insomnia", icon: "😴", remedies_count: 42 },
+  { id: "d4", name: "Cold & Flu", icon: "🤧", remedies_count: 52 },
+  { id: "d5", name: "Allergies", icon: "🤧", remedies_count: 47 },
+  { id: "d6", name: "Joint Pain", icon: "🦴", remedies_count: 35 },
+  { id: "d7", name: "Digestion", icon: "💊", remedies_count: 41 },
+  { id: "d8", name: "Cough", icon: "😷", remedies_count: 44 },
+  { id: "d9", name: "Muscle Soreness", icon: "💪", remedies_count: 29 },
+  { id: "d10", name: "Nasal polyps", icon: "👃", remedies_count: 18 },
+  { id: "d11", name: "Sunburn", icon: "☀️", remedies_count: 22 },
+  { id: "d12", name: "Back pain", icon: "🧍", remedies_count: 33 },
+  { id: "d13", name: "High blood pressure", icon: "🩸", remedies_count: 31 },
+  { id: "d14", name: "Urinary tract infection", icon: "💧", remedies_count: 26 },
+  { id: "d15", name: "Kidney stones", icon: "🪨", remedies_count: 19 },
+  { id: "d16", name: "Cuts, bruises, and burns", icon: "🔥", remedies_count: 28 },
+  { id: "d17", name: "Swelling", icon: "🟡", remedies_count: 24 },
+];
+
+export default async function Home() {
+
+  const { data: ailmentsData, error } = await supabase
+    .from("ailments")
+    .select("id, name, icon, remedies_count")
+    .order("name", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching ailments:", error);
+  }
+
+  const ailments = ailmentsData && ailmentsData.length > 0 ? ailmentsData : dummyAilments;
 
   const topRemedies = [
     { 
@@ -83,7 +97,8 @@ export default function Home() {
                 </div>
               </div>
 
-              <h2 className="text-4xl font-serif mb-3">Your Path to Healing</h2>
+              <h2 className="text-huge font-serif mb-3">Your Path to Healing</h2>
+              <h1 className="text-huge">Huge heading</h1>
               <p className="text-lg mb-8 max-w-2xl mx-auto">
                 Find trusted homeopathic solutions for your health concerns,<br />
                 backed by community reviews and expert guidance.
@@ -117,14 +132,15 @@ export default function Home() {
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {ailments.slice(0, 17).map((ailment, index) => (
-              <div
-                key={index}
-                className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg transition-shadow cursor-pointer"
-              >
-                <div className="text-3xl mb-2">{ailment.icon}</div>
-                <h4 className="font-medium text-sm mb-1">{ailment.name}</h4>
-                <p className="text-xs text-gray-500">🔬 {ailment.remedies} remedies</p>
-              </div>
+              <Link href={`/ailments/${ailment.id}`} key={ailment.id}>
+                <div
+                  className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg transition-shadow cursor-pointer h-full"
+                >
+                  <div className="text-3xl mb-2">{ailment.icon}</div>
+                  <h4 className="font-medium text-sm mb-1">{ailment.name}</h4>
+                  <p className="text-xs text-gray-500">🔬 {ailment.remedies_count} remedies</p>
+                </div>
+              </Link>
             ))}
             
             <div className="bg-[#5A6A5A] text-white rounded-xl p-4 flex items-center justify-center hover:bg-[#4A5A4A] transition-colors cursor-pointer">
