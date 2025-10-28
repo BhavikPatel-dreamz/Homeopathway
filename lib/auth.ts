@@ -19,14 +19,15 @@ export async function signUpWithEmail({ email, password, firstName, lastName }: 
   if (error) return { error };
 
   // 2) If the signup succeeded and user is available, create a profile row.
-  // Assumes you have a `profiles` table with columns: id (uuid same as auth user id), first_name, last_name, role
+  // Assumes you have a `profiles` table with columns: id (uuid same as auth user id), email, first_name, last_name, role
   try {
     const user = data.user;
     if (user) {
       const { error: profileError } = await supabase
         .from('profiles')
         .insert({ 
-          id: user.id, 
+          id: user.id,
+          email: user.email,
           first_name: firstName ?? null, 
           last_name: lastName ?? null, 
           role: 'user' 
@@ -75,14 +76,51 @@ export async function getCurrentUser() {
 
 export async function getUserProfile(userId?: string) {
   // If no userId provided, try to get the currently logged-in user
+  let userEmail: string | undefined;
   if (!userId) {
     const { data: udata } = await supabase.auth.getUser();
     userId = udata.user?.id ?? undefined;
+    userEmail = udata.user?.email;
   }
 
   if (!userId) return { profile: null, error: null };
 
+  // Try to get profile
   const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
+  
+  // If profile doesn't exist, try to create it
+  if (!data && !error) {
+    console.log('🔧 Profile not found, attempting to create...');
+    
+    // Get user email if we don't have it
+    if (!userEmail) {
+      const { data: udata } = await supabase.auth.getUser();
+      userEmail = udata.user?.email;
+    }
+    
+    if (userEmail) {
+      const { data: newProfile, error: createError } = await supabase
+        .from('profiles')
+        .insert({
+          id: userId,
+          email: userEmail,
+          first_name: 'User',
+          last_name: 'Name',
+          role: 'user'
+        })
+        .select()
+        .single();
+      
+      if (createError) {
+        console.error('❌ Failed to create profile:', createError);
+        return { profile: null, error: createError };
+      }
+      
+      console.log('✅ Profile created successfully');
+      return { profile: newProfile, error: null };
+    }
+  }
+  
   return { profile: data, error };
 }
 

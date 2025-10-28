@@ -16,29 +16,62 @@ export default function LoginForm() {
     e.preventDefault();
     setMessage(null);
     setLoading(true);
-    const { data, error } = await signInWithEmail({ email, password });
     
-    if (error) {
-      setLoading(false);
-      setMessage(error.message || 'Failed to sign in');
-      return;
-    }
-
-    // Get user profile to check role
-    if (data?.user) {
-      const { profile } = await getUserProfile(data.user.id);
-      setLoading(false);
+    try {
+      console.log('🔐 Attempting login...');
+      const { data, error } = await signInWithEmail({ email, password });
       
-      if (profile?.role === 'admin') {
-        // Redirect admin to dashboard
-        router.push('/admin/dashboard');
-      } else {
-        // Redirect regular user to home page
-        router.push('/');
+      if (error) {
+        console.error('❌ Login error:', error);
+        setLoading(false);
+        setMessage(error.message || 'Failed to sign in');
+        return;
       }
-    } else {
+
+      console.log('✅ Login successful, user:', data?.user?.email);
+      console.log('📝 User ID:', data?.user?.id);
+
+      // Get user profile to check role
+      if (data?.user) {
+        console.log('🔍 Fetching user profile...');
+        const { profile, error: profileError } = await getUserProfile(data.user.id);
+        
+        console.log('📋 Profile data:', profile);
+        console.log('👤 User role:', profile?.role);
+        
+        if (profileError) {
+          console.error('❌ Profile fetch error:', profileError);
+          setLoading(false);
+          setMessage(`Profile error: ${profileError.message}`);
+          return;
+        }
+        
+        if (!profile) {
+          console.error('⚠️ Profile still not found after auto-create attempt');
+          setLoading(false);
+          setMessage('Unable to create profile. Please check database permissions.');
+          return;
+        }
+        
+        // Success! Redirect based on role
+        if (profile?.role === 'admin') {
+          // Redirect admin to dashboard
+          console.log('👑 Redirecting admin to dashboard');
+          window.location.href = '/admin/dashboard';
+        } else {
+          // Redirect regular user to home page
+          console.log('👤 Redirecting user to home');
+          window.location.href = '/';
+        }
+      } else {
+        console.warn('⚠️ No user data returned');
+        setLoading(false);
+        setMessage('Signed in successfully');
+      }
+    } catch (err) {
       setLoading(false);
-      setMessage('Signed in successfully');
+      setMessage('An error occurred during sign in');
+      console.error('💥 Login error:', err);
     }
   }
 

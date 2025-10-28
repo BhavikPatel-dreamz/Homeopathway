@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Header from "@/components/Header";
 
 export default function Home() {
   const ailments = [
@@ -57,16 +58,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#2C3E3E]">
       {/* Header */}
-      <header className="px-6 py-4 text-white">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-semibold">Home</h1>
-          <Link href="/login">
-            <button className="px-6 py-2 bg-white/10 backdrop-blur-sm rounded-full hover:bg-white/20 transition-colors">
-              Login
-            </button>
-          </Link>
-        </div>
-      </header>
+      <Header />
 
       {/* Hero Section */}
       <section className="relative px-6 py-16">
