@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { supabase } from '@/lib/supabaseClient';
+import { supabase } from '../lib/supabaseClient';
 
 interface Ailment {
   id: string;
@@ -13,6 +12,14 @@ interface Ailment {
 
 export default function AdminAilmentsManager() {
   const [ailments, setAilments] = useState<Ailment[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingAilment, setEditingAilment] = useState<Ailment | null>(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    icon: '',
+    description: '',
+    remedies_count: 0,
+  });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
@@ -22,18 +29,79 @@ export default function AdminAilmentsManager() {
 
   const fetchAilments = async () => {
     setLoading(true);
+    const { data, error } = await supabase.from('ailments').select('*').order('name', { ascending: true });
+    if (error) {
+      setMessage({ type: 'error', text: 'Failed to fetch ailments.' });
+    } else if (data) {
+      setAilments(data);
+    }
+    setLoading(false);
+  };
+
+  const openModal = (ailment?: Ailment) => {
+    if (ailment) {
+      setEditingAilment(ailment);
+      setFormData({
+        name: ailment.name,
+        icon: ailment.icon,
+        description: ailment.description,
+        remedies_count: ailment.remedies_count,
+      });
+    } else {
+      setEditingAilment(null);
+      setFormData({
+        name: '',
+        icon: '',
+        description: '',
+        remedies_count: 0,
+      });
+    }
+    setIsModalOpen(true);
+    setMessage(null);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingAilment(null);
+    setFormData({
+      name: '',
+      icon: '',
+      description: '',
+      remedies_count: 0,
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage(null);
+
     try {
-      const { data, error } = await supabase
-        .from('ailments')
-        .select('*')
-        .order('created_at', { ascending: false });
+      if (editingAilment) {
+        // Update existing ailment
+        const { error } = await supabase
+          .from('ailments')
+          .update(formData)
+          .eq('id', editingAilment.id);
+        if (error) throw error;
+        setMessage({ type: 'success', text: 'Ailment updated successfully!' });
+      } else {
+        // Create new ailment
+        const { error } = await supabase
+          .from('ailments')
+          .insert([formData]);
+        if (error) throw error;
+        setMessage({ type: 'success', text: 'Ailment created successfully!' });
+      }
 
-      if (error) throw error;
+      // Refetch data and close modal
+      await fetchAilments();
+      setTimeout(() => {
+        closeModal();
+      }, 1500);
 
-      setAilments(data || []);
-    } catch (error: any) {
-      console.error('Error fetching ailments:', error);
-      setMessage({ type: 'error', text: 'Failed to load ailments' });
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to save ailment. Please try again.' });
     } finally {
       setLoading(false);
     }
@@ -48,14 +116,11 @@ export default function AdminAilmentsManager() {
         .from('ailments')
         .delete()
         .eq('id', id);
-
       if (error) throw error;
-
-      setAilments(ailments.filter(a => a.id !== id));
+      await fetchAilments();
       setMessage({ type: 'success', text: 'Ailment deleted successfully!' });
       setTimeout(() => setMessage(null), 3000);
-    } catch (error: any) {
-      console.error('Error deleting ailment:', error);
+    } catch (error) {
       setMessage({ type: 'error', text: 'Failed to delete ailment.' });
     } finally {
       setLoading(false);
@@ -70,13 +135,13 @@ export default function AdminAilmentsManager() {
           <h2 className="text-3xl font-serif text-gray-900">Manage Ailments</h2>
           <p className="text-gray-600 mt-1">Add, edit, or remove ailments from your database</p>
         </div>
-        <Link
-          href="/admin/dashboard/ailments/add"
+        <button
+          onClick={() => openModal()}
           className="px-6 py-3 bg-[#6B7B5E] text-white rounded-lg font-medium hover:bg-[#5A6A4D] transition-colors flex items-center gap-2"
         >
           <span className="text-xl">+</span>
           Add New Ailment
-        </Link>
+        </button>
       </div>
 
       {/* Success/Error Message */}
@@ -124,12 +189,12 @@ export default function AdminAilmentsManager() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex justify-end gap-2">
-                      <Link
-                        href={`/admin/dashboard/ailments/edit/${ailment.id}`}
+                      <button
+                        onClick={() => openModal(ailment)}
                         className="px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                       >
                         Edit
-                      </Link>
+                      </button>
                       <button
                         onClick={() => handleDelete(ailment.id)}
                         disabled={loading}
@@ -145,6 +210,102 @@ export default function AdminAilmentsManager() {
           </tbody>
         </table>
       </div>
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <h3 className="text-2xl font-serif">
+                {editingAilment ? 'Edit Ailment' : 'Add New Ailment'}
+              </h3>
+            </div>
+
+            <form onSubmit={handleSubmit} className="p-6 space-y-5">
+              {/* Name Field */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Ailment Name *
+                </label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="e.g., Headache"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent"
+                  required
+                />
+              </div>
+
+              {/* Icon Field */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Icon (Emoji) *
+                </label>
+                <input
+                  type="text"
+                  value={formData.icon}
+                  onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                  placeholder="e.g., 😣"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent"
+                  required
+                  maxLength={4}
+                />
+                <p className="text-xs text-gray-500 mt-1">Use a single emoji to represent this ailment</p>
+              </div>
+
+              {/* Description Field */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description *
+                </label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="e.g., Headaches are one of the most common ailments affecting people worldwide. In homeopathy, we understand that headaches can have various underlying causes..."
+                  rows={4}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent resize-none"
+                  required
+                />
+              </div>
+
+              {/* Remedies Count Field */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Number of Remedies
+                </label>
+                <input
+                  type="number"
+                  value={formData.remedies_count}
+                  onChange={(e) => setFormData({ ...formData, remedies_count: parseInt(e.target.value) || 0 })}
+                  placeholder="e.g., 112"
+                  min="0"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent"
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                  disabled={loading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 px-6 py-3 bg-[#6B7B5E] text-white rounded-lg font-medium hover:bg-[#5A6A4D] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Saving...' : editingAilment ? 'Update Ailment' : 'Create Ailment'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
