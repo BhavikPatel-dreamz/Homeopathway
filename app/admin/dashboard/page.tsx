@@ -1,4 +1,5 @@
 import { getUserProfile, isAdmin } from '../../../lib/auth';
+import { createClient } from '../../../lib/supabase/server';
 import DashboardLayout from '../../../components/admin/DashboardLayout';
 import Link from 'next/link';
 
@@ -8,8 +9,9 @@ export const metadata = {
 
 export default async function DashboardPage() {
   // Server-side check: ensure current user is admin
-  const { data: udata } = await (await import('../../../lib/supabaseClient')).supabase.auth.getUser();
-  const userId = udata.user?.id;
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const userId = user?.id;
 
   if (!userId) {
     return (

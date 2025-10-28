@@ -1,4 +1,5 @@
 import { getUserProfile } from '../../lib/auth';
+import { createClient } from '../../lib/supabase/server';
 import AccountSettings from '../../components/AccountSettings';
 import Link from 'next/link';
 
@@ -7,8 +8,9 @@ export const metadata = {
 };
 
 export default async function ProfilePage() {
-  const { data: udata } = await (await import('../../lib/supabaseClient')).supabase.auth.getUser();
-  const userId = udata.user?.id;
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const userId = user?.id;
 
   if (!userId) {
     return (
@@ -35,7 +37,7 @@ export default async function ProfilePage() {
     <AccountSettings 
       user={{
         id: userId,
-        email: udata.user?.email || '',
+        email: user?.email || '',
         first_name: profile?.first_name || '',
         last_name: profile?.last_name || '',
       }}
