@@ -6,7 +6,16 @@ import { supabase } from './supabaseClient';
 
 export async function signUpWithEmail({ email, password, firstName, lastName }: { email: string; password: string; firstName?: string; lastName?: string }) {
   // 1) Sign up the user
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  const { data, error } = await supabase.auth.signUp({ 
+    email, 
+    password,
+    options: {
+      data: {
+        first_name: firstName,
+        last_name: lastName,
+      }
+    }
+  });
   if (error) return { error };
 
   // 2) If the signup succeeded and user is available, create a profile row.
@@ -14,7 +23,18 @@ export async function signUpWithEmail({ email, password, firstName, lastName }: 
   try {
     const user = data.user;
     if (user) {
-      await supabase.from('profiles').insert({ id: user.id, first_name: firstName ?? null, last_name: lastName ?? null, role: 'user' });
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert({ 
+          id: user.id, 
+          first_name: firstName ?? null, 
+          last_name: lastName ?? null, 
+          role: 'user' 
+        });
+      
+      if (profileError) {
+        console.warn('Profile insert failed:', profileError);
+      }
     }
   } catch (err) {
     // Non-fatal here; profile creation may be blocked by RLS depending on your setup.
@@ -26,7 +46,14 @@ export async function signUpWithEmail({ email, password, firstName, lastName }: 
 }
 
 export async function signInWithEmail({ email, password }: { email: string; password: string }) {
-  return supabase.auth.signInWithPassword({ email, password });
+  const result = await supabase.auth.signInWithPassword({ email, password });
+  
+  // Ensure session is persisted
+  if (result.data.session) {
+    await supabase.auth.setSession(result.data.session);
+  }
+  
+  return result;
 }
 
 export async function signInWithGoogle() {

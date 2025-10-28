@@ -1,33 +1,99 @@
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export async function middleware(req: NextRequest) {
-  // Get auth token from cookies
-  const token = req.cookies.get('sb-access-token')?.value;
-  const pathname = req.nextUrl.pathname;
+  let response = NextResponse.next({
+    request: {
+      headers: req.headers,
+    },
+  });
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return req.cookies.get(name)?.value;
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          req.cookies.set({
+            name,
+            value,
+            ...options,
+          });
+          response = NextResponse.next({
+            request: {
+              headers: req.headers,
+            },
+          });
+          response.cookies.set({
+            name,
+            value,
+            ...options,
+          });
+        },
+        remove(name: string, options: CookieOptions) {
+          req.cookies.set({
+            name,
+            value: '',
+            ...options,
+          });
+          response = NextResponse.next({
+            request: {
+              headers: req.headers,
+            },
+          });
+          response.cookies.set({
+            name,
+            value: '',
+            ...options,
+          });
+        },
+      },
+    }
+  );
+
+  // Refresh session if expired - required for Server Components
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   // Check if the user is accessing admin routes
-  if (pathname.startsWith('/admin')) {
-    if (!token) {
+  if (req.nextUrl.pathname.startsWith('/admin')) {
+    if (!user) {
       // Not logged in, redirect to login
-      return NextResponse.redirect(new URL('/login', req.url));
+      const redirectUrl = new URL('/login', req.url);
+      return NextResponse.redirect(redirectUrl);
     }
 
-    // Note: For proper role checking, we'd need to verify the JWT token
-    // For now, the client-side will handle the role check
-    // You can enhance this by decoding the JWT and checking the role claim
+    // Check if user has admin role
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (profile?.role !== 'admin') {
+      // Not an admin, redirect to home
+      const redirectUrl = new URL('/', req.url);
+      return NextResponse.redirect(redirectUrl);
+    }
   }
 
-  // Check if accessing login/register while potentially logged in
-  if (token && (pathname === '/login' || pathname === '/register')) {
-    // User is logged in, let the page handle the redirect based on role
-    // Or you can redirect to home by default
-    return NextResponse.redirect(new URL('/', req.url));
-  }
-
-  return NextResponse.next();
+  return response;
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/login', '/register'],
+  matcher: [
+    /*
+     * Match all request paths except:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public folder
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 };
