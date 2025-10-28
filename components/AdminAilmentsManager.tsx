@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabaseClient';
 
 interface Ailment {
   id: string;
@@ -20,16 +21,22 @@ export default function AdminAilmentsManager() {
   }, []);
 
   const fetchAilments = async () => {
-    // TODO: Replace with actual API call to Supabase
-    // For now, using mock data
-    const mockAilments: Ailment[] = [
-      { id: '1', name: 'Headache', icon: '😣', description: 'Headaches are one of the most common ailments affecting people worldwide.', remedies_count: 112 },
-      { id: '2', name: 'Anxiety', icon: '😰', description: 'Mental health condition characterized by excessive worry and fear.', remedies_count: 38 },
-      { id: '3', name: 'Insomnia', icon: '😴', description: 'Sleep disorder making it hard to fall asleep or stay asleep.', remedies_count: 42 },
-      { id: '4', name: 'Cold & Flu', icon: '🤧', description: 'Common viral infections affecting the respiratory system.', remedies_count: 52 },
-      { id: '5', name: 'Allergies', icon: '🤧', description: 'Immune system reactions to foreign substances.', remedies_count: 47 },
-    ];
-    setAilments(mockAilments);
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('ailments')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      setAilments(data || []);
+    } catch (error: any) {
+      console.error('Error fetching ailments:', error);
+      setMessage({ type: 'error', text: 'Failed to load ailments' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -37,11 +44,18 @@ export default function AdminAilmentsManager() {
 
     setLoading(true);
     try {
-      // TODO: Replace with actual API call to Supabase
+      const { error } = await supabase
+        .from('ailments')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
       setAilments(ailments.filter(a => a.id !== id));
       setMessage({ type: 'success', text: 'Ailment deleted successfully!' });
       setTimeout(() => setMessage(null), 3000);
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error deleting ailment:', error);
       setMessage({ type: 'error', text: 'Failed to delete ailment.' });
     } finally {
       setLoading(false);

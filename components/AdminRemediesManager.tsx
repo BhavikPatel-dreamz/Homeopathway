@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabaseClient';
 
 interface Remedy {
   id: string;
@@ -20,16 +21,22 @@ export default function AdminRemediesManager() {
   }, []);
 
   const fetchRemedies = async () => {
-    // TODO: Replace with actual API call to Supabase
-    // For now, using mock data
-    const mockRemedies: Remedy[] = [
-      { id: '1', name: 'Arnica Montana', scientific_name: 'Arnica montana', average_rating: 4.5, review_count: 245 },
-      { id: '2', name: 'Belladonna', scientific_name: 'Atropa belladonna', average_rating: 4.2, review_count: 189 },
-      { id: '3', name: 'Chamomilla', scientific_name: 'Matricaria chamomilla', average_rating: 4.7, review_count: 312 },
-      { id: '4', name: 'Nux Vomica', scientific_name: 'Strychnos nux-vomica', average_rating: 4.3, review_count: 198 },
-      { id: '5', name: 'Pulsatilla', scientific_name: 'Pulsatilla pratensis', average_rating: 4.6, review_count: 267 },
-    ];
-    setRemedies(mockRemedies);
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('remedies')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      setRemedies(data || []);
+    } catch (error: any) {
+      console.error('Error fetching remedies:', error);
+      setMessage({ type: 'error', text: 'Failed to load remedies' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -37,11 +44,18 @@ export default function AdminRemediesManager() {
 
     setLoading(true);
     try {
-      // TODO: Replace with actual API call to Supabase
+      const { error } = await supabase
+        .from('remedies')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
       setRemedies(remedies.filter(r => r.id !== id));
       setMessage({ type: 'success', text: 'Remedy deleted successfully!' });
       setTimeout(() => setMessage(null), 3000);
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error deleting remedy:', error);
       setMessage({ type: 'error', text: 'Failed to delete remedy.' });
     } finally {
       setLoading(false);
@@ -119,12 +133,12 @@ export default function AdminRemediesManager() {
                     <span className="text-sm text-gray-600">{remedy.review_count} reviews</span>
                   </td>
                   <td className="px-6 py-4 text-right space-x-2">
-                    <button
-                      onClick={() => alert('Edit functionality coming soon')}
+                    <Link
+                      href={`/admin/dashboard/remedies/edit/${remedy.id}`}
                       className="text-blue-600 hover:text-blue-800 font-medium text-sm"
                     >
                       Edit
-                    </button>
+                    </Link>
                     <button
                       onClick={() => handleDelete(remedy.id)}
                       disabled={loading}
