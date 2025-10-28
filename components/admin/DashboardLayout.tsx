@@ -1,7 +1,8 @@
 "use client";
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { supabase } from '@/lib/supabaseClient';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -10,7 +11,17 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children, userName }: DashboardLayoutProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      router.push('/login');
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
 
   const navigation = [
     { name: 'Overview', href: '/admin/dashboard', icon: '📊' },
@@ -18,8 +29,8 @@ export default function DashboardLayout({ children, userName }: DashboardLayoutP
     { name: 'Remedies', href: '/admin/dashboard/remedies', icon: '🧪' },
     { name: 'Users', href: '/admin/dashboard/users', icon: '👥' },
     { name: 'Reviews', href: '/admin/dashboard/reviews', icon: '⭐' },
-    { name: 'Analytics', href: '/admin/dashboard/analytics', icon: '📈' },
-    { name: 'Settings', href: '/admin/dashboard/settings', icon: '⚙️' },
+    // { name: 'Analytics', href: '/admin/dashboard/analytics', icon: '📈' },
+    // { name: 'Settings', href: '/admin/dashboard/settings', icon: '⚙️' },
   ];
 
   return (
@@ -89,6 +100,17 @@ export default function DashboardLayout({ children, userName }: DashboardLayoutP
               </div>
             )}
           </div>
+          
+          {/* Logout Button */}
+          {isSidebarOpen && (
+            <button
+              onClick={handleLogout}
+              className="mt-3 w-full flex items-center justify-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors text-sm font-medium"
+            >
+              <span>🚪</span>
+              <span>Logout</span>
+            </button>
+          )}
         </div>
 
         {/* Toggle Button */}

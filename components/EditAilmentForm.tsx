@@ -101,7 +101,7 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
       <div>
         <Link
           href="/admin/dashboard/ailments"
-          className="text-blue-600 hover:text-blue-800 flex items-center mb-4"
+          className="text-teal-600 hover:text-teal-800 flex items-center mb-4"
         >
           ← Back to Ailments
         </Link>
@@ -175,7 +175,7 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors"
+                className="flex-1 bg-teal-600 text-white py-3 rounded-lg hover:bg-teal-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors"
               >
                 {loading ? 'Updating...' : 'Update Ailment'}
               </button>

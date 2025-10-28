@@ -72,7 +72,7 @@ export default function AdminRemediesManager() {
         </div>
         <Link
           href="/admin/dashboard/remedies/add"
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+          className="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors font-medium"
         >
           + Add Remedy
         </Link>
@@ -135,7 +135,7 @@ export default function AdminRemediesManager() {
                   <td className="px-6 py-4 text-right space-x-2">
                     <Link
                       href={`/admin/dashboard/remedies/edit/${remedy.id}`}
-                      className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                      className="text-teal-600 hover:text-teal-800 font-medium text-sm"
                     >
                       Edit
                     </Link>
@@ -160,7 +160,7 @@ export default function AdminRemediesManager() {
             <p className="text-gray-600 mb-4">Get started by adding your first remedy</p>
             <Link
               href="/admin/dashboard/remedies/add"
-              className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              className="inline-block px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors font-medium"
             >
               + Add Remedy
             </Link>

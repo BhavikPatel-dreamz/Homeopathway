@@ -91,7 +91,7 @@ export default function AddUserForm() {
       <div>
         <Link
           href="/admin/dashboard/users"
-          className="text-blue-600 hover:text-blue-800 flex items-center mb-4"
+          className="text-teal-600 hover:text-teal-800 flex items-center mb-4"
         >
           ← Back to Users
         </Link>
@@ -234,7 +234,7 @@ export default function AddUserForm() {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors"
+              className="flex-1 bg-teal-600 text-white py-3 px-6 rounded-lg hover:bg-teal-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors"
             >
               {loading ? 'Creating...' : 'Create User'}
             </button>

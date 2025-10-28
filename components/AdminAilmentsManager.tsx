@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { supabase } from '../lib/supabaseClient';
 
 interface Ailment {
@@ -135,13 +136,13 @@ export default function AdminAilmentsManager() {
           <h2 className="text-3xl font-serif text-gray-900">Manage Ailments</h2>
           <p className="text-gray-600 mt-1">Add, edit, or remove ailments from your database</p>
         </div>
-        <button
-          onClick={() => openModal()}
-          className="px-6 py-3 bg-[#6B7B5E] text-white rounded-lg font-medium hover:bg-[#5A6A4D] transition-colors flex items-center gap-2"
+        <Link
+          href="/admin/dashboard/ailments/add"
+          className="px-6 py-3 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 transition-colors flex items-center gap-2"
         >
           <span className="text-xl">+</span>
-          Add New Ailment
-        </button>
+          Add Ailment
+        </Link>
       </div>
 
       {/* Success/Error Message */}
@@ -189,12 +190,12 @@ export default function AdminAilmentsManager() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex justify-end gap-2">
-                      <button
-                        onClick={() => openModal(ailment)}
-                        className="px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      <Link
+                        href={`/admin/dashboard/ailments/edit/${ailment.id}`}
+                        className="px-3 py-1.5 text-sm text-teal-600 hover:bg-teal-50 rounded-lg transition-colors"
                       >
                         Edit
-                      </button>
+                      </Link>
                       <button
                         onClick={() => handleDelete(ailment.id)}
                         disabled={loading}
