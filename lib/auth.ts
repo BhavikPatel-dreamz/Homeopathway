@@ -30,7 +30,16 @@ export async function signInWithEmail({ email, password }: { email: string; pass
 }
 
 export async function signInWithGoogle() {
-  return supabase.auth.signInWithOAuth({ provider: 'google' });
+  const redirectUrl = typeof window !== 'undefined' 
+    ? `${window.location.origin}/auth/callback`
+    : undefined;
+  
+  return supabase.auth.signInWithOAuth({ 
+    provider: 'google',
+    options: {
+      redirectTo: redirectUrl
+    }
+  });
 }
 
 export async function signOut() {

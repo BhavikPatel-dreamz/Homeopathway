@@ -1,9 +1,11 @@
 "use client";
 import { useState } from 'react';
-import { signInWithEmail, signInWithGoogle } from '../lib/auth';
+import { signInWithEmail, signInWithGoogle, getUserProfile } from '../lib/auth';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function LoginForm() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -15,18 +17,44 @@ export default function LoginForm() {
     setMessage(null);
     setLoading(true);
     const { data, error } = await signInWithEmail({ email, password });
-    setLoading(false);
+    
     if (error) {
+      setLoading(false);
       setMessage(error.message || 'Failed to sign in');
       return;
     }
-    setMessage('Signed in successfully');
+
+    // Get user profile to check role
+    if (data?.user) {
+      const { profile } = await getUserProfile(data.user.id);
+      setLoading(false);
+      
+      if (profile?.role === 'admin') {
+        // Redirect admin to dashboard
+        router.push('/admin/dashboard');
+      } else {
+        // Redirect regular user to home page
+        router.push('/');
+      }
+    } else {
+      setLoading(false);
+      setMessage('Signed in successfully');
+    }
   }
 
   async function handleGoogle() {
     setMessage(null);
     setLoading(true);
-    await signInWithGoogle();
+    const { data, error } = await signInWithGoogle();
+    
+    if (error) {
+      setLoading(false);
+      setMessage(error.message || 'Failed to sign in with Google');
+      return;
+    }
+
+    // Note: Google OAuth redirect is handled by Supabase
+    // You'll need to set up a callback page to handle role-based redirect
     setLoading(false);
   }
 
