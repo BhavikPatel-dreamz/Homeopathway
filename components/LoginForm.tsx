@@ -33,7 +33,7 @@ export default function LoginForm() {
 
       // Get user profile to check role
       if (data?.user) {
-        console.log('🔍 Fetching user profile...');
+        console.log('🔍 Fetching user profile...',);
         const { profile, error: profileError } = await getUserProfile(data.user.id);
         
         console.log('📋 Profile data:', profile);
@@ -57,11 +57,11 @@ export default function LoginForm() {
         if (profile?.role === 'admin') {
           // Redirect admin to dashboard
           console.log('👑 Redirecting admin to dashboard');
-          window.location.href = '/admin/dashboard';
+          router.push('/admin/dashboard');
         } else {
           // Redirect regular user to home page
           console.log('👤 Redirecting user to home');
-          window.location.href = '/';
+          router.push('/');
         }
       } else {
         console.warn('⚠️ No user data returned');
