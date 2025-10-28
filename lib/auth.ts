@@ -46,14 +46,8 @@ export async function signUpWithEmail({ email, password, firstName, lastName }: 
 }
 
 export async function signInWithEmail({ email, password }: { email: string; password: string }) {
-  const result = await supabase.auth.signInWithPassword({ email, password });
-  
-  // Ensure session is persisted
-  if (result.data.session) {
-    await supabase.auth.setSession(result.data.session);
-  }
-  
-  return result;
+  // @supabase/ssr automatically handles session persistence in cookies
+  return supabase.auth.signInWithPassword({ email, password });
 }
 
 export async function signInWithGoogle() {
