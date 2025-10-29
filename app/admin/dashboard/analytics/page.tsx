@@ -19,7 +19,7 @@ export default async function AnalyticsPage() {
   const { profile } = await getUserProfile(userId);
 
   return (
-    <DashboardLayout userName={profile?.first_name || 'Admin'}>
+ 
       <div className="text-center py-16">
         <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
           <span className="text-5xl">📈</span>
@@ -27,6 +27,6 @@ export default async function AnalyticsPage() {
         <h2 className="text-2xl font-serif text-gray-900 mb-2">Analytics Dashboard</h2>
         <p className="text-gray-600">This page is ready for your content</p>
       </div>
-    </DashboardLayout>
+
   );
 }

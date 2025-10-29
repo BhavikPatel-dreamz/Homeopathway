@@ -1,7 +1,5 @@
 import { getUserProfile, isAdmin } from '../../../../lib/auth';
 import { createClient } from '../../../../lib/supabase/server';
-import DashboardLayout from '../../../../components/admin/DashboardLayout';
-import Link from 'next/link';
 
 export const metadata = {
   title: 'Settings - Admin Dashboard',
@@ -19,7 +17,7 @@ export default async function SettingsPage() {
   const { profile } = await getUserProfile(userId);
 
   return (
-    <DashboardLayout userName={profile?.first_name || 'Admin'}>
+
       <div className="text-center py-16">
         <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
           <span className="text-5xl">⚙️</span>
@@ -27,6 +25,6 @@ export default async function SettingsPage() {
         <h2 className="text-2xl font-serif text-gray-900 mb-2">Settings</h2>
         <p className="text-gray-600">This page is ready for your content</p>
       </div>
-    </DashboardLayout>
+
   );
 }

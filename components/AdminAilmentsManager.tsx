@@ -1,5 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { supabase } from '../lib/supabaseClient';
 
 interface Ailment {
   id: string;
@@ -27,16 +29,14 @@ export default function AdminAilmentsManager() {
   }, []);
 
   const fetchAilments = async () => {
-    // TODO: Replace with actual API call to Supabase
-    // For now, using mock data
-    const mockAilments: Ailment[] = [
-      { id: '1', name: 'Headache', icon: '😣', description: 'Headaches are one of the most common ailments affecting people worldwide.', remedies_count: 112 },
-      { id: '2', name: 'Anxiety', icon: '😰', description: 'Mental health condition characterized by excessive worry and fear.', remedies_count: 38 },
-      { id: '3', name: 'Insomnia', icon: '😴', description: 'Sleep disorder making it hard to fall asleep or stay asleep.', remedies_count: 42 },
-      { id: '4', name: 'Cold & Flu', icon: '🤧', description: 'Common viral infections affecting the respiratory system.', remedies_count: 52 },
-      { id: '5', name: 'Allergies', icon: '🤧', description: 'Immune system reactions to foreign substances.', remedies_count: 47 },
-    ];
-    setAilments(mockAilments);
+    setLoading(true);
+    const { data, error } = await supabase.from('ailments').select('*').order('name', { ascending: true });
+    if (error) {
+      setMessage({ type: 'error', text: 'Failed to fetch ailments.' });
+    } else if (data) {
+      setAilments(data);
+    }
+    setLoading(false);
   };
 
   const openModal = (ailment?: Ailment) => {
@@ -78,27 +78,29 @@ export default function AdminAilmentsManager() {
     setMessage(null);
 
     try {
-      // TODO: Replace with actual API call to Supabase
       if (editingAilment) {
         // Update existing ailment
-        setAilments(ailments.map(a => 
-          a.id === editingAilment.id 
-            ? { ...a, ...formData } 
-            : a
-        ));
+        const { error } = await supabase
+          .from('ailments')
+          .update(formData)
+          .eq('id', editingAilment.id);
+        if (error) throw error;
         setMessage({ type: 'success', text: 'Ailment updated successfully!' });
       } else {
         // Create new ailment
-        const newAilment: Ailment = {
-          id: Date.now().toString(),
-          ...formData,
-        };
-        setAilments([...ailments, newAilment]);
+        const { error } = await supabase
+          .from('ailments')
+          .insert([formData]);
+        if (error) throw error;
         setMessage({ type: 'success', text: 'Ailment created successfully!' });
       }
+
+      // Refetch data and close modal
+      await fetchAilments();
       setTimeout(() => {
         closeModal();
       }, 1500);
+
     } catch (error) {
       setMessage({ type: 'error', text: 'Failed to save ailment. Please try again.' });
     } finally {
@@ -111,8 +113,12 @@ export default function AdminAilmentsManager() {
 
     setLoading(true);
     try {
-      // TODO: Replace with actual API call to Supabase
-      setAilments(ailments.filter(a => a.id !== id));
+      const { error } = await supabase
+        .from('ailments')
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
+      await fetchAilments();
       setMessage({ type: 'success', text: 'Ailment deleted successfully!' });
       setTimeout(() => setMessage(null), 3000);
     } catch (error) {
@@ -130,13 +136,13 @@ export default function AdminAilmentsManager() {
           <h2 className="text-3xl font-serif text-gray-900">Manage Ailments</h2>
           <p className="text-gray-600 mt-1">Add, edit, or remove ailments from your database</p>
         </div>
-        <button
-          onClick={() => openModal()}
-          className="px-6 py-3 bg-[#6B7B5E] text-white rounded-lg font-medium hover:bg-[#5A6A4D] transition-colors flex items-center gap-2"
+        <Link
+          href="/admin/dashboard/ailments/add"
+          className="px-6 py-3 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 transition-colors flex items-center gap-2"
         >
           <span className="text-xl">+</span>
-          Add New Ailment
-        </button>
+          Add Ailment
+        </Link>
       </div>
 
       {/* Success/Error Message */}
@@ -184,12 +190,12 @@ export default function AdminAilmentsManager() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex justify-end gap-2">
-                      <button
-                        onClick={() => openModal(ailment)}
-                        className="px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      <Link
+                        href={`/admin/dashboard/ailments/edit/${ailment.id}`}
+                        className="px-3 py-1.5 text-sm text-teal-600 hover:bg-teal-50 rounded-lg transition-colors"
                       >
                         Edit
-                      </button>
+                      </Link>
                       <button
                         onClick={() => handleDelete(ailment.id)}
                         disabled={loading}
