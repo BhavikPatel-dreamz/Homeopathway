@@ -2,7 +2,6 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
-import { getUserProfile } from '@/lib/auth';
 
 // Force dynamic rendering - this page needs to run on the client
 export const dynamic = 'force-dynamic';
@@ -24,7 +23,11 @@ export default function AuthCallback() {
 
         if (session?.user) {
           // Get user profile to check role
-          const { profile } = await getUserProfile(session.user.id);
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', session.user.id)
+            .single();
           
           if (profile?.role === 'admin') {
             // Redirect admin to dashboard
