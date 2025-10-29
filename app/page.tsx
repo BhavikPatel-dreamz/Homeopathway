@@ -62,14 +62,27 @@ export default function Home() {
 
       {/* Hero Section */}
       <section className="relative px-6 py-16">
+        <div className="heroContent">
+          <div className="flex items-center">
+            <div className="logoBlock">
+
+            </div>
+            <div className="textBlock">
+              <h2 className="text-40 mb-3 text-white">Your Path to Healing</h2>
+              <p className="text-lg mb-8 max-w-2xl mx-auto text-white">
+                Find trusted homeopathic solutions for your health concerns,<br />
+                backed by community reviews and expert guidance.
+              </p>
+            </div>
+          </div>
+        </div>
         <div className="max-w-7xl mx-auto">
           <div className="relative bg-gradient-to-br from-teal-700/80 to-gray-700/60 rounded-3xl overflow-hidden">
             {/* Background Image Overlay */}
-            <div className="absolute inset-0 bg-cover bg-center opacity-40" style={{backgroundImage: "url('data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='100' height='100' fill='%23456'/%3E%3C/svg%3E')"}}></div>
             
             <div className="relative z-10 px-12 py-16 text-center text-white">
               {/* Logo */}
-              <div className="flex justify-center mb-6">
+              <div className=" justify-center mb-6">
                 <div className="w-20 h-20 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center">
                   <svg viewBox="0 0 100 100" className="w-12 h-12">
                     <path d="M50 10 L50 50 M30 30 L50 50 L70 30 M20 50 L50 50 L80 50 M30 70 L50 50 L70 70" 
@@ -83,11 +96,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <h2 className="text-4xl font-serif mb-3">Your Path to Healing</h2>
-              <p className="text-lg mb-8 max-w-2xl mx-auto">
-                Find trusted homeopathic solutions for your health concerns,<br />
-                backed by community reviews and expert guidance.
-              </p>
+              
 
               {/* Search Bar */}
               <div className="max-w-2xl mx-auto">
