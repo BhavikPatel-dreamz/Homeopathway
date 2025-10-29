@@ -50,16 +50,25 @@ export async function addReview({
  * @param {string} [params.remedyId] - The ID of the remedy to fetch reviews for.
  * @param {'newest' | 'helpful'} [params.sortBy='newest'] - The sorting order for the reviews.
  * @param {number} [params.limit=10] - The maximum number of reviews to return.
+ * @param {number[]} [params.rating] - An array of ratings to filter by (e.g., [4, 5]).
+ * @param {string[]} [params.dosageUsed] - An array of dosages to filter by (e.g., ["30C", "200C"]).
+ * @param {string[]} [params.formUsed] - An array of forms to filter by (e.g., ["Pellets", "Liquid"]).
  * @returns {Promise<{ data: any[] | null; error: Error | null }>} A list of reviews with associated user profiles, or an error.
  */
 export async function getReviews({
   remedyId,
   sortBy = 'newest',
   limit = 10,
+  rating,
+  dosageUsed,
+  formUsed,
 }: {
   remedyId?: string;
   sortBy?: 'newest' | 'helpful';
   limit?: number;
+  rating?: number[];
+  dosageUsed?: string[];
+  formUsed?: string[];
 }): Promise<{ data: any[] | null; error: Error | null; }> {
   let query = supabase
     .from('reviews')
@@ -74,6 +83,18 @@ export async function getReviews({
 
   if (remedyId) {
     query = query.eq('remedy_id', remedyId);
+  }
+
+  if (rating && rating.length > 0) {
+    query = query.in('rating', rating);
+  }
+
+  if (dosageUsed && dosageUsed.length > 0) {
+    query = query.in('dosage_used', dosageUsed);
+  }
+
+  if (formUsed && formUsed.length > 0) {
+    query = query.in('form_used', formUsed);
   }
 
   if (sortBy === 'helpful') {
