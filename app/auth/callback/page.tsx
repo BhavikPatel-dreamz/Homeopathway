@@ -4,6 +4,9 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import { getUserProfile } from '@/lib/auth';
 
+// Force dynamic rendering - this page needs to run on the client
+export const dynamic = 'force-dynamic';
+
 export default function AuthCallback() {
   const router = useRouter();
 
