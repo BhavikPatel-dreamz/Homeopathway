@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabaseClient';
+import { createClient } from '@/lib/supabase/server';
 import HomePageClient from '@/components/HomePageClient';
 
 const dummyAilments = [
@@ -22,6 +22,7 @@ const dummyAilments = [
 ];
 
 export default async function Home() {
+  const supabase = await createClient();
 
   const { data: ailmentsData, error: ailmentsError } = await supabase
     .from("ailments")
