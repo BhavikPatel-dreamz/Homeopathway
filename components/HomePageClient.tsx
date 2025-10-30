@@ -4,6 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 interface Ailment {
   id: string;
@@ -71,75 +76,184 @@ export default function HomePageClient({
     }
   };
 
+    const settings = {
+      dots: true,
+      arrows: false,
+      infinite: true,
+      speed: 1200, 
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      autoplay: true, 
+      autoplaySpeed: 3000,
+      fade: true,
+      cssEase: "ease-in-out", 
+    };
+  
+  
   return (
     <div className="min-h-screen bg-[#2C3E3E]">
       <Header />
 
-      {/* Hero Section */}
-      <section className="relative px-6 py-16">
-        <div className="max-w-7xl mx-auto">
-          <div className="relative bg-gradient-to-br from-teal-700/80 to-gray-700/60 rounded-3xl overflow-hidden">
-            <div
-              className="absolute inset-0 bg-cover bg-center opacity-40"
-              style={{
-                backgroundImage:
-                  "url('data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='100' height='100' fill='%23456'/%3E%3C/svg%3E')",
-              }}
-            ></div>
+      <div>
 
-            <div className="relative z-10 px-12 py-16 text-center text-white">
-              <div className="flex justify-center mb-6">
-                <div className="w-20 h-20 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center">
-                  <svg viewBox="0 0 100 100" className="w-12 h-12">
-                    <path
-                      d="M50 10 L50 50 M30 30 L50 50 L70 30 M20 50 L50 50 L80 50 M30 70 L50 50 L70 70"
-                      stroke="white"
-                      strokeWidth="2"
-                      fill="none"
-                    />
-                    <circle cx="50" cy="50" r="3" fill="white" />
-                    <circle cx="30" cy="30" r="2" fill="white" />
-                    <circle cx="70" cy="30" r="2" fill="white" />
-                    <circle cx="30" cy="70" r="2" fill="white" />
-                    <circle cx="70" cy="70" r="2" fill="white" />
-                  </svg>
+      <section className="relative overflow-hidden">
+        <Slider {...settings} className="relative home-slider">
+          {/*------ Slide 1 -----*/}
+          <div className="relative">
+              <div className="absolute top-0 left-0 w-full h-full">
+                  <img className="object-cover h-full w-full" src="/home-slide-1.png" alt="" />
+              </div>
+              <div className=" relative flex pt-25 pb-30 lg:pb-48  pl-[15px] pr-[15px]">
+                <div className="flex items-center flex-col lg:flex-row justify-center mb-6 max-w-[900px] mx-auto">
+                    <div className="w-35 h-35 md:w-48 md:h-48 lg:w-48 lg:h-48 mr-6 flex-shrink-0 lg:mb-0 mb-2">
+                        <img className="w-full h-full object-contain" src="/home-banner-logo.svg" alt="" />
+                    </div>
+                    <div className="text-white lg:text-left text-center">
+                      <h1 className="text-[32px] md:text-[32px] lg:text-[40px]">Your Path to Healing</h1>
+                      <h6 className="text-[24px] font-[400]">
+                        Find trusted homeopathic solutions for your health concerns, backed by community reviews and expert guidance.
+                      </h6>
+                    </div>
                 </div>
               </div>
+          </div>
 
-              <h2 className="text-huge font-serif mb-3">Your Path to Healing</h2>
-              <h1 className="text-huge">Huge heading</h1>
-              <p className="text-lg mb-8 max-w-2xl mx-auto">
-                Find trusted homeopathic solutions for your health concerns,
-                <br />
-                backed by community reviews and expert guidance.
-              </p>
+            {/*------ Slide 2 -----*/}
+            <div className="relative">
+              <div className="absolute top-0 left-0 w-full h-full">
+                  <img className="object-cover h-full w-full" src="/home-slide-2.png" alt="" />
+              </div>
+              <div className=" relative flex pt-25 pb-30 lg:pb-48  pl-[15px] pr-[15px]">
+                <div className="flex items-center flex-col lg:flex-row justify-center mb-6 max-w-[900px] mx-auto">
+                    <div className="w-35 h-35 md:w-48 md:h-48 lg:w-48 lg:h-48 mr-6 flex-shrink-0 lg:mb-0 mb-2">
+                        <img className="w-full h-full object-contain" src="/home-banner-logo.svg" alt="" />
+                    </div>
+                    <div className="text-white lg:text-left text-center">
+                      <h1 className="text-[32px] md:text-[32px] lg:text-[40px]">Your Path to Healing</h1>
+                      <h6 className="text-[24px] font-[400]">
+                        Find trusted homeopathic solutions for your health concerns, backed by community reviews and expert guidance.
+                      </h6>
+                    </div>
+                </div>
+              </div>
+          </div>
 
-              <div className="max-w-2xl mx-auto">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search for ailments like headache or anxiety, or search for remedies like arnica or belladonna"
-                    className="w-full px-6 py-4 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                  />
-                  <button
+
+          {/*------ Slide 3 -----*/}
+          <div className="relative">
+              <div className="absolute top-0 left-0 w-full h-full">
+                  <img className="object-cover h-full w-full" src="/home-slide-3.png" alt="" />
+              </div>
+              <div className=" relative flex pt-25 pb-30 lg:pb-48  pl-[15px] pr-[15px]">
+                <div className="flex items-center flex-col lg:flex-row justify-center mb-6 max-w-[900px] mx-auto">
+                    <div className="w-35 h-35 md:w-48 md:h-48 lg:w-48 lg:h-48 mr-6 flex-shrink-0 lg:mb-0 mb-2">
+                        <img className="w-full h-full object-contain" src="/home-banner-logo.svg" alt="" />
+                    </div>
+                    <div className="text-white lg:text-left text-center">
+                      <h1 className="text-[32px] md:text-[32px] lg:text-[40px]">Your Path to Healing</h1>
+                      <h6 className="text-[24px] font-[400]">
+                        Find trusted homeopathic solutions for your health concerns, backed by community reviews and expert guidance.
+                      </h6>
+                    </div>
+                </div>
+              </div>
+          </div>
+
+          {/*------ Slide 4 -----*/}
+          <div className="relative">
+              <div className="absolute top-0 left-0 w-full h-full">
+                  <img className="object-cover h-full w-full" src="/home-slide-1.png" alt="" />
+              </div>
+              <div className=" relative flex pt-25 pb-30 lg:pb-48  pl-[15px] pr-[15px]">
+                <div className="flex items-center flex-col lg:flex-row justify-center mb-6 max-w-[900px] mx-auto">
+                    <div className="w-35 h-35 md:w-48 md:h-48 lg:w-48 lg:h-48 mr-6 flex-shrink-0 lg:mb-0 mb-2">
+                        <img className="w-full h-full object-contain" src="/home-banner-logo.svg" alt="" />
+                    </div>
+                    <div className="text-white lg:text-left text-center">
+                      <h1 className="text-[32px] md:text-[32px] lg:text-[40px]">Your Path to Healing</h1>
+                      <h6 className="text-[24px] font-[400]">
+                        Find trusted homeopathic solutions for your health concerns, backed by community reviews and expert guidance.
+                      </h6>
+                    </div>
+                </div>
+              </div>
+          </div>
+
+          {/*------ Slide 5 -----*/}
+          <div className="relative">
+              <div className="absolute top-0 left-0 w-full h-full">
+                  <img className="object-cover h-full w-full" src="/home-slide-1.png" alt="" />
+              </div>
+              <div className=" relative flex pt-25 pb-30 lg:pb-48  pl-[15px] pr-[15px]">
+                <div className="flex items-center flex-col lg:flex-row justify-center mb-6 max-w-[900px] mx-auto">
+                    <div className="w-35 h-35 md:w-48 md:h-48 lg:w-48 lg:h-48 mr-6 flex-shrink-0 lg:mb-0 mb-2">
+                        <img className="w-full h-full object-contain" src="/home-banner-logo.svg" alt="" />
+                    </div>
+                    <div className="text-white lg:text-left text-center">
+                      <h1 className="text-[32px] md:text-[32px] lg:text-[40px]">Your Path to Healing</h1>
+                      <h6 className="text-[24px] font-[400]">
+                        Find trusted homeopathic solutions for your health concerns, backed by community reviews and expert guidance.
+                      </h6>
+                    </div>
+                </div>
+              </div>
+          </div>
+
+          {/*------ Slide 6 -----*/}
+          <div className="relative">
+              <div className="absolute top-0 left-0 w-full h-full">
+                  <img className="object-cover h-full w-full" src="/home-slide-1.png" alt="" />
+              </div>
+              <div className=" relative flex pt-25 pb-30 lg:pb-48  pl-[15px] pr-[15px]">
+                <div className="flex items-center flex-col lg:flex-row justify-center mb-6 max-w-[900px] mx-auto">
+                    <div className="w-35 h-35 md:w-48 md:h-48 lg:w-48 lg:h-48 mr-6 flex-shrink-0 lg:mb-0 mb-2">
+                        <img className="w-full h-full object-contain" src="/home-banner-logo.svg" alt="" />
+                    </div>
+                    <div className="text-white lg:text-left text-center">
+                      <h1 className="text-[32px] md:text-[32px] lg:text-[40px]">Your Path to Healing</h1>
+                      <h6 className="text-[24px] font-[400]">
+                        Find trusted homeopathic solutions for your health concerns, backed by community reviews and expert guidance.
+                      </h6>
+                    </div>
+                </div>
+              </div>
+          </div>
+
+
+
+     
+        </Slider>
+
+        {/*------ Searchbar -----*/}
+        <div className="absolute bottom-[60px] lg:bottom-[100px] w-full left-1/2 -translate-x-1/2  z-10 pr-[15px] pl-[15px]">
+                <div className="relative max-w-[870px] mx-auto">
+                <img src="/search.svg" 
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none"
+                />
+                <input
+                  type="text"
+                  placeholder="Search for ailments like 'headache' or 'anxiety' or search for remedies like 'arnica' or 'bella donna'"
+                  className="w-full pl-12 pr-4 py-3 lg:py-6 bg-white rounded-[8px] text-gray-800 placeholder-gray-500 focus:outline-none"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                />
+                  {/* <button
                     onClick={handleSearch}
                     disabled={loading}
                     className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2 bg-[#2C3E3E] text-white rounded-full hover:bg-[#3C4E4E] transition-colors disabled:opacity-50"
                   >
                     {loading ? '...' : 'Search'}
-                  </button>
+                  </button> */}
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
       </section>
+     
+    </div>
+
 
       {/* Popular Ailments Section */}
-      <section className="px-6 py-12 bg-white">
+      <section className="px-6 py-12 bg-[#f5f3ed]">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-3 mb-8">
             <span className="text-3xl">💊</span>
@@ -215,6 +329,10 @@ export default function HomePageClient({
           </div>
         </div>
       </section>
-    </div>
+      <Footer />
+      </div>
+
+
   );
 }
+

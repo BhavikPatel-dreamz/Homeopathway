@@ -43,7 +43,7 @@ export default function Header() {
 
   if (loading) {
     return (
-      <header className="px-6 py-4 text-white">
+      <header className="fixed top-0 left-0 w-full px-6 py-4 text-white z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <h1 className="text-2xl font-semibold">Home</h1>
           <div className="px-6 py-2 bg-white/10 backdrop-blur-sm rounded-full animate-pulse">
@@ -55,14 +55,14 @@ export default function Header() {
   }
 
   return (
-    <header className="px-6 py-[17px] text-white">
+    <header className="fixed top-0 left-0 w-full px-6 py-[17px] text-white z-50">
       <div className="max-w-7xl mx-auto flex justify-end items-center">
         
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-8">
           {user ? (
             <>
               {/* User Info */}
-              <div className="hidden sm:flex items-center gap-3">
+              <div className="hidden sm:flex items-center gap-4">
                 <div className="text-right">
                   <p className="text-sm font-medium">
                     {profile?.first_name} {profile?.last_name}
@@ -98,8 +98,13 @@ export default function Header() {
             </>
           ) : (
             <>
+             <Link href="">
+                <button className="font-[600] text-[#D3D6D1] text-[16px] flex items-center hover:text-[#20231E]">
+                  <img className="mr-2" src="/save-icon.svg" />Save
+                </button>
+              </Link>
               <Link href="/login">
-                <button className="text-montserrat px-6 py-2 hover:bg-teal-700 border-1 border-[#D3D6D1] rounded-full transition-colors font-semibold text-[16px] leading-[24px] text-[#D3D6D1]">
+                <button className="text-montserrat px-4 py-[5px] hover:bg-transparent hover:text-[#20231E] border-1 border-[#D3D6D1] hover:!border-[#20231E] rounded-full transition-colors font-semibold text-[16px] leading-[24px] text-[#D3D6D1] cursor-pointer transition-all duration-500">
                   Login
                 </button>
               </Link>
