@@ -27,7 +27,7 @@ export default async function RegisterPage() {
   }
 
   return (
-    <main className="p-8">
+    <main >
       <RegisterForm />
     </main>
   );

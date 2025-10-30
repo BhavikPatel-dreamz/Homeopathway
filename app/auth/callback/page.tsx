@@ -44,7 +44,7 @@ export default function AuthCallback() {
   }, [router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F5F1E8]">
+    <div className="min-h-screen flex items-center justify-center bg-[#F5F3ED]">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6B7B5E] mx-auto mb-4"></div>
         <p className="text-gray-600">Signing you in...</p>

@@ -27,7 +27,7 @@ export default async function LoginPage() {
   }
 
   return (
-    <main className="p-8">
+    <main >
       <LoginForm />
     </main>
   );
