@@ -1,4 +1,4 @@
-import { getUserProfile } from '../../lib/auth';
+import { getUserProfile } from '../../lib/auth-server';
 import { createClient } from '../../lib/supabase/server';
 import AccountSettings from '../../components/AccountSettings';
 import Link from 'next/link';

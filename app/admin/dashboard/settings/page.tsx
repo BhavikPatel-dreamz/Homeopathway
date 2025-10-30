@@ -1,4 +1,4 @@
-import { getUserProfile, isAdmin } from '../../../../lib/auth';
+import { getUserProfile, isAdmin } from '../../../../lib/auth-server';
 import { createClient } from '../../../../lib/supabase/server';
 
 export const metadata = {

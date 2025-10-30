@@ -1,4 +1,4 @@
-import { getUserProfile, isAdmin } from '../../../../lib/auth';
+import { getUserProfile, isAdmin } from '../../../../lib/auth-server';
 import { createClient } from '../../../../lib/supabase/server';
 import DashboardLayout from '../../../../components/admin/DashboardLayout';
 import Link from 'next/link';
