@@ -437,10 +437,12 @@ export default function HomePageClient({
               </Link>
             ))}
             {!searchQuery.trim() && (
-              <div className="bg-[#5A6A5A] text-white rounded-xl p-4 flex items-center justify-center hover:bg-[#4A5A4A] transition-colors cursor-pointer">
-                <span className="font-medium">View all Ailments</span>
-              </div>
-            )}
+          <Link href="/ailments">
+               <div className="bg-[#5A6A5A] text-white rounded-xl p-4 flex items-center justify-center hover:bg-[#4A5A4A] transition-colors cursor-pointer h-full">
+            <span className="font-medium">View all Ailments</span>
+         </div>
+         </Link>
+)}
           </div>
         </div>
       </section>
@@ -484,9 +486,9 @@ export default function HomePageClient({
               </div>
             ))}
             {!searchQuery.trim() && (
-              <div className="bg-[#5A6A5A] text-white rounded-xl p-6 flex items-center justify-center hover:bg-[#4A5A4A] transition-colors cursor-pointer">
-                <span className="font-medium text-lg">View all Remedies</span>
-              </div>
+              <Link href="/remedies" className="bg-[#5A6A5A] text-white rounded-xl p-6 flex items-center justify-center hover:bg-[#4A5A4A] transition-colors cursor-pointer">
+                  <span className="font-medium text-lg">View all Remedies</span>
+              </Link>
             )}
           </div>
         </div>

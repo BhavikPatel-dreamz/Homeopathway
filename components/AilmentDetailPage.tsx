@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Footer from "@/components/Footer";
+import Header from "./Header";
 
 interface Remedy {
   id: number;
@@ -49,65 +50,7 @@ export default function AilmentDetailPage({ ailment, remedies }: AilmentDetailPa
   return (
     <div className="min-h-screen bg-[#F5F1E8]">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <svg viewBox="0 0 40 60" className="w-10 h-14">
-              <g transform="translate(20, 10)">
-                {/* Leaves */}
-                <ellipse cx="-6" cy="-2" rx="4" ry="7" fill="#2C5F4F" transform="rotate(-30 -6 -2)"/>
-                <ellipse cx="6" cy="-2" rx="4" ry="7" fill="#2C5F4F" transform="rotate(30 6 -2)"/>
-                <ellipse cx="-8" cy="3" rx="3.5" ry="6" fill="#2C5F4F" transform="rotate(-40 -8 3)"/>
-                <ellipse cx="8" cy="3" rx="3.5" ry="6" fill="#2C5F4F" transform="rotate(40 8 3)"/>
-                <ellipse cx="-5" cy="8" rx="3" ry="5" fill="#2C5F4F" transform="rotate(-25 -5 8)"/>
-                <ellipse cx="5" cy="8" rx="3" ry="5" fill="#2C5F4F" transform="rotate(25 5 8)"/>
-                
-                {/* Stem/Staff */}
-                <line x1="0" y1="10" x2="0" y2="35" stroke="#2C5F4F" strokeWidth="2"/>
-                
-                {/* Snake coiled around staff */}
-                <path d="M -2 15 Q -5 18 -3 21 Q -1 24 -4 27 Q -6 30 -2 33" 
-                      stroke="#2C5F4F" strokeWidth="2.5" fill="none"/>
-                <circle cx="-2" cy="14" r="1.5" fill="#2C5F4F"/>
-              </g>
-            </svg>
-            <div>
-              <div className="text-xl font-serif tracking-wide">HOMEOPATHWAY</div>
-              <div className="text-[10px] text-gray-600 tracking-widest">YOUR PATH TO HEALING</div>
-            </div>
-          </div>
-          
-          <div className="flex-1 max-w-2xl mx-8">
-            <div className="relative">
-              <input 
-                type="text" 
-                placeholder="Search for ailments like 'headache' or 'anxiety' or search for remedies like 'arnica' or 'bella donna'"
-                className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-              />
-              <svg className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <button className="p-2 hover:bg-gray-100 rounded-lg">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-              </svg>
-            </button>
-            <button className="px-4 py-2 flex items-center gap-2 hover:bg-gray-100 rounded-lg">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-              </svg>
-              <span>Save</span>
-            </button>
-            <button className="px-6 py-2 border border-gray-900 rounded-full hover:bg-gray-900 hover:text-white transition-colors">
-              Login
-            </button>
-          </div>
-        </div>
-      </header>
+     <Header />
 
       {/* Breadcrumb */}
       <div className="bg-[#F5F1E8] border-b border-gray-200">
