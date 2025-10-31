@@ -242,7 +242,7 @@ export default function HomePageClient({
             {/*------ Slide 4 -----*/}
             <div className="relative">
               <div className="absolute top-0 left-0 w-full h-full">
-                <img className="object-cover h-full w-full" src="/home-slide-1.png" alt="" />
+                <img className="object-cover h-full w-full" src="/home-slide-4.png" alt="" />
               </div>
               <div className="relative flex pt-25 pb-30 lg:pb-48 pl-[15px] pr-[15px]">
                 <div className="flex items-center flex-col lg:flex-row justify-center mb-6 max-w-[900px] mx-auto">
@@ -262,7 +262,7 @@ export default function HomePageClient({
             {/*------ Slide 5 -----*/}
             <div className="relative">
               <div className="absolute top-0 left-0 w-full h-full">
-                <img className="object-cover h-full w-full" src="/home-slide-1.png" alt="" />
+                <img className="object-cover h-full w-full" src="/home-slide-5.png" alt="" />
               </div>
               <div className="relative flex pt-25 pb-30 lg:pb-48 pl-[15px] pr-[15px]">
                 <div className="flex items-center flex-col lg:flex-row justify-center mb-6 max-w-[900px] mx-auto">
@@ -282,7 +282,7 @@ export default function HomePageClient({
             {/*------ Slide 6 -----*/}
             <div className="relative">
               <div className="absolute top-0 left-0 w-full h-full">
-                <img className="object-cover h-full w-full" src="/home-slide-1.png" alt="" />
+                <img className="object-cover h-full w-full" src="/home-slide-6.png" alt="" />
               </div>
               <div className="relative flex pt-25 pb-30 lg:pb-48 pl-[15px] pr-[15px]">
                 <div className="flex items-center flex-col lg:flex-row justify-center mb-6 max-w-[900px] mx-auto">
@@ -415,44 +415,49 @@ export default function HomePageClient({
       </div>
 
       {/* Popular Ailments Section */}
-      <section className="px-6 py-12 bg-[#f5f3ed]">
+      <section className="px-4 py-6 lg:py-10 bg-[#f5f3ed]">
         <div className="max-w-7xl mx-auto">
-          <div className="flex items-center gap-3 mb-8">
-            <span className="text-3xl">💊</span>
-            <h3 className="text-3xl font-serif">
+          <div className="flex items-center gap-3 mb-6">
+            <img className="w-[40px] h-[40px] lg:w-[60px] lg:h-[60px]" src="/ailments-icon.svg" alt="" />
+            <h3 className="text-[28px] lg:text-[40px]">
               {searchQuery.trim() ? "Ailment Results" : "Popular Ailments"}
             </h3>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-6 lg:grid-cols-4 gap-4 lg:gap-6">
             {ailments.slice(0, 17).map((ailment) => (
               <Link href={`/ailments/${ailment.id}`} key={ailment.id}>
-                <div className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg transition-shadow cursor-pointer h-full">
-                  <div className="text-3xl mb-2">{ailment.icon}</div>
-                  <h4 className="font-medium text-sm mb-1">{ailment.name}</h4>
-                  <p className="text-xs text-gray-500">
-                    🔬 {ailment.remedies_count} remedies
-                  </p>
+                <div className="flex items-center bg-white  rounded-xl pr-4 pl-4 pt-7 pb-7 transition-shadow cursor-pointer h-full">
+                  <div className="text-3xl mb-2 mr-5 w-[32px] h-[32px]">{ailment.icon}</div>
+                  <div>
+                    <p className="text-[16px] font-[600] mb-1 text-[#0B0C0A]">{ailment.name}</p>
+                    <p className="text-[#7D5C4E] text-[12px] font-[500] flex items-center">
+                      <img className="mr-1" src="/remedies.svg" alt="" /> {ailment.remedies_count} remedies
+                    </p>
+                  </div>
+                
                 </div>
               </Link>
             ))}
             {!searchQuery.trim() && (
-          <Link href="/ailments">
-               <div className="bg-[#5A6A5A] text-white rounded-xl p-4 flex items-center justify-center hover:bg-[#4A5A4A] transition-colors cursor-pointer h-full">
-            <span className="font-medium">View all Ailments</span>
-         </div>
-         </Link>
-)}
+              <Link href="/ailments">
+                  <div className="bg-[#4B544A] text-white rounded-xl p-4 flex items-center justify-center hover:bg-[#2B2E28] transition-colors cursor-pointer h-full transition-all duration-500">
+                <span className="font-[600]  text-white text-[16px]">View all Ailments</span>
+            </div>
+            </Link>
+            )}
+
           </div>
+
         </div>
       </section>
 
       {/* Top Rated Remedies Section */}
-      <section className="px-6 py-12 bg-gray-50">
+      <section className="px-4 py-6 lg:py-10 bg-[#f5f3ed]">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-3 mb-8">
-            <span className="text-3xl">👍</span>
-            <h3 className="text-3xl font-serif">
+            <img className="w-[40px] h-[40px] lg:w-[60px] lg:h-[60px]" src="/top-remedies.svg" alt="" />
+            <h3 className="text-[28px] lg:text-[40px]">
               {searchQuery.trim() ? "Remedy Results" : "Top Rated Remedies"}
             </h3>
           </div>
@@ -461,33 +466,33 @@ export default function HomePageClient({
             {topRemedies.map((remedy, index) => (
               <div
                 key={index}
-                className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow"
+                className="bg-white rounded-xl p-4 transition-shadow"
               >
-                <div className="flex items-start gap-4 mb-3">
-                  <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center text-2xl flex-shrink-0">
-                    💊
+                <div className="flex items-start gap-4">
+                  <div className="w-15 h-15 bg-[#F9F7F2] rounded-full flex items-center justify-center text-2xl flex-shrink-0 p-2.5">
+                    <img src="/Blossom.png" alt="" />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-semibold text-lg mb-1">{remedy.name}</h4>
-                    <div className="flex items-center gap-2">
+                    <p className="font-[600] text-[20px] mb-1">{remedy.name}</p>
+                    <div className="flex items-center gap-2 mb-3">
                       <div className="flex text-yellow-400">
                         {[...Array(5)].map((_, i) => (
-                          <span key={i}>★</span>
+                          <span key={i}><img src="/star.svg" alt="" /></span>
                         ))}
                       </div>
-                      <span className="text-sm text-gray-500">
+                      <span className="text-[#41463B] font-[500]">
                         {remedy.average_rating.toFixed(1)} ({remedy.review_count}{" "}
                         reviews)
                       </span>
                     </div>
+                    <p className="text-[#2B2E28] font-[500]">{remedy.description}</p>
                   </div>
                 </div>
-                <p className="text-sm text-gray-600">{remedy.description}</p>
               </div>
             ))}
             {!searchQuery.trim() && (
-              <Link href="/remedies" className="bg-[#5A6A5A] text-white rounded-xl p-6 flex items-center justify-center hover:bg-[#4A5A4A] transition-colors cursor-pointer">
-                  <span className="font-medium text-lg">View all Remedies</span>
+              <Link href="/remedies" className="bg-[#4B544A] text-white rounded-xl h-[136px] lg:h-[auto] p-6 flex items-center justify-center hover:bg-[#2B2E28] transition-colors cursor-pointer transition-all duration-500">
+                  <span className="font-[600] text-[20px] text-white">View all Remedies</span>
               </Link>
             )}
           </div>

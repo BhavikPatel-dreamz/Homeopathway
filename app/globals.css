@@ -71,6 +71,7 @@ h1,h2,h3,h4,h5,h6{
   border-radius: 50px;
   background: rgba(75, 84, 74, 0.6);
   transition: all 0.3s ease;
+  padding: 0px;
 }
 .home-slider .slick-dots li button:hover {
   background: #ffffff;
