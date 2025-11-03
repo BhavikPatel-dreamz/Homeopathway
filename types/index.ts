@@ -40,3 +40,26 @@ export interface AilmentRemedy {
   ailment?: Ailment;
   remedy?: Remedy;
 }
+
+export interface Review {
+  id: string;
+  remedy_id: string;
+  user_id: string | null;
+  star_count: number; // 1-5 rating
+  potency?: string; // e.g., "6C", "30C", "200C", "1M"
+  potency_2?: string; // Secondary potency if applicable
+  dosage?: string; // How much and how often
+  duration_used?: string; // How long used
+  effectiveness?: number; // 1-5 scale for effectiveness
+  notes?: string; // Additional notes
+  experienced_side_effects: boolean; // Checkbox for side effects/aggravations
+  created_at: string;
+  updated_at: string;
+  // Related data when joined
+  remedy?: Remedy;
+  user_profile?: {
+    first_name: string;
+    last_name: string;
+    email: string;
+  };
+}

@@ -53,3 +53,20 @@ export interface UserProfile {
   created_at: string;
   updated_at: string;
 }
+
+// Review Types
+export interface DatabaseReview {
+  id: string;
+  remedy_id: string;
+  user_id: string | null;
+  star_count: number;
+  potency: string | null;
+  potency_2: string | null;
+  dosage: string | null;
+  duration_used: string | null;
+  effectiveness: number | null;
+  notes: string | null;
+  experienced_side_effects: boolean;
+  created_at: string;
+  updated_at: string;
+}

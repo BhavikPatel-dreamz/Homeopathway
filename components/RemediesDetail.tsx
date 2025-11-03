@@ -13,6 +13,7 @@ import AddReviewForm from "./AddReviewForm";
 // Mock Data
 // ---------------------------
 const remedy = {
+  id: "belladonna-123",  // Mock remedy ID
   name: "Belladonna",
   subtitle: "For throbbing, pulsating headaches",
   rating: 4.8,
@@ -454,7 +455,14 @@ export default function RemediesDetailPage() {
             <p>Related remedies will appear here.</p>
         </section> */}
       </main>
-    {isReviewFormOpen && <AddReviewForm onClose={() => setIsReviewFormOpen(false)} />}
+    {isReviewFormOpen && (
+      <AddReviewForm 
+        onClose={() => setIsReviewFormOpen(false)}
+        remedyId={remedy.id}
+        remedyName={remedy.name}
+        condition={remedy.subtitle}
+      />
+    )}
       {/* Footer */}
       <Footer />
     </div>
