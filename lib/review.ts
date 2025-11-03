@@ -99,14 +99,7 @@ export async function getReviews({
 }): Promise<{ data: Review[] | null; error: Error | null; }> {
   let query = supabase
     .from('reviews')
-    .select(`
-      *,
-      profiles (
-        first_name,
-        last_name,
-        email
-      )
-    `)
+    .select('*')
     .limit(limit);
 
   if (remedyId) {
@@ -154,14 +147,7 @@ export async function getReviews({
 export async function getReviewById(reviewId: string): Promise<{ data: Review | null; error: Error | null; }> {
   return supabase
     .from('reviews')
-    .select(`
-      *,
-      profiles (
-        first_name,
-        last_name,
-        email
-      )
-    `)
+    .select('*')
     .eq('id', reviewId)
     .single();
 }
