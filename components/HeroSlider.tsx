@@ -9,17 +9,7 @@ import Slider from "react-slick";
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
-interface HeroSliderProps {
-  initialAilments: Ailment[];
-  initialTopRemedies: Remedy[];
-  onSearchResults: (ailments: Ailment[], remedies: Remedy[], query?: string) => void;
-}
-
-export default function HeroSlider({ 
-  initialAilments, 
-  initialTopRemedies, 
-  onSearchResults 
-}: HeroSliderProps) {
+export default function HeroSlider() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
@@ -87,38 +77,16 @@ export default function HeroSlider({
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) {
-      onSearchResults(initialAilments, initialTopRemedies, "");
       setShowSuggestions(false);
       return;
     }
 
     setLoading(true);
     setShowSuggestions(false);
-    try {
-      const [ailmentsRes, remediesRes] = await Promise.all([
-        supabase
-          .from("ailments")
-          .select("id, name, slug, icon, remedies_count")
-          .ilike("name", `%${searchQuery}%`)
-          .order("name", { ascending: true }),
-        supabase
-          .from("remedies")
-          .select("name, average_rating, review_count, description")
-          .ilike("name", `%${searchQuery}%`)
-          .order("average_rating", { ascending: false })
-          .order("review_count", { ascending: false })
-          .limit(5),
-      ]);
-
-      if (ailmentsRes.error) throw ailmentsRes.error;
-      if (remediesRes.error) throw remediesRes.error;
-
-      onSearchResults(ailmentsRes.data || [], remediesRes.data || [], searchQuery);
-    } catch (error) {
-      console.error("Error during search:", error);
-    } finally {
-      setLoading(false);
-    }
+    
+    // Navigate to search results page with query
+    const searchParams = new URLSearchParams({ q: searchQuery });
+    router.push(`/search?${searchParams.toString()}`);
   };
 
   const handleSelectAilment = (ailment: Ailment) => {
@@ -136,7 +104,9 @@ export default function HeroSlider({
   const handleSelectRemedy = (remedy: Remedy) => {
     setSearchQuery(remedy.name);
     setShowSuggestions(false);
-    handleSearch();
+    // Navigate to search with remedy name
+    const searchParams = new URLSearchParams({ q: remedy.name });
+    router.push(`/search?${searchParams.toString()}`);
   };
 
   const clearSearch = () => {
@@ -144,7 +114,6 @@ export default function HeroSlider({
     setShowSuggestions(false);
     setFilteredAilments([]);
     setFilteredRemedies([]);
-    onSearchResults(initialAilments, initialTopRemedies, "");
   };
 
   const settings = {
