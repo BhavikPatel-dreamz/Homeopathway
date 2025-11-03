@@ -4,15 +4,13 @@ import AilmentDetailPage from '../../../components/AilmentDetailPage';
 import { supabase } from '@/lib/supabaseClient';
 
 interface Remedy {
-  id: number;
+  id: string;
   name: string;
-  icon: string;
-  color: string;
   indication: string;
   rating: number;
-  reviewCount: number;
-  ailment: string;
+  review_count: number;
   description: string;
+  key_symptoms?: string[];
 }
 
 interface Ailment {
@@ -38,9 +36,21 @@ async function getAilmentData(slug: string) {
   }
 
   const { data: remediesData, error: remediesError } = await supabase
-    .from('remedies')
-    .select('*')
-   
+    .from('ailment_remedies')
+    .select(`
+      remedy_id,
+      effectiveness_rating,
+      notes,
+      remedies:remedy_id (
+        id,
+        name,
+        description,
+        key_symptoms,
+        average_rating,
+        review_count
+      )
+    `)
+    .eq('ailment_id', ailmentData.id);
 
   if (remediesError) {
     console.error('Error fetching remedies:', remediesError.message);
@@ -56,18 +66,17 @@ async function getAilmentData(slug: string) {
     personalized_approach: ailmentData.personalized_approach || 'The beauty of homeopathic treatment lies in its individualized approach. Two people with the same condition may receive different remedies based on their unique symptoms.',
   };
 
-  const remedies: Remedy[] = (remediesData || []).map((r: unknown) => {
-    const remedy = r as Record<string, unknown>;
+  const remedies: Remedy[] = (remediesData || []).map((ar: unknown) => {
+    const ailmentRemedy = ar as Record<string, unknown>;
+    const remedy = ailmentRemedy.remedies as Record<string, unknown>;
     return {
-      id: remedy.id as number,
+      id: String(remedy.id),
       name: remedy.name as string,
-      icon: '🌿',
-      color: 'bg-green-100',
       indication: (remedy.key_symptoms as string[])?.[0] || 'No indication specified.',
       rating: (remedy.average_rating as number) || 0,
-      reviewCount: (remedy.review_count as number) || 0,
-      ailment: ailment.name,
+      review_count: (remedy.review_count as number) || 0,
       description: (remedy.description as string) || 'No description available.',
+      key_symptoms: (remedy.key_symptoms as string[]) || [],
     };
   });
 
