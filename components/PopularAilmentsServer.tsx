@@ -1,0 +1,40 @@
+import Link from "next/link";
+import { Ailment } from "@/types";
+import AilmentCard from "./AilmentCard";
+
+
+interface PopularAilmentsServerProps {
+  ailments: Ailment[];
+  searchQuery?: string;
+}
+
+export default function PopularAilmentsServer({ 
+  ailments, 
+  searchQuery = "" 
+}: PopularAilmentsServerProps) {
+  return (
+    <section className="px-4 py-6 lg:py-10 bg-[#f5f3ed]">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex items-center gap-3 mb-6">
+          <img className="w-[40px] h-[40px] lg:w-[60px] lg:h-[60px]" src="/ailments-icon.svg" alt="" />
+          <h3 className="text-[28px] lg:text-[40px] text-[#0B0C0A]">
+            {searchQuery.trim() ? "Ailment Results" : "Popular Ailments"}
+          </h3>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-6 lg:grid-cols-4 gap-4 lg:gap-6">
+          {ailments.slice(0, 17).map((ailment) => (
+            <AilmentCard key={ailment.id} ailment={ailment} />
+          ))}
+          {!searchQuery.trim() && (
+            <Link href="/ailments">
+              <div className="bg-[#4B544A] text-white rounded-xl p-4 flex items-center justify-center hover:bg-[#2B2E28] transition-colors cursor-pointer h-full transition-all duration-500">
+                <span className="font-[600] text-white text-[16px]">View all Ailments</span>
+              </div>
+            </Link>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}

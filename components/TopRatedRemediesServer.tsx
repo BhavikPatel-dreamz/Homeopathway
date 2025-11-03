@@ -1,20 +1,21 @@
-"use client";
-
 import Link from "next/link";
 import { Remedy } from "@/types";
 
-interface TopRatedRemediesProps {
+interface TopRatedRemediesServerProps {
   topRemedies: Remedy[];
-  searchQuery: string;
+  searchQuery?: string;
 }
 
-export default function TopRatedRemedies({ topRemedies, searchQuery }: TopRatedRemediesProps) {
+export default function TopRatedRemediesServer({ 
+  topRemedies, 
+  searchQuery = "" 
+}: TopRatedRemediesServerProps) {
   return (
     <section className="px-4 py-6 lg:py-10 bg-[#f5f3ed]">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
           <img className="w-[40px] h-[40px] lg:w-[60px] lg:h-[60px]" src="/top-remedies.svg" alt="" />
-          <h3 className="text-[28px] lg:text-[40px]">
+          <h3 className="text-[28px] lg:text-[40px] text-[#0B0C0A]">
             {searchQuery.trim() ? "Remedy Results" : "Top Rated Remedies"}
           </h3>
         </div>
@@ -30,7 +31,7 @@ export default function TopRatedRemedies({ topRemedies, searchQuery }: TopRatedR
                   <img src="/Blossom.png" alt="" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-[600] text-[20px] mb-1">{remedy.name}</p>
+                  <p className="font-[600] text-[20px] mb-1 text-[#0B0C0A]">{remedy.name}</p>
                   <div className="flex items-center gap-2 mb-3">
                     <div className="flex text-yellow-400">
                       {[...Array(5)].map((_, i) => (
