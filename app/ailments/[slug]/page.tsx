@@ -35,12 +35,13 @@ async function getAilmentData(slug: string) {
     return null;
   }
 
+
+  console.log('Fetched ailment data:', ailmentData);
+
   const { data: remediesData, error: remediesError } = await supabase
     .from('ailment_remedies')
     .select(`
       remedy_id,
-      effectiveness_rating,
-      notes,
       remedies:remedy_id (
         id,
         name,
