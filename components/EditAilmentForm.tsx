@@ -72,7 +72,7 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
         setSlugLoading(true);
         try {
           // For edit form, we need to exclude current ailment from uniqueness check
-          const uniqueSlug = await createUniqueSlugFromName(formData.name, ailmentId);
+          const uniqueSlug = await createUniqueSlugFromName(formData.name, 'ailments', ailmentId);
           setGeneratedSlug(uniqueSlug);
         } catch (error) {
           console.error('Error generating slug:', error);
@@ -101,7 +101,7 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
       // Generate final unique slug if name changed
       let finalSlug = null;
       if (formData.name !== originalName) {
-        finalSlug = await createUniqueSlugFromName(formData.name, ailmentId);
+        finalSlug = await createUniqueSlugFromName(formData.name, 'ailments', ailmentId);
       }
 
       const updateData: Record<string, unknown> = {

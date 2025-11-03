@@ -1,7 +1,10 @@
 "use client";
 import { useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import Header from './Header';
+import Footer from './Footer';
+import Breadcrumb from './Breadcrumb';
+import { breadcrumbPaths } from '../lib/breadcrumbUtils';
 
 interface AccountSettingsProps {
   user: {
@@ -77,61 +80,10 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#2C3E3E] rounded-lg flex items-center justify-center">
-                <svg viewBox="0 0 100 100" className="w-6 h-6">
-                  <path
-                    d="M50 10 L50 50 M30 30 L50 50 L70 30 M20 50 L50 50 L80 50 M30 70 L50 50 L70 70"
-                    stroke="white"
-                    strokeWidth="2"
-                    fill="none"
-                  />
-                  <circle cx="50" cy="50" r="3" fill="white" />
-                </svg>
-              </div>
-              <div>
-                <h1 className="text-lg font-semibold text-gray-900">HOMEOPATHWAY</h1>
-                <p className="text-xs text-gray-500">YOUR PATH TO HEALING</p>
-              </div>
-            </Link>
-
-            {/* Search Bar */}
-            <div className="flex-1 max-w-2xl mx-8">
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </span>
-                <input
-                  type="text"
-                  placeholder="Search for ailments like 'headache' or 'anxiety' or search for remedies like 'arnica' or 'bella donna'"
-                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent"
-                />
-              </div>
-            </div>
-
-            {/* User Avatar */}
-            <div className="w-10 h-10 bg-[#B8A67E] rounded-full flex items-center justify-center text-white font-semibold">
-              {user.first_name ? user.first_name[0].toUpperCase() : 'M'}
-            </div>
-          </div>
-        </div>
-      </header>
-
+      <Header />
+      
       {/* Breadcrumb */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-3">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Link href="/" className="hover:text-gray-900">Home</Link>
-            <span>/</span>
-            <span className="text-gray-900 font-medium">Account Settings</span>
-          </div>
-        </div>
-      </div>
+      <Breadcrumb items={breadcrumbPaths.profile()} />
 
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-6 py-8">
@@ -290,70 +242,7 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
       </main>
 
       {/* Footer */}
-      <footer className="bg-[#3C4E4E] text-white px-6 py-12 mt-12">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            {/* Logo and Description */}
-            <div className="md:col-span-2">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center">
-                  <svg viewBox="0 0 100 100" className="w-8 h-8">
-                    <path d="M50 10 L50 50 M30 30 L50 50 L70 30 M20 50 L50 50 L80 50 M30 70 L50 50 L70 70" 
-                          stroke="white" strokeWidth="2" fill="none"/>
-                    <circle cx="50" cy="50" r="3" fill="white"/>
-                  </svg>
-                </div>
-                <span className="text-xl font-semibold">HOMEOPATHWAY</span>
-              </div>
-              <p className="text-gray-300 text-sm max-w-md">
-                Your trusted guide to natural homeopathic healing. Find remedies, read reviews and take charge of your health.
-              </p>
-            </div>
-
-            {/* About Homeopathy */}
-            <div>
-              <h4 className="font-semibold mb-4">About Homeopathy</h4>
-              <ul className="space-y-2 text-sm text-gray-300">
-                <li><Link href="/what-is-homeopathy" className="hover:text-white">What is HomeoPathway</Link></li>
-                <li><Link href="/how-it-works" className="hover:text-white">How It Works</Link></li>
-                <li><Link href="/safety-research" className="hover:text-white">Safety & Research</Link></li>
-                <li><Link href="/getting-started" className="hover:text-white">Getting Started</Link></li>
-              </ul>
-            </div>
-
-            {/* Support */}
-            <div>
-              <h4 className="font-semibold mb-4">Support</h4>
-              <ul className="space-y-2 text-sm text-gray-300">
-                <li><Link href="/contact" className="hover:text-white">Contact Us</Link></li>
-                <li><Link href="/help-center" className="hover:text-white">Help Center</Link></li>
-                <li><Link href="/safety-guidelines" className="hover:text-white">Safety Guidelines</Link></li>
-                <li><Link href="/faq" className="hover:text-white">FAQ</Link></li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Social Media and Copyright */}
-          <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-gray-300">© 2025 HomeoPathway. All rights reserved.</p>
-            <div className="flex gap-4">
-              <span className="text-sm text-gray-300">Follow Us:</span>
-              <a href="#" className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
-                <span className="text-sm">f</span>
-              </a>
-              <a href="#" className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
-                <span className="text-sm">𝕏</span>
-              </a>
-              <a href="#" className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
-                <span className="text-sm">in</span>
-              </a>
-              <a href="#" className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
-                <span className="text-sm">▶</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
