@@ -27,8 +27,7 @@ interface AilmentDetailPageProps {
   remedies: Remedy[];
 }
 
-export default function 
-AilmentDetailPage({ ailment, remedies }: AilmentDetailPageProps) {
+export default function AilmentDetailPage({ ailment, remedies }: AilmentDetailPageProps) {
 
 
   const breadcrumbItems = [
@@ -37,6 +36,7 @@ AilmentDetailPage({ ailment, remedies }: AilmentDetailPageProps) {
     { label: ailment.name, isActive: true }
   ];
 
+  console.log('AilmentDetailPage remedies:', remedies);
   
   return (
     <div className="min-h-screen bg-[#F5F1E8]">
