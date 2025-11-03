@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
-import HomePageClient from '@/components/HomePageClient';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import HomePageContent from '@/components/HomePageContent';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -134,15 +136,16 @@ export default async function Home() {
   };
 
   return (
-    <>
+    <div className="min-h-screen bg-[#2C3E3E]">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(structuredData),
         }}
       />
-      <HomePageClient initialAilments={ailments} initialTopRemedies={topRemedies} />
-      {/* The footer can be moved into HomePageClient or kept here if it's static */}
-    </>
+      <Header />
+      <HomePageContent initialAilments={ailments} initialTopRemedies={topRemedies} />
+      <Footer />
+    </div>
   );
 }
