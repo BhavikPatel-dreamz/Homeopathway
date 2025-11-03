@@ -133,10 +133,10 @@ export default function AilmentListPage({
       {/* Header */}
     <Header />
       {/* Breadcrumb */}
-      <div className="bg-[#F5F1E8] border-b border-gray-200">
+      <div className="bg-[#F5F1E8]">
         <div className="max-w-7xl mx-auto px-6 py-3">
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Link href="/" className="hover:text-gray-900 transition-colors">
+            <Link href="/" className="hover:text-gray-900 text-[#41463B] underline  transition-all duration-500">
               Back to home
             </Link>
             <span>/</span>
