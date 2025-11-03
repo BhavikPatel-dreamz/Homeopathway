@@ -35,9 +35,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check if remedy_id is a UUID or a slug and convert if necessary
+    let actualRemedyId = remedy_id;
+    
+    // Simple UUID validation (UUID format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(remedy_id);
+    
+    if (!isUUID) {
+      // It's likely a slug, so look up the actual remedy ID
+      const { data: remedy, error: remedyError } = await supabase
+        .from('remedies')
+        .select('id')
+        .eq('slug', remedy_id)
+        .single();
+
+      if (remedyError || !remedy) {
+        return NextResponse.json(
+          { error: 'Remedy not found' },
+          { status: 404 }
+        );
+      }
+
+      actualRemedyId = remedy.id;
+    }
+
     // Use the addReview function from review.ts with server-side client
     const { data, error } = await addReview({
-      remedyId: remedy_id,
+      remedyId: actualRemedyId,
       starCount: parseInt(star_count),
       potency: potency || undefined,
       dosage: dosage || undefined,
