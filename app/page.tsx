@@ -103,7 +103,7 @@ export default async function Home() {
 
   const { data: remediesData, error: remediesError } = await supabase
     .from("remedies")
-    .select("name, average_rating, review_count, description")
+    .select("name, average_rating, review_count, description,slug")
     .order("average_rating", { ascending: false })
     .order("review_count", { ascending: false })
     .limit(5);
@@ -134,6 +134,7 @@ export default async function Home() {
       "description": "Leading platform for homeopathic remedies and natural health solutions"
     }
   };
+  
 
   return (
     <div className="min-h-screen bg-[#2C3E3E]">
