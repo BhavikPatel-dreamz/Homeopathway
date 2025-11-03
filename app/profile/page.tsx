@@ -2,9 +2,23 @@ import { getUserProfile } from '../../lib/auth-server';
 import { createClient } from '../../lib/supabase/server';
 import AccountSettings from '../../components/AccountSettings';
 import Link from 'next/link';
+import { Metadata } from 'next';
 
-export const metadata = {
-  title: 'Account Settings - Homeopathway',
+export const metadata: Metadata = {
+  title: 'Account Settings - Manage Your Homeopathway Profile',
+  description: 'Manage your Homeopathway account settings, update personal information, change password, and customize your wellness preferences.',
+  keywords: [
+    'account settings',
+    'profile management',
+    'user settings',
+    'update profile',
+    'change password',
+    'account preferences'
+  ],
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default async function ProfilePage() {
