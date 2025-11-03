@@ -3,11 +3,11 @@ import React, { useState } from "react";
 import Link from "next/link";
 
 interface Remedy {
-  id: string;
+  id: number;
   name: string;
   indication: string;
   rating: number; // Renamed from rating
-  review_count: number; // Renamed from reviewCount
+  reviewCount: number; // Renamed from reviewCount
   description: string;
   key_symptoms?: string[];
 }
@@ -17,7 +17,6 @@ interface TopRemediesProps {
 }
 
 export default function TopRemedies({ remedies }: TopRemediesProps) {
-    console.log(remedies,"55555")
   const [sortBy, setSortBy] = useState("Overall Rating");
 
   const renderStars = (rating: number) => {
@@ -38,7 +37,7 @@ export default function TopRemedies({ remedies }: TopRemediesProps) {
   const sortedRemedies = [...remedies].sort((a, b) => {
     switch (sortBy) {
       case "Most Reviewed":
-        return b.review_count - a.review_count;
+        return b.reviewCount - a.reviewCount;
       case "Alphabetical":
         return a.name.localeCompare(b.name);
       case "Overall Rating":
@@ -47,7 +46,7 @@ export default function TopRemedies({ remedies }: TopRemediesProps) {
           return b.rating - a.rating;
         }
         // If ratings are equal, sort by review count as a tie-breaker
-        return b.review_count - a.review_count;
+        return b.reviewCount - a.reviewCount;
     }
   });
 
@@ -104,7 +103,7 @@ export default function TopRemedies({ remedies }: TopRemediesProps) {
                   <div className="flex items-center gap-2 mb-3">
                     {renderStars(remedy.rating)}
                     <span className="text-sm text-[#41463B]">
-                      {typeof remedy.rating === 'number' ? remedy.rating.toFixed(1) : 'N/A'} ({remedy.review_count} reviews)
+                      {typeof remedy.rating === 'number' ? remedy.rating.toFixed(1) : 'N/A'} ({remedy.reviewCount} reviews)
                     </span>
                   </div>
                   
