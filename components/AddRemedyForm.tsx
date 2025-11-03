@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
+import { createUniqueSlugFromName, generateSlug } from '@/lib/slugUtils';
 
 export default function AddRemedyForm() {
   const router = useRouter();
@@ -11,6 +12,7 @@ export default function AddRemedyForm() {
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
+    slug: '',
     scientific_name: '',
     common_name: '',
     description: '',
@@ -28,6 +30,9 @@ export default function AddRemedyForm() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
 
+      // Generate unique slug for the remedy
+      const slug = await createUniqueSlugFromName(formData.name, 'remedies');
+
       // Convert comma-separated strings to arrays
       const keySymptoms = formData.key_symptoms
         .split(',')
@@ -39,11 +44,12 @@ export default function AddRemedyForm() {
         .map(s => s.trim())
         .filter(s => s.length > 0);
 
-      const { data, error: insertError } = await supabase
+      const { error: insertError } = await supabase
         .from('remedies')
         .insert([
           {
             name: formData.name,
+            slug: slug,
             scientific_name: formData.scientific_name || null,
             common_name: formData.common_name || null,
             description: formData.description,
@@ -60,18 +66,38 @@ export default function AddRemedyForm() {
 
       // Success - redirect back to remedies page
       router.push('/admin/dashboard/remedies');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error adding remedy:', err);
-      setError(err.message || 'Failed to add remedy');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to add remedy';
+      setError(errorMessage);
       setLoading(false);
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    
+    setFormData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    // Auto-generate slug when name changes
+    if (name === 'name' && value.trim()) {
+      const newSlug = generateSlug(value);
+      setFormData(prev => ({
+        ...prev,
+        slug: newSlug,
+      }));
+    }
+  };
+
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newSlug = generateSlug(e.target.value);
+    setFormData(prev => ({
+      ...prev,
+      slug: newSlug,
+    }));
   };
 
   return (
@@ -118,6 +144,24 @@ export default function AddRemedyForm() {
                   placeholder="e.g., Arnica Montana, Belladonna"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                 />
+              </div>
+
+              {/* Slug */}
+              <div>
+                <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-2">
+                  URL Slug *
+                </label>
+                <input
+                  type="text"
+                  id="slug"
+                  name="slug"
+                  required
+                  value={formData.slug}
+                  onChange={handleSlugChange}
+                  placeholder="e.g., arnica-montana, belladonna"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                />
+                <p className="text-sm text-gray-500 mt-1">Auto-generated from remedy name, but can be edited</p>
               </div>
 
               {/* Scientific Name */}

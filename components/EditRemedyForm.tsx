@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
+import { createUniqueSlugFromName, generateSlug } from '@/lib/slugUtils';
 
 interface EditRemedyFormProps {
   remedyId: string;
@@ -16,6 +17,7 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
+    slug: '',
     scientific_name: '',
     common_name: '',
     description: '',
@@ -26,46 +28,48 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
   });
 
   useEffect(() => {
+    const fetchRemedy = async () => {
+      try {
+        // Validate UUID format
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (!uuidRegex.test(remedyId)) {
+          throw new Error('Invalid remedy ID format. Please use a valid UUID from your database.');
+        }
+
+        const { data, error } = await supabase
+          .from('remedies')
+          .select('*')
+          .eq('id', remedyId)
+          .single();
+
+        if (error) throw error;
+
+        if (!data) {
+          throw new Error('Remedy not found');
+        }
+
+        setFormData({
+          name: data.name || '',
+          slug: data.slug || '',
+          scientific_name: data.scientific_name || '',
+          common_name: data.common_name || '',
+          description: data.description || '',
+          key_symptoms: Array.isArray(data.key_symptoms) ? data.key_symptoms.join(', ') : '',
+          constitutional_type: data.constitutional_type || '',
+          dosage_forms: Array.isArray(data.dosage_forms) ? data.dosage_forms.join(', ') : '',
+          safety_precautions: data.safety_precautions || '',
+        });
+      } catch (err: unknown) {
+        console.error('Error fetching remedy:', err);
+        const errorMessage = err instanceof Error ? err.message : 'Failed to load remedy';
+        setError(errorMessage);
+      } finally {
+        setFetching(false);
+      }
+    };
+
     fetchRemedy();
   }, [remedyId]);
-
-  const fetchRemedy = async () => {
-    try {
-      // Validate UUID format
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (!uuidRegex.test(remedyId)) {
-        throw new Error('Invalid remedy ID format. Please use a valid UUID from your database.');
-      }
-
-      const { data, error } = await supabase
-        .from('remedies')
-        .select('*')
-        .eq('id', remedyId)
-        .single();
-
-      if (error) throw error;
-
-      if (!data) {
-        throw new Error('Remedy not found');
-      }
-
-      setFormData({
-        name: data.name || '',
-        scientific_name: data.scientific_name || '',
-        common_name: data.common_name || '',
-        description: data.description || '',
-        key_symptoms: Array.isArray(data.key_symptoms) ? data.key_symptoms.join(', ') : '',
-        constitutional_type: data.constitutional_type || '',
-        dosage_forms: Array.isArray(data.dosage_forms) ? data.dosage_forms.join(', ') : '',
-        safety_precautions: data.safety_precautions || '',
-      });
-    } catch (err: any) {
-      console.error('Error fetching remedy:', err);
-      setError(err.message || 'Failed to load remedy');
-    } finally {
-      setFetching(false);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,6 +77,12 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
     setError(null);
 
     try {
+      // Generate unique slug if needed (for new names or edited slugs)
+      let finalSlug = formData.slug;
+      if (!finalSlug || finalSlug.trim() === '') {
+        finalSlug = await createUniqueSlugFromName(formData.name, 'remedies', remedyId);
+      }
+
       // Convert comma-separated strings to arrays
       const keySymptoms = formData.key_symptoms
         .split(',')
@@ -88,6 +98,7 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
         .from('remedies')
         .update({
           name: formData.name,
+          slug: finalSlug,
           scientific_name: formData.scientific_name || null,
           common_name: formData.common_name || null,
           description: formData.description,
@@ -103,18 +114,38 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
 
       // Success - redirect back to remedies page
       router.push('/admin/dashboard/remedies');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error updating remedy:', err);
-      setError(err.message || 'Failed to update remedy');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update remedy';
+      setError(errorMessage);
       setLoading(false);
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    
+    setFormData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    // Auto-generate slug when name changes
+    if (name === 'name' && value.trim()) {
+      const newSlug = generateSlug(value);
+      setFormData(prev => ({
+        ...prev,
+        slug: newSlug,
+      }));
+    }
+  };
+
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newSlug = generateSlug(e.target.value);
+    setFormData(prev => ({
+      ...prev,
+      slug: newSlug,
+    }));
   };
 
   if (fetching) {
@@ -172,6 +203,24 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
                   placeholder="e.g., Arnica Montana, Belladonna"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                 />
+              </div>
+
+              {/* Slug */}
+              <div>
+                <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-2">
+                  URL Slug *
+                </label>
+                <input
+                  type="text"
+                  id="slug"
+                  name="slug"
+                  required
+                  value={formData.slug}
+                  onChange={handleSlugChange}
+                  placeholder="e.g., arnica-montana, belladonna"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                />
+                <p className="text-sm text-gray-500 mt-1">Auto-generated from remedy name, but can be edited</p>
               </div>
 
               {/* Scientific Name */}

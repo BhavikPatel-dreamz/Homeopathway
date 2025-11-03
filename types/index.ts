@@ -11,8 +11,19 @@ export interface Ailment {
 }
 
 export interface Remedy {
+  id?: string;
   name: string;
+  slug?: string;
   average_rating: number;
   review_count: number;
   description: string;
+  scientific_name?: string;
+  common_name?: string;
+  key_symptoms?: string[];
+  constitutional_type?: string;
+  dosage_forms?: string[];
+  safety_precautions?: string;
+  created_at?: string;
+  updated_at?: string;
+  created_by?: string;
 }

@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabaseClient';
 interface Remedy {
   id: string;
   name: string;
+  slug?: string;
   scientific_name: string;
   average_rating: number;
   review_count: number;
@@ -31,7 +32,7 @@ export default function AdminRemediesManager() {
       if (error) throw error;
 
       setRemedies(data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching remedies:', error);
       setMessage({ type: 'error', text: 'Failed to load remedies' });
     } finally {
@@ -54,7 +55,7 @@ export default function AdminRemediesManager() {
       setRemedies(remedies.filter(r => r.id !== id));
       setMessage({ type: 'success', text: 'Remedy deleted successfully!' });
       setTimeout(() => setMessage(null), 3000);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error deleting remedy:', error);
       setMessage({ type: 'error', text: 'Failed to delete remedy.' });
     } finally {
