@@ -35,23 +35,23 @@ export const metadata: Metadata = {
 };
 
 const dummyAilments = [
-  { id: "d1", name: "Headache", icon: "😣", remedies_count: 45 },
-  { id: "d2", name: "Anxiety", icon: "😰", remedies_count: 38 },
-  { id: "d3", name: "Insomnia", icon: "😴", remedies_count: 42 },
-  { id: "d4", name: "Cold & Flu", icon: "🤧", remedies_count: 52 },
-  { id: "d5", name: "Allergies", icon: "🤧", remedies_count: 47 },
-  { id: "d6", name: "Joint Pain", icon: "🦴", remedies_count: 35 },
-  { id: "d7", name: "Digestion", icon: "💊", remedies_count: 41 },
-  { id: "d8", name: "Cough", icon: "😷", remedies_count: 44 },
-  { id: "d9", name: "Muscle Soreness", icon: "💪", remedies_count: 29 },
-  { id: "d10", name: "Nasal polyps", icon: "👃", remedies_count: 18 },
-  { id: "d11", name: "Sunburn", icon: "☀️", remedies_count: 22 },
-  { id: "d12", name: "Back pain", icon: "🧍", remedies_count: 33 },
-  { id: "d13", name: "High blood pressure", icon: "🩸", remedies_count: 31 },
-  { id: "d14", name: "Urinary tract infection", icon: "💧", remedies_count: 26 },
-  { id: "d15", name: "Kidney stones", icon: "🪨", remedies_count: 19 },
-  { id: "d16", name: "Cuts, bruises, and burns", icon: "🔥", remedies_count: 28 },
-  { id: "d17", name: "Swelling", icon: "🟡", remedies_count: 24 },
+  { id: "d1", name: "Headache", slug: "headache", icon: "😣", remedies_count: 45 },
+  { id: "d2", name: "Anxiety", slug: "anxiety", icon: "😰", remedies_count: 38 },
+  { id: "d3", name: "Insomnia", slug: "insomnia", icon: "😴", remedies_count: 42 },
+  { id: "d4", name: "Cold & Flu", slug: "cold-and-flu", icon: "🤧", remedies_count: 52 },
+  { id: "d5", name: "Allergies", slug: "allergies", icon: "🤧", remedies_count: 47 },
+  { id: "d6", name: "Joint Pain", slug: "joint-pain", icon: "🦴", remedies_count: 35 },
+  { id: "d7", name: "Digestion", slug: "digestion", icon: "💊", remedies_count: 41 },
+  { id: "d8", name: "Cough", slug: "cough", icon: "😷", remedies_count: 44 },
+  { id: "d9", name: "Muscle Soreness", slug: "muscle-soreness", icon: "💪", remedies_count: 29 },
+  { id: "d10", name: "Nasal polyps", slug: "nasal-polyps", icon: "👃", remedies_count: 18 },
+  { id: "d11", name: "Sunburn", slug: "sunburn", icon: "☀️", remedies_count: 22 },
+  { id: "d12", name: "Back pain", slug: "back-pain", icon: "🧍", remedies_count: 33 },
+  { id: "d13", name: "High blood pressure", slug: "high-blood-pressure", icon: "🩸", remedies_count: 31 },
+  { id: "d14", name: "Urinary tract infection", slug: "urinary-tract-infection", icon: "💧", remedies_count: 26 },
+  { id: "d15", name: "Kidney stones", slug: "kidney-stones", icon: "🪨", remedies_count: 19 },
+  { id: "d16", name: "Cuts, bruises, and burns", slug: "cuts-bruises-and-burns", icon: "🔥", remedies_count: 28 },
+  { id: "d17", name: "Swelling", slug: "swelling", icon: "🟡", remedies_count: 24 },
 ];
 
 export default async function Home() {
@@ -59,7 +59,7 @@ export default async function Home() {
 
   const { data: ailmentsData, error: ailmentsError } = await supabase
     .from("ailments")
-    .select("id, name, icon, remedies_count")
+    .select("id, name, slug, icon, remedies_count")
     .order("name", { ascending: true });
 
   if (ailmentsError) {

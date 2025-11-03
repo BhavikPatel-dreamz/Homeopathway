@@ -18,24 +18,19 @@ interface Remedy {
 interface Ailment {
   id: string;
   name: string;
+  slug: string;
   icon: string;
   remedies_count: number;
   description: string;
   personalizedApproach: string;
 }
 
-// Converts names to slug-safe format
-function nameToSlug(name: string) {
-  return name.toLowerCase().replace(/ & /g, ' and ').replace(/\s+/g, '-');
-}
-
-
 async function getAilmentData(slug: string) {
-  const name = nameToSlug(slug);
+  // Fetch ailment by slug column instead of converting name
   const { data: ailmentData, error: ailmentError } = await supabase
     .from('ailments')
     .select('*')
-    .ilike('name', name) // Case-insensitive name match
+    .eq('slug', slug) // Direct slug match
     .single();
   if (ailmentError || !ailmentData) {
     console.error('Error fetching ailment:', ailmentError?.message);
@@ -54,6 +49,7 @@ async function getAilmentData(slug: string) {
   const ailment: Ailment = {
     id: ailmentData.id,
     name: ailmentData.name,
+    slug: ailmentData.slug,
     icon: ailmentData.icon || '🩺',
     remedies_count: ailmentData.remedies_count || 0,
     description: ailmentData.description || 'No description available.',
@@ -62,17 +58,20 @@ async function getAilmentData(slug: string) {
       'The beauty of homeopathic treatment lies in its individualized approach. Two people with the same condition may receive different remedies based on their unique symptoms.',
   };
 
-  const remedies: Remedy[] = (remediesData || []).map((r: any) => ({
-    id: r.id,
-    name: r.name,
-    icon: '🌿',
-    color: 'bg-green-100',
-    indication: r.key_symptoms?.[0] || 'No indication specified.',
-    rating: r.average_rating || 0,
-    reviewCount: r.review_count || 0,
-    ailment: ailment.name,
-    description: r.description || 'No description available.',
-  }));
+  const remedies: Remedy[] = (remediesData || []).map((r: unknown) => {
+    const remedy = r as Record<string, unknown>;
+    return {
+      id: remedy.id as number,
+      name: remedy.name as string,
+      icon: '🌿',
+      color: 'bg-green-100',
+      indication: (remedy.key_symptoms as string[])?.[0] || 'No indication specified.',
+      rating: (remedy.average_rating as number) || 0,
+      reviewCount: (remedy.review_count as number) || 0,
+      ailment: ailment.name,
+      description: (remedy.description as string) || 'No description available.',
+    };
+  });
 
   return { ailment, remedies };
 }

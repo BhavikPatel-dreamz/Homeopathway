@@ -53,7 +53,7 @@ export default function HeroSlider({
           const [ailmentsRes, remediesRes] = await Promise.all([
             supabase
               .from("ailments")
-              .select("id, name, icon, remedies_count")
+              .select("id, name, slug, icon, remedies_count")
               .ilike("name", `%${searchQuery}%`)
               .order("name", { ascending: true })
               .limit(5),
@@ -98,7 +98,7 @@ export default function HeroSlider({
       const [ailmentsRes, remediesRes] = await Promise.all([
         supabase
           .from("ailments")
-          .select("id, name, icon, remedies_count")
+          .select("id, name, slug, icon, remedies_count")
           .ilike("name", `%${searchQuery}%`)
           .order("name", { ascending: true }),
         supabase
@@ -121,16 +121,17 @@ export default function HeroSlider({
     }
   };
 
-  function nameToSlug(name: string) {
-    return name.toLowerCase().replace(/ & /g, ' and ').replace(/\s+/g, '-');
-  }
-
   const handleSelectAilment = (ailment: Ailment) => {
     setSearchQuery(ailment.name);
     setShowSuggestions(false);
-    const slug = nameToSlug(ailment.name);
+    // Use the slug from the database, fallback to generated slug if not available
+    const slug = ailment.slug || nameToSlug(ailment.name);
     router.push(`/ailments/${slug}`, { scroll: false });
   };
+
+  function nameToSlug(name: string) {
+    return name.toLowerCase().replace(/ & /g, ' and ').replace(/\s+/g, '-');
+  }
 
   const handleSelectRemedy = (remedy: Remedy) => {
     setSearchQuery(remedy.name);
