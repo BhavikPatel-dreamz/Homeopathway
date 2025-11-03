@@ -20,6 +20,7 @@ export default function AddAilmentForm() {
     name: '',
     icon: '',
     description: '',
+    personalizedApproach: '',
   });
 
   // Generate slug when name changes
@@ -74,6 +75,13 @@ export default function AddAilmentForm() {
       return;
     }
 
+    if (!formData.personalizedApproach.trim()) {
+      setError('Personalized approach is required');
+      setActiveTab('basic');
+      console.log('Validation failed: Missing personalized approach');
+      return;
+    }
+
     console.log('Validation passed, starting submission...');
     setLoading(true);
     setError(null);
@@ -122,6 +130,7 @@ export default function AddAilmentForm() {
             slug: finalSlug,
             icon: formData.icon,
             description: formData.description,
+            personalized_approach: formData.personalizedApproach,
             created_by: user?.id,
           },
         ])
@@ -332,6 +341,23 @@ export default function AddAilmentForm() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 resize-none"
                 />
               </div>
+
+              {/* Personalized Approach Field */}
+              <div>
+                <label htmlFor="personalizedApproach" className="block text-sm font-medium text-gray-700 mb-2">
+                  Personalized Approach *
+                </label>
+                <textarea
+                  id="personalizedApproach"
+                  name="personalizedApproach"
+                  required
+                  value={formData.personalizedApproach}
+                  onChange={handleChange}
+                  rows={4}
+                  placeholder="Describe the personalized approach and treatment recommendations for this ailment..."
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 resize-none"
+                />
+              </div>
             </div>
           )}
 
@@ -358,6 +384,9 @@ export default function AddAilmentForm() {
                   </span>
                   <span className={formData.description ? 'text-green-600' : 'text-red-600'}>
                     Description: {formData.description ? '✓' : '✗'}
+                  </span>
+                  <span className={formData.personalizedApproach ? 'text-green-600' : 'text-red-600'}>
+                    Approach: {formData.personalizedApproach ? '✓' : '✗'}
                   </span>
                   <span className="text-blue-600">
                     Remedies: {selectedRemedyRelations.length}
@@ -400,6 +429,11 @@ export default function AddAilmentForm() {
                 <p className="text-sm text-gray-600 mt-1">
                   {formData.description || 'Description will appear here...'}
                 </p>
+                {formData.personalizedApproach && (
+                  <p className="text-sm text-gray-600 mt-1 italic">
+                    <strong>Approach:</strong> {formData.personalizedApproach}
+                  </p>
+                )}
                 <p className="text-xs text-gray-500 mt-2">
                   {selectedRemedyRelations.length} remedies selected
                 </p>
