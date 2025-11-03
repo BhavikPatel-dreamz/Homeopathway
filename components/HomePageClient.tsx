@@ -140,14 +140,16 @@ export default function HomePageClient({
   };
 
   function nameToSlug(name: string) {
-  return name.toLowerCase().replace(/ & /g, ' and ').replace(/\s+/g, '-');
-}
-const handleSelectAilment = (ailment: Ailment) => {
-  setSearchQuery(ailment.name);
-  setShowSuggestions(false);
-  const slug = nameToSlug(ailment.name);
-  router.push(`/ailments/${slug}`, { scroll: false });
-};
+    return name.toLowerCase().replace(/ & /g, ' and ').replace(/\s+/g, '-');
+  }
+
+  const handleSelectAilment = (ailment: Ailment) => {
+    setSearchQuery(ailment.name);
+    setShowSuggestions(false);
+    // Use the slug from the database, fallback to generated slug if not available
+    const slug = ailment.slug || nameToSlug(ailment.name);
+    router.push(`/ailments/${slug}`, { scroll: false });
+  };
 
   const handleSelectRemedy = (remedy: Remedy) => {
     setSearchQuery(remedy.name);

@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
+import { generateSlug, createUniqueSlugFromName } from '@/lib/slugUtils';
 
 interface EditAilmentFormProps {
   ailmentId: string;
@@ -14,17 +15,16 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [generatedSlug, setGeneratedSlug] = useState('');
+  const [slugLoading, setSlugLoading] = useState(false);
+  const [originalName, setOriginalName] = useState(''); // Track original name to avoid unnecessary slug updates
   const [formData, setFormData] = useState({
     name: '',
     icon: '',
     description: '',
   });
 
-  useEffect(() => {
-    fetchAilment();
-  }, [ailmentId]);
-
-  const fetchAilment = async () => {
+  const fetchAilment = useCallback(async () => {
     try {
       // Validate UUID format
       const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -49,13 +49,48 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
         icon: data.icon || '',
         description: data.description || '',
       });
-    } catch (err: any) {
+      
+      // Set original name for slug comparison
+      setOriginalName(data.name || '');
+    } catch (err: unknown) {
       console.error('Error fetching ailment:', err);
-      setError(err.message || 'Failed to load ailment');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load ailment';
+      setError(errorMessage);
     } finally {
       setFetching(false);
     }
-  };
+  }, [ailmentId]);
+
+  useEffect(() => {
+    fetchAilment();
+  }, [fetchAilment]);
+
+  // Generate slug when name changes (only if different from original)
+  useEffect(() => {
+    const generateSlugFromName = async () => {
+      if (formData.name.trim() && formData.name !== originalName) {
+        setSlugLoading(true);
+        try {
+          // For edit form, we need to exclude current ailment from uniqueness check
+          const uniqueSlug = await createUniqueSlugFromName(formData.name, ailmentId);
+          setGeneratedSlug(uniqueSlug);
+        } catch (error) {
+          console.error('Error generating slug:', error);
+          setGeneratedSlug(generateSlug(formData.name));
+        } finally {
+          setSlugLoading(false);
+        }
+      } else if (formData.name === originalName) {
+        // If name is same as original, no need to generate new slug
+        setGeneratedSlug('');
+      } else {
+        setGeneratedSlug('');
+      }
+    };
+
+    const timeoutId = setTimeout(generateSlugFromName, 500); // Debounce for 500ms
+    return () => clearTimeout(timeoutId);
+  }, [formData.name, originalName, ailmentId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,23 +98,37 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
     setError(null);
 
     try {
+      // Generate final unique slug if name changed
+      let finalSlug = null;
+      if (formData.name !== originalName) {
+        finalSlug = await createUniqueSlugFromName(formData.name, ailmentId);
+      }
+
+      const updateData: Record<string, unknown> = {
+        name: formData.name,
+        icon: formData.icon,
+        description: formData.description,
+        updated_at: new Date().toISOString(),
+      };
+
+      // Only update slug if name changed
+      if (finalSlug) {
+        updateData.slug = finalSlug;
+      }
+
       const { error: updateError } = await supabase
         .from('ailments')
-        .update({
-          name: formData.name,
-          icon: formData.icon,
-          description: formData.description,
-          updated_at: new Date().toISOString(),
-        })
+        .update(updateData)
         .eq('id', ailmentId);
 
       if (updateError) throw updateError;
 
       // Success - redirect back to ailments page
       router.push('/admin/dashboard/ailments');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error updating ailment:', err);
-      setError(err.message || 'Failed to update ailment');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update ailment';
+      setError(errorMessage);
       setLoading(false);
     }
   };
@@ -135,6 +184,30 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
                 placeholder="e.g., Headache, Common Cold"
               />
             </div>
+
+            {/* Slug Preview - only show if name changed */}
+            {formData.name && formData.name !== originalName && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  URL Slug (Auto-generated from new name)
+                </label>
+                <div className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-600">
+                  {slugLoading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-teal-600"></div>
+                      <span>Generating unique slug...</span>
+                    </div>
+                  ) : (
+                    <span className="font-mono">
+                      /ailments/{generatedSlug || generateSlug(formData.name)}
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm text-gray-500 mt-1">
+                  This URL will be updated when you save the changes
+                </p>
+              </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">

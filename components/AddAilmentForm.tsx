@@ -1,19 +1,45 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
+import { generateSlug, createUniqueSlugFromName } from '@/lib/slugUtils';
 
 export default function AddAilmentForm() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [generatedSlug, setGeneratedSlug] = useState('');
+  const [slugLoading, setSlugLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     icon: '',
     description: '',
   });
+
+  // Generate slug when name changes
+  useEffect(() => {
+    const generateSlugFromName = async () => {
+      if (formData.name.trim()) {
+        setSlugLoading(true);
+        try {
+          const uniqueSlug = await createUniqueSlugFromName(formData.name);
+          setGeneratedSlug(uniqueSlug);
+        } catch (error) {
+          console.error('Error generating slug:', error);
+          setGeneratedSlug(generateSlug(formData.name));
+        } finally {
+          setSlugLoading(false);
+        }
+      } else {
+        setGeneratedSlug('');
+      }
+    };
+
+    const timeoutId = setTimeout(generateSlugFromName, 500); // Debounce for 500ms
+    return () => clearTimeout(timeoutId);
+  }, [formData.name]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,11 +49,15 @@ export default function AddAilmentForm() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
-      const { data, error: insertError } = await supabase
+      // Generate final unique slug
+      const finalSlug = await createUniqueSlugFromName(formData.name);
+      
+      const { error: insertError } = await supabase
         .from('ailments')
         .insert([
           {
             name: formData.name,
+            slug: finalSlug,
             icon: formData.icon,
             description: formData.description,
             created_by: user?.id,
@@ -39,9 +69,10 @@ export default function AddAilmentForm() {
 
       // Success - redirect back to ailments page
       router.push('/admin/dashboard/ailments');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error adding ailment:', err);
-      setError(err.message || 'Failed to add ailment');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to add ailment';
+      setError(errorMessage);
       setLoading(false);
     }
   };
@@ -93,6 +124,30 @@ export default function AddAilmentForm() {
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
             />
           </div>
+
+          {/* Slug Preview */}
+          {formData.name && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                URL Slug (Auto-generated)
+              </label>
+              <div className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-600">
+                {slugLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-teal-600"></div>
+                    <span>Generating unique slug...</span>
+                  </div>
+                ) : (
+                  <span className="font-mono">
+                    /ailments/{generatedSlug || generateSlug(formData.name)}
+                  </span>
+                )}
+              </div>
+              <p className="text-sm text-gray-500 mt-1">
+                This URL will be used to access the ailment page
+              </p>
+            </div>
+          )}
 
           {/* Icon Field */}
           <div>

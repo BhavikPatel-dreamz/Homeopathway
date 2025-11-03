@@ -72,7 +72,7 @@ export default async function AilmentsPage() {
   // Fetch all ailments from database
   const { data: ailmentsData, error: ailmentsError } = await supabase
     .from("ailments")
-    .select("id, name, icon, remedies_count")
+    .select("id, name, slug, icon, remedies_count")
     .order("name", { ascending: true });
 
   if (ailmentsError) {

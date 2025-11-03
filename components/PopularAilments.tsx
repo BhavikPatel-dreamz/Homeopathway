@@ -17,7 +17,8 @@ export default function PopularAilments({ ailments, searchQuery }: PopularAilmen
   }
 
   const handleSelectAilment = (ailment: Ailment) => {
-    const slug = nameToSlug(ailment.name);
+    // Use the slug from the database, fallback to generated slug if not available
+    const slug = ailment.slug || nameToSlug(ailment.name);
     router.push(`/ailments/${slug}`, { scroll: false });
   };
 
