@@ -4,11 +4,11 @@ import Breadcrumb from "./Breadcrumb";
 import TopRemedies from "./TopRemedies";
 
 interface Remedy {
-  id: string;
+  id: number;
   name: string;
   indication: string;
   rating: number; 
-  review_count: number;
+  reviewCount: number;
   description: string;
   key_symptoms?: string[];
 }
