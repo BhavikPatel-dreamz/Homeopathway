@@ -5,6 +5,7 @@ export interface Ailment {
   icon: string;
   remedies_count: number;
   description?: string;
+  personalized_approach?: string;
   created_at?: string;
   updated_at?: string;
   created_by?: string;

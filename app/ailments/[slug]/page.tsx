@@ -22,7 +22,7 @@ interface Ailment {
   icon: string;
   remedies_count: number;
   description: string;
-  personalizedApproach: string;
+  personalized_approach: string;
 }
 
 async function getAilmentData(slug: string) {
@@ -53,9 +53,7 @@ async function getAilmentData(slug: string) {
     icon: ailmentData.icon || '🩺',
     remedies_count: ailmentData.remedies_count || 0,
     description: ailmentData.description || 'No description available.',
-    personalizedApproach:
-      ailmentData.personalized_approach ||
-      'The beauty of homeopathic treatment lies in its individualized approach. Two people with the same condition may receive different remedies based on their unique symptoms.',
+    personalized_approach: ailmentData.personalized_approach || 'The beauty of homeopathic treatment lies in its individualized approach. Two people with the same condition may receive different remedies based on their unique symptoms.',
   };
 
   const remedies: Remedy[] = (remediesData || []).map((r: unknown) => {

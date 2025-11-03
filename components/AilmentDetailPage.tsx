@@ -1,6 +1,6 @@
 import Footer from "@/components/Footer";
 import Header from "./Header";
-import TopRemedies from "./TopRemedies";
+import Breadcrumb from "./Breadcrumb";
 
 interface Remedy {
   id: string;
@@ -18,6 +18,7 @@ interface Ailment {
   icon: string;
   remedies_count: number;
   description: string;
+  personalized_approach: string;
 }
 
 interface AilmentDetailPageProps {
@@ -27,21 +28,36 @@ interface AilmentDetailPageProps {
 
 export default function 
 AilmentDetailPage({ ailment, remedies }: AilmentDetailPageProps) {
+  const [sortBy, setSortBy] = useState("Overall Rating");
+
+  const breadcrumbItems = [
+    { label: "Home", href: "/" },
+    { label: "Ailments", href: "/ailments" },
+    { label: ailment.name, isActive: true }
+  ];
+
+  const renderStars = (rating: number) => {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+    
+    return (
+      <div className="flex items-center gap-0.5">
+        {[...Array(5)].map((_, i) => (
+          <span key={i} className={i < fullStars ? 'text-yellow-400' : i === fullStars && hasHalfStar ? 'text-yellow-400' : 'text-gray-300'}>
+            {i < fullStars ? '★' : i === fullStars && hasHalfStar ? '⯨' : '☆'}
+          </span>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-[#F5F1E8]">
       {/* Header */}
      <Header />
 
       {/* Breadcrumb */}
-      <div className="bg-[#F5F1E8]">
-        <div className="max-w-7xl mx-auto px-6 py-3">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <a href="#" className=" text-[#41463B] hover:text-[#0B0C0A] underline font-[16px]  transition-all duration-500">Back to home</a>
-            <span>/</span>
-            <span className="text-[#0B0C0A] font-[500]">Headache</span>
-          </div>
-        </div>
-      </div>
+      <Breadcrumb items={breadcrumbItems} />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 pb-10">
@@ -61,6 +77,7 @@ AilmentDetailPage({ ailment, remedies }: AilmentDetailPageProps) {
 
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p className=" text-[16px] font-[500] text-[#41463B]">{ailment.description}</p>
+            <p className=" text-[16px] font-[500] text-[#41463B]">{ailment.personalized_approach}</p>
           </div>
         </div>
 
