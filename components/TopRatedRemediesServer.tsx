@@ -49,7 +49,7 @@ export default function TopRatedRemediesServer({
             </div>
           ))}
           {!searchQuery.trim() && (
-            <Link href="/remedies" className="bg-[#4B544A] text-white rounded-xl h-[136px] lg:h-[auto] p-6 flex items-center justify-center hover:bg-[#2B2E28] transition-colors cursor-pointer transition-all duration-500">
+            <Link href="/remedies" className="bg-[#4B544A] text-white rounded-xl py-14 px-6 flex items-center justify-center hover:bg-[#2B2E28] transition-colors cursor-pointer transition-all duration-500">
               <span className="font-[600] text-[20px] text-white">View all Remedies</span>
             </Link>
           )}

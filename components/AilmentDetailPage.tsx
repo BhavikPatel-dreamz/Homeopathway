@@ -97,7 +97,7 @@ AilmentDetailPage({ ailment, remedies }: AilmentDetailPageProps) {
             
             {/* Sort Dropdown */}
             <div className="relative w-1/2">
-              <div className="flex items-center justify-end">
+              <div className="flex items-center justify-end flex-col lg:flex-row">
                 <div className="mr-1 font-[500]">Sort by:</div>
                 <select className="block text-[#20231E] text-[16px] focus:outline-none">
                   <option value="">Select an option</option>
@@ -114,17 +114,16 @@ AilmentDetailPage({ ailment, remedies }: AilmentDetailPageProps) {
           <div className="space-y-4 flex flex-col">
             {remedies.map((remedy, index) => (
               <Link href={`/remedies/${remedy.id}`} key={remedy.id}>
-                <div className="bg-white rounded-[8px] p-6 transition-shadow cursor-pointer">
+                <div className="bg-white rounded-[8px] p-4 lg:p-6 transition-shadow cursor-pointer">
                   <div className="flex items-start gap-6">
                     {/* Icon */}
-                    <div className={`w-15 h-15 p-3 ${remedy.color} rounded-full flex items-center justify-center text-4xl flex-shrink-0`}>
+                    <div className={`w-15 h-15 p-3 ${remedy.color} rounded-full flex items-center justify-center text-3xl flex-shrink-0`}>
                       {remedy.icon}
                     </div>
 
                     {/* Content */}
                     <div className="flex-1">
-                      <div className="flex items-start justify-between mb-4 flex-col
-">
+                      <div className="flex items-start justify-between mb-4 flex-col">
                         <div className="flex items-start w-full justify-between">
                           <div>
                             <h3 className="text-[20px] text-[#0B0C0A] font-semibold mb-1 text-montserrat">{remedy.name}</h3>

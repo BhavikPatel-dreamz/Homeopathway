@@ -144,88 +144,99 @@ export default function RemediesDetailPage() {
       </div>
 
       {/* Tabs */}
-      <div className="sticky top-0 z-10 border-b border-gray-200 bg-white/80 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-6 flex gap-8 text-sm font-medium">
+      <div className="sticky top-0 z-10 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-6 flextext-sm mt-3 font-medium">
+          <div className="border-t border-[#B5B6B1] w-full flex gap-9 ">
+
+          
           {["Overview", "Origin", "Reviews", "Related Remedies"].map((tab) => (
             <button
               key={tab}
               onClick={() => handleTabClick(tab)}
-              className={`py-4 border-b-2 transition-all ${
-                activeTab === tab ? "border-[#2C5F4F] text-[#2C5F4F]" : "border-transparent text-gray-600 hover:text-gray-900"
+              className={`pt-8 border-t-2 transition-all cursor-pointer ${
+                activeTab === tab ? "border-[#0B0C0A] text-[#0B0C0A]" : "border-transparent text-[#41463B] hover:text-[#0B0C0A] hover:border-[#0B0C0A]  transition-all duration-500"
               }`}
             >
               {tab}
             </button>
           ))}
         </div>
+        </div>
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl mx-auto px-6 py-10 space-y-12">
+      <main className="flex-1 max-w-7xl mx-auto px-6 py-10 space-y-10">
         {/* Overview Section */}
-        <section id="Overview" ref={sectionRefs.Overview} className="grid grid-cols-1 lg:grid-cols-3 gap-8 scroll-mt-20">
+        <section id="Overview" ref={sectionRefs.Overview} className="flex gap-6 scroll-mt-20">
             {/* Left */}
-            <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm p-8">
-              <h1 className="text-4xl font-serif mb-2">{remedy.name}</h1>
-              <p className="text-gray-600 mb-4">{remedy.subtitle}</p>
-              <div className="flex items-center gap-2 mb-6">
-                {renderStars(remedy.rating)}
-                <span className="text-gray-600 text-sm">
-                  {remedy.rating} ({remedy.reviewsCount.toLocaleString()} reviews for headaches)
-                </span>
+            <div className="lg:w-[71%] bg-white rounded-[8px]  p-6 flex items-start">
+              <div className="flex items-center">
+                <div className="w-15 h-15 p-3 bg-green-100 rounded-full flex items-center justify-center text-3xl flex-shrink-0 mr-3">🌿</div>
               </div>
+              <div className="w-full">
+                <h1 className="text-[32px] lg:text-[40px] font-serif text-[#0B0C0A] mb-2 lg:mb-0">{remedy.name}</h1>
+                <p className="text[#41463B] text-[16px] mb-4">{remedy.subtitle}</p>
+                <div className="flex items-center gap-2 mb-6">
+                  {renderStars(remedy.rating)}
+                  <span className="text[#41463B] text-sm">
+                    {remedy.rating} ({remedy.reviewsCount.toLocaleString()} reviews for headaches)
+                  </span>
+                </div>
 
-              <h2 className="text-xl font-semibold mb-4">Key Symptoms for {remedy.name} Headaches:</h2>
-              <div className="grid sm:grid-cols-2 gap-6">
-                {remedy.symptoms.map((s, i) => (
-                  <div key={i} className="flex gap-3 items-start">
-                    <div className="w-3 h-3 mt-1.5 bg-yellow-500 rounded-full"></div>
-                    <div>
-                      <p className="font-medium">{s.title}</p>
-                      <p className="text-sm text-gray-600">{s.desc}</p>
+                <h4 className="text-[20px] text-[#2B2E28] font-bold mb-5 text-montserrat">Key Symptoms for {remedy.name} Headaches:</h4>
+                <div className="grid sm:grid-cols-2 gap-2 gap-y-8">
+                  {remedy.symptoms.map((s, i) => (
+                    <div key={i} className="flex gap-3 items-center">
+                      <div className="w-3 h-3 mt-1.5 bg-[#C3AF76] rounded-full"></div>
+                      <div>
+                        <p className="tex-[16px] text-[#2B2E28] font-semibold">{s.title}</p>
+                        <p className="text-sm text-[#2B2E28] font-medium">{s.desc}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
+         
             </div>
 
             {/* Right - Quick Stats */}
-            <aside className="bg-white rounded-2xl shadow-sm p-6 h-fit">
-              <h3 className="text-lg font-semibold mb-4">Quick Stats</h3>
+            <aside className="bg-white lg:w-[29%] white rounded-[8px]  p-4 h-fit">
+              <h3 className="text-[16px] text[#0B0C0A] font-semibold mb-4 text-montserrat">Quick Stats</h3>
               <ul className="space-y-3 text-sm text-gray-700">
                 <li className="flex justify-between">
-                  <span>Overall Rating</span>
-                  <span className="font-medium">{remedy.quickStats.overallRating}/5</span>
+                  <span className="text[#2B2E28] font-medium">Overall Rating</span>
+                  <span className="font-semibold">{remedy.quickStats.overallRating}/5</span>
                 </li>
                 <li className="flex justify-between">
-                  <span>Total Reviews</span>
-                  <span className="font-medium">{remedy.quickStats.totalReviews}</span>
+                  <span className="text[#2B2E28] font-medium">Total Reviews</span>
+                  <span className="font-semibold">{remedy.quickStats.totalReviews}</span>
                 </li>
                 <li className="flex justify-between">
-                  <span>Success Rate</span>
-                  <span className="font-medium">{remedy.quickStats.successRate}</span>
+                  <span className="text[#2B2E28] font-medium">Success Rate</span>
+                  <span className="font-semibold text-[#175F3D]">{remedy.quickStats.successRate}</span>
                 </li>
               </ul>
               <div className="mt-6">
-                <p className="text-sm text-gray-600 mb-1">Common Potencies</p>
-                <div className="bg-[#F5F1E8] px-4 py-2 rounded-lg inline-block font-medium text-gray-800">
-                  {remedy.quickStats.mostPopularPotency} <span className="text-xs text-gray-500">(Most Popular)</span>
+                <p className="text-[16px] text-[#0B0C0A] mb-2 font-semibold">Common Potencies</p>
+                <div className="flex justify-between flex-wrap font-medium text-[#2B2E28]">
+                  <div className="">{remedy.quickStats.mostPopularPotency} <span className="text-xs text-[#2B2E28]"></span></div>
                 </div>
               </div>
             </aside>
         </section>
 
         {/* Origin Section */}
-        <section id="Origin" ref={sectionRefs.Origin} className="bg-white rounded-2xl shadow-sm p-8 scroll-mt-20">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="text-3xl">🌿</div>
+        <section id="Origin" ref={sectionRefs.Origin} className="bg-white rounded-[8px] p-6 scroll-mt-20">
+          <p className="text-[20px] text-[#0B0C0A] font-semibold  mb-4" >Origin</p>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-15 h-15 p-3 bg-[#F9F7F2] rounded-full flex items-center justify-center text-3xl flex-shrink-0 mr-2">🌿</div>
               <div>
-                <h3 className="text-xl font-semibold">{remedy.origin.name}</h3>
-                <p className="text-sm text-gray-600">Also known as “{remedy.origin.alias}”</p>
+                <h6 className="text-[16px] text-[#0B0C0A] font-semibold text-montserrat mb-1">{remedy.origin.name}</h6>
+                <p className="text-sm text-[#0B0C0A] font-medium">Also known as “{remedy.origin.alias}”</p>
               </div>
             </div>
-            <p className="text-gray-700 mb-4">{remedy.origin.description}</p>
-            <p className="text-gray-700">{remedy.origin.homeopathic}</p>
+            <p className="text-[#41463B] font-medium mb-4">{remedy.origin.description}</p>
+            <p className="text-[#41463B] font-medium">{remedy.origin.homeopathic}</p>
         </section>
 
         {/* Reviews Section */}
