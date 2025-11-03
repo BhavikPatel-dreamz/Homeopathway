@@ -4,11 +4,11 @@ import AilmentDetailPage from '../../../components/AilmentDetailPage';
 import { supabase } from '@/lib/supabaseClient';
 
 interface Remedy {
-  id: string;
+  id: number;
   name: string;
   indication: string;
   rating: number;
-  review_count: number;
+  reviewCount: number;
   description: string;
   key_symptoms?: string[];
 }
@@ -70,11 +70,11 @@ async function getAilmentData(slug: string) {
     const ailmentRemedy = ar as Record<string, unknown>;
     const remedy = ailmentRemedy.remedies as Record<string, unknown>;
     return {
-      id: String(remedy.id),
+      id: Number(remedy.id),
       name: remedy.name as string,
       indication: (remedy.key_symptoms as string[])?.[0] || 'No indication specified.',
       rating: (remedy.average_rating as number) || 0,
-      review_count: (remedy.review_count as number) || 0,
+      reviewCount: (remedy.review_count as number) || 0,
       description: (remedy.description as string) || 'No description available.',
       key_symptoms: (remedy.key_symptoms as string[]) || [],
     };
