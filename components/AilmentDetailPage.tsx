@@ -30,7 +30,8 @@ interface AilmentDetailPageProps {
   remedies: Remedy[];
 }
 
-export default function AilmentDetailPage({ ailment, remedies }: AilmentDetailPageProps) {
+export default function 
+AilmentDetailPage({ ailment, remedies }: AilmentDetailPageProps) {
   const [sortBy, setSortBy] = useState("Overall Rating");
 
   const renderStars = (rating: number) => {

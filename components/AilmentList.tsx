@@ -181,22 +181,20 @@ export default function AilmentListPage({
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {paginatedAilments.length > 0 ? (
               paginatedAilments.map((ailment) => (
-                <button
-                  key={ailment.id}
-                  onClick={() => handleAilmentClick(ailment.id)}
-                  className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg hover:border-[#2C5F4F] transition-all text-left h-full flex flex-col justify-between group"
-                >
-                  <div>
-                    <div className="text-5xl mb-3">{ailment.icon}</div>
-                    <h4 className="font-semibold text-lg mb-2 text-gray-900 group-hover:text-[#2C5F4F] transition-colors">
-                      {ailment.name}
-                    </h4>
+                <Link href={`/ailments/${ailment.name}`} key={ailment.name}>
+                  <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg hover:border-[#2C5F4F] transition-all text-left h-full flex flex-col justify-between group cursor-pointer">
+                    <div>
+                      <div className="text-5xl mb-3">{ailment.icon}</div>
+                      <h4 className="font-semibold text-lg mb-2 text-gray-900 group-hover:text-[#2C5F4F] transition-colors">
+                        {ailment.name}
+                      </h4>
+                    </div>
+                    <p className="text-sm text-gray-500 mt-3 flex items-center gap-1">
+                      <span>🔬</span>
+                      <span>{ailment.remedies_count} remedies</span>
+                    </p>
                   </div>
-                  <p className="text-sm text-gray-500 mt-3 flex items-center gap-1">
-                    <span>🔬</span>
-                    <span>{ailment.remedies_count} remedies</span>
-                  </p>
-                </button>
+                </Link>
               ))
             ) : (
               <div className="col-span-full text-center py-12">
