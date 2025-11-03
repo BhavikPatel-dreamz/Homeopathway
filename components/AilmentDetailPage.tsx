@@ -29,7 +29,7 @@ interface AilmentDetailPageProps {
 
 export default function 
 AilmentDetailPage({ ailment, remedies }: AilmentDetailPageProps) {
-  const [sortBy, setSortBy] = useState("Overall Rating");
+
 
   const breadcrumbItems = [
     { label: "Home", href: "/" },
@@ -37,21 +37,7 @@ AilmentDetailPage({ ailment, remedies }: AilmentDetailPageProps) {
     { label: ailment.name, isActive: true }
   ];
 
-  const renderStars = (rating: number) => {
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 >= 0.5;
-    
-    return (
-      <div className="flex items-center gap-0.5">
-        {[...Array(5)].map((_, i) => (
-          <span key={i} className={i < fullStars ? 'text-yellow-400' : i === fullStars && hasHalfStar ? 'text-yellow-400' : 'text-gray-300'}>
-            {i < fullStars ? '★' : i === fullStars && hasHalfStar ? '⯨' : '☆'}
-          </span>
-        ))}
-      </div>
-    );
-  };
-
+  
   return (
     <div className="min-h-screen bg-[#F5F1E8]">
       {/* Header */}
