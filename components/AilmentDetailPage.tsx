@@ -1,6 +1,7 @@
 import Footer from "@/components/Footer";
 import Header from "./Header";
 import Breadcrumb from "./Breadcrumb";
+import TopRemedies from "./TopRemedies";
 
 interface Remedy {
   id: string;
