@@ -20,19 +20,20 @@ export function generateSlug(text: string): string {
 }
 
 /**
- * Checks if a slug exists in the ailments table
+ * Checks if a slug exists in the specified table
  * @param slug - The slug to check
+ * @param table - The table to check ('ailments' or 'remedies')
  * @param excludeId - Optional ID to exclude from the check (for editing)
  * @returns Boolean indicating if slug exists
  */
-export async function checkSlugExists(slug: string, excludeId?: string): Promise<boolean> {
+export async function checkSlugExists(slug: string, table: 'ailments' | 'remedies' = 'ailments', excludeId?: string): Promise<boolean> {
   try {
     let query = supabase
-      .from('ailments')
+      .from(table)
       .select('slug')
       .eq('slug', slug);
 
-    // Exclude current ailment when editing
+    // Exclude current record when editing
     if (excludeId) {
       query = query.neq('id', excludeId);
     }
@@ -54,14 +55,15 @@ export async function checkSlugExists(slug: string, excludeId?: string): Promise
 /**
  * Generates a unique slug by appending numbers if the base slug exists
  * @param baseSlug - The base slug to make unique
+ * @param table - The table to check ('ailments' or 'remedies')
  * @param excludeId - Optional ID to exclude from the check (for editing)
  * @returns A unique slug
  */
-export async function generateUniqueSlug(baseSlug: string, excludeId?: string): Promise<string> {
+export async function generateUniqueSlug(baseSlug: string, table: 'ailments' | 'remedies' = 'ailments', excludeId?: string): Promise<string> {
   let uniqueSlug = baseSlug;
   let counter = 1;
 
-  while (await checkSlugExists(uniqueSlug, excludeId)) {
+  while (await checkSlugExists(uniqueSlug, table, excludeId)) {
     counter++;
     uniqueSlug = `${baseSlug}-${counter}`;
   }
@@ -72,10 +74,11 @@ export async function generateUniqueSlug(baseSlug: string, excludeId?: string): 
 /**
  * Creates a unique slug from a name
  * @param name - The name to convert to a unique slug
+ * @param table - The table to check ('ailments' or 'remedies')
  * @param excludeId - Optional ID to exclude from the check (for editing)
  * @returns A unique slug
  */
-export async function createUniqueSlugFromName(name: string, excludeId?: string): Promise<string> {
+export async function createUniqueSlugFromName(name: string, table: 'ailments' | 'remedies' = 'ailments', excludeId?: string): Promise<string> {
   const baseSlug = generateSlug(name);
-  return generateUniqueSlug(baseSlug, excludeId);
+  return generateUniqueSlug(baseSlug, table, excludeId);
 }

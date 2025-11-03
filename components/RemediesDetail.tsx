@@ -4,6 +4,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { Star, StarHalf, StarOff, Search, ChevronDown } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Breadcrumb from "@/components/Breadcrumb";
+import { breadcrumbPaths } from "@/lib/breadcrumbUtils";
 import ReviewFilterModal from "./ReviewFilterModal";
 import AddReviewForm from "./AddReviewForm";
 
@@ -127,21 +129,9 @@ export default function RemediesDetailPage() {
       <Header />
 
       {/* Breadcrumb */}
-      <div className="bg-[#F5F1E8] border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-3">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <a href="/" className="hover:text-gray-900">
-              Home
-            </a>
-            <span>/</span>
-            <a href="#" className="hover:text-gray-900">
-              Headache
-            </a>
-            <span>/</span>
-            <span className="text-gray-900 ">{remedy.name}</span>
-          </div>
-        </div>
-      </div>
+      <Breadcrumb 
+        items={breadcrumbPaths.remedyDetail(remedy.name, "Headache", "headache")}
+      />
 
       {/* Tabs */}
       <div className="sticky top-0 z-10 backdrop-blur-sm">

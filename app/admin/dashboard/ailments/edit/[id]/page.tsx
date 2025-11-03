@@ -1,4 +1,4 @@
-import EditAilmentForm from '../../../../../../components/EditAilmentForm';
+import EditAilmentForm from '../../../../../../components/EditAilmentFormWithRemedies';
 
 export const metadata = {
   title: 'Edit Ailment - Admin Dashboard',
