@@ -1,9 +1,28 @@
 import LoginForm from '../../../components/LoginForm';
 import { redirect } from 'next/navigation';
 import { createClient } from '../../../lib/supabase/server';
+import { Metadata } from 'next';
 
-export const metadata = {
-  title: 'Login',
+export const metadata: Metadata = {
+  title: 'Login - Access Your Homeopathway Account',
+  description: 'Sign in to your Homeopathway account to access personalized remedy recommendations, save your favorite treatments, and manage your health profile.',
+  keywords: [
+    'login',
+    'sign in',
+    'homeopathway account',
+    'user account',
+    'access account',
+    'member login'
+  ],
+  robots: {
+    index: false,
+    follow: true,
+  },
+  openGraph: {
+    title: 'Login - Access Your Homeopathway Account',
+    description: 'Sign in to access personalized homeopathic remedy recommendations and manage your health profile.',
+    url: '/login',
+  },
 };
 
 export default async function LoginPage() {

@@ -1,5 +1,36 @@
 import { createClient } from '@/lib/supabase/server';
 import AilmentListPage from '../../components/AilmentList';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: "Browse All Ailments - Homeopathic Treatment Database",
+  description: "Explore our complete list of ailments and conditions treated with homeopathic remedies. Find natural treatments for headaches, anxiety, digestive issues, respiratory problems, and more.",
+  keywords: [
+    "ailments list",
+    "homeopathic conditions",
+    "natural treatment conditions",
+    "headache treatment",
+    "anxiety remedies",
+    "digestive health",
+    "respiratory ailments",
+    "skin conditions",
+    "joint pain",
+    "mental health"
+  ],
+  openGraph: {
+    title: "All Ailments - Homeopathic Treatment Database",
+    description: "Browse our comprehensive database of ailments treated with homeopathic remedies. Find natural solutions for your health concerns.",
+    url: "/ailments",
+    images: [
+      {
+        url: "/og-ailments.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Homeopathway Ailments Database",
+      },
+    ],
+  },
+};
 
 // Mock data as fallback
 const mockAilments = [

@@ -1,5 +1,36 @@
 import { createClient } from '@/lib/supabase/server';
 import RemedyListPage from '../../components/RemedyList';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: "Homeopathic Remedies Database - Natural Medicine Solutions",
+  description: "Discover our comprehensive collection of homeopathic remedies including Arnica Montana, Belladonna, Nux Vomica, and more. Read reviews, ratings, and detailed descriptions for each remedy.",
+  keywords: [
+    "homeopathic remedies",
+    "Arnica Montana",
+    "Belladonna",
+    "Nux Vomica",
+    "Pulsatilla",
+    "Ignatia Amara",
+    "natural medicine",
+    "homeopathy database",
+    "remedy reviews",
+    "natural treatments"
+  ],
+  openGraph: {
+    title: "Homeopathic Remedies Database - Natural Medicine Solutions",
+    description: "Browse our extensive collection of homeopathic remedies with user reviews and ratings. Find the right natural treatment for your health needs.",
+    url: "/remedies",
+    images: [
+      {
+        url: "/og-remedies.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Homeopathway Remedies Database",
+      },
+    ],
+  },
+};
 
 // Mock data as fallback - matches the structure expected by RemedyListPage
 const mockRemedies = [
