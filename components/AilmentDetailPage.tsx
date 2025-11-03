@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import Link from "next/link";
 import Footer from "@/components/Footer";
 import Header from "./Header";
 
@@ -107,38 +108,40 @@ export default function AilmentDetailPage({ ailment, remedies }: AilmentDetailPa
           {/* Remedies List */}
           <div className="space-y-4">
             {remedies.map((remedy, index) => (
-              <div key={remedy.id} className="border border-gray-200 rounded-2xl p-6 hover:shadow-md transition-shadow">
-                <div className="flex items-start gap-6">
-                  {/* Icon */}
-                  <div className={`w-20 h-20 ${remedy.color} rounded-full flex items-center justify-center text-4xl flex-shrink-0`}>
-                    {remedy.icon}
-                  </div>
-
-                  {/* Content */}
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <h3 className="text-2xl font-semibold mb-1">{remedy.name}</h3>
-                        <p className="text-sm text-gray-600">{remedy.indication}</p>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-5xl font-serif text-gray-200">#{index + 1}</div>
-                      </div>
+              <Link href={`/remedies/${remedy.id}`} key={remedy.id}>
+                <div className="border border-gray-200 rounded-2xl p-6 hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="flex items-start gap-6">
+                    {/* Icon */}
+                    <div className={`w-20 h-20 ${remedy.color} rounded-full flex items-center justify-center text-4xl flex-shrink-0`}>
+                      {remedy.icon}
                     </div>
 
-                    {/* Rating */}
-                    <div className="flex items-center gap-2 mb-3">
-                      {renderStars(remedy.rating)}
-                      <span className="text-sm text-gray-600">
-                        {remedy.rating} ({remedy.reviewCount.toLocaleString()} reviews for {remedy.ailment})
-                      </span>
-                    </div>
+                    {/* Content */}
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <h3 className="text-2xl font-semibold mb-1">{remedy.name}</h3>
+                          <p className="text-sm text-gray-600">{remedy.indication}</p>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-5xl font-serif text-gray-200">#{index + 1}</div>
+                        </div>
+                      </div>
 
-                    {/* Description */}
-                    <p className="text-gray-700 text-sm leading-relaxed">{remedy.description}</p>
+                      {/* Rating */}
+                      <div className="flex items-center gap-2 mb-3">
+                        {renderStars(remedy.rating)}
+                        <span className="text-sm text-gray-600">
+                          {remedy.rating} ({remedy.reviewCount.toLocaleString()} reviews for {remedy.ailment})
+                        </span>
+                      </div>
+
+                      {/* Description */}
+                      <p className="text-gray-700 text-sm leading-relaxed">{remedy.description}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
 
