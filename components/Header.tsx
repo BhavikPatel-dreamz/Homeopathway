@@ -1,25 +1,28 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 'use client';
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { SupabaseUser, UserProfile } from "@/types/supabase";
+import {  isAdmin } from "@/lib/userUtils";
 
 export default function Header() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    checkUser();
-  }, []);
 
   const checkUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     
+   
+
     if (user) {
-      setUser(user);
+      // Type assertion since we know the structure matches our interface
+      setUser(user as SupabaseUser);
       
       // Fetch profile to get role
       const { data: profileData } = await supabase
@@ -28,10 +31,15 @@ export default function Header() {
         .eq('id', user.id)
         .single();
       
-      setProfile(profileData);
+      setProfile(profileData as UserProfile);
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    // Initial user authentication check on component mount
+    checkUser();
+  }, []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -62,19 +70,19 @@ export default function Header() {
           {user ? (
             <>
               {/* User Info */}
-              <div className="hidden sm:flex items-center gap-4">
+              {/* <div className="hidden sm:flex items-center gap-4">
                 <div className="text-right">
                   <p className="text-sm font-medium">
-                    {profile?.first_name} {profile?.last_name}
+                    {getUserDisplayName(user, profile)}
                   </p>
                   <p className="text-xs text-white/60">
-                    {profile?.role === 'admin' ? '👑 Admin' : '👤 User'}
+                    {isAdmin(profile) ? '👑 Admin' : '👤 User'}
                   </p>
                 </div>
-              </div>
+              </div> */}
 
               {/* Navigation Links */}
-              {profile?.role === 'admin' && (
+              {isAdmin(profile) && (
                 <Link href="/admin/dashboard">
                   <button className="px-4 py-2 bg-teal-600 hover:bg-teal-700 rounded-full transition-colors text-sm ">
                     Dashboard
@@ -100,7 +108,14 @@ export default function Header() {
             <>
              <Link href="">
                 <button className="font-[600] text-[#D3D6D1] text-[16px] flex items-center hover:text-[#20231E]">
-                  <img className="mr-2" src="/save-icon.svg" />Save
+                  <Image 
+                    src="/save-icon.svg" 
+                    alt="Save icon" 
+                    width={16} 
+                    height={16} 
+                    className="mr-2" 
+                  />
+                  Save
                 </button>
               </Link>
               <Link href="/login">

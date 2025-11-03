@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 import Header from "@/components/Header";
@@ -33,6 +34,7 @@ export default function HomePageClient({
   initialAilments,
   initialTopRemedies,
 }: HomePageClientProps) {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [ailments, setAilments] = useState<Ailment[]>(initialAilments);
   const [topRemedies, setTopRemedies] = useState<Remedy[]>(initialTopRemedies);
@@ -137,12 +139,15 @@ export default function HomePageClient({
     }
   };
 
-  const handleSelectAilment = (ailment: Ailment) => {
-    setSearchQuery(ailment.name);
-    setShowSuggestions(false);
-    // Navigate to ailment page
-    window.location.href = `/ailments/${ailment.id}`;
-  };
+  function nameToSlug(name: string) {
+  return name.toLowerCase().replace(/ & /g, ' and ').replace(/\s+/g, '-');
+}
+const handleSelectAilment = (ailment: Ailment) => {
+  setSearchQuery(ailment.name);
+  setShowSuggestions(false);
+  const slug = nameToSlug(ailment.name);
+  router.push(`/ailments/${slug}`, { scroll: false });
+};
 
   const handleSelectRemedy = (remedy: Remedy) => {
     setSearchQuery(remedy.name);
@@ -425,8 +430,9 @@ export default function HomePageClient({
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-6 lg:grid-cols-4 gap-4 lg:gap-6">
-            {ailments.slice(0, 17).map((ailment) => (
-              <Link href={`/ailments/${ailment.id}`} key={ailment.id}>
+            {ailments.slice(0, 17).map((ailment) => {
+              return(
+                <button onClick={(e)=>handleSelectAilment(ailment)}>
                 <div className="flex items-center bg-white  rounded-xl pr-4 pl-4 pt-7 pb-7 transition-shadow cursor-pointer h-full">
                   <div className="text-3xl mb-2 mr-5 w-[32px] h-[32px]">{ailment.icon}</div>
                   <div>
@@ -437,8 +443,11 @@ export default function HomePageClient({
                   </div>
                 
                 </div>
-              </Link>
-            ))}
+                </button>
+              )
+            }
+             
+            )}
             {!searchQuery.trim() && (
               <Link href="/ailments">
                   <div className="bg-[#4B544A] text-white rounded-xl p-4 flex items-center justify-center hover:bg-[#2B2E28] transition-colors cursor-pointer h-full transition-all duration-500">

@@ -1,0 +1,24 @@
+# Robots.txt for Homeopathway
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://homeopathway.com/sitemap.xml
+
+# Specific directives
+Disallow: /admin/
+Disallow: /api/
+Disallow: /auth/callback
+Disallow: /_next/
+Disallow: /private/
+
+# Allow important pages
+Allow: /
+Allow: /ailments/
+Allow: /remedies/
+Allow: /profile
+Allow: /login
+Allow: /register
+
+# Crawl delay (optional, in seconds)
+Crawl-delay: 1

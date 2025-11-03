@@ -1,5 +1,38 @@
 import { createClient } from '@/lib/supabase/server';
-import HomePageClient from '@/components/HomePageClient';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import HomePageContent from '@/components/HomePageContent';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: "Home - Find Natural Homeopathic Remedies for Common Ailments",
+  description: "Explore our comprehensive database of homeopathic remedies for headaches, anxiety, insomnia, cold & flu, allergies, and more. Read user reviews and find effective natural treatments.",
+  keywords: [
+    "homeopathic remedies",
+    "natural treatment",
+    "headache remedy",
+    "anxiety treatment",
+    "insomnia cure",
+    "cold flu remedy",
+    "allergy treatment",
+    "joint pain relief",
+    "digestive health",
+    "muscle soreness treatment"
+  ],
+  openGraph: {
+    title: "Homeopathway - Find Natural Homeopathic Remedies",
+    description: "Discover effective homeopathic treatments for common ailments. Browse remedies, read reviews, and find natural solutions for your health needs.",
+    url: "/",
+    images: [
+      {
+        url: "/og-home.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Homeopathway Homepage - Natural Remedies Database",
+      },
+    ],
+  },
+};
 
 const dummyAilments = [
   { id: "d1", name: "Headache", icon: "😣", remedies_count: 45 },
@@ -81,10 +114,38 @@ export default async function Home() {
 
   const topRemedies = remediesData && remediesData.length > 0 ? remediesData : dummyTopRemedies;
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Homeopathway",
+    "description": "Comprehensive database of homeopathic remedies and natural treatments",
+    "url": process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/search?q={search_term_string}`
+      },
+      "query-input": "required name=search_term_string"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Homeopathway",
+      "description": "Leading platform for homeopathic remedies and natural health solutions"
+    }
+  };
+
   return (
-    <>
-      <HomePageClient initialAilments={ailments} initialTopRemedies={topRemedies} />
-      {/* The footer can be moved into HomePageClient or kept here if it's static */}
-    </>
+    <div className="min-h-screen bg-[#2C3E3E]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData),
+        }}
+      />
+      <Header />
+      <HomePageContent initialAilments={ailments} initialTopRemedies={topRemedies} />
+      <Footer />
+    </div>
   );
 }
