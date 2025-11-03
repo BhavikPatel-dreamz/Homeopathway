@@ -8,6 +8,7 @@ interface Remedy {
   name: string;
   indication: string;
   rating: number;
+  slug:string
   reviewCount: number;
   description: string;
   key_symptoms?: string[];
@@ -46,6 +47,7 @@ async function getAilmentData(slug: string) {
         id,
         name,
         description,
+        slug,
         key_symptoms,
         average_rating,
         review_count
@@ -75,6 +77,7 @@ async function getAilmentData(slug: string) {
       name: remedy.name as string,
       indication: (remedy.key_symptoms as string[])?.[0] || 'No indication specified.',
       rating: (remedy.average_rating as number) || 0,
+      slug:remedy.slug as string,
       reviewCount: (remedy.review_count as number) || 0,
       description: (remedy.description as string) || 'No description available.',
       key_symptoms: (remedy.key_symptoms as string[]) || [],
