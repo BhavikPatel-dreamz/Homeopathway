@@ -332,9 +332,9 @@ export default function HomePageClient({
 
               {/* Auto-Suggestions Dropdown */}
               {showSuggestions && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-2xl border border-gray-100 max-h-96 overflow-y-auto z-20">
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-2xl border border-gray-100 max-h-96 overflow-y-auto z-20">
                   {loading ? (
-                    <div className="p-8 text-center text-gray-500">
+                    <div className="p-8 text-[#0B0C0A]">
                       <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#2C3E3E]"></div>
                       <p className="mt-2">Searching...</p>
                     </div>
@@ -343,7 +343,7 @@ export default function HomePageClient({
                       {/* Ailments Section */}
                       {filteredAilments.length > 0 && (
                         <div className="border-b border-gray-100">
-                          <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
+                          <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-[#0B0C0A] uppercase tracking-wide flex items-start gap-2">
                             <span>😷</span> Ailments
                           </div>
                           {filteredAilments.map((ailment) => (
@@ -369,7 +369,7 @@ export default function HomePageClient({
                       {/* Remedies Section */}
                       {filteredRemedies.length > 0 && (
                         <div>
-                          <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
+                          <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-[#0B0C0A] uppercase tracking-wide flex items-center gap-2">
                             <span>💊</span> Remedies
                           </div>
                           {filteredRemedies.map((remedy, index) => (
@@ -400,7 +400,7 @@ export default function HomePageClient({
 
                       {/* No Results */}
                       {filteredAilments.length === 0 && filteredRemedies.length === 0 && (
-                        <div className="p-8 text-center text-gray-500">
+                        <div className="p-6 text-left  text-[#0B0C0A]">
                           <p className="text-lg font-medium">No results found</p>
                           <p className="text-sm mt-1">Try searching for different keywords</p>
                         </div>
@@ -419,7 +419,7 @@ export default function HomePageClient({
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-3 mb-6">
             <img className="w-[40px] h-[40px] lg:w-[60px] lg:h-[60px]" src="/ailments-icon.svg" alt="" />
-            <h3 className="text-[28px] lg:text-[40px]">
+            <h3 className="text-[28px] lg:text-[40px] text-[#0B0C0A]">
               {searchQuery.trim() ? "Ailment Results" : "Popular Ailments"}
             </h3>
           </div>
@@ -457,7 +457,7 @@ export default function HomePageClient({
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-3 mb-8">
             <img className="w-[40px] h-[40px] lg:w-[60px] lg:h-[60px]" src="/top-remedies.svg" alt="" />
-            <h3 className="text-[28px] lg:text-[40px]">
+            <h3 className="text-[28px] lg:text-[40px] text-[#0B0C0A]">
               {searchQuery.trim() ? "Remedy Results" : "Top Rated Remedies"}
             </h3>
           </div>
@@ -473,7 +473,7 @@ export default function HomePageClient({
                     <img src="/Blossom.png" alt="" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-[600] text-[20px] mb-1">{remedy.name}</p>
+                    <p className="font-[600] text-[20px] mb-1 text-[#0B0C0A]">{remedy.name}</p>
                     <div className="flex items-center gap-2 mb-3">
                       <div className="flex text-yellow-400">
                         {[...Array(5)].map((_, i) => (

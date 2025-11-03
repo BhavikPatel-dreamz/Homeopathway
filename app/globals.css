@@ -90,6 +90,9 @@ h1,h2,h3,h4,h5,h6{
 .home-slider .slick-dots li:not(:last-child){
   margin-right: 8px;
 }
+select option{
+  color: #20231E;
+}
 @media only screen and (max-width:767px) {
   .home-slider .slick-dots li button{
     width: 40px;
