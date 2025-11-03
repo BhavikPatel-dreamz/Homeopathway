@@ -27,3 +27,15 @@ export interface Remedy {
   updated_at?: string;
   created_by?: string;
 }
+
+export interface AilmentRemedy {
+  id: string;
+  ailment_id: string;
+  remedy_id: string;
+  created_at: string;
+  updated_at: string;
+  created_by?: string;  // Made optional
+  // Related data when joined
+  ailment?: Ailment;
+  remedy?: Remedy;
+}
