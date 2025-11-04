@@ -58,6 +58,13 @@ export interface Review {
   created_at: string;
   updated_at: string;
   // Related data when joined
+  remedies?: Remedy;
+  profiles?: {
+    first_name: string;
+    last_name: string;
+    email: string;
+  };
+  // Legacy support for old structure
   remedy?: Remedy;
   user_profile?: {
     first_name: string;

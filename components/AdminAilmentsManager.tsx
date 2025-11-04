@@ -137,7 +137,7 @@ export default function AdminAilmentsManager() {
           <p className="text-gray-600 mt-1">Add, edit, or remove ailments from your database</p>
         </div>
         <Link
-          href="/admin/dashboard/ailments/add"
+          href="/admin/ailments/add"
           className="px-6 py-3 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 transition-colors flex items-center gap-2"
         >
           <span className="text-xl">+</span>
@@ -191,7 +191,7 @@ export default function AdminAilmentsManager() {
                   <td className="px-6 py-4">
                     <div className="flex justify-end gap-2">
                       <Link
-                        href={`/admin/dashboard/ailments/edit/${ailment.id}`}
+                        href={`/admin/ailments/edit/${ailment.id}`}
                         className="px-3 py-1.5 text-sm text-teal-600 hover:bg-teal-50 rounded-lg transition-colors"
                       >
                         Edit

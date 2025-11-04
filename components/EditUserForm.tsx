@@ -78,7 +78,7 @@ export default function EditUserForm({ userId }: EditUserFormProps) {
       if (updateError) throw updateError;
 
       // Success - redirect back to users page
-      router.push('/admin/dashboard/users');
+      router.push('/admin/users');
     } catch (err: any) {
       console.error('Error updating user:', err);
       setError(err.message || 'Failed to update user');
@@ -109,7 +109,7 @@ export default function EditUserForm({ userId }: EditUserFormProps) {
       {/* Header */}
       <div>
         <Link
-          href="/admin/dashboard/users"
+          href="/admin/users"
           className="text-teal-600 hover:text-teal-800 flex items-center mb-4"
         >
           ← Back to Users
@@ -239,7 +239,7 @@ export default function EditUserForm({ userId }: EditUserFormProps) {
               {loading ? 'Updating...' : 'Update User'}
             </button>
             <Link
-              href="/admin/dashboard/users"
+              href="/admin/users"
               className="flex-1 bg-gray-200 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-300 font-medium transition-colors text-center"
             >
               Cancel

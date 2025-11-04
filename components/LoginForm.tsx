@@ -57,7 +57,7 @@ export default function LoginForm() {
         if (profile?.role === 'admin') {
           // Redirect admin to dashboard
           console.log('👑 Redirecting admin to dashboard');
-          router.push('/admin/dashboard');
+          router.push('/admin');
         } else {
           // Redirect regular user to home page
           console.log('👤 Redirecting user to home');

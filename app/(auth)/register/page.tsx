@@ -40,7 +40,7 @@ export default async function RegisterPage() {
       .single();
 
     if (profile?.role === 'admin') {
-      redirect('/admin/dashboard');
+      redirect('/admin');
     } else {
       redirect('/');
     }

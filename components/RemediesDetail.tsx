@@ -9,6 +9,7 @@ import { breadcrumbPaths } from "@/lib/breadcrumbUtils";
 import ReviewFilterModal from "./ReviewFilterModal";
 import AddReviewForm from "./AddReviewForm";
 import { Remedy } from "@/types";
+import ReviewListPage from "./ReviewList";
 
 // ---------------------------
 // Type Definitions
@@ -225,164 +226,13 @@ export default function RemediesDetailPage({ remedy }: RemediesDetailPageProps) 
         </section>
 
         {/* Reviews Section */}
-    
- <section className="bg-white rounded-2xl shadow-sm p-8">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        {/* Left – Rating Summary */}
-        <aside className="col-span-1">
-          <div className="flex flex-col items-center text-center border border-gray-200 rounded-2xl p-6 bg-[#F9F7F2]">
-            <span className="text-5xl font-serif text-gray-800 mb-2">⭐</span>
-            <h2 className="text-4xl font-bold text-gray-800 mb-1">
-              {remedy.average_rating.toFixed(1)}
-            </h2>
-            <p className="text-sm text-gray-500 mb-6">
-              Based on {remedy.review_count.toLocaleString()} reviews
-            </p>
-
-            {/* Rating Bars */}
-            <div className="w-full space-y-2 mb-6">
-              {[5, 4, 3, 2, 1].map((star) => (
-                <div key={star} className="flex items-center gap-2 text-sm">
-                  <span className="w-3 text-gray-700">{star}</span>
-                  <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div
-                      className="h-2 bg-[#6C7463] rounded-full"
-                      style={{
-                        width:
-                          star === 5
-                            ? "80%"
-                            : star === 4
-                            ? "12%"
-                            : star === 3
-                            ? "5%"
-                            : star === 2
-                            ? "2%"
-                            : "1%",
-                      }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-
-             <button 
-                  onClick={() => setIsReviewFormOpen(true)}
-                  className="bg-[#6C7463] hover:bg-[#5A6B5D] text-white px-5 py-2 rounded-full text-sm font-medium transition"
-                >
-                  Review Remedy
-                </button>
-          </div>
-        </aside>
-
-        {/* Right – Reviews List */}
-        <div className="col-span-2">
-          {/* Header: Search + Sort */}
-          <div className="flex flex-wrap items-center gap-3 mb-6">
-            <div className="relative flex-1 max-w-md mr-[5pc]">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                placeholder="Search reviews..."
-                className="w-full pl-11 pr-14 py-2.5 border border-gray-300 rounded-xl text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent"
-              />
-              <button
-                onClick={() => setIsFilterModalOpen(true)}
-                className="absolute right-1 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-[#6B7C6E] hover:bg-[#5A6B5D] rounded-lg transition-colors"
-              >
-                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                  <circle cx="8" cy="6" r="1.5" fill="currentColor" />
-                  <circle cx="8" cy="12" r="1.5" fill="currentColor" />
-                  <circle cx="8" cy="18" r="1.5" fill="currentColor" />
-                </svg>
-              </button>
-            </div>
-
-            <button className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition-colors">
-              <span className="text-gray-600">Sort by:</span>
-              <span className="font-medium text-gray-900">{sortBy}</span>
-              <ChevronDown className="w-4 h-4 text-gray-600" />
-            </button>
-          </div>
-
-          {/* Reviews */}
-          <div className="space-y-6">
-            {reviews.map((r) => (
-              <div
-                key={r.id}
-                className="border border-gray-200 rounded-2xl p-6 hover:shadow-md transition-shadow"
-              >
-                <div className="flex items-start justify-between mb-3">
-                  {/* User Info */}
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#E6E3DA] flex items-center justify-center text-sm font-semibold text-gray-700">
-                      {r.name.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="font-semibold text-gray-800">{r.name}</p>
-                      <div className="flex items-center gap-1">
-                        {renderStars(r.rating)}
-                        <span className="ml-1 text-sm text-gray-600">
-                          {r.rating.toFixed(1)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Time */}
-                  <p className="text-sm text-gray-500">{r.timeAgo}</p>
-                </div>
-
-                {/* Tags */}
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {r.tags.map((tag, i) => (
-                    <span
-                      key={i}
-                      className="text-xs bg-[#F5F1E8] px-2 py-1 rounded-full text-gray-700 border"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                {/* Review Text */}
-                <p className="text-gray-700 text-sm leading-relaxed">{r.text}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Pagination */}
-          <div className="flex items-center justify-center gap-2 mt-8">
-            {[1, 2, 3, 4].map((num) => (
-              <button
-                key={num}
-                className={`w-8 h-8 rounded-full text-sm font-medium ${
-                  num === 1
-                    ? "bg-[#6C7463] text-white"
-                    : "bg-[#F5F1E8] text-gray-700 hover:bg-[#EAE6DD]"
-                }`}
-              >
-                {num}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-      <ReviewFilterModal
-        isOpen={isFilterModalOpen}
-        onClose={() => setIsFilterModalOpen(false)}
-        onApply={(filters) => console.log("Applying filters:", filters)}
-        // You might want to calculate the actual number of reviews
-        totalResults={reviews.length}
-      />
-    </section>
-
-
+           <ReviewListPage remedy={remedy}/>
         {/* Related Remedies Section */}
-<section
-  id="Related Remedies"
-  ref={sectionRefs["Related Remedies"]}
-  className=" p-8 scroll-mt-20"
->
+       <section
+       id="Related Remedies"
+       ref={sectionRefs["Related Remedies"]}
+      className=" p-8 scroll-mt-20"
+        >
   <h3 className="text-2xl font-serif text-gray-800 mb-6">Related Remedies</h3>
 
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -443,20 +293,20 @@ export default function RemediesDetailPage({ remedy }: RemediesDetailPageProps) 
       </div>
     ))}
   </div>
-</section>
+        </section>
 
         {/* <section id="Related Remedies" ref={sectionRefs['Related Remedies']} className="bg-white rounded-2xl shadow-sm p-8 text-gray-600 scroll-mt-20">
             <p>Related remedies will appear here.</p>
         </section> */}
       </main>
-    {isReviewFormOpen && (
+    {/* {isReviewFormOpen && (
       <AddReviewForm 
         onClose={() => setIsReviewFormOpen(false)}
         remedyId={remedy.id}
         remedyName={remedy.name}
         condition={"your condition"}
       />
-    )}
+    )} */}
 
     </div>
   );

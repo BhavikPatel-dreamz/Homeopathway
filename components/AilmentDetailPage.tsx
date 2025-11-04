@@ -6,7 +6,6 @@ import TopRemedies from "./TopRemedies";
 interface Remedy {
   id: number;
   name: string;
-  slug:string;
   indication: string;
   rating: number; 
   reviewCount: number;

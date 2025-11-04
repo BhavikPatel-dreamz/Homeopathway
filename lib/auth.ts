@@ -100,7 +100,7 @@ export async function getUserProfile(userId?: string) {
     .eq('id', userId)
     .single();
   
-  console.log('📊 Query result - data:', data, 'error:', error);
+  
 
   // If there's an error (like infinite recursion or permission denied), return it
   if (error) {
@@ -150,7 +150,7 @@ export async function getUserProfile(userId?: string) {
     return { profile: null, error };
   }
   
-  console.log('✅ Profile found:', data);
+  
   return { profile: data, error: null };
 }
 

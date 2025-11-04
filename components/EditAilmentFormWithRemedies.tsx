@@ -121,7 +121,7 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
       if (updateError) throw updateError;
 
       // Success - redirect back to ailments page
-      router.push('/admin/dashboard/ailments');
+      router.push('/admin/ailments');
     } catch (err: unknown) {
       console.error('Error updating ailment:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to update ailment';
@@ -146,7 +146,7 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
       {/* Header */}
       <div>
         <Link
-          href="/admin/dashboard/ailments"
+          href="/admin/ailments"
           className="text-teal-600 hover:text-teal-800 flex items-center mb-4"
         >
           ← Back to Ailments
@@ -294,7 +294,7 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
                       {loading ? 'Updating...' : 'Update Ailment'}
                     </button>
                     <Link
-                      href="/admin/dashboard/ailments"
+                      href="/admin/ailments"
                       className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
                     >
                       Cancel

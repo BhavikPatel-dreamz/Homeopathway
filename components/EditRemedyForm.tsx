@@ -120,7 +120,7 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
       if (updateError) throw updateError;
 
       // Success - redirect back to remedies page
-      router.push('/admin/dashboard/remedies');
+      router.push('/admin/remedies');
     } catch (err: unknown) {
       console.error('Error updating remedy:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to update remedy';
@@ -171,7 +171,7 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
       {/* Header */}
       <div>
         <Link 
-          href="/admin/dashboard/remedies"
+          href="/admin/remedies"
           className="text-teal-600 hover:text-teal-700 flex items-center gap-2 mb-4"
         >
           ← Back to Remedies
@@ -423,7 +423,7 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
               {loading ? 'Updating...' : 'Update Remedy'}
             </button>
             <Link
-              href="/admin/dashboard/remedies"
+              href="/admin/remedies"
               className="flex-1 bg-gray-200 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-300 font-medium transition-colors text-center"
             >
               Cancel

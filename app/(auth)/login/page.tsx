@@ -39,7 +39,7 @@ export default async function LoginPage() {
       .single();
 
     if (profile?.role === 'admin') {
-      redirect('/admin/dashboard');
+      redirect('/admin');
     } else {
       redirect('/');
     }

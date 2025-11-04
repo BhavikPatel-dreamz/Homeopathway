@@ -24,13 +24,13 @@ export default function DashboardLayout({ children, userName }: DashboardLayoutP
   };
 
   const navigation = [
-    { name: 'Overview', href: '/admin/dashboard', icon: '📊' },
-    { name: 'Ailments', href: '/admin/dashboard/ailments', icon: '💊' },
-    { name: 'Remedies', href: '/admin/dashboard/remedies', icon: '🧪' },
-    { name: 'Users', href: '/admin/dashboard/users', icon: '👥' },
-    { name: 'Reviews', href: '/admin/dashboard/reviews', icon: '⭐' },
-    // { name: 'Analytics', href: '/admin/dashboard/analytics', icon: '📈' },
-    // { name: 'Settings', href: '/admin/dashboard/settings', icon: '⚙️' },
+    { name: 'Overview', href: '/admin/', icon: '📊' },
+    { name: 'Ailments', href: '/admin/ailments', icon: '💊' },
+    { name: 'Remedies', href: '/admin/remedies', icon: '🧪' },
+    { name: 'Users', href: '/admin/users', icon: '👥' },
+    { name: 'Reviews', href: '/admin/reviews', icon: '⭐' },
+    // { name: 'Analytics', href: '/admin/analytics', icon: '📈' },
+    // { name: 'Settings', href: '/admin/settings', icon: '⚙️' },
   ];
 
   return (
