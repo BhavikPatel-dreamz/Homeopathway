@@ -9,6 +9,16 @@ export async function middleware(req: NextRequest) {
     },
   });
 
+  // Add pathname to headers for server-side access
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set('x-pathname', req.nextUrl.pathname);
+  
+  response = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -25,7 +35,7 @@ export async function middleware(req: NextRequest) {
           });
           response = NextResponse.next({
             request: {
-              headers: req.headers,
+              headers: requestHeaders,
             },
           });
           response.cookies.set({
