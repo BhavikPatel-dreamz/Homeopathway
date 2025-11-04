@@ -132,7 +132,6 @@ export default function AilmentListPage({
     <div className="min-h-screen bg-[#F5F1E8]">
       {/* Header */}
       
-    <Header />
       {/* Breadcrumb */}
       <div className="bg-[#F5F1E8]">
         <div className="max-w-7xl mx-auto px-6 py-3">
@@ -260,7 +259,6 @@ export default function AilmentListPage({
       </main>
 
       {/* Footer */}
-      <Footer />
     </div>
   );
 }

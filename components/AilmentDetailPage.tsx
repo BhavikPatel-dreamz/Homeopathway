@@ -70,8 +70,7 @@ export default function AilmentDetailPage({ ailment, remedies }: AilmentDetailPa
         <TopRemedies remedies={remedies}/>
       </main>
 
-      {/* Footer */}
-            <Footer/>
+
     </div>
   );
 }

@@ -123,9 +123,6 @@ export default function RemediesDetailPage({ remedy }: RemediesDetailPageProps) 
 
   return (
     <div className="min-h-screen bg-[#F5F1E8] flex flex-col">
-      {/* Header */}
-      <Header />
-
       {/* Breadcrumb */}
       <Breadcrumb 
         items={breadcrumbPaths.remedyDetail(remedy.name, "All Remedies", "/remedies")}
@@ -460,8 +457,7 @@ export default function RemediesDetailPage({ remedy }: RemediesDetailPageProps) 
         condition={"your condition"}
       />
     )}
-      {/* Footer */}
-      <Footer />
+
     </div>
   );
 }

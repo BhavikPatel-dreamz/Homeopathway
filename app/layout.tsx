@@ -111,7 +111,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} antialiased`}
       > 
-      <div className="min-h-screen bg-[#2C3E3E]">
+      <div className="min-h-screen bg-[#F5F3ED] main-wrapper">
      
       <Header />
       
