@@ -137,16 +137,14 @@ export default async function Home() {
   
 
   return (
-    <div className="min-h-screen bg-[#2C3E3E]">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(structuredData),
-        }}
-      />
-      <Header />
+    <>
+    <script
+           type="application/ld+json"
+           dangerouslySetInnerHTML={{
+             __html: JSON.stringify(structuredData),
+           }}
+         />
       <HomePageContent initialAilments={ailments} initialTopRemedies={topRemedies} />
-      <Footer />
-    </div>
+     </>
   );
 }

@@ -40,9 +40,6 @@ export default function AilmentDetailPage({ ailment, remedies }: AilmentDetailPa
   
   return (
     <div className="min-h-screen bg-[#F5F1E8]">
-      {/* Header */}
-     <Header />
-
       {/* Breadcrumb */}
       <Breadcrumb items={breadcrumbItems} />
 

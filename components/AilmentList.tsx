@@ -131,6 +131,7 @@ export default function AilmentListPage({
   return (
     <div className="min-h-screen bg-[#F5F1E8]">
       {/* Header */}
+      
     <Header />
       {/* Breadcrumb */}
       <div className="bg-[#F5F1E8]">
