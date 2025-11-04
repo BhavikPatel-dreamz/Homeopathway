@@ -23,7 +23,7 @@ export default function Header() {
   }, []);
 
   // ✅ if inner page → show HeaderInner only
-  if (!isHome) {
+  if (!isHome ) {
     return <HeaderInner />;
   }
 

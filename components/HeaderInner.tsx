@@ -1,13 +1,17 @@
 
-import { useState, useEffect } from "react";
+"use client";
 
+import { useState, useEffect } from "react";
 import Logo from "./header/Logo";
 import SearchBar from "./SearchBar";
 import Image from "next/image";
+import ShareModal from "./ShareModal";
+import UserAvatar from "./UserAvatar";
+import SaveButton from "./SaveButton";
 
 export default function HeaderInner() {
-
   const [isSticky, setIsSticky] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -37,21 +41,27 @@ export default function HeaderInner() {
 
           {/*------ Header Button -----*/}
           
-          <div className="flex items-cente gap-2">
-            <button className="flex items-center justify-center w-[25px] h-[25px] md:w-[35px] md:h-[35px] lg:w-[44px] lg:h-[44px] cursor-pointer">
-              <Image height={20} width={20} src="/share-icon.svg" alt="" />
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setShowShareModal(true)}
+              className="flex items-center justify-center w-[25px] h-[25px] md:w-[35px] md:h-[35px] lg:w-[44px] lg:h-[44px] cursor-pointer hover:bg-gray-200 rounded-full transition-colors"
+              title="Share this page"
+            >
+              <Image height={20} width={20} src="/share-icon.svg" alt="Share" />
             </button>
 
-            <button className="flex items-center justify-center w-[25px] h-[25px] md:w-[35px] md:h-[35px] lg:w-[44px] lg:h-[44px] cursor-pointer">
-              <Image height={20} width={20}  src="/save.svg" alt="" />
-            </button>
+            <SaveButton className="w-[25px] h-[25px] md:w-[35px] md:h-[35px] lg:w-[44px] lg:h-[44px]" />
 
-            <div className="flex items-center justify-center text-center shrink bg-[#C3AF76]  w-[28px] h-[28px] md:w-[35px] md:h-[35px] lg:w-[44px] lg:h-[44px] p-2 text-[20px] lg:text-[24px] font-semibold text-white rounded-full">
-              M
-            </div>
+            <UserAvatar className="w-[28px] h-[28px] md:w-[35px] md:h-[35px] lg:w-[44px] lg:h-[44px] text-[12px] lg:text-[16px] font-semibold cursor-pointer hover:opacity-80 transition-opacity" />
 
           </div>
       </div>
+      
+      {/* Share Modal */}
+      <ShareModal 
+        isOpen={showShareModal} 
+        onClose={() => setShowShareModal(false)} 
+      />
     </header>
   )
 }
