@@ -46,7 +46,7 @@ export default function AilmentDetailPage({ ailment, remedies }: AilmentDetailPa
       <Breadcrumb items={breadcrumbItems} />
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 pb-10">
+      <main className="max-w-7xl mx-auto px-4 lg:px-5 pb-10">
         {/* Ailment Header */}
         <div className="bg-white rounded-[8px]  pl-4 pr-4 pt-6 pb-6 lg:p-6 mb-6 lg:mb-10 flex-row lg:flex-col">
           <div className="flex justify-between items-start lg:items-center mb-6 flex-col lg:flex-row">
