@@ -67,6 +67,45 @@ export async function addReview({
     .select()
     .single();
 
+  if (error) {
+    return { data, error };
+  }
+
+  // Update the remedy's average_rating and review_count
+  try {
+    // Get all reviews for this remedy to calculate the new average
+    const { data: allReviews, error: reviewsError } = await client
+      .from('reviews')
+      .select('star_count')
+      .eq('remedy_id', remedyId);
+
+    if (reviewsError) {
+      console.error('Error fetching reviews for average calculation:', reviewsError);
+      // Don't fail the entire operation, just log the error
+    } else if (allReviews) {
+      const reviewCount = allReviews.length;
+      const totalStars = allReviews.reduce((sum, review) => sum + review.star_count, 0);
+      const averageRating = totalStars / reviewCount;
+
+      // Update the remedy table
+      const { error: updateError } = await client
+        .from('remedies')
+        .update({
+          average_rating: averageRating,
+          review_count: reviewCount,
+        })
+        .eq('id', remedyId);
+
+      if (updateError) {
+        console.error('Error updating remedy statistics:', updateError);
+        // Don't fail the entire operation, just log the error
+      }
+    }
+  } catch (updateError) {
+    console.error('Error in remedy statistics update:', updateError);
+    // Don't fail the entire operation, just log the error
+  }
+
   return { data, error };
 }
 
