@@ -91,6 +91,81 @@ export const isHome = (): boolean => {
   return currentPath === '/' || currentPath === '/home';
 };
 
+// General page checker - check if current page matches a specific path or array of paths
+export const isPageChecker = (targetPath: string | string[]): boolean => {
+  
+  if (typeof window === 'undefined') {
+    // Server-side: cannot determine current page
+    return false;
+  }
+  
+  const currentPath = window.location.pathname;
+  
+  
+  // If targetPath is an array, check if current path matches any of them
+  if (Array.isArray(targetPath)) {
+    return targetPath.some(path => {
+      // Exact match
+      if (currentPath === path) {
+        return true;
+      }
+      
+      // Check if current path starts with target path (for nested routes)
+      if (path !== '/' && currentPath.startsWith(path)) {
+        return true;
+      }
+      
+      return false;
+    });
+  }
+  
+  // Single path logic (original functionality)
+  // Exact match
+  if (currentPath === targetPath) {
+    return true;
+  }
+  
+  // Check if current path starts with target path (for nested routes)
+  if (targetPath !== '/' && currentPath.startsWith(targetPath)) {
+    return true;
+  }
+  
+  return false;
+};
+
+// Server-side compatible page checker - accepts pathname parameter for SSR
+export const isPageCheckerSSR = (currentPath: string, targetPath: string | string[]): boolean => {
+  // If targetPath is an array, check if current path matches any of them
+  if (Array.isArray(targetPath)) {
+    return targetPath.some(path => {
+      // Exact match
+      if (currentPath === path) {
+        return true;
+      }
+      
+      // Check if current path starts with target path (for nested routes)
+      if (path !== '/' && currentPath.startsWith(path)) {
+        return true;
+      }
+      
+      return false;
+    });
+  }
+  
+  // Single path logic
+  // Exact match
+  if (currentPath === targetPath) {
+    return true;
+  }
+  
+  // Check if current path starts with target path (for nested routes)
+  if (targetPath !== '/' && currentPath.startsWith(targetPath)) {
+    return true;
+  }
+  
+  return false;
+};
+
 // Example utility functions using the typed user object
 export const getUserDisplayName = (user: User | null, profile: UserProfile | null): string => {
   if (!user) return 'Guest';
