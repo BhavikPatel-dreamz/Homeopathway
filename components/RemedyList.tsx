@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import Footer from "./Footer";
-import Header from "./Header";
+
+import Breadcrumb from "./Breadcrumb";
 
 interface Remedy {
   id: number;
@@ -100,20 +100,15 @@ export default function RemedyListPage({
 
   return (
     <div className="min-h-screen bg-[#F5F1E8]">
-      {/* Header */}
-    <Header />
+      
       {/* Breadcrumb */}
-      <div className="bg-[#F5F1E8] border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-3">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Link href="/" className="hover:text-gray-900 transition-colors">
-              Back to home
-            </Link>
-            <span>/</span>
-            <span className="text-gray-900 font-medium">All Remedies</span>
-          </div>
-        </div>
-      </div>
+      <Breadcrumb 
+        items={[
+          { label: "Back to home", href: "/" },
+          { label: "All Remedies", isActive: true }
+        ]} 
+        className="border-b border-gray-200"
+      />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-8">

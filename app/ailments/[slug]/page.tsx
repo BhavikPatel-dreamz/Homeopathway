@@ -37,7 +37,7 @@ async function getAilmentData(slug: string) {
   }
 
 
-  console.log('Fetched ailment data:', ailmentData);
+  
 
   const { data: remediesData, error: remediesError } = await supabase
     .from('ailment_remedies')

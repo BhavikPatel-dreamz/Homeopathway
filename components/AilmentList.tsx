@@ -123,10 +123,7 @@ export default function AilmentListPage({
     return pages;
   };
 
-  const handleAilmentClick = (ailmentId: string) => {
-    console.log(`Navigating to ailment: ${ailmentId}`);
-    // In your Next.js app, this would be handled by Link
-  };
+ 
 
   return (
     <div className="min-h-screen bg-[#F5F1E8]">
@@ -159,24 +156,9 @@ export default function AilmentListPage({
             </div>
           </div>
 
-          {/* Search Results Info */}
-          {searchQuery && (
-            <div className="mb-6 text-gray-600">
-              Found {filteredAilments.length} ailment{filteredAilments.length !== 1 ? 's' : ''} matching "{searchQuery}"
-              {filteredAilments.length > ITEMS_PER_PAGE && (
-                <span className="ml-2">
-                  (Showing {startIndex + 1}-{Math.min(endIndex, filteredAilments.length)})
-                </span>
-              )}
-            </div>
-          )}
+          
 
-          {!searchQuery && filteredAilments.length > ITEMS_PER_PAGE && (
-            <div className="mb-6 text-gray-600">
-              Showing {startIndex + 1}-{Math.min(endIndex, filteredAilments.length)} of {filteredAilments.length} ailments
-            </div>
-          )}
-
+        
           {/* Ailments Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {paginatedAilments.length > 0 ? (
