@@ -64,6 +64,7 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
   const [reviews, setReviews] = useState<ReviewType[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
   const [reviewsPerPage] = useState(5);
 
   const [isLoading, setIsLoading] = useState(true);
@@ -94,6 +95,7 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
           limit: reviewsPerPage,
           sortBy: sortBy,
           starCount: filters.rating,
+          searchQuery: searchQuery,
           potency: filters.dosage, // Assuming modal's 'dosage' is for potency
           // 'form' filter is not supported by getReviews yet
         });
@@ -138,12 +140,12 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
     };
 
     fetchReviewStats();
-  }, [remedy.id, remedy.review_count, sortBy, filters, currentPage, reviewsPerPage]);
+  }, [remedy.id, remedy.review_count, sortBy, filters, currentPage, reviewsPerPage, searchQuery]);
 
   useEffect(() => {
     // Reset to page 1 when filters or sort order changes
     setCurrentPage(1);
-  }, [filters, sortBy]);
+  }, [filters, sortBy, searchQuery]);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -214,6 +216,8 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
               <input
                 placeholder="Search reviews..."
                 className="w-full pl-11 pr-14 py-2.5 border border-gray-300 rounded-xl text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
               <button
                 onClick={() => setIsFilterModalOpen(true)}

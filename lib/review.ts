@@ -127,6 +127,7 @@ export async function getReviews({
   limit = 10,
   starCount,
   potency,
+  searchQuery,
   experiencedSideEffects,
 }: {
   remedyId?: string;
@@ -134,6 +135,7 @@ export async function getReviews({
   limit?: number;
   starCount?: number[];
   potency?: string[];
+  searchQuery?: string;
   experiencedSideEffects?: boolean;
 }): Promise<{ data: Review[] | null; error: Error | null; }> {
   let query = supabase
@@ -154,6 +156,11 @@ export async function getReviews({
 
   if (experiencedSideEffects !== undefined) {
     query = query.eq('experienced_side_effects', experiencedSideEffects);
+  }
+
+  if (searchQuery) {
+    const searchString = `%${searchQuery}%`;
+    query = query.or(`notes.ilike.${searchString},potency.ilike.${searchString},dosage.ilike.${searchString}`);
   }
 
   // Apply sorting
