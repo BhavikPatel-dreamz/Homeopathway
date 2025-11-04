@@ -5,13 +5,18 @@ import { X } from 'lucide-react';
 
 interface AddReviewFormProps {
   onClose: () => void;
+  remedyId: string;
+  remedyName: string;
+  condition?: string;
 }
 
-export default function AddReviewForm({ onClose }: AddReviewFormProps) {
+export default function AddReviewForm({ onClose, remedyId, remedyName, condition = 'your condition' }: AddReviewFormProps) {
   const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
-    remedy: 'Belladonna',
-    condition: 'Headache',
+    remedy: remedyName,
+    condition: condition,
     rating: 0,
     potencyType: '',
     potency: '',
@@ -28,13 +33,59 @@ export default function AddReviewForm({ onClose }: AddReviewFormProps) {
     onClose();
   };
 
+  const submitReview = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const reviewData = {
+        remedy_id: remedyId,
+        star_count: formData.rating,
+        potency: formData.potencyType && formData.potency ? `${formData.potencyType} ${formData.potency}` : null,
+        dosage: formData.dosage,
+        duration_used: formData.duration,
+        effectiveness: formData.effectiveness === 'Completely resolved symptoms' ? 5 :
+                      formData.effectiveness === 'Significantly improved' ? 4 :
+                      formData.effectiveness === 'Moderately improved' ? 3 :
+                      formData.effectiveness === 'Slightly improved' ? 2 :
+                      formData.effectiveness === 'No change' ? 1 :
+                      formData.effectiveness === 'Symptoms worsened' ? 0 : null,
+        notes: formData.notes,
+        experienced_side_effects: formData.sideEffects
+      };
+
+      const response = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(reviewData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to submit review');
+      }
+
+      const result = await response.json();
+      console.log('Review submitted successfully:', result);
+      
+      // Close the form on success
+      onClose();
+    } catch (err) {
+      console.error('Error submitting review:', err);
+      setError(err instanceof Error ? err.message : 'Failed to submit review');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleNext = () => {
     if (step < totalSteps) {
       setStep(step + 1);
     } else {
       // Submit form
-      console.log('Submit:', formData);
-      onClose();
+      submitReview();
     }
   };
 
@@ -87,9 +138,16 @@ export default function AddReviewForm({ onClose }: AddReviewFormProps) {
               Your experience with
             </h2>
             <h3 className="text-2xl font-serif text-gray-900 leading-tight">
-              <span className="font-semibold">{formData.remedy}</span> for your {formData.condition}
+              <span className="font-semibold">{formData.remedy}</span> for {formData.condition}
             </h3>
           </div>
+
+          {/* Error Display */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+              <p className="text-red-800 text-sm">{error}</p>
+            </div>
+          )}
 
           {/* Step 1: Rating */}
           {step === 1 && (
@@ -322,6 +380,7 @@ export default function AddReviewForm({ onClose }: AddReviewFormProps) {
             <button
               onClick={handleNext}
               disabled={
+                loading ||
                 (step === 1 && formData.rating === 0) ||
                 (step === 2 && (!formData.potencyType || !formData.potency)) ||
                 (step === 3 && !formData.dosage) ||
@@ -330,7 +389,7 @@ export default function AddReviewForm({ onClose }: AddReviewFormProps) {
               }
               className="flex-1 px-8 py-3 rounded-xl bg-gray-800 text-white hover:bg-gray-900 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all font-medium"
             >
-              {step === totalSteps ? 'Submit Review' : 'Next'}
+              {loading ? 'Submitting...' : (step === totalSteps ? 'Submit Review' : 'Next')}
             </button>
           </div>
         </div>

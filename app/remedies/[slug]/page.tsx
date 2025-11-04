@@ -4,31 +4,20 @@ import RemediesDetailPage from '../../../components/RemediesDetail';
 
 interface RemedyDetailPageProps {
   params: Promise<{
-    id: string;
+     slug: string;
   }>;
 }
 
-async function getRemedyBySlugOrId(slugOrId: string) {
+async function getRemedyBySlugOrId(slug: string) {
   const supabase = await createClient();
   
   // First try to fetch by slug
   let { data: remedy, error } = await supabase
     .from('remedies')
     .select('*')
-    .eq('slug', slugOrId)
+    .eq('slug', slug)
     .single();
 
-  // If not found by slug, try by ID
-  if (error && error.code === 'PGRST116') {
-    const { data: remedyById, error: idError } = await supabase
-      .from('remedies')
-      .select('*')
-      .eq('id', slugOrId)
-      .single();
-    
-    remedy = remedyById;
-    error = idError;
-  }
 
   if (error || !remedy) {
     return null;
@@ -38,8 +27,8 @@ async function getRemedyBySlugOrId(slugOrId: string) {
 }
 
 export async function generateMetadata({ params }: RemedyDetailPageProps) {
-  const { id } = await params;
-  const remedy = await getRemedyBySlugOrId(id);
+  const {slug} = await params;
+  const remedy = await getRemedyBySlugOrId(slug);
 
   if (!remedy) {
     return {
@@ -59,14 +48,12 @@ export async function generateMetadata({ params }: RemedyDetailPageProps) {
 }
 
 export default async function RemedyDetailPage({ params }: RemedyDetailPageProps) {
-  const { id } = await params;
-  const remedy = await getRemedyBySlugOrId(id);
-
+  const { slug } = await params;
+  const remedy = await getRemedyBySlugOrId(slug);
   if (!remedy) {
     notFound();
   }
 
-  // For now, just render the component without passing the remedy
-  // TODO: Update RemediesDetailPage to properly accept and use remedy prop
-  return <RemediesDetailPage />;
+  // Pass the fetched remedy data to the client component
+  return <RemediesDetailPage remedy={remedy} />;
 }

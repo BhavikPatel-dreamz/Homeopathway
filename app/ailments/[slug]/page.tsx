@@ -6,13 +6,12 @@ import { supabase } from '@/lib/supabaseClient';
 interface Remedy {
   id: number;
   name: string;
-  icon: string;
-  color: string;
   indication: string;
   rating: number;
+  slug:string
   reviewCount: number;
-  ailment: string;
   description: string;
+  key_symptoms?: string[];
 }
 
 interface Ailment {
@@ -22,7 +21,7 @@ interface Ailment {
   icon: string;
   remedies_count: number;
   description: string;
-  personalizedApproach: string;
+  personalized_approach: string;
 }
 
 async function getAilmentData(slug: string) {
@@ -37,10 +36,24 @@ async function getAilmentData(slug: string) {
     return null;
   }
 
+
+  console.log('Fetched ailment data:', ailmentData);
+
   const { data: remediesData, error: remediesError } = await supabase
-    .from('remedies')
-    .select('*')
-   
+    .from('ailment_remedies')
+    .select(`
+      remedy_id,
+      remedies:remedy_id (
+        id,
+        name,
+        description,
+        slug,
+        key_symptoms,
+        average_rating,
+        review_count
+      )
+    `)
+    .eq('ailment_id', ailmentData.id);
 
   if (remediesError) {
     console.error('Error fetching remedies:', remediesError.message);
@@ -53,23 +66,21 @@ async function getAilmentData(slug: string) {
     icon: ailmentData.icon || '🩺',
     remedies_count: ailmentData.remedies_count || 0,
     description: ailmentData.description || 'No description available.',
-    personalizedApproach:
-      ailmentData.personalized_approach ||
-      'The beauty of homeopathic treatment lies in its individualized approach. Two people with the same condition may receive different remedies based on their unique symptoms.',
+    personalized_approach: ailmentData.personalized_approach || 'The beauty of homeopathic treatment lies in its individualized approach. Two people with the same condition may receive different remedies based on their unique symptoms.',
   };
 
-  const remedies: Remedy[] = (remediesData || []).map((r: unknown) => {
-    const remedy = r as Record<string, unknown>;
+  const remedies: Remedy[] = (remediesData || []).map((ar: unknown) => {
+    const ailmentRemedy = ar as Record<string, unknown>;
+    const remedy = ailmentRemedy.remedies as Record<string, unknown>;
     return {
-      id: remedy.id as number,
+      id: Number(remedy.id),
       name: remedy.name as string,
-      icon: '🌿',
-      color: 'bg-green-100',
       indication: (remedy.key_symptoms as string[])?.[0] || 'No indication specified.',
       rating: (remedy.average_rating as number) || 0,
+      slug:remedy.slug as string,
       reviewCount: (remedy.review_count as number) || 0,
-      ailment: ailment.name,
       description: (remedy.description as string) || 'No description available.',
+      key_symptoms: (remedy.key_symptoms as string[]) || [],
     };
   });
 

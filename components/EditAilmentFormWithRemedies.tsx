@@ -24,6 +24,7 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
     name: '',
     icon: '',
     description: '',
+    personalizedApproach: '',
   });
 
   const fetchAilment = useCallback(async () => {
@@ -50,6 +51,7 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
         name: data.name || '',
         icon: data.icon || '',
         description: data.description || '',
+        personalizedApproach: data.personalized_approach || '',
       });
       setOriginalName(data.name || '');
       setGeneratedSlug(data.slug || '');
@@ -102,6 +104,7 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
         name: formData.name,
         icon: formData.icon,
         description: formData.description,
+        personalized_approach: formData.personalizedApproach,
         updated_at: new Date().toISOString(),
       };
 
@@ -266,6 +269,22 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
                     />
                   </div>
 
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Personalized Approach *
+                    </label>
+                    <textarea
+                      required
+                      value={formData.personalizedApproach}
+                      onChange={(e) =>
+                        setFormData({ ...formData, personalizedApproach: e.target.value })
+                      }
+                      rows={5}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                      placeholder="Describe the personalized approach and treatment recommendations for this ailment..."
+                    />
+                  </div>
+
                   <div className="flex gap-3">
                     <button
                       type="submit"
@@ -298,9 +317,14 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">
                         {formData.name || 'Ailment Name'}
                       </h3>
-                      <p className="text-sm text-gray-600 mb-4">
+                      <p className="text-sm text-gray-600 mb-2">
                         {formData.description || 'Description will appear here...'}
                       </p>
+                      {formData.personalizedApproach && (
+                        <p className="text-sm text-gray-600 italic">
+                          <strong>Approach:</strong> {formData.personalizedApproach}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
