@@ -4,31 +4,31 @@ import RemediesDetailPage from '../../../components/RemediesDetail';
 
 interface RemedyDetailPageProps {
   params: Promise<{
-    id: string;
+     slug: string;
   }>;
 }
 
-async function getRemedyBySlugOrId(slugOrId: string) {
+async function getRemedyBySlugOrId(slug: string) {
   const supabase = await createClient();
   
   // First try to fetch by slug
   let { data: remedy, error } = await supabase
     .from('remedies')
     .select('*')
-    .eq('slug', slugOrId)
+    .eq('slug', slug)
     .single();
-
+  console.log(remedy,"12121")
   // If not found by slug, try by ID
-  if (error && error.code === 'PGRST116') {
-    const { data: remedyById, error: idError } = await supabase
-      .from('remedies')
-      .select('*')
-      .eq('id', slugOrId)
-      .single();
+  // if (error && error.code === 'PGRST116') {
+  //   const { data: remedyById, error: idError } = await supabase
+  //     .from('remedies')
+  //     .select('*')
+  //     .eq('id', slugOrId)
+  //     .single();
     
-    remedy = remedyById;
-    error = idError;
-  }
+  //   remedy = remedyById;
+  //   error = idError;
+  // }
 
   if (error || !remedy) {
     return null;
@@ -38,8 +38,9 @@ async function getRemedyBySlugOrId(slugOrId: string) {
 }
 
 export async function generateMetadata({ params }: RemedyDetailPageProps) {
-  const { id } = await params;
-  const remedy = await getRemedyBySlugOrId(id);
+  const {slug} = await params;
+  const remedy = await getRemedyBySlugOrId(slug);
+  console.log(remedy,"12121228888")
 
   if (!remedy) {
     return {
@@ -59,14 +60,15 @@ export async function generateMetadata({ params }: RemedyDetailPageProps) {
 }
 
 export default async function RemedyDetailPage({ params }: RemedyDetailPageProps) {
-  const { id } = await params;
-  const remedy = await getRemedyBySlugOrId(id);
-
+  const { slug } = await params;
+  console.log(slug,"11111")
+  const remedy = await getRemedyBySlugOrId(slug);
+  console.log(remedy,"4444")
   if (!remedy) {
     notFound();
   }
 
   // For now, just render the component without passing the remedy
   // TODO: Update RemediesDetailPage to properly accept and use remedy prop
-  return <RemediesDetailPage />;
+  return <RemediesDetailPage params={{slug}} />;
 }

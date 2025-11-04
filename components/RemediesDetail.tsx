@@ -8,12 +8,14 @@ import Breadcrumb from "@/components/Breadcrumb";
 import { breadcrumbPaths } from "@/lib/breadcrumbUtils";
 import ReviewFilterModal from "./ReviewFilterModal";
 import AddReviewForm from "./AddReviewForm";
+import supabase from "@/lib/supabaseClient";
 
 // ---------------------------
 // Mock Data
 // ---------------------------
-const remedy = {
+const remedies = [{
   id: "belladonna-123",  // Mock remedy ID
+  slug: "belladonna",
   name: "Belladonna",
   subtitle: "For throbbing, pulsating headaches",
   rating: 4.8,
@@ -55,11 +57,53 @@ const remedy = {
       timeAgo: "3 days ago",
     },
   ],
-};
+},
+{
+    id: "nux-vomica-456",
+     slug: "nux-vomica",
+    name: "Nux Vomica",
+    subtitle: "For indigestion and irritability from overindulgence",
+    rating: 4.6,
+    reviewsCount: 1842,
+    quickStats: {
+      overallRating: 4.6,
+      totalReviews: 750,
+      successRate: "85%",
+      mostPopularPotency: "30C",
+    },
+    symptoms: [
+      { title: "Indigestion", desc: "Nausea, bloating, and heartburn" },
+      { title: "Irritability", desc: "Easily angered or annoyed, impatient" },
+      { title: "Sensitivity", desc: "Sensitive to noise, odors, and light" },
+      { title: "Stress-related issues", desc: "Headaches from mental strain" },
+    ],
+    origin: {
+      name: "Strychnos nux-vomica",
+      alias: "Poison Nut",
+      description: "The Nux Vomica tree is native to Southeast Asia. Its seeds contain strychnine, a potent poison.",
+      homeopathic: "In homeopathy, it's used for ailments related to a modern sedentary lifestyle, overwork, and overindulgence in rich food, coffee, or alcohol.",
+    },
+    reviews: [
+      {
+        id: 1,
+        name: "John D.",
+        rating: 5,
+        text: "After a weekend of overeating, Nux Vomica was a lifesaver for my indigestion. Felt better in a couple of hours.",
+        tags: ["Pellet", "30C", "As needed"],
+        timeAgo: "2 days ago",
+      },
+    ],
+  }
+];
 
+//  let { data: remedy, error } = await supabase
+//     .from('remedies')
+//     .select('*')
 // ---------------------------
 // Utility Functions
 // ---------------------------
+const getRemedyBySlug = (slug: string) => remedies.find(r => r.slug.toLowerCase().replace(/ /g, '-') === slug);
+
 const renderStars = (rating: number) => {
   const stars = [];
   const fullStars = Math.floor(rating);
@@ -77,11 +121,26 @@ const renderStars = (rating: number) => {
 // ---------------------------
 // Main Component
 // ---------------------------
-export default function RemediesDetailPage() {
+export default function RemediesDetailPage({ params }: { params: { slug: string } }) {
+  console.log(params,"12121545454")
+  const [remedy, setRemedy] = useState<(typeof remedies)[0] | null>(null);
   const [activeTab, setActiveTab] = useState("Overview");
   const [sortBy, setSortBy] = useState("Most Recent");
    const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (params.slug) {
+      const foundRemedy = getRemedyBySlug(params.slug);
+      if (foundRemedy) {
+        setRemedy(foundRemedy);
+      } else {
+        // Handle remedy not found, e.g., redirect or show a 404 message
+        console.error("Remedy not found for slug:", params.slug);
+      }
+    }
+  }, [params.slug]);
+
 
   const sectionRefs = {
     Overview: useRef<HTMLElement>(null),
@@ -124,6 +183,10 @@ export default function RemediesDetailPage() {
     }
   };
 
+  console.log(remedy,"33333")
+  if (!remedy) {
+    return <div>Loading remedy details...</div>; // Or a 404 component
+  }
   return (
     <div className="min-h-screen bg-[#F5F1E8] flex flex-col">
       {/* Header */}
