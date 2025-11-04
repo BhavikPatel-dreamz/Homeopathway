@@ -14,7 +14,7 @@ export default function PopularAilmentsServer({
 }: PopularAilmentsServerProps) {
   return (
     <section className="px-4 py-6 lg:py-10 bg-[#f5f3ed]">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl px-0 lg:px-5 mx-auto">
         <div className="flex items-center gap-3 mb-6">
           <img className="w-[40px] h-[40px] lg:w-[60px] lg:h-[60px]" src="/ailments-icon.svg" alt="" />
           <h3 className="text-[28px] lg:text-[40px] text-[#0B0C0A]">

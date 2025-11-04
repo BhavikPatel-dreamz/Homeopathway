@@ -5,7 +5,7 @@ import React from 'react'
 export default function Footer() {
   return (
     <footer className="bg-[#4B544A] text-white px-4 py-6 lg:py-10">
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-7xl px-0 lg:px-5 mx-auto">
       <div className="grid grid-cols-12 gap-6 lg:gap-8 md:mb-5 lg:mb-6">
         <div className="col-span-12 md:col-span-6 lg:col-span-7 flex items-center">
           <div className="flex items-start lg:items-center gap-3  flex-col lg:flex-row">

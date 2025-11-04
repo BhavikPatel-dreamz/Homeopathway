@@ -13,7 +13,7 @@ export default function TopRatedRemediesServer({
 }: TopRatedRemediesServerProps) {
   return (
     <section className="px-4 py-6 lg:py-10 bg-[#f5f3ed]">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl px-0 lg:px-5 mx-auto">
         <div className="flex items-center gap-3 mb-8">
           <Image 
             className="w-[40px] h-[40px] lg:w-[60px] lg:h-[60px]" 
@@ -32,7 +32,7 @@ export default function TopRatedRemediesServer({
             <Link
               key={remedy.id || index}
               href={`/remedies/${remedy.slug || remedy.id}`}
-              className="bg-white rounded-xl p-4 transition-shadow hover:shadow-lg block"
+              className="bg-white rounded-xl p-4 transition-shadow hover:shadow-lg block transition-all duration-500" 
             >
               <div className="flex items-start gap-4">
                 <div className="w-15 h-15 bg-[#F9F7F2] rounded-full flex items-center justify-center text-2xl flex-shrink-0 p-2.5">

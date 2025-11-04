@@ -134,7 +134,7 @@ export default function AilmentListPage({
       
       {/* Breadcrumb */}
       <div className="bg-[#F5F1E8]">
-        <div className="max-w-7xl mx-auto px-6 py-3">
+        <div className="max-w-7xl mx-auto px-0 lg:px-5 py-3">
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <Link href="/" className="hover:text-gray-900 text-[#41463B] underline  transition-all duration-500">
               Back to home
@@ -146,7 +146,7 @@ export default function AilmentListPage({
       </div>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-0 lg:px-5 py-8">
         {/* Ailments Section */}
         <div className="bg-white rounded-2xl p-8 shadow-sm">
           <div className="flex items-center gap-3 mb-8">

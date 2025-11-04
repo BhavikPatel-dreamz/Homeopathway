@@ -27,7 +27,7 @@ export default function TopRemedies({ remedies }: TopRemediesProps) {
     return (
       <div className="flex items-center gap-0.5">
         {[...Array(5)].map((_, i) => (
-          <span key={i} className={i < fullStars ? 'text-yellow-400' : i === fullStars && hasHalfStar ? 'text-yellow-400' : 'text-gray-300'}>
+          <span key={i} className={i < fullStars ? 'text-yellow-400' : i === fullStars && hasHalfStar ? 'text-yellow-400' : 'text-gray-300'  }>
             {i < fullStars ? '★' : i === fullStars && hasHalfStar ? '⯨' : '☆'}
           </span>
         ))}
@@ -56,13 +56,13 @@ export default function TopRemedies({ remedies }: TopRemediesProps) {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <img src="/top-remedies.svg" alt="" className="w-10 h-10 lg:w-12 lg:h-12" />
-          <h2 className="text-[28px] lg:text-[40px] text-[#0B0C0A]">Top Remedies</h2>
+          <h2 className="text-[28px] lg:text-[40px] text-[#0B0C0A] ">Top Remedies</h2>
         </div>
         
         {/* Sort Dropdown */}
         <div className="relative">
           <div className="flex items-center justify-end">
-            <label htmlFor="sort-remedies" className="mr-2 font-medium text-gray-700">Sort by:</label>
+            <label htmlFor="sort-remedies" className="mr-2 font-semibold text-[#2B2E28]">Sort by:</label>
             <select 
               id="sort-remedies"
               value={sortBy}
@@ -92,10 +92,10 @@ export default function TopRemedies({ remedies }: TopRemediesProps) {
                 <div className="flex-1">
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <h3 className="text-xl text-[#0B0C0A] font-semibold">{remedy.name}</h3>
-                      <p className="text-base text-[#41463B]">{remedy.indication}</p>
+                      <h3 className="text-xl text-[#0B0C0A] font-semibold text-montserrat">{remedy.name}</h3>
+                      <p className="text-base font-medium text-[#2B2E28]">{remedy.indication}</p>
                     </div>
-                    <div className="hidden sm:block text-right text-5xl font-serif text-[#B8A67E] opacity-75">
+                    <div className="hidden sm:block text-right text-4xl lg:text-5xl font-serif text-kingred  text-[#7D5C4E]">
                       #{index + 1}
                     </div>
                   </div>
@@ -109,7 +109,7 @@ export default function TopRemedies({ remedies }: TopRemediesProps) {
                   </div>
                   
                   {/* Description */}
-                  <p className="text-sm text-gray-700 leading-relaxed line-clamp-2">{remedy.description}</p>
+                  <p className="text-sm text-gray-700 leading-relaxed line-clamp-2 font-medium ">{remedy.description}</p>
                 </div>
               </div>
             </div>

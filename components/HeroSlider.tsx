@@ -177,7 +177,7 @@ export default function HeroSlider() {
             <input
               type="text"
               placeholder="Search for ailments like 'headache' or 'anxiety' or search for remedies like 'arnica' or 'bella donna'"
-              className="w-full pl-12 pr-12 py-3 lg:py-6 bg-white rounded-[8px] text-gray-800 placeholder-gray-500 focus:outline-none"
+              className="w-full pl-12 pr-12 py-3 lg:py-6 bg-white rounded-[8px] text-[#0B0C0A] placeholder-[#41463B] focus:outline-none"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -265,7 +265,7 @@ export default function HeroSlider() {
 
                   {/* No Results */}
                   {filteredAilments.length === 0 && filteredRemedies.length === 0 && (
-                    <div className="p-8 text-center text-gray-500">
+                    <div className="p-8 text-center text-[#0B0C0A]">
                       <p className="text-lg font-medium">No results found</p>
                       <p className="text-sm mt-1">Try searching for different keywords</p>
                     </div>
