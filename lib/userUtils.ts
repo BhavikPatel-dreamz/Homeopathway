@@ -40,12 +40,12 @@ export const isSessionValid = async (): Promise<boolean> => {
 // Check if any user is currently logged in (no parameters needed)
 export const checkIsUserLoggedIn = async (): Promise<boolean> => {
   try {
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const { data: { session }, error } = await supabase.auth.getSession();
     if (error) {
       console.error('Error checking if user is logged in:', error);
       return false;
     }
-    return user !== null && !!user.id;
+    return session !== null && session?.user !== null;
   } catch (error) {
     console.error('Error in checkIsUserLoggedIn:', error);
     return false;
