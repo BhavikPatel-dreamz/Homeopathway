@@ -67,7 +67,8 @@ export default function TopRemedies({ remedies }: TopRemediesProps) {
               id="sort-remedies"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="block appearance-none bg-transparent text-[#20231E] text-[16px] focus:outline-none pr-6"
+              className="block appearance-none bg-transparent text-[#20231E] text-[16px] focus:outline-none pr-5 bg-[url('/arrow-down.svg')] bg-[right_center]
+              bg-no-repeat"
             >
               <option>Overall Rating</option>
               <option>Most Reviewed</option>

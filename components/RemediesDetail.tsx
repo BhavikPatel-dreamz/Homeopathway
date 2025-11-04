@@ -132,7 +132,7 @@ export default function RemediesDetailPage({ remedy }: RemediesDetailPageProps) 
       {/* Tabs */}
       <div className="sticky top-0 z-10 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-6 flextext-sm mt-3 font-medium">
-          <div className="border-t border-[#B5B6B1] w-full flex gap-9 ">
+          <div className="border-t border-[#B5B6B1] w-full flex gap-9 whitespace-nowrap overflow-x-scroll md:overflow-x-visible">
 
           
           {["Overview", "Origin", "Reviews", "Related Remedies"].map((tab) => (
@@ -151,11 +151,11 @@ export default function RemediesDetailPage({ remedy }: RemediesDetailPageProps) 
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl mx-auto px-6 py-10 space-y-10">
+      <main className="flex-1 max-w-7xl mx-auto px-6 py-10 space-y-5 lg:space-y-10">
         {/* Overview Section */}
-        <section id="Overview" ref={sectionRefs.Overview} className="flex gap-6 scroll-mt-20">
+        <section id="Overview" ref={sectionRefs.Overview} className="flex gap-6 scroll-mt-20 flex-col lg:flex-row">
             {/* Left */}
-            <div className="lg:w-[71%] bg-white rounded-[8px]  p-6 flex items-start">
+            <div className="lg:w-[71%] bg-white rounded-[8px]  p-4 lg:p-6 flex items-start">
               <div className="flex items-center">
                 <div className="w-15 h-15 p-3 bg-green-100 rounded-full flex items-center justify-center text-3xl flex-shrink-0 mr-3">🌿</div>
               </div>
@@ -173,9 +173,9 @@ export default function RemediesDetailPage({ remedy }: RemediesDetailPageProps) 
                 <div className="grid sm:grid-cols-2 gap-2 gap-y-8">
                   {symptoms.map((s, i) => (
                     <div key={i} className="flex gap-3 items-center">
-                      <div className="w-3 h-3 mt-1.5 bg-[#C3AF76] rounded-full"></div>
+                      <div className="w-3 h-3 bg-[#C3AF76] rounded-full"></div>
                       <div>
-                        <p className="tex-[16px] text-[#2B2E28] font-semibold">{s.title}</p>
+                        <p className="text-[16px] text-[#2B2E28] font-semibold">{s.title}</p>
                         <p className="text-sm text-[#2B2E28] font-medium">{s.desc}</p>
                       </div>
                     </div>

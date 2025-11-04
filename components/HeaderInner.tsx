@@ -139,7 +139,7 @@ export default function HeaderInner() {
       <div className="max-w-7xl mx-auto px-0 lg:px-5 flex justify-between items-center">
           {/*------ Main Logo-----*/}
           <div>
-            <a href="/" className="w-[50px] md:w-[90px] w-[100px] block">
+            <a href="/" className="w-[70px] md:w-[90px] lg:w-[100px] block">
                 <img  className="w-full h-full object-contain"  src="/header-logo.svg" alt="" />
             </a>
           </div>
