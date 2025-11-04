@@ -1,20 +1,10 @@
-import { getUserProfile, isAdmin } from '../../../../lib/auth-server';
-import { createClient } from '../../../../lib/supabase/server';
 
 export const metadata = {
   title: 'Settings - Admin Dashboard',
 };
 
 export default async function SettingsPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  const userId = user?.id;
 
-  if (!userId || !(await isAdmin(userId))) {
-    return <div>Access Denied</div>;
-  }
-
-  const { profile } = await getUserProfile(userId);
 
   return (
 
