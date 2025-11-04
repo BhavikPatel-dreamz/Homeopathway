@@ -39,11 +39,11 @@ export default function HeaderInner() {
           
           <div className="flex items-cente gap-2">
             <button className="flex items-center justify-center w-[25px] h-[25px] md:w-[35px] md:h-[35px] lg:w-[44px] lg:h-[44px] cursor-pointer">
-              <Image height={30} width={30} src="/share-icon.svg" alt="" />
+              <Image height={20} width={20} src="/share-icon.svg" alt="" />
             </button>
 
             <button className="flex items-center justify-center w-[25px] h-[25px] md:w-[35px] md:h-[35px] lg:w-[44px] lg:h-[44px] cursor-pointer">
-              <Image height={30} width={30}  src="/save.svg" alt="" />
+              <Image height={20} width={20}  src="/save.svg" alt="" />
             </button>
 
             <div className="flex items-center justify-center text-center shrink bg-[#C3AF76]  w-[28px] h-[28px] md:w-[35px] md:h-[35px] lg:w-[44px] lg:h-[44px] p-2 text-[20px] lg:text-[24px] font-semibold text-white rounded-full">
