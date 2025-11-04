@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import Footer from "./Footer";
-import Header from "./Header";
+
+import Breadcrumb from "./Breadcrumb";
 
 interface Ailment {
   id: string;
@@ -130,17 +130,12 @@ export default function AilmentListPage({
       {/* Header */}
       
       {/* Breadcrumb */}
-      <div className="bg-[#F5F1E8]">
-        <div className="max-w-7xl mx-auto px-0 lg:px-5 py-3">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Link href="/" className="hover:text-gray-900 text-[#41463B] underline  transition-all duration-500">
-              Back to home
-            </Link>
-            <span>/</span>
-            <span className="text-gray-900 font-medium">All Ailments</span>
-          </div>
-        </div>
-      </div>
+      <Breadcrumb 
+        items={[
+          { label: "Back to home", href: "/" },
+          { label: "All Ailments", isActive: true }
+        ]} 
+      />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-0 lg:px-5 py-8">
