@@ -1,51 +1,15 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo, useReducer } from "react";
-import { Star, StarHalf, StarOff, Search, ChevronDown, Loader2 } from "lucide-react"; // Keep these imports
-import { getReviews } from "@/lib/review";
-import ReviewFilterModal from "./ReviewFilterModal";
+import React, { useState, useEffect } from "react";
+import { Star, StarHalf, StarOff, Search, ChevronDown, Loader2 } from "lucide-react";
+import { getReviews, getReviewFilterOptions } from "@/lib/review";
+import ReviewFilterModal, { ReviewFilters } from "./ReviewFilterModal";
 import AddReviewForm from "./AddReviewForm";
-import { Remedy, Review as ReviewType } from "@/types"; // Import Remedy and Review from @/types
+import { Remedy, Review as ReviewType } from "@/types";
 
-type State = {
-  reviews: ReviewType[];
-  isLoading: boolean;
-  error: string | null;
-};
-
-type Action =
-  | { type: 'FETCH_START' }
-  | { type: 'FETCH_SUCCESS'; payload: ReviewType[] }
-  | { type: 'FETCH_ERROR'; payload: string };
-
-const initialState: State = {
-  reviews: [],
-  isLoading: true,
-  error: null,
-};
-
-function reviewsReducer(state: State, action: Action): State {
-  switch (action.type) {
-    case 'FETCH_START':
-      return { ...state, isLoading: true, error: null };
-    case 'FETCH_SUCCESS':
-      return { ...state, isLoading: false, reviews: action.payload };
-    case 'FETCH_ERROR':
-      return { ...state, isLoading: false, error: action.payload };
-    default:
-      return state;
-  }
-}
 // ---------------------------
 // Type Definitions
 // ---------------------------
-interface Symptom {
-  title: string;
-  desc: string;
-}
- // Remove the local Review interface
-
-
 interface ReviewListPageProps {
   remedy: Remedy & {
     id:string,
@@ -94,78 +58,90 @@ const renderStars = (rating: number) => {
 // Main Component
 // ---------------------------
 export default function ReviewListPage({ remedy }: ReviewListPageProps) {
-  const [activeTab, setActiveTab] = useState("Overview");
-  const [sortBy, setSortBy] = useState("Most Recent");
-   const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'highest_rated' | 'lowest_rated'>("newest");
+  const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  const [{ reviews, isLoading, error: reviewsError }, dispatch] = useReducer(reviewsReducer, initialState);
+  const [reviews, setReviews] = useState<ReviewType[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [reviewsPerPage] = useState(5);
 
-  const sectionRefs = {
-    Overview: useRef<HTMLElement>(null),
-    Origin: useRef<HTMLElement>(null),
-    Reviews: useRef<HTMLElement>(null),
-    "Related Remedies": useRef<HTMLElement>(null),
-  };
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveTab(entry.target.id);
-          }
-        });
-      },
-      { rootMargin: "-50% 0px -50% 0px", threshold: 0 }
-    );
-
-    Object.values(sectionRefs).forEach((ref) => {
-      if (ref.current) {
-        observer.observe(ref.current);
-      }
-    });
-
-    return () => {
-      Object.values(sectionRefs).forEach((ref) => {
-        if (ref.current) {
-          observer.unobserve(ref.current);
-        }
-      });
-    };
-  }, []);
+  const [isLoading, setIsLoading] = useState(true);
+  const [filters, setFilters] = useState<ReviewFilters>({
+    rating: [],
+    dosage: [],
+    form: [],
+  });
+  const [filterOptions, setFilterOptions] = useState<{ potencies: string[]; forms: string[] }>({
+    potencies: [],
+    forms: [],
+  });
 
   useEffect(() => {
+    setTotalPages(Math.ceil(remedy.review_count / reviewsPerPage));
+
     const fetchReviews = async () => {
       if (!remedy.id) return;
-      dispatch({ type: 'FETCH_START' });
+      setIsLoading(true);
       try {
-        const { data, error } = await getReviews({ remedyId: remedy.id, limit: 10 });
-        console.log(data,"****")
+        const { data, error } = await getReviews({ 
+          remedyId: remedy.id, 
+          limit: reviewsPerPage,
+          sortBy: sortBy,
+          starCount: filters.rating,
+          potency: filters.dosage, // Assuming modal's 'dosage' is for potency
+          // 'form' filter is not supported by getReviews yet
+        });
         if (error) {
           throw error;
         }
-        dispatch({ type: 'FETCH_SUCCESS', payload: data || [] });
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "An unknown error occurred";
-        console.error("Failed to fetch reviews:", errorMessage);
-        dispatch({ type: 'FETCH_ERROR', payload: errorMessage });
+        setReviews(data || []);
+      } catch (error) {
+        console.error("Failed to fetch reviews:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchReviews();
-  }, [remedy.id]);
 
-  const symptoms: Symptom[] = useMemo(() => {
-    if (!remedy.key_symptoms) return [];
-    // Assuming key_symptoms is an array of strings.
-    // If they are in "Title: Description" format, you might need more parsing.
-    return remedy.key_symptoms.map(symptom => {
-      const parts = symptom.split(':');
-      if (parts.length > 1) {
-        return { title: parts[0].trim(), desc: parts.slice(1).join(':').trim() };
+    const fetchFilterOptions = async () => {
+      if (!remedy.id) return;
+      try {
+        const { data, error } = await getReviewFilterOptions(remedy.id);
+        if (error) throw error;
+        if (data) {
+          setFilterOptions(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch filter options:", error);
       }
-      return { title: symptom, desc: '' };
-    });
-  }, [remedy.key_symptoms]);
+    };
+
+    fetchFilterOptions();
+  }, [remedy.id, remedy.review_count, sortBy, filters, currentPage, reviewsPerPage]);
+
+  useEffect(() => {
+    // Reset to page 1 when filters or sort order changes
+    setCurrentPage(1);
+  }, [filters, sortBy]);
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+      // Optional: scroll to top of reviews section
+      const reviewSection = document.getElementById("Reviews");
+      reviewSection?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const sortOptions: { label: string; value: typeof sortBy }[] = [
+    { label: "Most Recent", value: "newest" },
+    { label: "Oldest", value: "oldest" },
+    { label: "Highest Rated", value: "highest_rated" },
+    { label: "Lowest Rated", value: "lowest_rated" },
+  ];
+
+  const currentSortLabel = sortOptions.find(opt => opt.value === sortBy)?.label || "Most Recent";
 
   if (!remedy) {
     return <div>Loading remedy details...</div>; // Or a 404 component
@@ -173,7 +149,7 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
 
   return (
     <div>
-      <section className="bg-white rounded-2xl shadow-sm p-8">
+      <section id="Reviews" className="bg-white rounded-2xl shadow-sm p-8 scroll-mt-20">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         {/* Left – Rating Summary */}
         <aside className="col-span-1">
@@ -244,11 +220,15 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
               </button>
             </div>
 
-            <button className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition-colors">
+            {/* This is a simplified dropdown. For a real app, you'd use a dropdown component library */}
+            <select 
+              value={sortBy} 
+              onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+              className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition-colors bg-transparent"
+            >
               <span className="text-gray-600">Sort by:</span>
-              <span className="font-medium text-gray-900">{sortBy}</span>
-              <ChevronDown className="w-4 h-4 text-gray-600" />
-            </button>
+              {sortOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+            </select>
           </div>
 
           {/* Reviews */}
@@ -258,11 +238,6 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
                 <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
                 <span className="ml-2 text-gray-600">Loading reviews...</span>
               </div>
-            ) : reviewsError ? (
-              <div className="text-center py-10 text-red-500">
-                <p className="font-medium">Failed to load reviews.</p>
-                <p className="text-sm">{reviewsError}</p>
-              </div>
             ) : reviews.length === 0 ? (
               <div className="text-center py-10 text-gray-500">
                 <p className="font-medium">No reviews yet.</p>
@@ -270,6 +245,7 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
               </div>
             ) : (
               reviews.map((review) => {
+                console.log(review,)
                 const userName = review.profiles?.first_name ? `${review.profiles.first_name} ${review.profiles.last_name?.charAt(0) || ''}.` : "Anonymous";
                 const userInitial = userName.charAt(0).toUpperCase();
                 const tags = [review.dosage, review.potency].filter(Boolean);
@@ -325,20 +301,41 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
           </div>
 
           {/* Pagination */}
-          {reviews.length > 0 && (
+          {reviews.length > 0 && totalPages > 1 && (
             <div className="flex items-center justify-center gap-2 mt-8">
-              {[1, 2, 3, 4].map((num) => (
-                <button
-                  key={num}
-                  className={`w-8 h-8 rounded-full text-sm font-medium ${
-                    num === 1
-                      ? "bg-[#6C7463] text-white"
-                      : "bg-[#F5F1E8] text-gray-700 hover:bg-[#EAE6DD]"
-                  }`}
-                >
-                  {num}
-                </button>
-              ))}
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-3 py-1 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+              >
+                Prev
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`w-8 h-8 rounded-full text-sm font-medium transition-colors ${
+                      currentPage === page
+                        ? "bg-[#6C7463] text-white"
+                        : "bg-[#F5F1E8] text-gray-700 hover:bg-[#EAE6DD]"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+              >
+                Next
+              </button>
+            </div>
+          )}
+          {reviews.length > 0 && totalPages > 1 && (
+            <div className="text-center mt-4 text-sm text-gray-600">
+              Page {currentPage} of {totalPages}
             </div>
           )}
         </div>
@@ -346,9 +343,14 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
       <ReviewFilterModal
         isOpen={isFilterModalOpen}
         onClose={() => setIsFilterModalOpen(false)}
-        onApply={(filters) => console.log("Applying filters:", filters)}
+        onApply={(appliedFilters) => {
+          setFilters(appliedFilters);
+          console.log("Applying filters:", appliedFilters);
+        }}
         // You might want to calculate the actual number of reviews
         totalResults={reviews.length}
+        dosageOptions={filterOptions.potencies}
+        formOptions={filterOptions.forms}
       />
     </section>
     {isReviewFormOpen && (

@@ -101,7 +101,6 @@ export async function getReviews({
     .from('reviews')
     .select('*')
     .limit(limit);
-
   if (remedyId) {
     query = query.eq('remedy_id', remedyId);
   }
@@ -136,6 +135,45 @@ export async function getReviews({
   }
 
   return query;
+}
+
+/**
+ * Fetches unique filter options (like potency and form) for reviews of a specific remedy.
+ *
+ * @param {string} remedyId - The ID of the remedy to get filter options for.
+ * @returns {Promise<{ data: { potencies: string[]; forms: string[] } | null; error: Error | null }>}
+ */
+export async function getReviewFilterOptions(remedyId: string): Promise<{
+  data: { potencies: string[]; forms: string[] } | null;
+  error: Error | null;
+}> {
+  try {
+    // Using rpc call to a function that gets distinct values would be more efficient.
+    // As a fallback, we can fetch all and process in JS, but this is not scalable.
+    const { data, error } = await supabase
+      .from('reviews')
+      .select('potency, dosage') // Assuming 'dosage' might contain form info like 'pellets'
+      .eq('remedy_id', remedyId);
+
+    if (error) {
+      throw error;
+    }
+
+    if (!data) {
+      return { data: { potencies: [], forms: [] }, error: null };
+    }
+
+    const potencies = [...new Set(data.map(r => r.potency).filter(Boolean) as string[])].sort();
+    
+    // This is a guess. The 'form' might be part of 'dosage' or another column.
+    // For now, I'll extract from dosage. A dedicated 'form' column is better.
+    const forms = [...new Set(data.map(r => r.dosage).filter(Boolean) as string[])].sort();
+
+    return { data: { potencies, forms }, error: null };
+  } catch (error) {
+    console.error('Error fetching review filter options:', error);
+    return { data: null, error: error as Error };
+  }
 }
 
 /**

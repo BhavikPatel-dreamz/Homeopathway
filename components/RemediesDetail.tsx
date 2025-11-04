@@ -59,9 +59,9 @@ export default function RemediesDetailPage({ remedy }: RemediesDetailPageProps) 
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 
   const sectionRefs = {
-    Overview: useRef<HTMLElement>(null),
-    Origin: useRef<HTMLElement>(null),
-    Reviews: useRef<HTMLElement>(null),
+ Overview: useRef<HTMLDivElement>(null),
+ Origin: useRef<HTMLDivElement>(null),
+ Reviews: useRef<HTMLDivElement>(null),
     "Related Remedies": useRef<HTMLElement>(null),
   };
 
@@ -226,7 +226,9 @@ export default function RemediesDetailPage({ remedy }: RemediesDetailPageProps) 
         </section>
 
         {/* Reviews Section */}
-           <ReviewListPage remedy={remedy}/>
+        <div ref={sectionRefs.Reviews}>
+          <ReviewListPage remedy={remedy} />
+        </div>
         {/* Related Remedies Section */}
        <section
        id="Related Remedies"

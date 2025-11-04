@@ -1,7 +1,7 @@
 "use client";
 import { useState } from 'react';
 
-interface ReviewFilters {
+export interface ReviewFilters {
   rating: number[];
   dosage: string[];
   form: string[];
@@ -12,14 +12,21 @@ interface ReviewFilterModalProps {
   onClose: () => void;
   onApply: (filters: ReviewFilters) => void;
   totalResults: number;
+  dosageOptions: string[];
+  formOptions: string[];
 }
 
-export default function ReviewFilterModal({ isOpen, onClose, onApply, totalResults }: ReviewFilterModalProps) {
+export default function ReviewFilterModal({ isOpen, onClose, onApply, totalResults, dosageOptions = [], formOptions = [] }: ReviewFilterModalProps) {
   const [filters, setFilters] = useState<ReviewFilters>({
     rating: [],
     dosage: [],
     form: [],
   });
+
+  // In a real scenario, you would fetch these from your database
+  // and pass them as props to this component. This is now correctly
+  // handled by destructuring `dosageOptions` and `formOptions` from props.
+  // Default values are provided in case the props are not passed.
 
   if (!isOpen) return null;
 
@@ -108,8 +115,8 @@ export default function ReviewFilterModal({ isOpen, onClose, onApply, totalResul
           <div>
             <h4 className="text-sm font-semibold text-gray-900 mb-3">Dosage</h4>
             <div className="space-y-2">
-              {['30C', '200C', '6C'].map((dosage) => (
-                <label key={dosage} className="flex items-center gap-3 cursor-pointer">
+              {dosageOptions.map((dosage) => (
+                <label key={dosage} className="flex items-center gap-3 cursor-pointer group">
                   <input
                     type="checkbox"
                     checked={filters.dosage.includes(dosage)}
@@ -126,8 +133,8 @@ export default function ReviewFilterModal({ isOpen, onClose, onApply, totalResul
           <div>
             <h4 className="text-sm font-semibold text-gray-900 mb-3">Form</h4>
             <div className="space-y-2">
-              {['Liquid', 'Pill'].map((form) => (
-                <label key={form} className="flex items-center gap-3 cursor-pointer">
+              {formOptions.map((form) => (
+                <label key={form} className="flex items-center gap-3 cursor-pointer group">
                   <input
                     type="checkbox"
                     checked={filters.form.includes(form)}
