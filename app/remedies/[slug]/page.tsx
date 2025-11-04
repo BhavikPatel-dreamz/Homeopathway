@@ -61,14 +61,11 @@ export async function generateMetadata({ params }: RemedyDetailPageProps) {
 
 export default async function RemedyDetailPage({ params }: RemedyDetailPageProps) {
   const { slug } = await params;
-  console.log(slug,"11111")
   const remedy = await getRemedyBySlugOrId(slug);
-  console.log(remedy,"4444")
   if (!remedy) {
     notFound();
   }
 
-  // For now, just render the component without passing the remedy
-  // TODO: Update RemediesDetailPage to properly accept and use remedy prop
-  return <RemediesDetailPage params={{slug}} />;
+  // Pass the fetched remedy data to the client component
+  return <RemediesDetailPage remedy={remedy} />;
 }

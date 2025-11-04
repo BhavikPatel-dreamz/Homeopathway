@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Star, StarHalf, StarOff, Search, ChevronDown } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -8,102 +8,32 @@ import Breadcrumb from "@/components/Breadcrumb";
 import { breadcrumbPaths } from "@/lib/breadcrumbUtils";
 import ReviewFilterModal from "./ReviewFilterModal";
 import AddReviewForm from "./AddReviewForm";
-import supabase from "@/lib/supabaseClient";
+import { Remedy } from "@/types";
 
 // ---------------------------
-// Mock Data
+// Type Definitions
 // ---------------------------
-const remedies = [{
-  id: "belladonna-123",  // Mock remedy ID
-  slug: "belladonna",
-  name: "Belladonna",
-  subtitle: "For throbbing, pulsating headaches",
-  rating: 4.8,
-  reviewsCount: 2314,
-  quickStats: {
-    overallRating: 4.8,
-    totalReviews: 892,
-    successRate: "87%",
-    mostPopularPotency: "30C",
-  },
-  symptoms: [
-    { title: "Sudden Onset", desc: "Headaches that come on quickly and intensely" },
-    { title: "Throbbing Pain", desc: "Pulsating pain, beating sensation in the head" },
-    { title: "Heat & Redness", desc: "Face feels hot and may appear flushed" },
-    { title: "Light Sensitivity", desc: "Bright light worsens headache" },
-  ],
-  origin: {
-    name: "Atropa Belladonna",
-    alias: "Deadly Nightshade",
-    description: `Belladonna has been used medicinally for centuries, despite its toxic nature in crude form. 
-    The name “belladonna” means “beautiful lady” in Italian, referring to its historical use by women to dilate their pupils for cosmetic purposes.`,
-    homeopathic: `In homeopathy, Belladonna was proven by Samuel Hahnemann himself in the early 1800s. When prepared homeopathically, it becomes completely safe and is one of the most frequently used remedies for acute conditions involving sudden onset, heat, and inflammation.`,
-  },
-  reviews: [
-    {
-      id: 1,
-      name: "Emily R.",
-      rating: 5,
-      text: "I used to get tension headaches every week from work stress. After a few doses of Nux Vomica, the pain eased within an hour. I feel calmer and more balanced now!",
-      tags: ["Pellet", "6C", "Once daily", "1–2 weeks"],
-      timeAgo: "1 hour ago",
-    },
-    {
-      id: 2,
-      name: "Sophia L.",
-      rating: 4.5,
-      text: "My migraine attacks were intense and came with light sensitivity. Belladonna worked surprisingly fast! The throbbing pain subsided within a few hours.",
-      tags: ["Pellet", "6C", "Once daily", "1–2 weeks"],
-      timeAgo: "3 days ago",
-    },
-  ],
-},
-{
-    id: "nux-vomica-456",
-     slug: "nux-vomica",
-    name: "Nux Vomica",
-    subtitle: "For indigestion and irritability from overindulgence",
-    rating: 4.6,
-    reviewsCount: 1842,
-    quickStats: {
-      overallRating: 4.6,
-      totalReviews: 750,
-      successRate: "85%",
-      mostPopularPotency: "30C",
-    },
-    symptoms: [
-      { title: "Indigestion", desc: "Nausea, bloating, and heartburn" },
-      { title: "Irritability", desc: "Easily angered or annoyed, impatient" },
-      { title: "Sensitivity", desc: "Sensitive to noise, odors, and light" },
-      { title: "Stress-related issues", desc: "Headaches from mental strain" },
-    ],
-    origin: {
-      name: "Strychnos nux-vomica",
-      alias: "Poison Nut",
-      description: "The Nux Vomica tree is native to Southeast Asia. Its seeds contain strychnine, a potent poison.",
-      homeopathic: "In homeopathy, it's used for ailments related to a modern sedentary lifestyle, overwork, and overindulgence in rich food, coffee, or alcohol.",
-    },
-    reviews: [
-      {
-        id: 1,
-        name: "John D.",
-        rating: 5,
-        text: "After a weekend of overeating, Nux Vomica was a lifesaver for my indigestion. Felt better in a couple of hours.",
-        tags: ["Pellet", "30C", "As needed"],
-        timeAgo: "2 days ago",
-      },
-    ],
+interface Symptom {
+  title: string;
+  desc: string;
+}
+
+interface RemediesDetailPageProps {
+  remedy: Remedy & {
+    id:string,
+    name:string,
+    // Add other fields from your Supabase table here if they are not in the base Remedy type
+    scientific_name?: string;
+    common_name?: string;
+    constitutional_type?: string;
+    dosage_forms?: string[];
+    safety_precautions?: string;
   }
-];
+}
 
-//  let { data: remedy, error } = await supabase
-//     .from('remedies')
-//     .select('*')
 // ---------------------------
 // Utility Functions
 // ---------------------------
-const getRemedyBySlug = (slug: string) => remedies.find(r => r.slug.toLowerCase().replace(/ /g, '-') === slug);
-
 const renderStars = (rating: number) => {
   const stars = [];
   const fullStars = Math.floor(rating);
@@ -121,26 +51,11 @@ const renderStars = (rating: number) => {
 // ---------------------------
 // Main Component
 // ---------------------------
-export default function RemediesDetailPage({ params }: { params: { slug: string } }) {
-  console.log(params,"12121545454")
-  const [remedy, setRemedy] = useState<(typeof remedies)[0] | null>(null);
+export default function RemediesDetailPage({ remedy }: RemediesDetailPageProps) {
   const [activeTab, setActiveTab] = useState("Overview");
   const [sortBy, setSortBy] = useState("Most Recent");
    const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-
-  useEffect(() => {
-    if (params.slug) {
-      const foundRemedy = getRemedyBySlug(params.slug);
-      if (foundRemedy) {
-        setRemedy(foundRemedy);
-      } else {
-        // Handle remedy not found, e.g., redirect or show a 404 message
-        console.error("Remedy not found for slug:", params.slug);
-      }
-    }
-  }, [params.slug]);
-
 
   const sectionRefs = {
     Overview: useRef<HTMLElement>(null),
@@ -183,10 +98,29 @@ export default function RemediesDetailPage({ params }: { params: { slug: string 
     }
   };
 
-  console.log(remedy,"33333")
+  const symptoms: Symptom[] = useMemo(() => {
+    if (!remedy.key_symptoms) return [];
+    // Assuming key_symptoms is an array of strings.
+    // If they are in "Title: Description" format, you might need more parsing.
+    return remedy.key_symptoms.map(symptom => {
+      const parts = symptom.split(':');
+      if (parts.length > 1) {
+        return { title: parts[0].trim(), desc: parts.slice(1).join(':').trim() };
+      }
+      return { title: symptom, desc: '' };
+    });
+  }, [remedy.key_symptoms]);
+
   if (!remedy) {
     return <div>Loading remedy details...</div>; // Or a 404 component
   }
+
+  // Mock data for reviews until it's fetched from Supabase
+  const reviews = [
+      { id: 1, name: "Emily R.", rating: 5, text: "This was amazing!", tags: ["Pellet", "30C"], timeAgo: "1 day ago" },
+      { id: 2, name: "John D.", rating: 4, text: "Helped a lot with my symptoms.", tags: ["Liquid", "6C"], timeAgo: "3 days ago" },
+  ];
+
   return (
     <div className="min-h-screen bg-[#F5F1E8] flex flex-col">
       {/* Header */}
@@ -194,7 +128,7 @@ export default function RemediesDetailPage({ params }: { params: { slug: string 
 
       {/* Breadcrumb */}
       <Breadcrumb 
-        items={breadcrumbPaths.remedyDetail(remedy.name, "Headache", "headache")}
+        items={breadcrumbPaths.remedyDetail(remedy.name, "All Remedies", "/remedies")}
       />
 
       {/* Tabs */}
@@ -229,17 +163,17 @@ export default function RemediesDetailPage({ params }: { params: { slug: string 
               </div>
               <div className="w-full">
                 <h1 className="text-[32px] lg:text-[40px] font-serif text-[#0B0C0A] mb-2 lg:mb-0">{remedy.name}</h1>
-                <p className="text[#41463B] text-[16px] mb-4">{remedy.subtitle}</p>
+                <p className="text[#41463B] text-[16px] mb-4">{remedy.description}</p>
                 <div className="flex items-center gap-2 mb-6">
-                  {renderStars(remedy.rating)}
+                  {renderStars(remedy.average_rating)}
                   <span className="text[#41463B] text-sm">
-                    {remedy.rating} ({remedy.reviewsCount.toLocaleString()} reviews for headaches)
+                    {remedy.average_rating.toFixed(1)} ({remedy.review_count.toLocaleString()} reviews)
                   </span>
                 </div>
 
                 <h4 className="text-[20px] text-[#2B2E28] font-bold mb-5 text-montserrat">Key Symptoms for {remedy.name} Headaches:</h4>
                 <div className="grid sm:grid-cols-2 gap-2 gap-y-8">
-                  {remedy.symptoms.map((s, i) => (
+                  {symptoms.map((s, i) => (
                     <div key={i} className="flex gap-3 items-center">
                       <div className="w-3 h-3 mt-1.5 bg-[#C3AF76] rounded-full"></div>
                       <div>
@@ -259,21 +193,21 @@ export default function RemediesDetailPage({ params }: { params: { slug: string 
               <ul className="space-y-3 text-sm text-gray-700">
                 <li className="flex justify-between">
                   <span className="text[#2B2E28] font-medium">Overall Rating</span>
-                  <span className="font-semibold">{remedy.quickStats.overallRating}/5</span>
+                  <span className="font-semibold">{remedy.average_rating.toFixed(1)}/5</span>
                 </li>
                 <li className="flex justify-between">
                   <span className="text[#2B2E28] font-medium">Total Reviews</span>
-                  <span className="font-semibold">{remedy.quickStats.totalReviews}</span>
+                  <span className="font-semibold">{remedy.review_count}</span>
                 </li>
                 <li className="flex justify-between">
                   <span className="text[#2B2E28] font-medium">Success Rate</span>
-                  <span className="font-semibold text-[#175F3D]">{remedy.quickStats.successRate}</span>
+                  <span className="font-semibold text-[#175F3D]">N/A</span>
                 </li>
               </ul>
               <div className="mt-6">
                 <p className="text-[16px] text-[#0B0C0A] mb-2 font-semibold">Common Potencies</p>
                 <div className="flex justify-between flex-wrap font-medium text-[#2B2E28]">
-                  <div className="">{remedy.quickStats.mostPopularPotency} <span className="text-xs text-[#2B2E28]"></span></div>
+                  <div className="">{(remedy.dosage_forms || []).join(', ')} <span className="text-xs text-[#2B2E28]"></span></div>
                 </div>
               </div>
             </aside>
@@ -285,12 +219,12 @@ export default function RemediesDetailPage({ params }: { params: { slug: string 
             <div className="flex items-center gap-2 mb-4">
               <div className="w-15 h-15 p-3 bg-[#F9F7F2] rounded-full flex items-center justify-center text-3xl flex-shrink-0 mr-2">🌿</div>
               <div>
-                <h6 className="text-[16px] text-[#0B0C0A] font-semibold text-montserrat mb-1">{remedy.origin.name}</h6>
-                <p className="text-sm text-[#0B0C0A] font-medium">Also known as “{remedy.origin.alias}”</p>
+                <h6 className="text-[16px] text-[#0B0C0A] font-semibold text-montserrat mb-1">{remedy.scientific_name || remedy.name}</h6>
+                <p className="text-sm text-[#0B0C0A] font-medium">Also known as “{remedy.common_name}”</p>
               </div>
             </div>
-            <p className="text-[#41463B] font-medium mb-4">{remedy.origin.description}</p>
-            <p className="text-[#41463B] font-medium">{remedy.origin.homeopathic}</p>
+            <p className="text-[#41463B] font-medium mb-4">{remedy.description}</p>
+            <p className="text-[#41463B] font-medium">{remedy.safety_precautions}</p>
         </section>
 
         {/* Reviews Section */}
@@ -302,10 +236,10 @@ export default function RemediesDetailPage({ params }: { params: { slug: string 
           <div className="flex flex-col items-center text-center border border-gray-200 rounded-2xl p-6 bg-[#F9F7F2]">
             <span className="text-5xl font-serif text-gray-800 mb-2">⭐</span>
             <h2 className="text-4xl font-bold text-gray-800 mb-1">
-              {remedy.rating}
+              {remedy.average_rating.toFixed(1)}
             </h2>
             <p className="text-sm text-gray-500 mb-6">
-              Based on {remedy.reviewsCount.toLocaleString()} reviews
+              Based on {remedy.review_count.toLocaleString()} reviews
             </p>
 
             {/* Rating Bars */}
@@ -375,7 +309,7 @@ export default function RemediesDetailPage({ params }: { params: { slug: string 
 
           {/* Reviews */}
           <div className="space-y-6">
-            {remedy.reviews.map((r) => (
+            {reviews.map((r) => (
               <div
                 key={r.id}
                 className="border border-gray-200 rounded-2xl p-6 hover:shadow-md transition-shadow"
@@ -441,7 +375,7 @@ export default function RemediesDetailPage({ params }: { params: { slug: string 
         onClose={() => setIsFilterModalOpen(false)}
         onApply={(filters) => console.log("Applying filters:", filters)}
         // You might want to calculate the actual number of reviews
-        totalResults={remedy.reviews.length}
+        totalResults={reviews.length}
       />
     </section>
 
@@ -523,7 +457,7 @@ export default function RemediesDetailPage({ params }: { params: { slug: string 
         onClose={() => setIsReviewFormOpen(false)}
         remedyId={remedy.id}
         remedyName={remedy.name}
-        condition={remedy.subtitle}
+        condition={"your condition"}
       />
     )}
       {/* Footer */}
