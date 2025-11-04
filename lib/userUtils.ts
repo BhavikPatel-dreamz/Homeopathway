@@ -166,6 +166,75 @@ export const isPageCheckerSSR = (currentPath: string, targetPath: string | strin
   return false;
 };
 
+// Check if user is on a mobile device
+export const isMobileDevice = (): boolean => {
+  if (typeof window === 'undefined') {
+    // Server-side: cannot determine device type
+    return false;
+  }
+
+  // Check if it's a mobile device using user agent
+  const userAgent = navigator.userAgent || navigator.vendor || (window as Window & { opera?: string }).opera || '';
+  
+  // Mobile device patterns
+  const mobileRegex = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i;
+  
+  // Check user agent
+  const isMobileUserAgent = mobileRegex.test(userAgent.toLowerCase());
+  
+  // Also check screen width as a fallback
+  const isMobileScreen = window.innerWidth <= 768;
+  
+  // Check if it's a touch device
+  const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  
+  // Return true if any mobile indicator is present
+  return isMobileUserAgent || (isMobileScreen && isTouchDevice);
+};
+
+// Server-side compatible mobile device checker - accepts user agent parameter for SSR
+export const isMobileDeviceSSR = (userAgent: string): boolean => {
+  if (!userAgent) return false;
+  
+  // Mobile device patterns
+  const mobileRegex = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i;
+  
+  return mobileRegex.test(userAgent.toLowerCase());
+};
+
+// Check specific mobile platforms
+export const isIOS = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  
+  const userAgent = navigator.userAgent || navigator.vendor;
+  return /iPad|iPhone|iPod/.test(userAgent);
+};
+
+export const isAndroid = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  
+  const userAgent = navigator.userAgent || navigator.vendor;
+  return /android/i.test(userAgent);
+};
+
+// Check if device is tablet
+export const isTablet = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  
+  const userAgent = navigator.userAgent || navigator.vendor;
+  const isTabletUserAgent = /tablet|ipad|playbook|silk/i.test(userAgent);
+  const isTabletScreen = window.innerWidth >= 768 && window.innerWidth <= 1024;
+  
+  return isTabletUserAgent || isTabletScreen;
+};
+
+// Check if device is desktop
+export const isDesktop = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  
+  return !isMobileDevice() && !isTablet();
+};
+
 // Example utility functions using the typed user object
 export const getUserDisplayName = (user: User | null, profile: UserProfile | null): string => {
   if (!user) return 'Guest';

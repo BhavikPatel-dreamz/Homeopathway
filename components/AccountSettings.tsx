@@ -79,9 +79,7 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <Header />
-      
+     
       {/* Breadcrumb */}
       <Breadcrumb items={breadcrumbPaths.profile()} />
 
@@ -241,8 +239,7 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
         </div>
       </main>
 
-      {/* Footer */}
-      <Footer />
+    
     </div>
   );
 }

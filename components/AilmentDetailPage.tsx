@@ -37,7 +37,7 @@ export default function AilmentDetailPage({ ailment, remedies }: AilmentDetailPa
     { label: ailment.name, isActive: true }
   ];
 
-  console.log('AilmentDetailPage remedies:', remedies);
+  
   
   return (
     <div className="min-h-screen bg-[#F5F1E8]">
