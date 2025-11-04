@@ -20,13 +20,23 @@ interface FilterOptions {
   dateRange: string;
   effectivenessRange: string;
   sideEffects: string;
+  page: number;
+}
+
+interface ApiResponse {
+  reviews: Review[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
 
 export default function AdminReviewsManager({ initialReviews, remedies }: AdminReviewsManagerProps) {
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
-  const [filteredReviews, setFilteredReviews] = useState<Review[]>(initialReviews);
   const [editingReview, setEditingReview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(initialReviews.length);
   const [filters, setFilters] = useState<FilterOptions>({
     search: '',
     remedy: '',
@@ -34,61 +44,51 @@ export default function AdminReviewsManager({ initialReviews, remedies }: AdminR
     dateRange: '',
     effectivenessRange: '',
     sideEffects: '',
+    page: 1,
   });
 
-  // Apply filters
+  // Fetch reviews with filters from API
+  const fetchReviews = async (filterOptions: FilterOptions) => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      
+      if (filterOptions.search) params.append('search', filterOptions.search);
+      if (filterOptions.remedy) params.append('remedy', filterOptions.remedy);
+      if (filterOptions.rating) params.append('rating', filterOptions.rating);
+      if (filterOptions.effectivenessRange) params.append('effectiveness', filterOptions.effectivenessRange);
+      if (filterOptions.sideEffects) params.append('sideEffects', filterOptions.sideEffects);
+      if (filterOptions.dateRange) params.append('dateRange', filterOptions.dateRange);
+      params.append('page', filterOptions.page.toString());
+      params.append('limit', '50');
+
+      const response = await fetch(`/api/admin/reviews/search?${params.toString()}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch reviews');
+      }
+
+      const data: ApiResponse = await response.json();
+      
+      setReviews(data.reviews);
+      setTotal(data.total);
+      setTotalPages(data.totalPages);
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+      alert('Failed to fetch reviews');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Apply filters with debouncing
   useEffect(() => {
-    let filtered = reviews;
+    const timeoutId = setTimeout(() => {
+      fetchReviews(filters);
+    }, 500); // 500ms debounce
 
-    // Search filter (user name, notes, potency, dosage)
-    if (filters.search) {
-      const searchLower = filters.search.toLowerCase();
-      filtered = filtered.filter(review => {
-        const userProfile = review.profiles || review.user_profile;
-        return (
-          (userProfile?.first_name?.toLowerCase().includes(searchLower)) ||
-          (userProfile?.last_name?.toLowerCase().includes(searchLower)) ||
-          (userProfile?.email?.toLowerCase().includes(searchLower)) ||
-          (review.notes?.toLowerCase().includes(searchLower)) ||
-          (review.potency?.toLowerCase().includes(searchLower)) ||
-          (review.dosage?.toLowerCase().includes(searchLower))
-        );
-      });
-    }
-
-    // Remedy filter
-    if (filters.remedy) {
-      filtered = filtered.filter(review => review.remedy_id === filters.remedy);
-    }
-
-    // Rating filter
-    if (filters.rating) {
-      const rating = parseInt(filters.rating);
-      filtered = filtered.filter(review => review.star_count === rating);
-    }
-
-    // Effectiveness filter
-    if (filters.effectivenessRange) {
-      const effectiveness = parseInt(filters.effectivenessRange);
-      filtered = filtered.filter(review => review.effectiveness === effectiveness);
-    }
-
-    // Side effects filter
-    if (filters.sideEffects) {
-      const hasSideEffects = filters.sideEffects === 'yes';
-      filtered = filtered.filter(review => review.experienced_side_effects === hasSideEffects);
-    }
-
-    // Date range filter (last 30 days, 90 days, etc.)
-    if (filters.dateRange) {
-      const now = new Date();
-      const daysAgo = parseInt(filters.dateRange);
-      const cutoff = new Date(now.getTime() - (daysAgo * 24 * 60 * 60 * 1000));
-      filtered = filtered.filter(review => new Date(review.created_at) >= cutoff);
-    }
-
-    setFilteredReviews(filtered);
-  }, [reviews, filters]);
+    return () => clearTimeout(timeoutId);
+  }, [filters]);
 
   const handleEditReview = async (reviewId: string, updatedData: Partial<Review>) => {
     setLoading(true);
@@ -151,6 +151,7 @@ export default function AdminReviewsManager({ initialReviews, remedies }: AdminR
       dateRange: '',
       effectivenessRange: '',
       sideEffects: '',
+      page: 1,
     });
   };
 
@@ -192,7 +193,7 @@ export default function AdminReviewsManager({ initialReviews, remedies }: AdminR
         <div>
           <h1 className="text-3xl font-serif text-gray-900">Reviews Management</h1>
           <p className="text-gray-600 mt-1">
-            Manage and moderate user reviews ({filteredReviews.length} of {reviews.length})
+            Manage and moderate user reviews ({reviews.length} of {total})
           </p>
         </div>
       </div>
@@ -203,7 +204,8 @@ export default function AdminReviewsManager({ initialReviews, remedies }: AdminR
           <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
           <button
             onClick={clearFilters}
-            className="text-sm text-[#6B7B5E] hover:text-[#5a6b4f] font-medium"
+            disabled={loading}
+            className="text-sm text-[#6B7B5E] hover:text-[#5a6b4f] font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Clear All
           </button>
@@ -211,17 +213,25 @@ export default function AdminReviewsManager({ initialReviews, remedies }: AdminR
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           {/* Search */}
-          <div>
+          <div className="relative">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Search
             </label>
-            <input
-              type="text"
-              placeholder="User, notes, potency..."
-              value={filters.search}
-              onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent"
-            />
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="User, notes, potency..."
+                value={filters.search}
+                onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value, page: 1 }))}
+                disabled={loading}
+                className="w-full px-3 py-2 pr-8 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+              />
+              {loading && filters.search && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#6B7B5E]"></div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Remedy */}
@@ -231,8 +241,9 @@ export default function AdminReviewsManager({ initialReviews, remedies }: AdminR
             </label>
             <select
               value={filters.remedy}
-              onChange={(e) => setFilters(prev => ({ ...prev, remedy: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent"
+              onChange={(e) => setFilters(prev => ({ ...prev, remedy: e.target.value, page: 1 }))}
+              disabled={loading}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <option value="">All Remedies</option>
               {remedies.map(remedy => (
@@ -250,8 +261,9 @@ export default function AdminReviewsManager({ initialReviews, remedies }: AdminR
             </label>
             <select
               value={filters.rating}
-              onChange={(e) => setFilters(prev => ({ ...prev, rating: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent"
+              onChange={(e) => setFilters(prev => ({ ...prev, rating: e.target.value, page: 1 }))}
+              disabled={loading}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <option value="">All Ratings</option>
               {[5, 4, 3, 2, 1].map(rating => (
@@ -269,8 +281,9 @@ export default function AdminReviewsManager({ initialReviews, remedies }: AdminR
             </label>
             <select
               value={filters.effectivenessRange}
-              onChange={(e) => setFilters(prev => ({ ...prev, effectivenessRange: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent"
+              onChange={(e) => setFilters(prev => ({ ...prev, effectivenessRange: e.target.value, page: 1 }))}
+              disabled={loading}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <option value="">All Effectiveness</option>
               {[5, 4, 3, 2, 1].map(eff => (
@@ -288,8 +301,9 @@ export default function AdminReviewsManager({ initialReviews, remedies }: AdminR
             </label>
             <select
               value={filters.sideEffects}
-              onChange={(e) => setFilters(prev => ({ ...prev, sideEffects: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent"
+              onChange={(e) => setFilters(prev => ({ ...prev, sideEffects: e.target.value, page: 1 }))}
+              disabled={loading}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <option value="">All</option>
               <option value="yes">With Side Effects</option>
@@ -304,8 +318,9 @@ export default function AdminReviewsManager({ initialReviews, remedies }: AdminR
             </label>
             <select
               value={filters.dateRange}
-              onChange={(e) => setFilters(prev => ({ ...prev, dateRange: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent"
+              onChange={(e) => setFilters(prev => ({ ...prev, dateRange: e.target.value, page: 1 }))}
+              disabled={loading}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <option value="">All Time</option>
               <option value="7">Last 7 days</option>
@@ -318,8 +333,18 @@ export default function AdminReviewsManager({ initialReviews, remedies }: AdminR
       </div>
 
       {/* Reviews Table */}
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+      <div className="bg-white rounded-lg shadow-sm overflow-hidden relative">
+        {/* Loading Overlay */}
+        {loading && (
+          <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
+            <div className="flex flex-col items-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6B7B5E]"></div>
+              <p className="mt-2 text-sm text-gray-600">Searching reviews...</p>
+            </div>
+          </div>
+        )}
+        
+        <div className={`overflow-x-auto ${loading ? 'opacity-50' : ''}`}>
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -344,7 +369,7 @@ export default function AdminReviewsManager({ initialReviews, remedies }: AdminR
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredReviews.map((review) => (
+              {reviews.map((review: Review) => (
                 <ReviewRow
                   key={review.id}
                   review={review}
@@ -362,7 +387,7 @@ export default function AdminReviewsManager({ initialReviews, remedies }: AdminR
             </tbody>
           </table>
 
-          {filteredReviews.length === 0 && (
+          {reviews.length === 0 && (
             <div className="text-center py-12">
               <div className="text-gray-400 text-6xl mb-4">📝</div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">No reviews found</h3>
@@ -372,6 +397,74 @@ export default function AdminReviewsManager({ initialReviews, remedies }: AdminR
                   : "Try adjusting your filters to see more results."
                 }
               </p>
+            </div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+              <div className="flex flex-1 justify-between sm:hidden">
+                <button
+                  onClick={() => setFilters(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
+                  disabled={filters.page === 1 || loading}
+                  className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => setFilters(prev => ({ ...prev, page: Math.min(totalPages, prev.page + 1) }))}
+                  disabled={filters.page === totalPages || loading}
+                  className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+              <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm text-gray-700">
+                    Showing page <span className="font-medium">{filters.page}</span> of{' '}
+                    <span className="font-medium">{totalPages}</span> ({total} total reviews)
+                  </p>
+                </div>
+                <div>
+                  <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                    <button
+                      onClick={() => setFilters(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
+                      disabled={filters.page === 1 || loading}
+                      className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Previous
+                    </button>
+                    
+                    {/* Page numbers */}
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      const pageNum = i + 1;
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => setFilters(prev => ({ ...prev, page: pageNum }))}
+                          disabled={loading}
+                          className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50 ${
+                            filters.page === pageNum
+                              ? 'z-10 bg-indigo-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600'
+                              : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+                    
+                    <button
+                      onClick={() => setFilters(prev => ({ ...prev, page: Math.min(totalPages, prev.page + 1) }))}
+                      disabled={filters.page === totalPages || loading}
+                      className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Next
+                    </button>
+                  </nav>
+                </div>
+              </div>
             </div>
           )}
         </div>

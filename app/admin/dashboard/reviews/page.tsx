@@ -17,15 +17,15 @@ export default async function ReviewsPage() {
     return <div>Access Denied</div>;
   }
 
-  // Fetch reviews with related data using RPC or raw query approach
-  // First, let's try a simple approach without complex joins
-  const { data: reviewsData, error } = await supabase
+  // Fetch initial reviews (just first page)
+  const reviewsData = await supabase
     .from('reviews')
     .select('*')
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .limit(50);
 
-  if (error) {
-    console.error('Error fetching reviews:', error);
+  if (reviewsData.error) {
+    console.error('Error fetching reviews:', reviewsData.error);
     return (
         <div className="text-center py-16">
           <div className="text-red-600 mb-4">Error loading reviews</div>
@@ -34,24 +34,24 @@ export default async function ReviewsPage() {
     );
   }
 
-  // Fetch related data separately
-  const remedyIds = reviewsData?.map(r => r.remedy_id).filter(Boolean) || [];
-  const userIds = reviewsData?.map(r => r.user_id).filter(Boolean) || [];
+  // Get related data for initial reviews
+  const remedyIds = reviewsData.data?.map(r => r.remedy_id).filter(Boolean) || [];
+  const userIds = reviewsData.data?.map(r => r.user_id).filter(Boolean) || [];
 
-  // Fetch remedies
-  const { data: remediesData } = await supabase
-    .from('remedies')
-    .select('id, name, slug')
-    .in('id', remedyIds);
+  // Fetch remedies and profiles
+  const [remediesResult, profilesResult] = await Promise.all([
+    supabase
+      .from('remedies')
+      .select('id, name, slug')
+      .in('id', remedyIds),
+    userIds.length > 0 ? supabase
+      .from('profiles')
+      .select('id, first_name, last_name, email')
+      .in('id', userIds) : { data: [] }
+  ]);
 
-  // Fetch profiles
-  const { data: profilesData } = await supabase
-    .from('profiles')
-    .select('id, first_name, last_name, email')
-    .in('id', userIds);
-
-  // Manually join the data
-  const reviewsWithProfiles: Review[] = (reviewsData || []).map(review => ({
+  // Join the initial data
+  const initialReviews: Review[] = (reviewsData.data || []).map(review => ({
     id: review.id,
     remedy_id: review.remedy_id,
     user_id: review.user_id,
@@ -65,11 +65,11 @@ export default async function ReviewsPage() {
     experienced_side_effects: review.experienced_side_effects,
     created_at: review.created_at,
     updated_at: review.updated_at,
-    profiles: profilesData?.find(p => p.id === review.user_id),
-    remedies: remediesData?.find(r => r.id === review.remedy_id) ? {
-      id: remediesData.find(r => r.id === review.remedy_id)!.id,
-      name: remediesData.find(r => r.id === review.remedy_id)!.name,
-      slug: remediesData.find(r => r.id === review.remedy_id)?.slug,
+    profiles: profilesResult.data?.find(p => p.id === review.user_id),
+    remedies: remediesResult.data?.find(r => r.id === review.remedy_id) ? {
+      id: remediesResult.data.find(r => r.id === review.remedy_id)!.id,
+      name: remediesResult.data.find(r => r.id === review.remedy_id)!.name,
+      slug: remediesResult.data.find(r => r.id === review.remedy_id)?.slug,
       average_rating: 0,
       review_count: 0,
       description: '',
@@ -85,7 +85,7 @@ export default async function ReviewsPage() {
 
   return (
       <AdminReviewsManager 
-        initialReviews={reviewsWithProfiles || []} 
+        initialReviews={initialReviews || []} 
         remedies={remedies || []}
       />
   );
