@@ -191,6 +191,20 @@ export default function AddAilmentForm() {
         }
         
         console.log('Remedy relations created successfully');
+
+        // Update the remedies_count in the ailments table
+        console.log('Updating remedies_count in ailments table...');
+        const { error: updateCountError } = await supabase
+          .from('ailments')
+          .update({ remedies_count: selectedRemedyRelations.length })
+          .eq('id', ailmentData.id);
+
+        if (updateCountError) {
+          console.error('Error updating remedies_count:', updateCountError);
+          // Don't throw here, just log the error since the main data is already saved
+        } else {
+          console.log('Remedies count updated successfully');
+        }
       } else {
         console.log('No remedy relations to create');
       }
