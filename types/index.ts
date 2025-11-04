@@ -24,6 +24,8 @@ export interface Remedy {
   constitutional_type?: string;
   dosage_forms?: string[];
   safety_precautions?: string;
+  icon?: string; // Emoji icon for the remedy
+  image_url?: string; // URL to remedy image
   created_at?: string;
   updated_at?: string;
   created_by?: string;

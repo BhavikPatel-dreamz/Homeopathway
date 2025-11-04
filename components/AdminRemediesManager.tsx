@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { supabase } from '@/lib/supabaseClient';
 
 interface Remedy {
@@ -10,6 +11,8 @@ interface Remedy {
   scientific_name: string;
   average_rating: number;
   review_count: number;
+  icon?: string;
+  image_url?: string;
 }
 
 export default function AdminRemediesManager() {
@@ -99,6 +102,9 @@ export default function AdminRemediesManager() {
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Icon
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Remedy Name
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -118,6 +124,28 @@ export default function AdminRemediesManager() {
             <tbody className="divide-y divide-gray-200">
               {remedies.map((remedy) => (
                 <tr key={remedy.id} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-6 py-4">
+                    <div className="w-10 h-10 flex items-center justify-center">
+                      {remedy.image_url ? (
+                        <Image 
+                          src={remedy.image_url} 
+                          alt={remedy.name} 
+                          width={40}
+                          height={40}
+                          className="w-10 h-10 object-cover rounded-lg border border-gray-200"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                          }}
+                        />
+                      ) : remedy.icon ? (
+                        <span className="text-2xl">{remedy.icon}</span>
+                      ) : (
+                        <div className="w-8 h-8 bg-gray-100 rounded border border-gray-200 flex items-center justify-center">
+                          <span className="text-gray-400 text-xs">No</span>
+                        </div>
+                      )}
+                    </div>
+                  </td>
                   <td className="px-6 py-4">
                     <div className="font-medium text-gray-900">{remedy.name}</div>
                   </td>
