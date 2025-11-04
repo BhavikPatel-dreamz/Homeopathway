@@ -224,8 +224,7 @@ export default function ReviewsWithFilter({
         isOpen={isFilterOpen}
         onClose={() => setIsFilterOpen(false)}
         onApply={applyFilters}
-        totalResults={filteredReviews.length}
-      />
+        totalResults={filteredReviews.length} dosageOptions={[]} formOptions={[]}      />
     </>
   );
 }
