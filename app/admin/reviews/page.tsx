@@ -17,12 +17,17 @@ export default async function ReviewsPage() {
     return <div>Access Denied</div>;
   }
 
-  // Fetch initial reviews (just first page)
-  const reviewsData = await supabase
-    .from('reviews')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(50);
+  // Fetch initial reviews (just first page) and total count
+  const [reviewsData, totalCountResult] = await Promise.all([
+    supabase
+      .from('reviews')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(1),
+    supabase
+      .from('reviews')
+      .select('id', { count: 'exact', head: true })
+  ]);
 
   if (reviewsData.error) {
     console.error('Error fetching reviews:', reviewsData.error);
@@ -33,6 +38,8 @@ export default async function ReviewsPage() {
         </div>
     );
   }
+
+  const totalCount = totalCountResult.count || 0;
 
   // Get related data for initial reviews
   const remedyIds = reviewsData.data?.map(r => r.remedy_id).filter(Boolean) || [];
@@ -87,6 +94,7 @@ export default async function ReviewsPage() {
       <AdminReviewsManager 
         initialReviews={initialReviews || []} 
         remedies={remedies || []}
+        totalCount={totalCount}
       />
   );
 }

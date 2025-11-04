@@ -11,6 +11,7 @@ interface Remedy {
 interface AdminReviewsManagerProps {
   initialReviews: Review[];
   remedies: Remedy[];
+  totalCount?: number;
 }
 
 interface FilterOptions {
@@ -31,12 +32,13 @@ interface ApiResponse {
   totalPages: number;
 }
 
-export default function AdminReviewsManager({ initialReviews, remedies }: AdminReviewsManagerProps) {
+export default function AdminReviewsManager({ initialReviews, remedies, totalCount }: AdminReviewsManagerProps) {
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
   const [editingReview, setEditingReview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [totalPages, setTotalPages] = useState(1);
-  const [total, setTotal] = useState(initialReviews.length);
+  const [totalPages, setTotalPages] = useState(Math.ceil((totalCount || initialReviews.length) / 1));
+  const [total, setTotal] = useState(totalCount || initialReviews.length);
+  const [filtersApplied, setFiltersApplied] = useState(false);
   const [filters, setFilters] = useState<FilterOptions>({
     search: '',
     remedy: '',
@@ -60,7 +62,7 @@ export default function AdminReviewsManager({ initialReviews, remedies }: AdminR
       if (filterOptions.sideEffects) params.append('sideEffects', filterOptions.sideEffects);
       if (filterOptions.dateRange) params.append('dateRange', filterOptions.dateRange);
       params.append('page', filterOptions.page.toString());
-      params.append('limit', '50');
+      params.append('limit', '1');
 
       const response = await fetch(`/api/admin/reviews/search?${params.toString()}`);
       
@@ -81,14 +83,36 @@ export default function AdminReviewsManager({ initialReviews, remedies }: AdminR
     }
   };
 
+  // Check if any filters are applied (excluding page)
+  const hasFiltersApplied = (filterOptions: FilterOptions) => {
+    return filterOptions.search !== '' ||
+           filterOptions.remedy !== '' ||
+           filterOptions.rating !== '' ||
+           filterOptions.dateRange !== '' ||
+           filterOptions.effectivenessRange !== '' ||
+           filterOptions.sideEffects !== '';
+  };
+
   // Apply filters with debouncing
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      fetchReviews(filters);
-    }, 500); // 500ms debounce
+    // Only fetch from API if filters are applied or page changed from 1
+    if (hasFiltersApplied(filters) || filters.page > 1) {
+      const timeoutId = setTimeout(() => {
+        setFiltersApplied(true);
+        fetchReviews(filters);
+      }, 500); // 500ms debounce
 
-    return () => clearTimeout(timeoutId);
-  }, [filters]);
+      return () => clearTimeout(timeoutId);
+    } else {
+      // Use initial reviews when no filters are applied and on page 1
+      if (filtersApplied) {
+        setReviews(initialReviews);
+        setTotal(totalCount || initialReviews.length);
+        setTotalPages(Math.ceil((totalCount || initialReviews.length) / 1));
+        setFiltersApplied(false);
+      }
+    }
+  }, [filters, initialReviews, filtersApplied, totalCount]);
 
   const handleEditReview = async (reviewId: string, updatedData: Partial<Review>) => {
     setLoading(true);
@@ -153,6 +177,11 @@ export default function AdminReviewsManager({ initialReviews, remedies }: AdminR
       sideEffects: '',
       page: 1,
     });
+    // Reset to initial reviews
+    setReviews(initialReviews);
+    setTotal(totalCount || initialReviews.length);
+    setTotalPages(Math.ceil((totalCount || initialReviews.length) / 1));
+    setFiltersApplied(false);
   };
 
   const getRemedyName = (remedyId: string, review?: Review) => {
@@ -437,23 +466,83 @@ export default function AdminReviewsManager({ initialReviews, remedies }: AdminR
                     </button>
                     
                     {/* Page numbers */}
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                      const pageNum = i + 1;
-                      return (
-                        <button
-                          key={pageNum}
-                          onClick={() => setFilters(prev => ({ ...prev, page: pageNum }))}
-                          disabled={loading}
-                          className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50 ${
-                            filters.page === pageNum
-                              ? 'z-10 bg-indigo-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600'
-                              : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
-                          }`}
-                        >
-                          {pageNum}
-                        </button>
-                      );
-                    })}
+                    {(() => {
+                      const currentPage = filters.page;
+                      const pages = [];
+                      const maxVisiblePages = 5;
+                      
+                      let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+                      const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+                      
+                      // Adjust start if we're near the end
+                      if (endPage - startPage + 1 < maxVisiblePages) {
+                        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                      }
+                      
+                      // Add first page and ellipsis if needed
+                      if (startPage > 1) {
+                        pages.push(
+                          <button
+                            key={1}
+                            onClick={() => setFilters(prev => ({ ...prev, page: 1 }))}
+                            disabled={loading}
+                            className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            1
+                          </button>
+                        );
+                        
+                        if (startPage > 2) {
+                          pages.push(
+                            <span key="ellipsis1" className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">
+                              ...
+                            </span>
+                          );
+                        }
+                      }
+                      
+                      // Add visible page numbers
+                      for (let i = startPage; i <= endPage; i++) {
+                        pages.push(
+                          <button
+                            key={i}
+                            onClick={() => setFilters(prev => ({ ...prev, page: i }))}
+                            disabled={loading}
+                            className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50 ${
+                              currentPage === i
+                                ? 'z-10 bg-indigo-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600'
+                                : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
+                            }`}
+                          >
+                            {i}
+                          </button>
+                        );
+                      }
+                      
+                      // Add last page and ellipsis if needed
+                      if (endPage < totalPages) {
+                        if (endPage < totalPages - 1) {
+                          pages.push(
+                            <span key="ellipsis2" className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">
+                              ...
+                            </span>
+                          );
+                        }
+                        
+                        pages.push(
+                          <button
+                            key={totalPages}
+                            onClick={() => setFilters(prev => ({ ...prev, page: totalPages }))}
+                            disabled={loading}
+                            className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            {totalPages}
+                          </button>
+                        );
+                      }
+                      
+                      return pages;
+                    })()}
                     
                     <button
                       onClick={() => setFilters(prev => ({ ...prev, page: Math.min(totalPages, prev.page + 1) }))}
