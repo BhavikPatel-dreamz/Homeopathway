@@ -80,6 +80,17 @@ export const checkIsAdmin = async (): Promise<boolean> => {
   }
 };
 
+// Check if current page is home (no parameters needed)
+export const isHome = (): boolean => {
+  if (typeof window === 'undefined') {
+    // Server-side: cannot determine current page
+    return false;
+  }
+  
+  const currentPath = window.location.pathname;
+  return currentPath === '/' || currentPath === '/home';
+};
+
 // Example utility functions using the typed user object
 export const getUserDisplayName = (user: User | null, profile: UserProfile | null): string => {
   if (!user) return 'Guest';
