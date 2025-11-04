@@ -315,14 +315,14 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
           </div>
 
           {/* Pagination */}
-          {reviews.length > 0 && totalPages > 1 && (
+          {(
             <div className="flex items-center justify-center gap-2 mt-8">
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
                 className="px-3 py-1 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
               >
-                Prev
+                  &lt;
               </button>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <button
@@ -343,13 +343,8 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
                 disabled={currentPage === totalPages}
                 className="px-3 py-1 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
               >
-                Next
+                &gt;
               </button>
-            </div>
-          )}
-          {reviews.length > 0 && totalPages > 1 && (
-            <div className="text-center mt-4 text-sm text-gray-600">
-              Page {currentPage} of {totalPages}
             </div>
           )}
         </div>
