@@ -47,10 +47,20 @@ export default function TopRatedRemediesServer({
                   <p className="font-[600] text-[20px] mb-1 text-[#0B0C0A]">{remedy.name}</p>
                   <div className="flex items-center gap-2 mb-3">
                     <div className="flex text-yellow-400">
-                      {[...Array(5)].map((_, i) => (
+                      {[...Array(remedy.review_count)].map((_, i) => (
                         <span key={i}>
                           <Image 
                             src="/star.svg" 
+                            alt="Star"
+                            width={16}
+                            height={16}
+                          />
+                        </span>
+                      ))}
+                       {[...Array(5-remedy.review_count)].map((_, i) => (
+                        <span key={i}>
+                          <Image 
+                            src="/star-blank.svg" 
                             alt="Star"
                             width={16}
                             height={16}
