@@ -5,7 +5,7 @@ export default function page() {
 
     <section className="px-4 p-50  lg:p-70  bg-[#f5f3ed] main-wrapper">
       <div className="max-w-7xl mx-auto text-center">
-        <h1 className='text-[30px] md:text-[32px] lg:text-[40px]'>What is HomeoPathway</h1>
+        <h1 className='text-[30px] md:text-[32px] lg:text-[40px]'>Contact Us</h1>
       </div>
     </section>
 

@@ -94,6 +94,11 @@ select option{
   color: #20231E;
 }
 
+.main-wrapper{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
 @media only screen and (max-width:767px) {
   .home-slider .slick-dots li button{
     width: 40px;
