@@ -58,11 +58,11 @@ async function SearchPageContent({ searchParams }: { searchParams: { q?: string 
 export default function SearchPage({ searchParams }: { searchParams: { q?: string } }) {
   return (
     <div className="min-h-screen bg-[#F5F3ED]">
-      <Header />
+      
       <Suspense fallback={<div className="p-8 text-center">Loading search results...</div>}>
         <SearchPageContent searchParams={searchParams} />
       </Suspense>
-      <Footer />
+      
     </div>
   );
 }
