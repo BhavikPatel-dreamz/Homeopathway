@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Star, StarHalf, StarOff, Search, ChevronDown, Loader2 } from "lucide-react";
+import { Star, StarHalf, StarOff, Search, Loader2 } from "lucide-react";
 import { getReviews, getReviewFilterOptions } from "@/lib/review";
 import ReviewFilterModal, { ReviewFilters } from "./ReviewFilterModal";
 import AddReviewForm from "./AddReviewForm";
@@ -141,8 +141,6 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
     { label: "Lowest Rated", value: "lowest_rated" },
   ];
 
-  const currentSortLabel = sortOptions.find(opt => opt.value === sortBy)?.label || "Most Recent";
-
   if (!remedy) {
     return <div>Loading remedy details...</div>; // Or a 404 component
   }
@@ -221,14 +219,16 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
             </div>
 
             {/* This is a simplified dropdown. For a real app, you'd use a dropdown component library */}
-            <select 
-              value={sortBy} 
-              onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-              className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition-colors bg-transparent"
-            >
-              <span className="text-gray-600">Sort by:</span>
-              {sortOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-            </select>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">Sort by:</span>
+              <select 
+                value={sortBy} 
+                onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                className="px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition-colors bg-transparent border border-gray-200"
+              >
+                {sortOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+              </select>
+            </div>
           </div>
 
           {/* Reviews */}
