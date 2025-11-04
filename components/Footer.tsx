@@ -10,7 +10,9 @@ export default function Footer() {
         <div className="col-span-12 md:col-span-6 lg:col-span-7 flex items-center">
           <div className="flex items-start lg:items-center gap-3  flex-col lg:flex-row">
             <div className='mb-3 w-26 h-28 md:w-39 md:h-39 lg:w-40 lg:h-40 '>
-              <img className="object-contain w-full h-full" src="/home-banner-logo.svg" alt="" />
+              <a href="">
+                <img className="object-contain w-full h-full" src="/home-banner-logo.svg" alt="" />
+              </a>
             </div>
             <div>
               <p className="text-[#D3D6D1] font-[500] max-w-[380px]">Your trusted guide to natural homeopathic healing, connecting you with remedies that work.</p>
@@ -43,16 +45,16 @@ export default function Footer() {
         <p className="text-[12px] text-[#D3D6D1] font-[500]">© 2025 Homeopathway. All Rights Reserved.</p>
         <div className="flex items-center gap-4">
           <div className="text-[#D3D6D1] font-[500]">Follow Us</div>
-          <a href="#" className="w-6 h-6">
+          <a href="https://www.facebook.com" target="_blank" className="w-6 h-6">
             <img className="w-full h-full object-contain hover:opacity-50 transition-all duration-500" src="/facebook.svg" alt="" />
           </a>
-          <a href="#" className="w-6 h-6 ">
+          <a href="https://x.com" target="_blank" className="w-6 h-6 ">
             <img className="w-full h-full object-contain hover:opacity-50 transition-all duration-500" src="/x.svg" alt="" />
           </a>
-          <a href="#" className="w-6 h-6">
+          <a href="https://www.instagram.com" target="_blank" className="w-6 h-6">
             <img className="w-full h-full object-contain hover:opacity-50 transition-all duration-500" src="/instagram.svg" alt="" />
           </a>
-          <a href="#" className="w-6 h-6">
+          <a href="https://www.youtube.com" target="_blank" className="w-6 h-6">
             <img className="w-full h-full object-contain hover:opacity-50 transition-all duration-500" src="/youtube.svg" alt="" />
           </a>
         </div>
