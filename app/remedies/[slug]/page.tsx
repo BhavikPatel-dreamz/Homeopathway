@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import RemediesDetailPage from '../../../components/RemediesDetail';
+import { Remedy } from '@/types';
 
 interface RemedyDetailPageProps {
   params: Promise<{
@@ -24,6 +25,18 @@ async function getRemedyBySlugOrId(slug: string) {
   }
 
   return remedy;
+}
+
+async function getRelatedRemedies(): Promise<Remedy[]> {
+  const supabase = await createClient();
+
+  // Fetch the details of the related remedies
+  const { data: remedies, error: remediesError } = await supabase
+    .from('remedies')
+    .select('*')
+    .limit(4); // Fetch 4 to filter out the current one and show 3
+
+  return remedies || [];
 }
 
 export async function generateMetadata({ params }: RemedyDetailPageProps) {
@@ -50,10 +63,12 @@ export async function generateMetadata({ params }: RemedyDetailPageProps) {
 export default async function RemedyDetailPage({ params }: RemedyDetailPageProps) {
   const { slug } = await params;
   const remedy = await getRemedyBySlugOrId(slug);
+
   if (!remedy) {
     notFound();
   }
 
-  // Pass the fetched remedy data to the client component
-  return <RemediesDetailPage remedy={remedy} />;
+  const relatedRemedies = await getRelatedRemedies();
+
+  return <RemediesDetailPage remedy={remedy} relatedRemedies={relatedRemedies} />;
 }

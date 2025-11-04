@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
+import Link from "next/link";
 import { Star, StarHalf, StarOff, Search, ChevronDown } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -29,7 +30,9 @@ interface RemediesDetailPageProps {
     constitutional_type?: string;
     dosage_forms?: string[];
     safety_precautions?: string;
+    slug: string;
   }
+  relatedRemedies: Remedy[];
 }
 
 // ---------------------------
@@ -52,7 +55,7 @@ const renderStars = (rating: number) => {
 // ---------------------------
 // Main Component
 // ---------------------------
-export default function RemediesDetailPage({ remedy }: RemediesDetailPageProps) {
+export default function RemediesDetailPage({ remedy, relatedRemedies }: RemediesDetailPageProps) {
   const [activeTab, setActiveTab] = useState("Overview");
   const [sortBy, setSortBy] = useState("Most Recent");
    const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
@@ -116,11 +119,10 @@ export default function RemediesDetailPage({ remedy }: RemediesDetailPageProps) 
     return <div>Loading remedy details...</div>; // Or a 404 component
   }
 
-  // Mock data for reviews until it's fetched from Supabase
-  const reviews = [
-      { id: 1, name: "Emily R.", rating: 5, text: "This was amazing!", tags: ["Pellet", "30C"], timeAgo: "1 day ago" },
-      { id: 2, name: "John D.", rating: 4, text: "Helped a lot with my symptoms.", tags: ["Liquid", "6C"], timeAgo: "3 days ago" },
-  ];
+  const filteredRelatedRemedies = relatedRemedies
+    .filter(r => r.slug !== remedy.slug)
+    .slice(0, 3);
+
 
   return (
     <div className="min-h-screen bg-[#F5F1E8] flex flex-col">
@@ -237,78 +239,47 @@ export default function RemediesDetailPage({ remedy }: RemediesDetailPageProps) 
         >
   <h3 className="text-2xl font-serif text-gray-800 mb-6">Related Remedies</h3>
 
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    {/* Remedy Card */}
-    {[
-      {
-        id: 1,
-        name: "Bryonia Alba",
-        image: "🟠",
-        rating: 3.8,
-        reviews: 2314,
-        description: "Best for: Headaches that worsen with movement",
-      },
-      {
-        id: 2,
-        name: "Coffea Cruda",
-        image: "☕",
-        rating: 3.8,
-        reviews: 2314,
-        description:
-          "Best for: Headaches from excitement, stress, or lack of sleep",
-      },
-      {
-        id: 3,
-        name: "Gelsemium Sempervirens",
-        image: "🌻",
-        rating: 3.8,
-        reviews: 2314,
-        description:
-          "Best for: Headaches from anticipation, nervous tension, or flu",
-      },
-    ].map((item) => (
-      <div
-        key={item.id}
-        className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-5 flex flex-col gap-3"
-      >
-        {/* Header */}
-        <div className="flex items-center gap-3">
-          <span className="text-3xl">{item.image}</span>
-          <h4 className="font-semibold text-gray-800 text-lg">
-            {item.name}
-          </h4>
-        </div>
+  {filteredRelatedRemedies && filteredRelatedRemedies.length > 0 ? (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {filteredRelatedRemedies.map((item) => (
+        <Link href={`/remedies/${item.slug}`} key={item.id}>
+          <div
+            className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-5 flex flex-col gap-3 h-full cursor-pointer"
+          >
+            {/* Header */}
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">{item.icon || '💊'}</span>
+              <h4 className="font-semibold text-gray-800 text-lg">
+                {item.name}
+              </h4>
+            </div>
 
-        {/* Rating */}
-        <div className="flex items-center gap-1 text-sm text-gray-700">
-          {renderStars(item.rating)}
-          <span className="ml-1">{item.rating.toFixed(1)}</span>
-          <span className="text-gray-500">
-            ({item.reviews.toLocaleString()} reviews)
-          </span>
-        </div>
+            {/* Rating */}
+            <div className="flex items-center gap-1 text-sm text-gray-700">
+              {renderStars(item.average_rating || 0)}
+              <span className="ml-1">{(item.average_rating || 0).toFixed(1)}</span>
+              <span className="text-gray-500">
+                ({(item.review_count || 0).toLocaleString()} reviews)
+              </span>
+            </div>
 
-        {/* Description */}
-        <p className="text-sm text-gray-600 leading-relaxed">
-          {item.description}
-        </p>
-      </div>
-    ))}
-  </div>
+            {/* Description */}
+            <p className="text-sm text-gray-600 leading-relaxed line-clamp-2">
+              {item.description}
+            </p>
+          </div>
+        </Link>
+      ))}
+    </div>
+  ) : (
+    <div className="text-center py-8 bg-gray-50 rounded-lg">
+      <p className="text-gray-500">No related remedies found.</p>
+    </div>
+  )}
         </section>
 
-        {/* <section id="Related Remedies" ref={sectionRefs['Related Remedies']} className="bg-white rounded-2xl shadow-sm p-8 text-gray-600 scroll-mt-20">
-            <p>Related remedies will appear here.</p>
-        </section> */}
       </main>
-    {/* {isReviewFormOpen && (
-      <AddReviewForm 
-        onClose={() => setIsReviewFormOpen(false)}
-        remedyId={remedy.id}
-        remedyName={remedy.name}
-        condition={"your condition"}
-      />
-    )} */}
+ 
 
     </div>
   );

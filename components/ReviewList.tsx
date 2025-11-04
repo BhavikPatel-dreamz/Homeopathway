@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Star, StarHalf, StarOff, Search, Loader2 } from "lucide-react";
-import { getReviews, getReviewFilterOptions } from "@/lib/review";
+import { Star, StarHalf, StarOff, Search, ChevronDown, Loader2, StarIcon } from "lucide-react";
+import { getReviews, getReviewFilterOptions, getReviewStats } from "@/lib/review";
 import ReviewFilterModal, { ReviewFilters } from "./ReviewFilterModal";
 import AddReviewForm from "./AddReviewForm";
 import { Remedy, Review as ReviewType } from "@/types";
@@ -76,6 +76,11 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
     potencies: [],
     forms: [],
   });
+  const [reviewStats, setReviewStats] = useState<{
+    average_rating: number;
+    total_reviews: number;
+    rating_distribution: Record<number, number>;
+  } | null>(null);
 
   useEffect(() => {
     setTotalPages(Math.ceil(remedy.review_count / reviewsPerPage));
@@ -118,6 +123,21 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
     };
 
     fetchFilterOptions();
+
+    const fetchReviewStats = async () => {
+      if (!remedy.id) return;
+      try {
+        const { data, error } = await getReviewStats(remedy.id);
+        if (error) throw error;
+        if (data) {
+          setReviewStats(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch review stats:", error);
+      }
+    };
+
+    fetchReviewStats();
   }, [remedy.id, remedy.review_count, sortBy, filters, currentPage, reviewsPerPage]);
 
   useEffect(() => {
@@ -162,25 +182,15 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
 
             {/* Rating Bars */}
             <div className="w-full space-y-2 mb-6">
-              {[5, 4, 3, 2, 1].map((star) => (
-                <div key={star} className="flex items-center gap-2 text-sm">
-                  <span className="w-3 text-gray-700">{star}</span>
-                  <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div
-                      className="h-2 bg-[#6C7463] rounded-full"
-                      style={{
-                        width:
-                          star === 5
-                            ? "80%"
-                            : star === 4
-                            ? "12%"
-                            : star === 3
-                            ? "5%"
-                            : star === 2
-                            ? "2%"
-                            : "1%",
-                      }}
-                    />
+              {reviewStats && [5, 4, 3, 2, 1].map((star) => (
+                <div key={star} className="flex items-center gap-2 text-sm w-full">
+                  <StarIcon className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                  <span className="w-3 text-gray-700 font-medium">{star}</span>
+                  <div className="flex-1 h-2 bg-gray-200 rounded-full">
+                    <div 
+                      className="h-full bg-[#6C7463] rounded-full"
+                      style={{ width: `${reviewStats.total_reviews > 0 ? (reviewStats.rating_distribution[star] / reviewStats.total_reviews) * 100 : 0}%` }}
+                    ></div>
                   </div>
                 </div>
               ))}
