@@ -1,4 +1,4 @@
-import AdminAilmentsManager from '../../../../components/AdminAilmentsManager';
+import AdminAilmentsManager from '../../../components/AdminAilmentsManager';
 
 export const metadata = {
   title: 'Manage Ailments - Admin Dashboard',

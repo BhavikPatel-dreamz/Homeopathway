@@ -1,4 +1,4 @@
-import AdminRemediesManager from '../../../../components/AdminRemediesManager';
+import AdminRemediesManager from '../../../components/AdminRemediesManager';
 
 export const metadata = {
   title: 'Manage Remedies - Admin Dashboard',

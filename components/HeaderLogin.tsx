@@ -32,7 +32,7 @@ export default function HeaderLogin() {
     <>
       {/* Navigation Links */}
       {isAdmin && (
-        <Link href="/admin/dashboard">
+        <Link href="/admin">
           <button className="px-4 py-2 bg-teal-600 hover:bg-teal-700 rounded-full transition-colors text-sm ">
             Dashboard
           </button>

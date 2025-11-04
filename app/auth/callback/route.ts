@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
       
       if (profile?.role === 'admin') {
         // Redirect admin to dashboard
-        return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+        return NextResponse.redirect(new URL('/admin', request.url));
       }
     }
     

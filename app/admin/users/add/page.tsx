@@ -1,4 +1,4 @@
-import AddUserForm from '../../../../../components/AddUserForm';
+import AddUserForm from '../../../../components/AddUserForm';
 
 export const metadata = {
   title: 'Add User - Admin Dashboard',

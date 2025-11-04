@@ -109,7 +109,7 @@ export default function AdminUsersManager() {
           <p className="text-gray-600 mt-1">View and manage user accounts and permissions</p>
         </div>
         <Link
-          href="/admin/dashboard/users/add"
+          href="/admin/users/add"
           className="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors font-medium"
         >
           + Add User
@@ -245,7 +245,7 @@ export default function AdminUsersManager() {
                     </td>
                     <td className="px-6 py-4 text-right space-x-2">
                       <Link
-                        href={`/admin/dashboard/users/edit/${user.id}`}
+                        href={`/admin/users/edit/${user.id}`}
                         className="text-teal-600 hover:text-teal-800 font-medium text-sm"
                       >
                         Edit
@@ -278,7 +278,7 @@ export default function AdminUsersManager() {
             </p>
             {!searchTerm && roleFilter === 'all' && (
               <Link
-                href="/admin/dashboard/users/add"
+                href="/admin/users/add"
                 className="inline-block px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors font-medium"
               >
                 + Add User

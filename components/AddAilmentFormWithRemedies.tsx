@@ -198,7 +198,7 @@ export default function AddAilmentForm() {
       console.log('=== ADD AILMENT SUBMISSION COMPLETED ===');
       
       // Success - redirect back to ailments page
-      router.push('/admin/dashboard/ailments');
+      router.push('/admin/ailments');
     } catch (err: unknown) {
       console.error('Error adding ailment:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to add ailment';
@@ -220,7 +220,7 @@ export default function AddAilmentForm() {
       {/* Header */}
       <div>
         <Link 
-          href="/admin/dashboard/ailments"
+          href="/admin/ailments"
           className="text-teal-600 hover:text-teal-700 flex items-center gap-2 mb-4"
         >
           ← Back to Ailments
@@ -406,7 +406,7 @@ export default function AddAilmentForm() {
               {loading ? 'Adding...' : 'Add Ailment'}
             </button>
             <Link
-              href="/admin/dashboard/ailments"
+              href="/admin/ailments"
               className="flex-1 bg-gray-200 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-300 font-medium transition-colors text-center"
             >
               Cancel

@@ -1,6 +1,6 @@
 import AdminReviewsManager from '@/components/admin/AdminReviewsManager';
-import { isAdmin } from '../../../../lib/auth-server';
-import { createClient } from '../../../../lib/supabase/server';
+import { isAdmin } from '../../../lib/auth-server';
+import { createClient } from '../../../lib/supabase/server';
 import { Review } from '@/types';
 
 

@@ -1,4 +1,4 @@
-import AddAilmentForm from '../../../../../components/AddAilmentFormWithRemedies';
+import AddAilmentForm from '../../../../components/AddAilmentFormWithRemedies';
 
 export const metadata = {
   title: 'Add Ailment - Admin Dashboard',

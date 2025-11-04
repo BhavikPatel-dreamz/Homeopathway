@@ -1,6 +1,6 @@
-import { getUserProfile, isAdmin } from '../../../lib/auth-server';
-import { createClient } from '../../../lib/supabase/server';
-import DashboardLayout from '../../../components/admin/DashboardLayout';
+import { getUserProfile, isAdmin } from '../../lib/auth-server';
+import { createClient } from '../../lib/supabase/server';
+import DashboardLayout from '../../components/admin/DashboardLayout';
 import Link from 'next/link';
 
 export default async function AdminDashboardLayout({

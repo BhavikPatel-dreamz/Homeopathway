@@ -74,7 +74,7 @@ export default function DashboardHome() {
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <a
-          href="/admin/dashboard/ailments/add"
+          href="/admin/ailments/add"
           className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
         >
           <div className="text-3xl mb-3">🤒</div>
@@ -83,7 +83,7 @@ export default function DashboardHome() {
         </a>
 
         <a
-          href="/admin/dashboard/remedies/add"
+          href="/admin/remedies/add"
           className="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
         >
           <div className="text-3xl mb-3">💊</div>
@@ -92,7 +92,7 @@ export default function DashboardHome() {
         </a>
 
         <a
-          href="/admin/dashboard/users"
+          href="/admin/users"
           className="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
         >
           <div className="text-3xl mb-3">👥</div>

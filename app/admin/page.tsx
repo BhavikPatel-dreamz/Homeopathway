@@ -1,10 +1,9 @@
-import { redirect } from 'next/navigation';
+import DashboardHome from '../../components/admin/DashboardHome';
 
 export const metadata = {
-  title: 'Admin - Homeopathway',
+  title: 'Admin Dashboard - Homeopathway',
 };
 
-export default async function AdminPage() {
-  // Redirect to dashboard
-  redirect('/admin/dashboard');
+export default function AdminDashboardPage() {
+  return <DashboardHome />;
 }

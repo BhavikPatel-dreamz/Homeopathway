@@ -1,4 +1,4 @@
-import EditRemedyForm from '../../../../../../components/EditRemedyForm';
+import EditRemedyForm from '../../../../../components/EditRemedyForm';
 
 export const metadata = {
   title: 'Edit Remedy - Admin Dashboard',

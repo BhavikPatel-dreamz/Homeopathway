@@ -1,4 +1,4 @@
-import EditUserForm from '../../../../../../components/EditUserForm';
+import EditUserForm from '../../../../../components/EditUserForm';
 
 export const metadata = {
   title: 'Edit User - Admin Dashboard',
