@@ -17,18 +17,7 @@ async function getRemedyBySlugOrId(slug: string) {
     .select('*')
     .eq('slug', slug)
     .single();
-  console.log(remedy,"12121")
-  // If not found by slug, try by ID
-  // if (error && error.code === 'PGRST116') {
-  //   const { data: remedyById, error: idError } = await supabase
-  //     .from('remedies')
-  //     .select('*')
-  //     .eq('id', slugOrId)
-  //     .single();
-    
-  //   remedy = remedyById;
-  //   error = idError;
-  // }
+
 
   if (error || !remedy) {
     return null;
@@ -40,7 +29,6 @@ async function getRemedyBySlugOrId(slug: string) {
 export async function generateMetadata({ params }: RemedyDetailPageProps) {
   const {slug} = await params;
   const remedy = await getRemedyBySlugOrId(slug);
-  console.log(remedy,"12121228888")
 
   if (!remedy) {
     return {

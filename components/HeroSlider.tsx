@@ -105,8 +105,10 @@ export default function HeroSlider() {
     setSearchQuery(remedy.name);
     setShowSuggestions(false);
     // Navigate to search with remedy name
-    const searchParams = new URLSearchParams({ q: remedy.name });
-    router.push(`/search?${searchParams.toString()}`);
+    // const searchParams = new URLSearchParams({ q: remedy.name });
+    // router.push(`/search?${searchParams.toString()}`);
+      const slug = remedy.slug || nameToSlug(remedy.name);
+    router.push(`/remedies/${slug}`, { scroll: false });
   };
 
   const clearSearch = () => {
