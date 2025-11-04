@@ -3,8 +3,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import {  checkIsUserLoggedIn } from "@/lib/userUtils";
+import {  checkIsUserLoggedIn ,isHome } from "@/lib/userUtils";
 import HeaderLogin from "./HeaderLogin";
+import HeaderInner from "./HeaderInner";
 
 export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -20,6 +21,8 @@ export default function Header() {
   return (
     <header className="fixed top-0 left-0 w-full px-6 py-[17px] text-white z-50">
       <div className="max-w-7xl mx-auto flex justify-end items-center">
+      {isHome() || <HeaderInner />}
+
         
         <div className="flex items-center gap-8">
           {isLoggedIn ? <HeaderLogin /> : (
