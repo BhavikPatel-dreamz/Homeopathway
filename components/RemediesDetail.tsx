@@ -3,12 +3,10 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 import { Star, StarHalf, StarOff, Search, ChevronDown } from "lucide-react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+
 import Breadcrumb from "@/components/Breadcrumb";
 import { breadcrumbPaths } from "@/lib/breadcrumbUtils";
-import ReviewFilterModal from "./ReviewFilterModal";
-import AddReviewForm from "./AddReviewForm";
+
 import { Remedy } from "@/types";
 import ReviewListPage from "./ReviewList";
 
@@ -33,6 +31,11 @@ interface RemediesDetailPageProps {
     slug: string;
   }
   relatedRemedies: Remedy[];
+  ailmentContext?: {
+    id: string;
+    name: string;
+    slug: string;
+  };
 }
 
 // ---------------------------
@@ -55,7 +58,7 @@ const renderStars = (rating: number) => {
 // ---------------------------
 // Main Component
 // ---------------------------
-export default function RemediesDetailPage({ remedy, relatedRemedies }: RemediesDetailPageProps) {
+export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentContext }: RemediesDetailPageProps) {
   const [activeTab, setActiveTab] = useState("Overview");
 
   const sectionRefs = {
@@ -125,7 +128,15 @@ export default function RemediesDetailPage({ remedy, relatedRemedies }: Remedies
     <div className="min-h-screen bg-[#F5F1E8] flex flex-col">
       {/* Breadcrumb */}
       <Breadcrumb 
-        items={breadcrumbPaths.remedyDetail(remedy.name, "All Remedies", "/remedies")}
+        items={ailmentContext 
+          ? [
+              { label: "Home", href: "/" },
+              { label: "Ailments", href: "/ailments" },
+              { label: ailmentContext.name, href: `/ailments/${ailmentContext.slug}` },
+              { label: remedy.name, isActive: true }
+            ]
+          : breadcrumbPaths.remedyDetail(remedy.name, "All Remedies", "/remedies")
+        }
       />
 
       {/* Tabs */}
@@ -226,7 +237,14 @@ export default function RemediesDetailPage({ remedy, relatedRemedies }: Remedies
 
         {/* Reviews Section */}
         <div ref={sectionRefs.Reviews}>
-          <ReviewListPage remedy={remedy} />
+          <ReviewListPage 
+            remedy={remedy} 
+            ailmentContext={ailmentContext ? {
+              id: ailmentContext.id,
+              name: ailmentContext.name,
+              slug: ailmentContext.slug
+            } : undefined}
+          />
         </div>
         {/* Related Remedies Section */}
        <section

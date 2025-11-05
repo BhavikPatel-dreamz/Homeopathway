@@ -20,6 +20,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
  */
 export async function addReview({
   remedyId,
+  ailmentId,
   starCount,
   potency,
   potency2,
@@ -31,6 +32,7 @@ export async function addReview({
   supabaseClient,
 }: {
   remedyId: string;
+  ailmentId?: string;
   starCount: number;
   potency?: string;
   potency2?: string;
@@ -54,6 +56,7 @@ export async function addReview({
     .from('reviews')
     .insert({
       remedy_id: remedyId,
+      ailment_id: ailmentId || null,
       user_id: user.id,
       star_count: starCount,
       potency: potency || null,
@@ -110,19 +113,22 @@ export async function addReview({
 }
 
 /**
- * Fetches a list of reviews, optionally filtered and sorted.
+ * Fetches a list of reviews with proper AND logic for remedy + ailment filtering.
  *
  * @param {object} params - The parameters for fetching reviews.
  * @param {string} [params.remedyId] - The ID of the remedy to fetch reviews for.
- * @param {'newest' | 'oldest' | 'highest_rated' | 'lowest_rated'} [params.sortBy='newest'] - The sorting order for the reviews.
+ * @param {string} [params.ailmentId] - The ID of the ailment to filter by.
+ * @param {'newest' | 'oldest' | 'highest_rated' | 'lowest_rated'} [params.sortBy='newest'] - The sorting order.
  * @param {number} [params.limit=10] - The maximum number of reviews to return.
- * @param {number[]} [params.starCount] - An array of star ratings to filter by (e.g., [4, 5]).
- * @param {string[]} [params.potency] - An array of potencies to filter by (e.g., ["30C", "200C"]).
- * @param {boolean} [params.experiencedSideEffects] - Filter by whether side effects were experienced.
- * @returns {Promise<{ data: Review[] | null; error: Error | null }>} A list of reviews with associated user profiles, or an error.
+ * @param {number[]} [params.starCount] - Star ratings to filter by (e.g., [4, 5]).
+ * @param {string[]} [params.potency] - Potencies to filter by (e.g., ["30C", "200C"]).
+ * @param {string} [params.searchQuery] - Search query to filter notes, potency, or dosage.
+ * @param {boolean} [params.experiencedSideEffects] - Filter by side effects.
+ * @returns {Promise<{ data: Review[] | null; error: Error | null }>} Reviews with associated profiles.
  */
 export async function getReviews({
   remedyId,
+  ailmentId,
   sortBy = 'newest',
   limit = 10,
   starCount,
@@ -131,6 +137,7 @@ export async function getReviews({
   experiencedSideEffects,
 }: {
   remedyId?: string;
+  ailmentId?: string | null;
   sortBy?: 'newest' | 'oldest' | 'highest_rated' | 'lowest_rated';
   limit?: number;
   starCount?: number[];
@@ -142,10 +149,35 @@ export async function getReviews({
     .from('reviews')
     .select('*')
     .limit(limit);
+
+  // REMEDY FILTER - Always apply if provided
   if (remedyId) {
     query = query.eq('remedy_id', remedyId);
   }
 
+  // AILMENT FILTER with AND logic
+  // This handles the relationship between remedy and ailment filtering
+  if (remedyId && ailmentId !== undefined) {
+    // Both remedy and ailment provided - filter by specific ailment only (strict AND)
+    if (ailmentId === null) {
+      // Get only general reviews (not specific to any ailment) for this remedy
+      query = query.is('ailment_id', null);
+    } else {
+      // Get reviews ONLY for this specific ailment (strict AND logic)
+      query = query.eq('ailment_id', ailmentId);
+    }
+  } else if (!remedyId && ailmentId !== undefined) {
+    // Only ailment provided - filter by ailment alone
+    if (ailmentId === null) {
+      query = query.is('ailment_id', null);
+    } else {
+      query = query.eq('ailment_id', ailmentId);
+    }
+  }
+  // If only remedyId is provided (ailmentId undefined), show ALL reviews for that remedy
+  // If neither provided, show ALL reviews
+
+  // ADDITIONAL FILTERS
   if (starCount && starCount.length > 0) {
     query = query.in('star_count', starCount);
   }
@@ -163,7 +195,7 @@ export async function getReviews({
     query = query.or(`notes.ilike.${searchString},potency.ilike.${searchString},dosage.ilike.${searchString}`);
   }
 
-  // Apply sorting
+  // SORTING
   switch (sortBy) {
     case 'oldest':
       query = query.order('created_at', { ascending: true });
@@ -190,11 +222,10 @@ export async function getReviews({
     return { data: [], error: null };
   }
 
-  // Manually fetch profile data for the reviews
+  // FETCH PROFILE DATA
   const userIds = reviews.map(review => review.user_id).filter(Boolean);
   
   if (userIds.length === 0) {
-    // No user IDs to fetch profiles for
     return { 
       data: reviews.map(review => ({ ...review, profiles: null })), 
       error: null 
@@ -207,7 +238,6 @@ export async function getReviews({
     .in('id', userIds);
 
   if (profileError) {
-    // If we can't fetch profiles, still return reviews but without profile data
     console.warn('Could not fetch profiles:', profileError);
     return { 
       data: reviews.map(review => ({ ...review, profiles: null })), 
@@ -215,7 +245,7 @@ export async function getReviews({
     };
   }
 
-  // Join the profile data with reviews
+  // Join profile data with reviews
   const reviewsWithProfiles = reviews.map(review => ({
     ...review,
     profiles: profiles?.find(profile => profile.id === review.user_id) || null
@@ -363,12 +393,91 @@ export async function deleteReview(reviewId: string): Promise<{ data: null; erro
 }
 
 /**
- * Gets review statistics for a remedy.
+ * Gets average rating and review count based on remedy and/or ailment filtering.
+ * 
+ * Logic:
+ * - Both remedyId + ailmentId: strict AND (remedy X AND ailment Y)
+ * - Only remedyId: ALL reviews for that remedy (any ailment)
+ * - Only ailmentId: ALL reviews for that ailment (any remedy)
+ * 
+ * @param {object} params - The filtering parameters
+ * @param {string} [params.remedyId] - The ID of the remedy
+ * @param {string} [params.ailmentId] - The ID of the ailment
+ * @returns {Promise<{ data: { average_rating: number; review_count: number } | null; error: Error | null }>}
+ */
+export async function getRemedyAilmentStats({
+  remedyId,
+  ailmentId,
+}: {
+  remedyId?: string;
+  ailmentId?: string;
+}): Promise<{
+  data: {
+    average_rating: number;
+    review_count: number;
+  } | null;
+  error: Error | null;
+}> {
+  let query = supabase
+    .from('reviews')
+    .select('star_count');
+
+  // Apply filters based on what's provided
+  if (remedyId && ailmentId) {
+    // Both provided - strict AND logic
+    query = query.eq('remedy_id', remedyId).eq('ailment_id', ailmentId);
+    console.log('Filtering by remedy AND ailment:', { remedyId, ailmentId });
+  } else if (remedyId) {
+    // Only remedy - get ALL reviews for this remedy
+    query = query.eq('remedy_id', remedyId);
+    console.log('Filtering by remedy only:', remedyId);
+  } else if (ailmentId) {
+    // Only ailment - get ALL reviews for this ailment
+    query = query.eq('ailment_id', ailmentId);
+    console.log('Filtering by ailment only:', ailmentId);
+  } else {
+    console.log('No filters applied - fetching ALL reviews');
+  }
+
+  const { data: reviews, error } = await query;
+  
+  console.log(`Query returned ${reviews?.length || 0} reviews for remedyId: ${remedyId}`);
+
+  if (error) {
+    return { data: null, error };
+  }
+
+  if (!reviews || reviews.length === 0) {
+    return {
+      data: {
+        average_rating: 0,
+        review_count: 0,
+      },
+      error: null,
+    };
+  }
+
+  const reviewCount = reviews.length;
+  const totalStars = reviews.reduce((sum, review) => sum + review.star_count, 0);
+  const averageRating = totalStars / reviewCount;
+
+  return {
+    data: {
+      average_rating: Math.round(averageRating * 10) / 10, // Round to 1 decimal
+      review_count: reviewCount,
+    },
+    error: null,
+  };
+}
+
+/**
+ * Gets review statistics for a remedy with proper AND logic for ailment filtering.
  *
  * @param {string} remedyId - The ID of the remedy.
+ * @param {string | null} [ailmentId] - The ID of the ailment to filter by (undefined = all reviews).
  * @returns {Promise<{ data: { average_rating: number; total_reviews: number; rating_distribution: Record<number, number> } | null; error: Error | null }>}
  */
-export async function getReviewStats(remedyId: string): Promise<{
+export async function getReviewStats(remedyId: string, ailmentId?: string | null): Promise<{
   data: {
     average_rating: number;
     total_reviews: number;
@@ -376,10 +485,24 @@ export async function getReviewStats(remedyId: string): Promise<{
   } | null;
   error: Error | null;
 }> {
-  const { data: reviews, error } = await supabase
+  let query = supabase
     .from('reviews')
     .select('star_count')
     .eq('remedy_id', remedyId);
+
+  // AILMENT FILTER with strict AND logic (matches getReviews logic)
+  if (ailmentId !== undefined) {
+    if (ailmentId === null) {
+      // Show only general reviews (not specific to any ailment)
+      query = query.is('ailment_id', null);
+    } else {
+      // Show reviews ONLY for this specific ailment (strict AND logic)
+      query = query.eq('ailment_id', ailmentId);
+    }
+  }
+  // If ailmentId is undefined, show ALL reviews for the remedy (no filtering by ailment)
+
+  const { data: reviews, error } = await query;
 
   if (error) {
     return { data: null, error };

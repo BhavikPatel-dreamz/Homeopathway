@@ -11,6 +11,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const {
       remedy_id,
+      ailment_id,
       star_count,
       potency,
       dosage,
@@ -62,6 +63,7 @@ export async function POST(request: NextRequest) {
     // Use the addReview function from review.ts with server-side client
     const { data, error } = await addReview({
       remedyId: actualRemedyId,
+      ailmentId: ailment_id || undefined,
       starCount: parseInt(star_count),
       potency: potency || undefined,
       dosage: dosage || undefined,

@@ -16,9 +16,10 @@ interface Remedy {
 
 interface TopRemediesProps {
   remedies: Remedy[];
+  ailmentSlug?: string;
 }
 
-export default function TopRemedies({ remedies }: TopRemediesProps) {
+export default function TopRemedies({ remedies, ailmentSlug }: TopRemediesProps) {
   const [sortBy, setSortBy] = useState("Overall Rating");
 
   const renderStars = (rating: number) => {
@@ -86,7 +87,7 @@ export default function TopRemedies({ remedies }: TopRemediesProps) {
       {/* Remedies List */}
       <div className="space-y-2.5 mb[10px]">
         {sortedRemedies.map((remedy, index) => (
-          <Link href={`/remedies/${remedy.slug}`} key={remedy.slug}>
+          <Link href={ailmentSlug ? `/ailments/${ailmentSlug}/${remedy.slug}` : `/remedies/${remedy.slug}`} key={remedy.slug}>
             <div className="bg-white rounded-xl p-6 hover:shadow-lg transition-all duration-300 cursor-pointer border border-transparent hover:border-gray-200 mb-[10px]">
               <div className="flex flex-col sm:flex-row items-start gap-6">
                 {/* Icon */}

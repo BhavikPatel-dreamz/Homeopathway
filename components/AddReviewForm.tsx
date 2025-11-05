@@ -10,9 +10,10 @@ interface AddReviewFormProps {
   remedyId: string;
   remedyName: string;
   condition?: string;
+  ailmentId?: string;
 }
 
-export default function AddReviewForm({ onClose, remedyId, remedyName, condition = 'your condition' }: AddReviewFormProps) {
+export default function AddReviewForm({ onClose, remedyId, remedyName, condition = 'your condition', ailmentId }: AddReviewFormProps) {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -66,6 +67,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
     try {
       const reviewData = {
         remedy_id: remedyId,
+        ailment_id: ailmentId,
         star_count: formData.rating,
         potency: formData.potencyType && formData.potency ? `${formData.potencyType} ${formData.potency}` : null,
         dosage: formData.dosage,

@@ -18,6 +18,7 @@ interface Remedy {
 interface Ailment {
   id: string;
   name: string;
+  slug: string;
   icon: string;
   remedies_count: number;
   description: string;
@@ -68,7 +69,7 @@ export default function AilmentDetailPage({ ailment, remedies }: AilmentDetailPa
         </div>
 
         {/* Top Remedies Section */}
-        <TopRemedies remedies={remedies}/>
+        <TopRemedies remedies={remedies} ailmentSlug={ailment.slug}/>
       </main>
 
 

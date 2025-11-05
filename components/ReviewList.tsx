@@ -23,6 +23,11 @@ interface ReviewListPageProps {
     dosage_forms?: string[];
     safety_precautions?: string;
   }
+  ailmentContext?: {
+    id: string;
+    name: string;
+    slug: string;
+  };
 }
 
 // ---------------------------
@@ -69,7 +74,7 @@ const renderStars = (rating: number) => {
 // ---------------------------
 // Main Component
 // ---------------------------
-export default function ReviewListPage({ remedy }: ReviewListPageProps) {
+export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPageProps) {
   const router = useRouter();
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'highest_rated' | 'lowest_rated'>("newest");
   const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
@@ -108,6 +113,7 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
         // TODO: Update getReviews function to support proper offset-based pagination
         const { data: reviewsData, error: reviewsError } = await getReviews({ 
           remedyId: remedy.id, 
+          ailmentId: ailmentContext ? ailmentContext.id : undefined, // Explicitly pass undefined when no ailment context
           limit: Math.max(reviewsPerPage * 3, 50), // Load enough for a few pages
           sortBy: sortBy,
           starCount: filters.rating,
@@ -127,7 +133,7 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
         setReviews(paginatedReviews);
 
         // Fetch review stats to get total count
-        const { data: statsData, error: statsError } = await getReviewStats(remedy.id);
+        const { data: statsData, error: statsError } = await getReviewStats(remedy.id, ailmentContext ? ailmentContext.id : undefined);
         if (statsError) throw statsError;
         
         if (statsData) {
@@ -151,7 +157,7 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
     };
 
     fetchData();
-  }, [remedy.id, sortBy, filters, currentPage, reviewsPerPage, searchQuery]);
+  }, [remedy.id, ailmentContext, sortBy, filters, currentPage, reviewsPerPage, searchQuery]);
 
   useEffect(() => {
     // Reset to page 1 when filters or sort order changes
@@ -192,7 +198,7 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
       setCurrentPage(1);
       
       // Fetch fresh review stats
-      const { data: statsData, error: statsError } = await getReviewStats(remedy.id);
+      const { data: statsData, error: statsError } = await getReviewStats(remedy.id, ailmentContext ? ailmentContext.id : undefined);
       if (statsError) throw statsError;
       
       if (statsData) {
@@ -201,9 +207,11 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
         setTotalPages(Math.ceil(statsData.total_reviews / reviewsPerPage));
       }
 
+
       // Fetch fresh reviews
       const { data: reviewsData, error: reviewsError } = await getReviews({ 
         remedyId: remedy.id, 
+        ailmentId: ailmentContext ? ailmentContext.id : undefined,
         limit: Math.max(reviewsPerPage * 3, 50),
         sortBy: sortBy,
         starCount: filters.rating,
@@ -451,7 +459,8 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
         }}
         remedyId={remedy.id}
         remedyName={remedy.name}
-        condition={"your condition"}
+        condition={ailmentContext?.name || "your condition"}
+        ailmentId={ailmentContext?.id}
       />
     )}
 

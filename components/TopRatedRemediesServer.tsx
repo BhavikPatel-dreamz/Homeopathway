@@ -12,6 +12,10 @@ export default function TopRatedRemediesServer({
   searchQuery = "" 
 }: TopRatedRemediesServerProps) {
   
+  // Just use the original remedy data - no need to refetch stats
+  // The stats are already calculated and stored in the remedies table
+  const remediesWithStats = topRemedies;
+
   return (
     <section className="px-4 py-6 lg:py-10 bg-[#f5f3ed]">
       <div className="max-w-7xl px-0 lg:px-5 mx-auto">
@@ -29,7 +33,9 @@ export default function TopRatedRemediesServer({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {topRemedies.map((remedy, index) => (
+          {remediesWithStats.map((remedy, index) => (
+            
+          
             <Link
               key={remedy.id || index}
               href={`/remedies/${remedy.slug || remedy.id}`}
