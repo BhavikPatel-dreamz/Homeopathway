@@ -28,7 +28,7 @@ async function SearchPageContent({ searchParams }: { searchParams: { q?: string 
           .order("name", { ascending: true }),
         supabase
           .from("remedies")
-          .select("name, average_rating, review_count, description")
+          .select("name, average_rating, review_count, description,icon")
           .ilike("name", `%${query}%`)
           .order("average_rating", { ascending: false })
           .order("review_count", { ascending: false })

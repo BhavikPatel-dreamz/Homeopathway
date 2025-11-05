@@ -103,7 +103,7 @@ export default async function Home() {
 
   const { data: remediesData, error: remediesError } = await supabase
     .from("remedies")
-    .select("name, average_rating, review_count, description,slug")
+    .select("name, average_rating, review_count, description,slug,icon")
     .order("average_rating", { ascending: false })
     .order("review_count", { ascending: false })
     .limit(5);
