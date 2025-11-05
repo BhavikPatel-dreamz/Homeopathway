@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
 import { generateSlug, createUniqueSlugFromName } from '@/lib/slugUtils';
+import { healthEmojis } from '@/lib/emojiList';
 import AilmentRemedyManager from './AilmentRemedyManager';
 import { AilmentRemedy } from '@/types';
 
@@ -23,15 +24,6 @@ export default function AddAilmentForm() {
     description: '',
     personalizedApproach: '',
   });
-
-  // Predefined emoji list for health-related ailments
-  const healthEmojis = [
-    '🤕', '🤒', '😷', '🤧', '🤮', '😵', '🥴', '😴', '🥵', '🥶',
-    '🤲', '🙏', '💊', '🩹', '🩺', '💉', '🧬', '🦠', '🧠', '🫀',
-    '🫁', '🦷', '👁️', '👂', '👃', '🤚', '🦵', '🦶', '💪', '🤰',
-    '😰', '😨', '😱', '😓', '😤', '😔', '😞', '😣', '😖', '😫',
-    '🌡️', '🔥', '❄️', '💧', '⚡', '🌟', '✨', '🌿', '🍃', '🌱'
-  ];
 
   // Generate slug when name changes
   useEffect(() => {

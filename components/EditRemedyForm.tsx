@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabaseClient';
 import { createUniqueSlugFromName, generateSlug } from '@/lib/slugUtils';
+import { healthEmojis } from '@/lib/emojiList';
 
 interface EditRemedyFormProps {
   remedyId: string;
@@ -16,6 +17,7 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
@@ -284,17 +286,93 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
                 <label htmlFor="icon" className="block text-sm font-medium text-gray-700 mb-2">
                   Icon (Emoji)
                 </label>
-                <input
-                  type="text"
-                  id="icon"
-                  name="icon"
-                  value={formData.icon}
-                  onChange={handleChange}
-                  placeholder="e.g., 🌿, 🍃, 🌸, 🌱"
-                  maxLength={2}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-3xl"
-                />
-                <p className="text-sm text-gray-500 mt-1">
+                
+                {/* Current Selection Display */}
+                <div className="mb-3">
+                  <div className="flex items-center gap-3 p-3 border border-gray-300 rounded-lg bg-gray-50">
+                    <div className="text-3xl">
+                      {formData.icon || '❓'}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-gray-700">
+                        {formData.icon ? 'Selected Emoji' : 'No emoji selected'}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {formData.icon ? 'Click on a different emoji below to change' : 'Choose an emoji from the options below'}
+                      </p>
+                    </div>
+                    {formData.icon && (
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, icon: '' })}
+                        className="text-red-500 hover:text-red-700 text-sm"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Emoji Picker */}
+                <div className="border border-gray-300 rounded-lg p-4 bg-white">
+                  <div className="mb-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                      className="text-sm text-teal-600 hover:text-teal-700 font-medium"
+                    >
+                      {showEmojiPicker ? 'Hide' : 'Show'} Emoji Options
+                    </button>
+                  </div>
+                  
+                  {showEmojiPicker && (
+                    <div className="grid grid-cols-12 gap-2 max-h-48 overflow-y-auto">
+                      {healthEmojis.map((emoji, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => {
+                            setFormData({ ...formData, icon: emoji });
+                            setShowEmojiPicker(false);
+                          }}
+                          className={`p-2 text-xl rounded-lg border transition-all hover:bg-teal-50 hover:border-teal-300 ${
+                            formData.icon === emoji
+                              ? 'bg-teal-100 border-teal-500 ring-2 ring-teal-200'
+                              : 'bg-gray-50 border-gray-200 hover:shadow-sm'
+                          }`}
+                          title={`Select ${emoji}`}
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {!showEmojiPicker && (
+                    <div className="text-sm text-gray-500">
+                      Click &ldquo;Show Emoji Options&rdquo; to browse available emojis
+                    </div>
+                  )}
+                </div>
+
+                {/* Manual Input Option */}
+                <div className="mt-3">
+                  <label className="text-xs text-gray-600 block mb-1">
+                    Or enter manually:
+                  </label>
+                  <input
+                    type="text"
+                    id="icon"
+                    name="icon"
+                    value={formData.icon}
+                    onChange={handleChange}
+                    placeholder="Type or paste emoji here"
+                    maxLength={2}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-2xl text-center"
+                  />
+                </div>
+
+                <p className="text-sm text-gray-500 mt-2">
                   Use an emoji to represent this remedy (optional)
                 </p>
               </div>

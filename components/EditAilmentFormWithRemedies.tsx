@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
 import { generateSlug, createUniqueSlugFromName } from '@/lib/slugUtils';
+import { healthEmojis } from '@/lib/emojiList';
 import AilmentRemedyManager from './AilmentRemedyManager';
 
 interface EditAilmentFormProps {
@@ -27,15 +28,6 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
     description: '',
     personalizedApproach: '',
   });
-
-  // Predefined emoji list for health-related ailments
-  const healthEmojis = [
-    '🤕', '🤒', '😷', '🤧', '🤮', '😵', '🥴', '😴', '🥵', '🥶',
-    '🤲', '🙏', '💊', '🩹', '🩺', '💉', '🧬', '🦠', '🧠', '🫀',
-    '🫁', '🦷', '👁️', '👂', '👃', '🤚', '🦵', '🦶', '💪', '🤰',
-    '😰', '😨', '😱', '😓', '😤', '😔', '😞', '😣', '😖', '😫',
-    '🌡️', '🔥', '❄️', '💧', '⚡', '🌟', '✨', '🌿', '🍃', '🌱'
-  ];
 
   const fetchAilment = useCallback(async () => {
     try {
