@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { supabase } from '../lib/supabaseClient';
+import Pagination from './Pagination';
 
 interface Ailment {
   id: string;
@@ -23,6 +24,9 @@ export default function AdminAilmentsManager() {
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(100);
 
   useEffect(() => {
     fetchAilments();
@@ -37,28 +41,6 @@ export default function AdminAilmentsManager() {
       setAilments(data);
     }
     setLoading(false);
-  };
-
-  const openModal = (ailment?: Ailment) => {
-    if (ailment) {
-      setEditingAilment(ailment);
-      setFormData({
-        name: ailment.name,
-        icon: ailment.icon,
-        description: ailment.description,
-        remedies_count: ailment.remedies_count,
-      });
-    } else {
-      setEditingAilment(null);
-      setFormData({
-        name: '',
-        icon: '',
-        description: '',
-        remedies_count: 0,
-      });
-    }
-    setIsModalOpen(true);
-    setMessage(null);
   };
 
   const closeModal = () => {
@@ -101,7 +83,8 @@ export default function AdminAilmentsManager() {
         closeModal();
       }, 1500);
 
-    } catch (error) {
+    } catch (error: unknown) {
+      console.error('Error saving ailment:', error);
       setMessage({ type: 'error', text: 'Failed to save ailment. Please try again.' });
     } finally {
       setLoading(false);
@@ -121,11 +104,36 @@ export default function AdminAilmentsManager() {
       await fetchAilments();
       setMessage({ type: 'success', text: 'Ailment deleted successfully!' });
       setTimeout(() => setMessage(null), 3000);
-    } catch (error) {
+    } catch (error: unknown) {
+      console.error('Error deleting ailment:', error);
       setMessage({ type: 'error', text: 'Failed to delete ailment.' });
     } finally {
       setLoading(false);
     }
+  };
+
+  // Filter ailments based on search
+  const filteredAilments = ailments.filter(ailment =>
+    ailment.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    ailment.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredAilments.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedAilments = filteredAilments.slice(startIndex, endIndex);
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll to top of table
+    const tableSection = document.querySelector('.bg-white.rounded-xl.shadow-sm');
+    tableSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   return (
@@ -152,6 +160,35 @@ export default function AdminAilmentsManager() {
         </div>
       )}
 
+      {/* Search and Stats */}
+      <div className="bg-white rounded-lg shadow-sm p-4">
+        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div className="flex-1">
+            <input
+              type="text"
+              placeholder="Search ailments..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+            />
+          </div>
+          <div className="flex gap-4 text-sm">
+            <div>
+              <span className="text-gray-600">Total: </span>
+              <span className="font-semibold text-gray-900">{filteredAilments.length}</span>
+            </div>
+            {filteredAilments.length > 0 && (
+              <div>
+                <span className="text-gray-600">Showing: </span>
+                <span className="font-semibold text-gray-900">
+                  {startIndex + 1}-{Math.min(endIndex, filteredAilments.length)} of {filteredAilments.length}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Ailments List */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <table className="w-full">
@@ -165,14 +202,14 @@ export default function AdminAilmentsManager() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {ailments.length === 0 ? (
+            {paginatedAilments.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
-                  No ailments found. Click "Add New Ailment" to create one.
+                  {searchTerm ? 'No ailments match your search.' : 'No ailments found. Click "Add Ailment" to create one.'}
                 </td>
               </tr>
             ) : (
-              ailments.map((ailment) => (
+              paginatedAilments.map((ailment) => (
                 <tr key={ailment.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4">
                     <span className="text-3xl">{ailment.icon}</span>
@@ -210,6 +247,20 @@ export default function AdminAilmentsManager() {
             )}
           </tbody>
         </table>
+
+        {/* Pagination */}
+        {filteredAilments.length > itemsPerPage && (
+          <div className="px-6 py-4 border-t border-gray-200">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              showTotal={true}
+              totalItems={filteredAilments.length}
+              itemsPerPage={itemsPerPage}
+            />
+          </div>
+        )}
       </div>
 
       {/* Modal */}

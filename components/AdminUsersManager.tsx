@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
+import Pagination from './Pagination';
 
 interface User {
   id: string;
@@ -18,6 +19,8 @@ export default function AdminUsersManager() {
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState<'all' | 'user' | 'admin'>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(25);
 
   useEffect(() => {
     fetchUsers();
@@ -34,7 +37,7 @@ export default function AdminUsersManager() {
       if (error) throw error;
 
       setUsers(data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching users:', error);
       setMessage({ type: 'error', text: 'Failed to load users' });
     } finally {
@@ -59,7 +62,7 @@ export default function AdminUsersManager() {
       setUsers(users.filter(u => u.id !== id));
       setMessage({ type: 'success', text: 'User deleted successfully!' });
       setTimeout(() => setMessage(null), 3000);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error deleting user:', error);
       setMessage({ type: 'error', text: 'Failed to delete user. You may need admin privileges.' });
     } finally {
@@ -80,7 +83,7 @@ export default function AdminUsersManager() {
       setUsers(users.map(u => u.id === userId ? { ...u, role: newRole } : u));
       setMessage({ type: 'success', text: `User role updated to ${newRole}` });
       setTimeout(() => setMessage(null), 3000);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error updating role:', error);
       setMessage({ type: 'error', text: 'Failed to update user role' });
     } finally {
@@ -99,6 +102,24 @@ export default function AdminUsersManager() {
     
     return matchesSearch && matchesRole;
   });
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, roleFilter]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll to top of table
+    const tableSection = document.querySelector('.bg-white.rounded-lg.shadow-md');
+    tableSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   return (
     <div className="space-y-6">
@@ -161,16 +182,24 @@ export default function AdminUsersManager() {
         <div className="flex gap-4 mt-4 pt-4 border-t">
           <div className="text-sm">
             <span className="text-gray-600">Total: </span>
-            <span className="font-semibold text-gray-900">{users.length}</span>
+            <span className="font-semibold text-gray-900">{filteredUsers.length}</span>
           </div>
           <div className="text-sm">
             <span className="text-gray-600">Admins: </span>
-            <span className="font-semibold text-gray-900">{users.filter(u => u.role === 'admin').length}</span>
+            <span className="font-semibold text-gray-900">{filteredUsers.filter(u => u.role === 'admin').length}</span>
           </div>
           <div className="text-sm">
             <span className="text-gray-600">Users: </span>
-            <span className="font-semibold text-gray-900">{users.filter(u => u.role === 'user').length}</span>
+            <span className="font-semibold text-gray-900">{filteredUsers.filter(u => u.role === 'user').length}</span>
           </div>
+          {filteredUsers.length > 0 && (
+            <div className="text-sm">
+              <span className="text-gray-600">Showing: </span>
+              <span className="font-semibold text-gray-900">
+                {startIndex + 1}-{Math.min(endIndex, filteredUsers.length)} of {filteredUsers.length}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -206,7 +235,7 @@ export default function AdminUsersManager() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {filteredUsers.map((user) => (
+                {paginatedUsers.map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center">
@@ -265,7 +294,7 @@ export default function AdminUsersManager() {
           </div>
         )}
 
-        {filteredUsers.length === 0 && !loading && (
+        {paginatedUsers.length === 0 && !loading && (
           <div className="text-center py-12">
             <div className="text-gray-400 text-5xl mb-4">👥</div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -284,6 +313,20 @@ export default function AdminUsersManager() {
                 + Add User
               </Link>
             )}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {filteredUsers.length > itemsPerPage && (
+          <div className="px-6 py-4 border-t border-gray-200">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              showTotal={true}
+              totalItems={filteredUsers.length}
+              itemsPerPage={itemsPerPage}
+            />
           </div>
         )}
       </div>
