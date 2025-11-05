@@ -11,6 +11,7 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children, userName }: DashboardLayoutProps) {
   const pathname = usePathname();
+  
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
@@ -24,7 +25,7 @@ export default function DashboardLayout({ children, userName }: DashboardLayoutP
   };
 
   const navigation = [
-    { name: 'Overview', href: '/admin/', icon: '📊' },
+    { name: 'Overview', href: '/admin', icon: '📊' },
     { name: 'Ailments', href: '/admin/ailments', icon: '💊' },
     { name: 'Remedies', href: '/admin/remedies', icon: '🧪' },
     { name: 'Users', href: '/admin/users', icon: '👥' },
@@ -67,7 +68,7 @@ export default function DashboardLayout({ children, userName }: DashboardLayoutP
         {/* Navigation */}
         <nav className="flex-1 px-4 py-6 space-y-1">
           {navigation.map((item) => {
-            const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
+            const isActive = pathname === item.href ;
             return (
               <Link key={item.name} href={item.href}>
                 <div
@@ -79,7 +80,9 @@ export default function DashboardLayout({ children, userName }: DashboardLayoutP
                 >
                   <span className="text-xl flex-shrink-0">{item.icon}</span>
                   {isSidebarOpen && (
-                    <span className="font-medium">{item.name}</span>
+                    <span className={isActive ? "font-semibold" : "font-medium"}>
+                      {item.name}
+                    </span>
                   )}
                 </div>
               </Link>

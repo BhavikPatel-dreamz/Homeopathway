@@ -103,8 +103,8 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Homeopathway" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/login-logo.svg" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/login-logo.svg" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} antialiased`}
