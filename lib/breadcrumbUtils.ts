@@ -29,7 +29,7 @@ export const breadcrumbPaths = {
   
   remedyDetail: (remedyName: string, ailmentName?: string, ailmentSlug?: string): BreadcrumbItem[] => [
     { label: "Home", href: "/" },
-    ...(ailmentName ? [{ label: ailmentName, href: ailmentSlug ? `/ailments/${ailmentSlug}` : "#" }] : []),
+    ...(ailmentName ? [{ label: ailmentName, href: ailmentSlug ? `/remedies` : "#" }] : []),
     { label: remedyName, isActive: true }
   ],
   

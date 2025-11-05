@@ -78,6 +78,7 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
     forms: [],
   });
   const [reviewStats, setReviewStats] = useState<{
+    star_count: any;
     average_rating: number;
     total_reviews: number;
     rating_distribution: Record<number, number>;
@@ -136,7 +137,7 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
         const { data, error } = await getReviewStats(remedy.id);
         if (error) throw error;
         if (data) {
-          setReviewStats(data);
+           setReviewStats({ ...data, star_count: data.average_rating });
         }
       } catch (error) {
         console.error("Failed to fetch review stats:", error);
@@ -180,10 +181,10 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
           <div className="flex flex-col items-center text-center border border-gray-200 rounded-2xl p-6 bg-[#F9F7F2]">
             <span className="text-5xl font-serif text-gray-800 mb-2">⭐</span>
             <h2 className="text-4xl font-bold text-gray-800 mb-1">
-              {remedy.average_rating.toFixed(1)}
+              {reviewStats ? reviewStats.star_count : remedy.average_rating}
             </h2>
             <p className="text-sm text-gray-500 mb-6">
-              Based on {remedy.review_count.toLocaleString()} reviews
+              Based on {reviewStats ? reviewStats.total_reviews.toLocaleString() : remedy.review_count.toLocaleString()} reviews
             </p>
 
             {/* Rating Bars */}
@@ -319,38 +320,51 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
           </div>
 
           {/* Pagination */}
-          {(
             <div className="flex items-center justify-center gap-2 mt-8">
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="px-3 py-1 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                className="w-10 h-10 rounded-full flex items-center justify-center bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                  &lt;
+                <ChevronDown className="w-5 h-5 rotate-90" />
               </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              {(() => {
+                const maxVisible = 2;
+                let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+                let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+                
+                if (endPage - startPage + 1 < maxVisible) {
+                  startPage = Math.max(1, endPage - maxVisible + 1);
+                }
+                
+                const pages = [];
+                for (let i = startPage; i <= endPage; i++) {
+                  pages.push(i);
+                }
+                
+                return pages.map((page) => (
                   <button
                     key={page}
                     onClick={() => handlePageChange(page)}
-                    className={`w-8 h-8 rounded-full text-sm font-medium transition-colors ${
+                    className={`w-10 h-10 rounded-full text-sm font-semibold transition-colors ${
                       currentPage === page
                         ? "bg-[#6C7463] text-white"
-                        : "bg-[#F5F1E8] text-gray-700 hover:bg-[#EAE6DD]"
+                        : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
                     }`}
                   >
                     {page}
                   </button>
-                )
-              )}
+                ));
+              })()}
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="px-3 py-1 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                className="w-10 h-10 rounded-full flex items-center justify-center bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                &gt;
+                <ChevronDown className="w-5 h-5 -rotate-90" />
               </button>
             </div>
-          )}
+        
         </div>
       </div>
       <ReviewFilterModal
