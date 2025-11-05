@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { supabase } from '../lib/supabaseClient';
 import Pagination from './Pagination';
@@ -26,22 +26,46 @@ export default function AdminAilmentsManager() {
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(100);
+  const [itemsPerPage] = useState(50);
+  const [totalAilments, setTotalAilments] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+
+  const fetchAilments = useCallback(async () => {
+    setLoading(true);
+    try {
+      // Calculate offset for pagination
+      const offset = (currentPage - 1) * itemsPerPage;
+
+      // Build query
+      let query = supabase
+        .from('ailments')
+        .select('*', { count: 'exact' })
+        .order('name', { ascending: true })
+        .range(offset, offset + itemsPerPage - 1);
+
+      // Apply search filter
+      if (searchTerm) {
+        query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+      }
+
+      const { data, error, count } = await query;
+
+      if (error) throw error;
+
+      setAilments(data || []);
+      setTotalAilments(count || 0);
+      setTotalPages(Math.ceil((count || 0) / itemsPerPage));
+    } catch (error: unknown) {
+      console.error('Error fetching ailments:', error);
+      setMessage({ type: 'error', text: 'Failed to fetch ailments.' });
+    } finally {
+      setLoading(false);
+    }
+  }, [currentPage, searchTerm, itemsPerPage]);
 
   useEffect(() => {
     fetchAilments();
-  }, []);
-
-  const fetchAilments = async () => {
-    setLoading(true);
-    const { data, error } = await supabase.from('ailments').select('*').order('name', { ascending: true });
-    if (error) {
-      setMessage({ type: 'error', text: 'Failed to fetch ailments.' });
-    } else if (data) {
-      setAilments(data);
-    }
-    setLoading(false);
-  };
+  }, [fetchAilments]);
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -112,21 +136,13 @@ export default function AdminAilmentsManager() {
     }
   };
 
-  // Filter ailments based on search
-  const filteredAilments = ailments.filter(ailment =>
-    ailment.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    ailment.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // Pagination logic
-  const totalPages = Math.ceil(filteredAilments.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedAilments = filteredAilments.slice(startIndex, endIndex);
-
-  // Reset to page 1 when search changes
+  // Reset to page 1 when search changes and debounce search
   useEffect(() => {
-    setCurrentPage(1);
+    const timeoutId = setTimeout(() => {
+      setCurrentPage(1);
+    }, 300); // Debounce for 300ms
+
+    return () => clearTimeout(timeoutId);
   }, [searchTerm]);
 
   const handlePageChange = (page: number) => {
@@ -175,13 +191,13 @@ export default function AdminAilmentsManager() {
           <div className="flex gap-4 text-sm">
             <div>
               <span className="text-gray-600">Total: </span>
-              <span className="font-semibold text-gray-900">{filteredAilments.length}</span>
+              <span className="font-semibold text-gray-900">{totalAilments}</span>
             </div>
-            {filteredAilments.length > 0 && (
+            {ailments.length > 0 && (
               <div>
                 <span className="text-gray-600">Showing: </span>
                 <span className="font-semibold text-gray-900">
-                  {startIndex + 1}-{Math.min(endIndex, filteredAilments.length)} of {filteredAilments.length}
+                  {((currentPage - 1) * itemsPerPage) + 1}-{((currentPage - 1) * itemsPerPage) + ailments.length} of {totalAilments}
                 </span>
               </div>
             )}
@@ -202,14 +218,14 @@ export default function AdminAilmentsManager() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {paginatedAilments.length === 0 ? (
+            {ailments.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
                   {searchTerm ? 'No ailments match your search.' : 'No ailments found. Click "Add Ailment" to create one.'}
                 </td>
               </tr>
             ) : (
-              paginatedAilments.map((ailment) => (
+              ailments.map((ailment) => (
                 <tr key={ailment.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4">
                     <span className="text-3xl">{ailment.icon}</span>
@@ -249,14 +265,14 @@ export default function AdminAilmentsManager() {
         </table>
 
         {/* Pagination */}
-        {filteredAilments.length > itemsPerPage && (
+        {totalPages > 1 && (
           <div className="px-6 py-4 border-t border-gray-200">
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={handlePageChange}
               showTotal={true}
-              totalItems={filteredAilments.length}
+              totalItems={totalAilments}
               itemsPerPage={itemsPerPage}
             />
           </div>

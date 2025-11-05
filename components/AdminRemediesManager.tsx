@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabaseClient';
@@ -22,30 +22,46 @@ export default function AdminRemediesManager() {
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage] = useState(50);
+  const [totalRemedies, setTotalRemedies] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
-  useEffect(() => {
-    fetchRemedies();
-  }, []);
-
-  const fetchRemedies = async () => {
+  const fetchRemedies = useCallback(async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      // Calculate offset for pagination
+      const offset = (currentPage - 1) * itemsPerPage;
+
+      // Build query
+      let query = supabase
         .from('remedies')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .select('*', { count: 'exact' })
+        .order('created_at', { ascending: false })
+        .range(offset, offset + itemsPerPage - 1);
+
+      // Apply search filter
+      if (searchTerm) {
+        query = query.or(`name.ilike.%${searchTerm}%,scientific_name.ilike.%${searchTerm}%`);
+      }
+
+      const { data, error, count } = await query;
 
       if (error) throw error;
 
       setRemedies(data || []);
+      setTotalRemedies(count || 0);
+      setTotalPages(Math.ceil((count || 0) / itemsPerPage));
     } catch (error: unknown) {
       console.error('Error fetching remedies:', error);
       setMessage({ type: 'error', text: 'Failed to load remedies' });
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, searchTerm, itemsPerPage]);
+
+  useEffect(() => {
+    fetchRemedies();
+  }, [fetchRemedies]);
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this remedy?')) return;
@@ -70,21 +86,13 @@ export default function AdminRemediesManager() {
     }
   };
 
-  // Filter remedies based on search
-  const filteredRemedies = remedies.filter(remedy =>
-    remedy.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    remedy.scientific_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // Pagination logic
-  const totalPages = Math.ceil(filteredRemedies.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedRemedies = filteredRemedies.slice(startIndex, endIndex);
-
-  // Reset to page 1 when search changes
+  // Reset to page 1 when search changes and debounce search
   useEffect(() => {
-    setCurrentPage(1);
+    const timeoutId = setTimeout(() => {
+      setCurrentPage(1);
+    }, 300); // Debounce for 300ms
+
+    return () => clearTimeout(timeoutId);
   }, [searchTerm]);
 
   const handlePageChange = (page: number) => {
@@ -138,13 +146,13 @@ export default function AdminRemediesManager() {
           <div className="flex gap-4 text-sm">
             <div>
               <span className="text-gray-600">Total: </span>
-              <span className="font-semibold text-gray-900">{filteredRemedies.length}</span>
+              <span className="font-semibold text-gray-900">{totalRemedies}</span>
             </div>
-            {filteredRemedies.length > 0 && (
+            {remedies.length > 0 && (
               <div>
                 <span className="text-gray-600">Showing: </span>
                 <span className="font-semibold text-gray-900">
-                  {startIndex + 1}-{Math.min(endIndex, filteredRemedies.length)} of {filteredRemedies.length}
+                  {((currentPage - 1) * itemsPerPage) + 1}-{((currentPage - 1) * itemsPerPage) + remedies.length} of {totalRemedies}
                 </span>
               </div>
             )}
@@ -179,7 +187,7 @@ export default function AdminRemediesManager() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {paginatedRemedies.map((remedy) => (
+              {remedies.map((remedy) => (
                 <tr key={remedy.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="w-10 h-10 flex items-center justify-center">
@@ -239,7 +247,7 @@ export default function AdminRemediesManager() {
           </table>
         </div>
 
-        {paginatedRemedies.length === 0 && (
+        {remedies.length === 0 && (
           <div className="text-center py-12">
             <div className="text-gray-400 text-5xl mb-4">💊</div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -260,14 +268,14 @@ export default function AdminRemediesManager() {
         )}
 
         {/* Pagination */}
-        {filteredRemedies.length > itemsPerPage && (
+        {totalPages > 1 && (
           <div className="px-6 py-4 border-t border-gray-200">
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={handlePageChange}
               showTotal={true}
-              totalItems={filteredRemedies.length}
+              totalItems={totalRemedies}
               itemsPerPage={itemsPerPage}
             />
           </div>

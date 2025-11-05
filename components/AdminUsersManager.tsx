@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
 import Pagination from './Pagination';
@@ -21,29 +21,50 @@ export default function AdminUsersManager() {
   const [roleFilter, setRoleFilter] = useState<'all' | 'user' | 'admin'>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(25);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      // Calculate offset for pagination
+      const offset = (currentPage - 1) * itemsPerPage;
+
+      // Build query
+      let query = supabase
         .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .select('*', { count: 'exact' })
+        .order('created_at', { ascending: false })
+        .range(offset, offset + itemsPerPage - 1);
+
+      // Apply search filter
+      if (searchTerm) {
+        query = query.or(`email.ilike.%${searchTerm}%,first_name.ilike.%${searchTerm}%,last_name.ilike.%${searchTerm}%`);
+      }
+
+      // Apply role filter
+      if (roleFilter !== 'all') {
+        query = query.eq('role', roleFilter);
+      }
+
+      const { data, error, count } = await query;
 
       if (error) throw error;
 
       setUsers(data || []);
+      setTotalUsers(count || 0);
+      setTotalPages(Math.ceil((count || 0) / itemsPerPage));
     } catch (error: unknown) {
       console.error('Error fetching users:', error);
       setMessage({ type: 'error', text: 'Failed to load users' });
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, searchTerm, roleFilter, itemsPerPage]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
@@ -91,27 +112,13 @@ export default function AdminUsersManager() {
     }
   };
 
-  // Filter users based on search and role filter
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = 
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.last_name?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-    
-    return matchesSearch && matchesRole;
-  });
-
-  // Pagination logic
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
-
-  // Reset to page 1 when filters change
+  // Reset to page 1 when filters change and debounce search
   useEffect(() => {
-    setCurrentPage(1);
+    const timeoutId = setTimeout(() => {
+      setCurrentPage(1);
+    }, 300); // Debounce for 300ms
+
+    return () => clearTimeout(timeoutId);
   }, [searchTerm, roleFilter]);
 
   const handlePageChange = (page: number) => {
@@ -182,21 +189,17 @@ export default function AdminUsersManager() {
         <div className="flex gap-4 mt-4 pt-4 border-t">
           <div className="text-sm">
             <span className="text-gray-600">Total: </span>
-            <span className="font-semibold text-gray-900">{filteredUsers.length}</span>
+            <span className="font-semibold text-gray-900">{totalUsers}</span>
           </div>
           <div className="text-sm">
-            <span className="text-gray-600">Admins: </span>
-            <span className="font-semibold text-gray-900">{filteredUsers.filter(u => u.role === 'admin').length}</span>
+            <span className="text-gray-600">Current Page: </span>
+            <span className="font-semibold text-gray-900">{users.length} users</span>
           </div>
-          <div className="text-sm">
-            <span className="text-gray-600">Users: </span>
-            <span className="font-semibold text-gray-900">{filteredUsers.filter(u => u.role === 'user').length}</span>
-          </div>
-          {filteredUsers.length > 0 && (
+          {users.length > 0 && (
             <div className="text-sm">
               <span className="text-gray-600">Showing: </span>
               <span className="font-semibold text-gray-900">
-                {startIndex + 1}-{Math.min(endIndex, filteredUsers.length)} of {filteredUsers.length}
+                {((currentPage - 1) * itemsPerPage) + 1}-{((currentPage - 1) * itemsPerPage) + users.length} of {totalUsers}
               </span>
             </div>
           )}
@@ -235,7 +238,7 @@ export default function AdminUsersManager() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {paginatedUsers.map((user) => (
+                {users.map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center">
@@ -294,7 +297,7 @@ export default function AdminUsersManager() {
           </div>
         )}
 
-        {paginatedUsers.length === 0 && !loading && (
+        {users.length === 0 && !loading && (
           <div className="text-center py-12">
             <div className="text-gray-400 text-5xl mb-4">👥</div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -317,14 +320,14 @@ export default function AdminUsersManager() {
         )}
 
         {/* Pagination */}
-        {filteredUsers.length > itemsPerPage && (
+        {totalPages > 1 && (
           <div className="px-6 py-4 border-t border-gray-200">
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={handlePageChange}
               showTotal={true}
-              totalItems={filteredUsers.length}
+              totalItems={totalUsers}
               itemsPerPage={itemsPerPage}
             />
           </div>
