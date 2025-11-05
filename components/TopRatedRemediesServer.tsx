@@ -11,6 +11,7 @@ export default function TopRatedRemediesServer({
   topRemedies, 
   searchQuery = "" 
 }: TopRatedRemediesServerProps) {
+  console.log(topRemedies);
   return (
     <section className="px-4 py-6 lg:py-10 bg-[#f5f3ed]">
       <div className="max-w-7xl px-0 lg:px-5 mx-auto">
@@ -47,7 +48,7 @@ export default function TopRatedRemediesServer({
                   <p className="font-[600] text-[20px] mb-1 text-[#0B0C0A]">{remedy.name}</p>
                   <div className="flex items-center gap-2 mb-3">
                     <div className="flex text-yellow-400">
-                      {[...Array(remedy.review_count)].map((_, i) => (
+                      {[...Array(Math.floor(remedy.average_rating))].map((_, i) => (
                         <span key={i}>
                           <Image 
                             src="/star.svg" 
@@ -57,7 +58,7 @@ export default function TopRatedRemediesServer({
                           />
                         </span>
                       ))}
-                       {[...Array(5-remedy.review_count)].map((_, i) => (
+                       {[...Array(5-Math.floor(remedy.average_rating))].map((_, i) => (
                         <span key={i}>
                           <Image 
                             src="/star-blank.svg" 
