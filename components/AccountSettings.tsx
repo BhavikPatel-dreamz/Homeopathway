@@ -1,10 +1,7 @@
 "use client";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Header from './Header';
-import Footer from './Footer';
-import Breadcrumb from './Breadcrumb';
-import { breadcrumbPaths } from '../lib/breadcrumbUtils';
+import { supabase } from '../lib/supabaseClient';
 
 interface AccountSettingsProps {
   user: {
@@ -33,35 +30,34 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
     setMessage(null);
 
     try {
-      // TODO: Implement actual Supabase update
-      // Split full name into first and last name
-      const nameParts = formData.full_name.trim().split(' ');
-      const firstName = nameParts[0] || '';
-      const lastName = nameParts.slice(1).join(' ') || '';
+      const response = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          full_name: formData.full_name,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
 
-      // Update profile
-      // await supabase.from('profiles').update({
-      //   first_name: firstName,
-      //   last_name: lastName,
-      // }).eq('id', user.id);
+      const data = await response.json();
 
-      // Update email if changed
-      // if (formData.email !== user.email) {
-      //   await supabase.auth.updateUser({ email: formData.email });
-      // }
-
-      // Update password if provided
-      // if (formData.password) {
-      //   await supabase.auth.updateUser({ password: formData.password });
-      // }
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update profile');
+      }
 
       setMessage({ type: 'success', text: 'Profile updated successfully!' });
       setIsEditing(false);
+      setFormData(prev => ({ ...prev, password: '' })); // Clear password field
+      
       setTimeout(() => {
         router.refresh();
       }, 1500);
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to update profile. Please try again.' });
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update profile. Please try again.';
+      setMessage({ type: 'error', text: errorMessage });
     } finally {
       setLoading(false);
     }
@@ -69,19 +65,25 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
 
   const handleLogout = async () => {
     try {
-      // TODO: Implement actual Supabase logout
-      // await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('Logout error:', error);
+      }
+      
+      // Redirect to login regardless of error (sometimes signOut fails but user is logged out)
       router.push('/login');
     } catch (error) {
       console.error('Logout error:', error);
+      // Fallback: redirect to login anyway
+      router.push('/login');
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
      
-      {/* Breadcrumb */}
-      <Breadcrumb items={breadcrumbPaths.profile()} />
+      
 
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-6 py-8">

@@ -1,7 +1,6 @@
 import { getUserProfile } from '../../lib/auth-server';
 import { createClient } from '../../lib/supabase/server';
 import AccountSettings from '../../components/AccountSettings';
-import Breadcrumb from '../../components/Breadcrumb';
 import Link from 'next/link';
 import { Metadata } from 'next';
 

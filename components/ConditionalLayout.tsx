@@ -11,9 +11,10 @@ export default async function ConditionalLayout({ children }: ConditionalLayoutP
   // Get the current pathname from headers
   const headersList = await headers();
   const pathname = headersList.get('x-pathname') || headersList.get('x-url') || '';
-
+  console.log('Current Pathname in Layout:', pathname);
   // Check if current page is an auth page
-  const isAuthPage = isPageCheckerSSR(pathname, ['/login', '/register', '/forgot-password','/admin']);
+  const isAuthPage = isPageCheckerSSR(pathname, ['/login', '/register', '/forgot-password','/admin','/profile']);
+  console.log(isAuthPage) 
 
   return (
     <div className="min-h-screen bg-[#2C3E3E]">
