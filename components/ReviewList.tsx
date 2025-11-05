@@ -68,7 +68,7 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  const [reviewsPerPage] = useState(5);
+  const [reviewsPerPage] = useState(15);
 
   const [isLoading, setIsLoading] = useState(true);
   const [filters, setFilters] = useState<ReviewFilters>({
@@ -81,74 +81,67 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
     forms: [],
   });
   const [reviewStats, setReviewStats] = useState<{
-    star_count: any;
+    star_count: number;
     average_rating: number;
     total_reviews: number;
     rating_distribution: Record<number, number>;
   } | null>(null);
+  const [totalReviews, setTotalReviews] = useState(0);
 
   useEffect(() => {
-    setTotalPages(Math.ceil(remedy.review_count / reviewsPerPage));
-
-    const fetchReviews = async () => {
+    const fetchData = async () => {
       if (!remedy.id) return;
       setIsLoading(true);
+      
       try {
-        const { data, error } = await getReviews({ 
+        // Fetch reviews - for now we'll load more than needed and paginate client-side
+        // TODO: Update getReviews function to support proper offset-based pagination
+        const { data: reviewsData, error: reviewsError } = await getReviews({ 
           remedyId: remedy.id, 
-          limit: reviewsPerPage,
+          limit: Math.max(reviewsPerPage * 3, 50), // Load enough for a few pages
           sortBy: sortBy,
           starCount: filters.rating,
           searchQuery: searchQuery,
-          potency: filters.dosage, // Assuming modal's 'dosage' is for potency
-          // 'form' filter is not supported by getReviews yet
+          potency: filters.dosage,
         });
-        if (error) {
-          throw error;
+        
+        if (reviewsError) throw reviewsError;
+        
+        // Store all fetched reviews for client-side pagination
+        const allReviews = reviewsData || [];
+        
+        // Implement client-side pagination
+        const startIndex = (currentPage - 1) * reviewsPerPage;
+        const endIndex = startIndex + reviewsPerPage;
+        const paginatedReviews = allReviews.slice(startIndex, endIndex);
+        setReviews(paginatedReviews);
+
+        // Fetch review stats to get total count
+        const { data: statsData, error: statsError } = await getReviewStats(remedy.id);
+        if (statsError) throw statsError;
+        
+        if (statsData) {
+          setReviewStats({ ...statsData, star_count: statsData.average_rating });
+          setTotalReviews(statsData.total_reviews);
+          setTotalPages(Math.ceil(statsData.total_reviews / reviewsPerPage));
         }
 
-        console.log("Fetched reviews:", data);
+        // Fetch filter options
+        const { data: filterData, error: filterError } = await getReviewFilterOptions(remedy.id);
+        if (filterError) throw filterError;
+        if (filterData) {
+          setFilterOptions(filterData);
+        }
 
-
-        setReviews(data || []);
       } catch (error) {
-        console.error("Failed to fetch reviews:", error);
+        console.error("Failed to fetch data:", error);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchReviews();
 
-    const fetchFilterOptions = async () => {
-      if (!remedy.id) return;
-      try {
-        const { data, error } = await getReviewFilterOptions(remedy.id);
-        if (error) throw error;
-        if (data) {
-          setFilterOptions(data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch filter options:", error);
-      }
-    };
-
-    fetchFilterOptions();
-
-    const fetchReviewStats = async () => {
-      if (!remedy.id) return;
-      try {
-        const { data, error } = await getReviewStats(remedy.id);
-        if (error) throw error;
-        if (data) {
-           setReviewStats({ ...data, star_count: data.average_rating });
-        }
-      } catch (error) {
-        console.error("Failed to fetch review stats:", error);
-      }
-    };
-
-    fetchReviewStats();
-  }, [remedy.id, remedy.review_count, sortBy, filters, currentPage, reviewsPerPage, searchQuery]);
+    fetchData();
+  }, [remedy.id, sortBy, filters, currentPage, reviewsPerPage, searchQuery]);
 
   useEffect(() => {
     // Reset to page 1 when filters or sort order changes
@@ -180,6 +173,47 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
     }
   };
 
+  const refreshReviews = async () => {
+    if (!remedy.id) return;
+    setIsLoading(true);
+    
+    try {
+      // Reset to first page when refreshing
+      setCurrentPage(1);
+      
+      // Fetch fresh review stats
+      const { data: statsData, error: statsError } = await getReviewStats(remedy.id);
+      if (statsError) throw statsError;
+      
+      if (statsData) {
+        setReviewStats({ ...statsData, star_count: statsData.average_rating });
+        setTotalReviews(statsData.total_reviews);
+        setTotalPages(Math.ceil(statsData.total_reviews / reviewsPerPage));
+      }
+
+      // Fetch fresh reviews
+      const { data: reviewsData, error: reviewsError } = await getReviews({ 
+        remedyId: remedy.id, 
+        limit: Math.max(reviewsPerPage * 3, 50),
+        sortBy: sortBy,
+        starCount: filters.rating,
+        searchQuery: searchQuery,
+        potency: filters.dosage,
+      });
+      
+      if (reviewsError) throw reviewsError;
+      
+      const allReviews = reviewsData || [];
+      const paginatedReviews = allReviews.slice(0, reviewsPerPage); // First page
+      setReviews(paginatedReviews);
+
+    } catch (error) {
+      console.error("Failed to refresh reviews:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const sortOptions: { label: string; value: typeof sortBy }[] = [
     { label: "Most Recent", value: "newest" },
     { label: "Oldest", value: "oldest" },
@@ -200,7 +234,7 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
           <div className="flex flex-col items-center text-center border border-gray-200 rounded-2xl p-6 bg-[#F9F7F2]">
             <span className="text-5xl font-serif text-gray-800 mb-2">⭐</span>
             <h2 className="text-4xl font-bold text-gray-800 mb-1">
-              {reviewStats ? reviewStats.star_count : remedy.average_rating}
+              {reviewStats ? reviewStats.average_rating.toFixed(1) : remedy.average_rating.toFixed(1)}
             </h2>
             <p className="text-sm text-gray-500 mb-6">
               Based on {reviewStats ? reviewStats.total_reviews.toLocaleString() : remedy.review_count.toLocaleString()} reviews
@@ -338,7 +372,8 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
             )}
           </div>
 
-          {/* Pagination */}
+          {/* Pagination - only show if there are more than 15 reviews */}
+          {totalReviews > 15 && (
             <div className="flex items-center justify-center gap-2 mt-8">
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
@@ -350,7 +385,7 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
               {(() => {
                 const maxVisible = 2;
                 let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
-                let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+                const endPage = Math.min(totalPages, startPage + maxVisible - 1);
                 
                 if (endPage - startPage + 1 < maxVisible) {
                   startPage = Math.max(1, endPage - maxVisible + 1);
@@ -383,6 +418,7 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
                 <ChevronDown className="w-5 h-5 -rotate-90" />
               </button>
             </div>
+          )}
         
         </div>
       </div>
@@ -401,7 +437,10 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
     </section>
     {isReviewFormOpen && (
       <AddReviewForm 
-        onClose={() => setIsReviewFormOpen(false)}
+        onClose={() => {
+          setIsReviewFormOpen(false);
+          refreshReviews(); // Refresh reviews when form closes
+        }}
         remedyId={remedy.id}
         remedyName={remedy.name}
         condition={"your condition"}
