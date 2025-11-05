@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Star, StarHalf, StarOff, Search, ChevronDown, Loader2, StarIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Star, StarHalf, StarOff, Search, Loader2, StarIcon } from "lucide-react";
 import { getReviews, getReviewFilterOptions, getReviewStats } from "@/lib/review";
+import { getCurrentUser } from "@/lib/auth";
 import ReviewFilterModal, { ReviewFilters } from "./ReviewFilterModal";
 import AddReviewForm from "./AddReviewForm";
 import { Remedy, Review as ReviewType } from "@/types";
@@ -58,6 +60,7 @@ const renderStars = (rating: number) => {
 // Main Component
 // ---------------------------
 export default function ReviewListPage({ remedy }: ReviewListPageProps) {
+  const router = useRouter();
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'highest_rated' | 'lowest_rated'>("newest");
   const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
@@ -161,6 +164,22 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
     }
   };
 
+  const handleReviewButtonClick = async () => {
+    try {
+      const { user, error } = await getCurrentUser();
+      if (error || !user) {
+        // User is not authenticated, redirect to login
+        router.push('/login');
+        return;
+      }
+      // User is authenticated, open the review form
+      setIsReviewFormOpen(true);
+    } catch (err) {
+      console.error('Authentication check failed:', err);
+      router.push('/login');
+    }
+  };
+
   const sortOptions: { label: string; value: typeof sortBy }[] = [
     { label: "Most Recent", value: "newest" },
     { label: "Oldest", value: "oldest" },
@@ -204,7 +223,7 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
             </div>
 
              <button 
-                  onClick={() => setIsReviewFormOpen(true)}
+                  onClick={handleReviewButtonClick}
                   className="bg-[#6C7463] hover:bg-[#5A6B5D] text-white px-5 py-2 rounded-full text-sm font-medium transition"
                 >
                   Review Remedy

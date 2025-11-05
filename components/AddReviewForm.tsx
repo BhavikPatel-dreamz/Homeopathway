@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { X } from 'lucide-react';
+import { getCurrentUser } from '@/lib/auth';
 
 interface AddReviewFormProps {
   onClose: () => void;
@@ -11,9 +13,11 @@ interface AddReviewFormProps {
 }
 
 export default function AddReviewForm({ onClose, remedyId, remedyName, condition = 'your condition' }: AddReviewFormProps) {
+  const router = useRouter();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [formData, setFormData] = useState({
     remedy: remedyName,
     condition: condition,
@@ -28,6 +32,28 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
   });
 
   const totalSteps = 6;
+
+  // Check authentication on component mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { user, error } = await getCurrentUser();
+        if (error || !user) {
+          // User is not authenticated, redirect to login
+          router.push('/login');
+          onClose(); // Close the modal
+          return;
+        }
+        setIsAuthenticated(true);
+      } catch (err) {
+        console.error('Authentication check failed:', err);
+        router.push('/login');
+        onClose();
+      }
+    };
+
+    checkAuth();
+  }, [router, onClose]);
 
   const handleClose = () => {
     onClose();
@@ -119,6 +145,23 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
     setFormData({ ...formData, effectiveness });
   };
 
+  // Show loading state while checking authentication
+  if (isAuthenticated === null) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg relative">
+          <div className="p-10 pt-12">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+              <p className="text-gray-600">Checking authentication...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // If we reach here, user is authenticated
   return (
     <div className="fixed inset-0  bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg relative">
