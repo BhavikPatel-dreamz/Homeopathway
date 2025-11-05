@@ -51,7 +51,6 @@ export default function TopRemedies({ remedies }: TopRemediesProps) {
         return b.reviewCount - a.reviewCount;
     }
   });
-  console.log(sortedRemedies,"11")
 
   return (
     <div className="">

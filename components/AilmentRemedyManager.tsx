@@ -181,12 +181,6 @@ export default function AilmentRemedyManager({
           throw new Error('User not authenticated');
         }
 
-        console.log('Current user:', user);
-        console.log('Attempting to insert:', {
-          ailment_id: ailmentId,
-          remedy_id: remedyId,
-        });
-
         // Try a simple insert with minimal data first
         const insertData = {
           ailment_id: ailmentId,
