@@ -1,10 +1,11 @@
 "use client";
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, ReactNode } from 'react';
 import Link from 'next/link';
 
 import Breadcrumb from "./Breadcrumb";
 
 interface Remedy {
+  icon: ReactNode;
   id: number;
   name?: string;
   slug: string;
@@ -154,7 +155,7 @@ export default function RemedyListPage({
                     className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg hover:border-[#2C5F4F] transition-all text-left h-full flex flex-col justify-between group cursor-pointer"
                   >
                   <div>
-                    <div className="text-5xl mb-3">💊</div>
+                    <div className="text-5xl mb-3">{remedy.icon || '🌿'}</div>
                     <h4 className="font-semibold text-lg mb-2 text-gray-900 group-hover:text-[#2C5F4F] transition-colors">
                       {remedy.name}
                     </h4>
