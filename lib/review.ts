@@ -414,3 +414,59 @@ export async function getReviewStats(remedyId: string): Promise<{
     error: null,
   };
 }
+
+/**
+ * Fetches counts of various entities for a dashboard overview.
+ *
+ * @returns {Promise<{ data: { totalReviews: number; totalRemedies: number; totalUsers: number } | null; error: Error | null }>}
+ *          An object containing the counts or an error.
+ */
+export async function getDashboardCounts(): Promise<{
+  data: { totalReviews: number; totalRemedies: number; totalUsers: number,totalAilment:number } | null;
+  error: Error | null;
+}> {
+  try {
+    // Fetch total reviews count
+    const { count: totalReviews, error: reviewsError } = await supabase
+      .from('reviews')
+      .select('*', { count: 'exact', head: true });
+
+    if (reviewsError) {
+      console.error('Error fetching total reviews:', reviewsError);
+      return { data: null, error: reviewsError };
+    }
+
+    // Fetch total remedies count
+    const { count: totalRemedies, error: remediesError } = await supabase
+      .from('remedies') // Corrected table name from 'remides'
+      .select('*', { count: 'exact', head: true });
+
+    if (remediesError) {
+      console.error('Error fetching total remedies:', remediesError);
+      return { data: null, error: remediesError };
+    }
+     const { count: totalAilment, error: ailmentError } = await supabase
+      .from('ailments') // Corrected table name from 'remides'
+      .select('*', { count: 'exact', head: true });
+
+    if (ailmentError) {
+      console.error('Error fetching total remedies:', remediesError);
+      return { data: null, error: remediesError };
+    }
+
+    // Fetch total profiles (users) count
+    const { count: totalUsers, error: profilesError } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true });
+
+    if (profilesError) {
+      console.error('Error fetching total users:', profilesError);
+      return { data: null, error: profilesError };
+    }
+
+    return { data: { totalReviews: totalReviews || 0, totalRemedies: totalRemedies || 0, totalUsers: totalUsers || 0 ,totalAilment:totalAilment||0}, error: null };
+  } catch (error) {
+    console.error('Error in getDashboardCounts:', error);
+    return { data: null, error: error instanceof Error ? error : new Error('An unknown error occurred') };
+  }
+}
