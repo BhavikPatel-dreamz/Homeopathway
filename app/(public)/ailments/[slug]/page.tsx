@@ -4,7 +4,7 @@ import AilmentDetailPage from '../../../../components/AilmentDetailPage';
 import { supabase } from '@/lib/supabaseClient';
 
 interface Remedy {
-  id: number;
+  id: string;
   name: string;
   indication: string;
   rating: number;
@@ -12,6 +12,7 @@ interface Remedy {
   reviewCount: number;
   description: string;
   key_symptoms?: string[];
+  icon:string
 }
 
 interface Ailment {
@@ -50,7 +51,8 @@ async function getAilmentData(slug: string) {
         slug,
         key_symptoms,
         average_rating,
-        review_count
+        review_count,
+        icon
       )
     `)
     .eq('ailment_id', ailmentData.id);
@@ -73,7 +75,7 @@ async function getAilmentData(slug: string) {
     const ailmentRemedy = ar as Record<string, unknown>;
     const remedy = ailmentRemedy.remedies as Record<string, unknown>;
     return {
-      id: Number(remedy.id),
+      id: (remedy.id as string),
       name: remedy.name as string,
       indication: (remedy.key_symptoms as string[])?.[0] || 'No indication specified.',
       rating: (remedy.average_rating as number) || 0,
@@ -81,6 +83,7 @@ async function getAilmentData(slug: string) {
       reviewCount: (remedy.review_count as number) || 0,
       description: (remedy.description as string) || 'No description available.',
       key_symptoms: (remedy.key_symptoms as string[]) || [],
+     icon: (remedy.icon as string)
     };
   });
 
