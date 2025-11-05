@@ -62,19 +62,24 @@ export default function TopRemedies({ remedies }: TopRemediesProps) {
         </div>
         
         {/* Sort Dropdown */}
-        <div className="relative">
-          <div className="flex items-center justify-end">
-            <label htmlFor="sort-remedies" className="mr-2 font-semibold text-[#2B2E28]">Sort by:</label>
+        <div className="flex items-center justify-end">
+          <label htmlFor="sort-remedies" className="mr-2 font-semibold text-[#2B2E28]">Sort by:</label>
+          <div className="relative">
             <select 
               id="sort-remedies"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="block appearance-none bg-transparent text-[#20231E] text-[16px] focus:outline-none pr-6"
+              className="block appearance-none bg-transparent text-[#20231E] text-[16px] focus:outline-none pr-5"
             >
               <option>Overall Rating</option>
               <option>Most Reviewed</option>
               <option>Alphabetical</option>
             </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+              <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+              </svg>
+            </div>
           </div>
         </div>
       </div>
