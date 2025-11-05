@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Star, StarHalf, StarOff, Search, Loader2, StarIcon } from "lucide-react";
+import { Star, StarHalf, StarOff, Search, Loader2, StarIcon, ChevronDown } from "lucide-react";
 import { getReviews, getReviewFilterOptions, getReviewStats } from "@/lib/review";
 import { getCurrentUser } from "@/lib/auth";
 import ReviewFilterModal, { ReviewFilters } from "./ReviewFilterModal";

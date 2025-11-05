@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import RemedyListPage from '../../components/RemedyList';
+import RemedyListPage from '../../../components/RemedyList';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {

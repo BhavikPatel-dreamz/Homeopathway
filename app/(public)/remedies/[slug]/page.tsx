@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import RemediesDetailPage from '../../../components/RemediesDetail';
+import RemediesDetailPage from '../../../../components/RemediesDetail';
 import { Remedy } from '@/types';
 
 interface RemedyDetailPageProps {

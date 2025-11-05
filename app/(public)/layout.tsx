@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Montserrat } from "next/font/google";
-import "./globals.css";
+
 import ConditionalLayout from "@/components/ConditionalLayout";
 
 const geistSans = Geist({
@@ -95,24 +95,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+  console.log('Rendering RootLayout');
   return (
-    <html lang="en">
-      <head>
-        <meta name="theme-color" content="#10b981" />
-        <meta name="msapplication-TileColor" content="#10b981" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Homeopathway" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-      </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} antialiased`}
-      > 
+    
       
+        <ConditionalLayout>
           {children}
-        
-      </body>
-    </html>
+        </ConditionalLayout>
+    
   );
 }

@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import AilmentListPage from '../../components/AilmentList';
+import AilmentListPage from '../../../components/AilmentList';
 import { Metadata } from 'next';
 interface Ailment {
   id: string;
