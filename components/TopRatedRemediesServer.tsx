@@ -11,7 +11,7 @@ export default function TopRatedRemediesServer({
   topRemedies, 
   searchQuery = "" 
 }: TopRatedRemediesServerProps) {
-  console.log(topRemedies);
+  
   return (
     <section className="px-4 py-6 lg:py-10 bg-[#f5f3ed]">
       <div className="max-w-7xl px-0 lg:px-5 mx-auto">
