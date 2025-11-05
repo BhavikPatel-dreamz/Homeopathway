@@ -148,7 +148,6 @@ export default function RemedyListPage({
             {paginatedRemedies.length > 0 ? (
               paginatedRemedies.map((remedy) => {
                 // Log the remedy object to inspect its properties
-                console.log('Remedy data:', remedy);
                 return (
                 <Link href={`/remedies/${remedy.slug}`} key={remedy.slug}>
                   <div

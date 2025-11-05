@@ -56,7 +56,7 @@ export default function SearchBar() {
               .limit(5),
             supabase
               .from("remedies")
-              .select("name, average_rating, review_count, description")
+              .select("name, average_rating, review_count, description,icon")
               .ilike("name", `%${searchQuery}%`)
               .order("average_rating", { ascending: false })
               .limit(5),
@@ -240,7 +240,7 @@ export default function SearchBar() {
                                 className='w-full px-4 py-4 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group border-b border-gray-50 last:border-b-0'
                               >
                                 <div className='w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-xl flex-shrink-0'>
-                                  💊
+                                  {remedy.icon}
                                 </div>
                                 <div className='flex-1'>
                                   <div className='font-medium text-gray-900 group-hover:text-[#2C3E3E]'>
@@ -368,7 +368,7 @@ export default function SearchBar() {
                           className='w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group'
                         >
                           <div className='w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-xl flex-shrink-0'>
-                            💊
+                            {remedy.icon}
                           </div>
                           <div className='flex-1'>
                             <div className='font-medium text-gray-900 group-hover:text-[#2C3E3E]'>

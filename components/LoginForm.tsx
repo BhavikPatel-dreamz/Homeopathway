@@ -29,15 +29,11 @@ export default function LoginForm() {
       }
 
       console.log('✅ Login successful, user:', data?.user?.email);
-      console.log('📝 User ID:', data?.user?.id);
-
       // Get user profile to check role
       if (data?.user) {
         console.log('🔍 Fetching user profile...',);
         const { profile, error: profileError } = await getUserProfile(data.user.id);
         
-        console.log('📋 Profile data:', profile);
-        console.log('👤 User role:', profile?.role);
         
         if (profileError) {
           console.error('❌ Profile fetch error:', profileError);

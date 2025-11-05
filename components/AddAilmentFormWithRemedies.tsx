@@ -52,56 +52,47 @@ export default function AddAilmentForm() {
     if (e) e.preventDefault();
     
     console.log('=== ADD AILMENT SUBMISSION STARTED ===');
-    console.log('Form data:', formData);
-    console.log('Selected remedy relations:', selectedRemedyRelations);
     
     // Validate required fields
     if (!formData.name.trim()) {
       setError('Ailment name is required');
       setActiveTab('basic'); // Switch to basic tab to show the error
-      console.log('Validation failed: Missing name');
+     
       return;
     }
     
     if (!formData.icon.trim()) {
       setError('Icon is required');
       setActiveTab('basic');
-      console.log('Validation failed: Missing icon');
+     
       return;
     }
     
     if (!formData.description.trim()) {
       setError('Description is required');
       setActiveTab('basic');
-      console.log('Validation failed: Missing description');
+ 
       return;
     }
 
     if (!formData.personalizedApproach.trim()) {
       setError('Personalized approach is required');
       setActiveTab('basic');
-      console.log('Validation failed: Missing personalized approach');
       return;
     }
 
-    console.log('Validation passed, starting submission...');
     setLoading(true);
     setError(null);
 
     try {
-      console.log('Getting current user...');
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
         throw new Error('You must be logged in to add an ailment');
       }
       
-      console.log('Current user:', user.id);
-      
       // Generate final unique slug
-      console.log('Generating slug...');
       const finalSlug = await createUniqueSlugFromName(formData.name);
-      console.log('Generated slug:', finalSlug);
       
       // Check if ailment with this name already exists
       console.log('Checking for existing ailment...');
@@ -120,10 +111,8 @@ export default function AddAilmentForm() {
       if (existingAilment) {
         throw new Error(`An ailment named "${formData.name}" already exists. Please choose a different name.`);
       }
+    
       
-      console.log('Ailment name is unique, proceeding with insert...');
-      
-      console.log('Inserting ailment...');
       const { data: ailmentData, error: insertError } = await supabase
         .from('ailments')
         .insert([
@@ -171,17 +160,14 @@ export default function AddAilmentForm() {
         }
       }
 
-      console.log('Ailment created successfully:', ailmentData);
 
       // If we have selected remedy relations, create them
       if (selectedRemedyRelations.length > 0) {
-        console.log('Creating remedy relations:', selectedRemedyRelations.length);
         const remedyRelations = selectedRemedyRelations.map(relation => ({
           ailment_id: ailmentData.id,
           remedy_id: relation.remedy_id,
         }));
 
-        console.log('Remedy relations to insert:', remedyRelations);
 
         const { error: relationsError } = await supabase
           .from('ailment_remedies')
@@ -195,7 +181,6 @@ export default function AddAilmentForm() {
         console.log('Remedy relations created successfully');
 
         // Update the remedies_count in the ailments table
-        console.log('Updating remedies_count in ailments table...');
         const { error: updateCountError } = await supabase
           .from('ailments')
           .update({ remedies_count: selectedRemedyRelations.length })

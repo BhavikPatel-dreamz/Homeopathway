@@ -37,8 +37,6 @@ export default function AilmentRemedyManager({
         .select('*')
         .limit(1);
       
-      console.log('Read test result:', { data: readTest, error: readError });
-      
       if (readError) {
         setError(`Read test failed: ${readError.message}`);
         return;
@@ -46,7 +44,6 @@ export default function AilmentRemedyManager({
       
       // Test 2: Get current user
       const { data: { user }, error: userError } = await supabase.auth.getUser();
-      console.log('User test result:', { user: user?.id, error: userError });
       
       if (userError || !user) {
         setError(`User authentication failed: ${userError?.message || 'No user'}`);
@@ -79,12 +76,10 @@ export default function AilmentRemedyManager({
         throw remediesError;
       }
 
-      console.log('Loaded remedies:', remediesData?.length || 0);
 
       // If we have an ailmentId, load existing relations
       let existingRelations: AilmentRemedy[] = [];
       if (ailmentId) {
-        console.log('Loading relations for ailment:', ailmentId);
         const { data: relationsData, error: relationsError } = await supabase
           .from('ailment_remedies')
           .select('*')
@@ -95,7 +90,7 @@ export default function AilmentRemedyManager({
           throw relationsError;
         }
         existingRelations = relationsData || [];
-        console.log('Loaded existing relations:', existingRelations.length);
+
       }
 
       // Combine remedies with relation status

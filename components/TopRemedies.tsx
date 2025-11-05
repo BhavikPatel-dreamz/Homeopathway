@@ -3,9 +3,10 @@ import React, { useState } from "react";
 import Link from "next/link";
 
 interface Remedy {
-  id: number;
+  id: string;
   name: string;
   slug:string;
+  icon:string;
   indication: string;
   rating: number; // Renamed from rating
   reviewCount: number; // Renamed from reviewCount
@@ -50,6 +51,7 @@ export default function TopRemedies({ remedies }: TopRemediesProps) {
         return b.reviewCount - a.reviewCount;
     }
   });
+  console.log(sortedRemedies,"11")
 
   return (
     <div className="">
@@ -85,7 +87,7 @@ export default function TopRemedies({ remedies }: TopRemediesProps) {
               <div className="flex flex-col sm:flex-row items-start gap-6">
                 {/* Icon */}
                 <div className="w-16 h-16 bg-[#F9F7F2] rounded-full flex items-center justify-center text-4xl flex-shrink-0">
-                  🌿
+                  {remedy.icon}
                 </div>
 
                 {/* Content */}

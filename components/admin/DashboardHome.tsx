@@ -62,27 +62,6 @@ export default function DashboardHome({
         </div>
       </div>
 
-      {/* Recent Activity */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-8">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Activity</h2>
-        <div className="space-y-4">
-          {[
-            { icon: '💊', text: 'New remedy "Arnica Montana" added', time: '2 hours ago' },
-            { icon: '✏️', text: 'Ailment "Headache" updated', time: '5 hours ago' },
-            { icon: '⭐', text: 'New review for "Belladonna"', time: '1 day ago' },
-            { icon: '👤', text: 'New user registered', time: '2 days ago' },
-          ].map((activity, index) => (
-            <div key={index} className="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-lg transition-colors">
-              <div className="text-2xl">{activity.icon}</div>
-              <div className="flex-1">
-                <p className="text-sm text-gray-900">{activity.text}</p>
-                <p className="text-xs text-gray-500">{activity.time}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Link

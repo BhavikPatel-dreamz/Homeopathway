@@ -94,7 +94,6 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
       }
 
       const result = await response.json();
-      console.log('Review submitted successfully:', result);
       
       // Close the form on success
       onClose();

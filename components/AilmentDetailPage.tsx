@@ -4,7 +4,7 @@ import Breadcrumb from "./Breadcrumb";
 import TopRemedies from "./TopRemedies";
 
 interface Remedy {
-  id: number;
+  id: string;
   name: string;
   indication: string;
   rating: number; 
@@ -12,6 +12,7 @@ interface Remedy {
   description: string;
   key_symptoms?: string[];
   slug:string;
+  icon:string;
 }
 
 interface Ailment {
@@ -30,7 +31,7 @@ interface AilmentDetailPageProps {
 
 export default function AilmentDetailPage({ ailment, remedies }: AilmentDetailPageProps) {
 
-
+ 
   const breadcrumbItems = [
     { label: "Home", href: "/" },
     { label: "Ailments", href: "/ailments" },

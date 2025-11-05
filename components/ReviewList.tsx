@@ -327,7 +327,6 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
               </div>
             ) : (
               reviews.map((review) => {
-                console.log(review,)
                 const userName = review.profiles?.first_name ? `${review.profiles.first_name} ${review.profiles.last_name?.charAt(0) || ''}.` : "Anonymous";
                 const userInitial = userName.charAt(0).toUpperCase();
                 const tags = [review.dosage, review.potency].filter(Boolean);
@@ -437,7 +436,6 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
         onClose={() => setIsFilterModalOpen(false)}
         onApply={(appliedFilters) => {
           setFilters(appliedFilters);
-          console.log("Applying filters:", appliedFilters);
         }}
         // You might want to calculate the actual number of reviews
         totalResults={reviews.length}
