@@ -102,6 +102,10 @@ export default function ReviewListPage({ remedy }: ReviewListPageProps) {
         if (error) {
           throw error;
         }
+
+        console.log("Fetched reviews:", data);
+
+
         setReviews(data || []);
       } catch (error) {
         console.error("Failed to fetch reviews:", error);

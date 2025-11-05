@@ -180,7 +180,48 @@ export async function getReviews({
       break;
   }
 
-  return query;
+  const { data: reviews, error } = await query;
+
+  if (error) {
+    return { data: null, error };
+  }
+
+  if (!reviews || reviews.length === 0) {
+    return { data: [], error: null };
+  }
+
+  // Manually fetch profile data for the reviews
+  const userIds = reviews.map(review => review.user_id).filter(Boolean);
+  
+  if (userIds.length === 0) {
+    // No user IDs to fetch profiles for
+    return { 
+      data: reviews.map(review => ({ ...review, profiles: null })), 
+      error: null 
+    };
+  }
+
+  const { data: profiles, error: profileError } = await supabase
+    .from('profiles')
+    .select('id, first_name, last_name, email')
+    .in('id', userIds);
+
+  if (profileError) {
+    // If we can't fetch profiles, still return reviews but without profile data
+    console.warn('Could not fetch profiles:', profileError);
+    return { 
+      data: reviews.map(review => ({ ...review, profiles: null })), 
+      error: null 
+    };
+  }
+
+  // Join the profile data with reviews
+  const reviewsWithProfiles = reviews.map(review => ({
+    ...review,
+    profiles: profiles?.find(profile => profile.id === review.user_id) || null
+  }));
+
+  return { data: reviewsWithProfiles, error: null };
 }
 
 /**
@@ -229,11 +270,37 @@ export async function getReviewFilterOptions(remedyId: string): Promise<{
  * @returns {Promise<{ data: Review | null; error: Error | null }>} The review object or an error.
  */
 export async function getReviewById(reviewId: string): Promise<{ data: Review | null; error: Error | null; }> {
-  return supabase
+  const { data: review, error } = await supabase
     .from('reviews')
     .select('*')
     .eq('id', reviewId)
     .single();
+
+  if (error) {
+    return { data: null, error };
+  }
+
+  if (!review) {
+    return { data: null, error: null };
+  }
+
+  // Fetch profile data if user_id exists
+  if (review.user_id) {
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('id, first_name, last_name, email')
+      .eq('id', review.user_id)
+      .single();
+
+    if (profileError) {
+      console.warn('Could not fetch profile for review:', profileError);
+      return { data: { ...review, profiles: null }, error: null };
+    }
+
+    return { data: { ...review, profiles: profile }, error: null };
+  }
+
+  return { data: { ...review, profiles: null }, error: null };
 }
 
 /**
