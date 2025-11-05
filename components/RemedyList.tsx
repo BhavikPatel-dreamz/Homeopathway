@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Breadcrumb from "./Breadcrumb";
 
 interface Remedy {
-  icon: ReactNode;
+  icon: any;
   id: number;
   name?: string;
   slug: string;
