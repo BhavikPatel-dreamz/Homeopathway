@@ -179,7 +179,7 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
               </div>
               <div className="w-full">
                 <h1 className="text-[32px] lg:text-[40px] font-serif text-[#0B0C0A] mb-2 lg:mb-0">{remedy.name}</h1>
-                <p className="text[#41463B] text-[16px] mb-4">{remedy.description}</p>
+                <p className="text[#41463B] text-[16px] mb-4 text-[#41463B] font-medium">{remedy.description}</p>
                 <div className="flex items-center gap-2 mb-6">
                   {renderStars(review?.average_rating  ? review?.average_rating : remedy.average_rating)}
                   <span className="text[#41463B] text-sm">
@@ -205,7 +205,7 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
 
             {/* Right - Quick Stats */}
             <aside className="bg-white lg:w-[29%] white rounded-[8px]  p-4 h-fit">
-              <h3 className="text-[16px] text[#0B0C0A] font-semibold mb-4 text-montserrat">Quick Stats</h3>
+              <h3 className="text-[16px] text[#0B0C0A] font-semibold mb-4 text-montserrat text-black">Quick Stats</h3>
               <ul className="space-y-3 text-sm text-gray-700">
                 <li className="flex justify-between">
                   <span className="text[#2B2E28] font-medium">Overall Rating</span>
