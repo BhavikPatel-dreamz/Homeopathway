@@ -72,6 +72,7 @@ export default async function ReviewsPage() {
     experienced_side_effects: review.experienced_side_effects,
     created_at: review.created_at,
     updated_at: review.updated_at,
+    rating: 0,
     profiles: profilesResult.data?.find(p => p.id === review.user_id),
     remedies: remediesResult.data?.find(r => r.id === review.remedy_id) ? {
       id: remediesResult.data.find(r => r.id === review.remedy_id)!.id,
@@ -79,7 +80,7 @@ export default async function ReviewsPage() {
       slug: remediesResult.data.find(r => r.id === review.remedy_id)?.slug,
       average_rating: 0,
       review_count: 0,
-      rating: 0,
+      // rating: 0,
       reviewCount: 0,
       description: '',
       indication: '',

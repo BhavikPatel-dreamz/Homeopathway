@@ -74,6 +74,12 @@ export interface Review {
     last_name: string;
     email: string;
   };
+  user?: string;
+  rating: number;
+  verified?: boolean;
+  date?: string;
+  comment?: string;
+  form?: string;
 }
 export interface User {
   id: string;

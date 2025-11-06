@@ -1,17 +1,18 @@
 "use client";
 import { useState } from 'react';
 import ReviewFilterModal from './ReviewFilterModal';
+import {Review} from '@/types'
 
-interface Review {
-  id: string;
-  user: string;
-  rating: number;
-  verified: boolean;
-  date: string;
-  comment: string;
-  dosage?: string;
-  form?: string;
-}
+// interface Review {
+//   id: string;
+//   user: string;
+//   rating: number;
+//   verified: boolean;
+//   date: string;
+//   comment: string;
+//   dosage?: string;
+//   form?: string;
+// }
 
 interface ReviewsWithFilterProps {
   reviews: Review[];
