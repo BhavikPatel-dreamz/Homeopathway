@@ -181,7 +181,7 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
                 <h1 className="text-[32px] lg:text-[40px] font-serif text-[#0B0C0A] mb-2 lg:mb-0">{remedy.name}</h1>
                 <p className="text[#41463B] text-[16px] mb-4">{remedy.description}</p>
                 <div className="flex items-center gap-2 mb-6">
-                  {renderStars(review?.average_rating === 0 ? review?.average_rating : remedy.average_rating)}
+                  {renderStars(review?.average_rating  ? review?.average_rating : remedy.average_rating)}
                   <span className="text[#41463B] text-sm">
                     {review?.average_rating.toFixed(1) || remedy.average_rating.toFixed(1)} ({ review?.total_reviews.toLocaleString() || remedy.review_count.toLocaleString()} reviews)
                   </span>
@@ -213,7 +213,7 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
                 </li>
                 <li className="flex justify-between">
                   <span className="text[#2B2E28] font-medium">Total Reviews</span>
-                  <span className="font-semibold">{review?.total_reviews !== 0 ? review?.total_reviews : remedy.review_count}</span>
+                  <span className="font-semibold">{review?.total_reviews  ? review?.total_reviews : remedy.review_count}</span>
                 </li>
                 <li className="flex justify-between">
                   <span className="text[#2B2E28] font-medium">Success Rate</span>
