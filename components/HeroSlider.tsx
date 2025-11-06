@@ -49,7 +49,7 @@ export default function HeroSlider() {
               .limit(5),
             supabase
               .from("remedies")
-              .select("name, average_rating, review_count, description, icon, indication")
+              .select("name, average_rating, review_count, description, icon")
               .ilike("name", `%${searchQuery}%`)
               .order("average_rating", { ascending: false })
               .limit(5),
@@ -63,7 +63,7 @@ export default function HeroSlider() {
             ...remedy,
             rating: remedy.average_rating,
             reviewCount: remedy.review_count,
-            indication: remedy.indication || "General"
+            indication: "General" // Default value since indication field doesn't exist in DB
           })));
         } catch (error) {
           console.error("Error during search:", error);

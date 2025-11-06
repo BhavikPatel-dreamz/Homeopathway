@@ -26,7 +26,7 @@ async function SearchPageContent({ searchParams }: { searchParams: { q?: string 
           .order("name", { ascending: true }),
         supabase
           .from("remedies")
-          .select("name, average_rating, review_count, description, icon, indication")
+          .select("name, average_rating, review_count, description, icon")
           .ilike("name", `%${query}%`)
           .order("average_rating", { ascending: false })
           .order("review_count", { ascending: false })
@@ -41,7 +41,7 @@ async function SearchPageContent({ searchParams }: { searchParams: { q?: string 
           ...remedy,
           rating: remedy.average_rating,
           reviewCount: remedy.review_count,
-          indication: remedy.indication || "General"
+          indication: "General" // Default value since indication field doesn't exist in DB
         }));
       }
     } catch (error) {
