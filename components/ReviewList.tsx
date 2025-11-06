@@ -280,7 +280,15 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
         {/* Left – Rating Summary */}
         <aside className="col-span-1">
           <div className="flex flex-col items-center text-center border border-gray-200 rounded-2xl p-6 bg-[#F9F7F2]">
-            <span className="text-5xl font-serif text-gray-800 mb-2">⭐</span>
+             <h2 className="text-3xl font-bold text-gray-800 mb-1">Review</h2>
+            <span className="text-5xl font-serif text-gray-800 mb-2">
+               <Image 
+                                  src="/star.svg" 
+                                  alt="Star"
+                                  width={45}
+                                  height={45}
+                                />
+            </span>
             <h2 className="text-4xl font-bold text-gray-800 mb-1">
               {reviewStats ? reviewStats.average_rating.toFixed(1) : remedy.average_rating.toFixed(1)}
             </h2>
@@ -292,7 +300,14 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
             <div className="w-full space-y-2 mb-6">
               {reviewStats && [5, 4, 3, 2, 1].map((star) => (
                 <div key={star} className="flex items-center gap-2 text-sm w-full">
-                  <StarIcon className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                  <span className="w-4 h-4 text-yellow-400 fill-yellow-400 ">
+                    <Image 
+                                  src="/star.svg" 
+                                  alt="Star"
+                                  width={16}
+                                  height={16}
+                                />
+                  </span>
                   <span className="w-3 text-gray-700 font-medium">{star}</span>
                   <div className="flex-1 h-2 bg-gray-200 rounded-full">
                     <div 
@@ -372,7 +387,7 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
                 return (
                   <div
                     key={review.id}
-                    className="border border-gray-200 rounded-2xl p-6 hover:shadow-md transition-shadow"
+                    className="border-b border-[#B5B6B1] w-full  p-6 "
                   >
                     <div className="flex items-start justify-between mb-3">
                       {/* User Info */}
@@ -401,7 +416,7 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
                         {tags.map((tag, i) => (
                           <span
                             key={i}
-                            className="text-xs bg-[#F5F1E8] px-2 py-1 rounded-full text-gray-700 border"
+                            className="text-xs bg-[#F5F1E8] px-2 py-1 rounded-md text-gray-700 border"
                           >
                             {tag}
                           </span>
