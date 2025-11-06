@@ -1,16 +1,16 @@
 "use client";
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-
+import { Ailment } from "@/types";
 import Breadcrumb from "./Breadcrumb";
 
-interface Ailment {
-  id: string;
-  name: string;
-  icon: string;
-  remedies_count: number;
-  slug: string;
-}
+// interface Ailment {
+//   id: string;
+//   name: string;
+//   icon: string;
+//   remedies_count: number;
+//   slug: string;
+// }
 
 interface AilmentListPageProps {
   ailments: Ailment[];

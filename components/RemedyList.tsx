@@ -1,22 +1,8 @@
 "use client";
 import React, { useState, useMemo, ReactNode } from 'react';
 import Link from 'next/link';
-
+import { Remedy } from "@/types";
 import Breadcrumb from "./Breadcrumb";
-
-interface Remedy {
-  icon: any;
-  id: number;
-  name?: string;
-  slug: string;
-  indication: string;
-  rating?: number;
-  reviewCount?: number;
-  average_rating?: number;
-  review_count?: number;
-  description: string;
-  key_symptoms?: string[];
-}
 
 interface RemedyListPageProps {
   remedies: Remedy[];
@@ -39,7 +25,7 @@ export default function RemedyListPage({
   const filteredRemedies = useMemo(() => {
     if (!searchQuery) return initialRemedies;
     return initialRemedies.filter((remedy) =>
-      remedy.slug.toLowerCase().includes(searchQuery.toLowerCase())
+       (remedy.slug || '').toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [initialRemedies, searchQuery]);
 

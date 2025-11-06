@@ -29,6 +29,9 @@ export interface Remedy {
   created_at?: string;
   updated_at?: string;
   created_by?: string;
+  rating: number; // Renamed from rating
+  reviewCount: number; // Renamed from reviewCount
+  indication:string
 }
 
 export interface AilmentRemedy {
