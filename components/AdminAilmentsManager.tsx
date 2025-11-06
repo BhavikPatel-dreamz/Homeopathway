@@ -3,14 +3,15 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { supabase } from '../lib/supabaseClient';
 import Pagination from './Pagination';
+import { Ailment } from "@/types";
 
-interface Ailment {
-  id: string;
-  name: string;
-  icon: string;
-  description: string;
-  remedies_count: number;
-}
+// interface Ailment {
+//   id: string;
+//   name: string;
+//   icon: string;
+//   description: string;
+//   remedies_count: number;
+// }
 
 export default function AdminAilmentsManager() {
   const [ailments, setAilments] = useState<Ailment[]>([]);

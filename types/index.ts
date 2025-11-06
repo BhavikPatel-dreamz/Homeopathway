@@ -17,7 +17,7 @@ export interface Remedy {
   slug?: string;
   average_rating: number;
   review_count: number;
-  description: string;
+  description?: string;
   scientific_name?: string;
   common_name?: string;
   key_symptoms?: string[];
@@ -29,9 +29,9 @@ export interface Remedy {
   created_at?: string;
   updated_at?: string;
   created_by?: string;
-  rating: number; // Renamed from rating
-  reviewCount: number; // Renamed from reviewCount
-  indication:string
+  rating?: number; // Renamed from rating
+  reviewCount?: number; // Renamed from reviewCount
+  indication?:string
 }
 
 export interface AilmentRemedy {

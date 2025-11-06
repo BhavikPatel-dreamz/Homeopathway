@@ -4,17 +4,18 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabaseClient';
 import Pagination from './Pagination';
+import { Remedy } from "@/types";
 
-interface Remedy {
-  id: string;
-  name: string;
-  slug?: string;
-  scientific_name: string;
-  average_rating: number;
-  review_count: number;
-  icon?: string;
-  image_url?: string;
-}
+// interface Remedy {
+//   id: string;
+//   name: string;
+//   slug?: string;
+//   scientific_name: string;
+//   average_rating: number;
+//   review_count: number;
+//   icon?: string;
+//   image_url?: string;
+// }
 
 export default function AdminRemediesManager() {
   const [remedies, setRemedies] = useState<Remedy[]>([]);
@@ -234,7 +235,7 @@ export default function AdminRemediesManager() {
                       Edit
                     </Link>
                     <button
-                      onClick={() => handleDelete(remedy.id)}
+                     onClick={() => handleDelete(remedy.id!)}
                       disabled={loading}
                       className="text-red-600 hover:text-red-800 font-medium text-sm disabled:opacity-50"
                     >
