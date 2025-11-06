@@ -1,4 +1,5 @@
 import { createClient } from './supabase/server';
+import { UserProfile } from '@/types/supabase'
 
 export interface ProfileUpdateData {
   first_name?: string;
@@ -6,15 +7,15 @@ export interface ProfileUpdateData {
   email?: string;
 }
 
-export interface UserProfile {
-  id: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  role: string;
-  created_at: string;
-  updated_at: string;
-}
+// export interface UserProfile {
+//   id: string;
+//   email: string;
+//   first_name: string;
+//   last_name: string;
+//   role: string;
+//   created_at: string;
+//   updated_at: string;
+// }
 
 /**
  * Update user profile in the profiles table
