@@ -3,15 +3,16 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
 import Pagination from './Pagination';
+import { User } from '@/types'
 
-interface User {
-  id: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  role: string;
-  created_at: string;
-}
+// interface User {
+//   id: string;
+//   email: string;
+//   first_name: string;
+//   last_name: string;
+//   role: string;
+//   created_at: string;
+// }
 
 export default function AdminUsersManager() {
   const [users, setUsers] = useState<User[]>([]);
