@@ -291,9 +291,9 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
        <section
        id="Related Remedies"
        ref={sectionRefs["Related Remedies"]}
-      className=" p-8 scroll-mt-20"
+      className="p-1 scroll-mt-20"
         >
-  <h3 className="text-2xl font-serif text-gray-800 mb-6">Related Remedies</h3>
+    <h3 className="text-3xl font-serif text-gray-800 mb-6">Related Remedies</h3>
 
   {filteredRelatedRemedies && filteredRelatedRemedies.length > 0 ? (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
