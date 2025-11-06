@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import RemediesDetail from '@/components/RemediesDetail';
+import { getReviewStats } from '@/lib/review';
 
 interface Remedy {
   id: string;
@@ -118,8 +119,9 @@ async function getRemedyData(ailmentSlug: string, remedySlug: string) {
       key_symptoms: remedy.key_symptoms || [],
     };
   });
+  const review = await getReviewStats(remedy.id, ailmentData.id || null);
 
-  return { ailment, remedy, relatedRemedies };
+  return { ailment, remedy, relatedRemedies, review };
 }
 
 export default async function AilmentRemedyPage({
@@ -129,6 +131,8 @@ export default async function AilmentRemedyPage({
 }) {
   const { slug, remedySlug } = await params;
   const data = await getRemedyData(slug, remedySlug);
+
+  console.log("Remedy Page Data:", data?.review?.data);
   
   if (!data) {
     notFound();
@@ -138,6 +142,7 @@ export default async function AilmentRemedyPage({
     <RemediesDetail 
       remedy={data.remedy} 
       relatedRemedies={data.relatedRemedies}
+      review={data?.review?.data ?? undefined}
       ailmentContext={{
         id: data.ailment.id,
         name: data.ailment.name,

@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import RemediesDetailPage from '../../../../components/RemediesDetail';
 import { Remedy } from '@/types';
+import { getReviewStats } from '@/lib/review';
 
 interface RemedyDetailPageProps {
   params: Promise<{
@@ -13,7 +14,7 @@ async function getRemedyBySlugOrId(slug: string) {
   const supabase = await createClient();
   
   // First try to fetch by slug
-  let { data: remedy, error } = await supabase
+  const { data: remedy, error } = await supabase
     .from('remedies')
     .select('*')
     .eq('slug', slug)
@@ -68,7 +69,8 @@ export default async function RemedyDetailPage({ params }: RemedyDetailPageProps
     notFound();
   }
 
+  const { data: review } = await getReviewStats(remedy.id);
   const relatedRemedies = await getRelatedRemedies();
 
-  return <RemediesDetailPage remedy={remedy} relatedRemedies={relatedRemedies} />;
+  return <RemediesDetailPage remedy={remedy} relatedRemedies={relatedRemedies} review={review || { average_rating: 0, total_reviews: 0, rating_distribution: {} }} />;
 }

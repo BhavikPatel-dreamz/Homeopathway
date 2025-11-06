@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
-import { Star, StarHalf, StarOff, Search, ChevronDown } from "lucide-react";
+import { Star, StarHalf, StarOff } from "lucide-react";
 
 import Breadcrumb from "@/components/Breadcrumb";
 import { breadcrumbPaths } from "@/lib/breadcrumbUtils";
@@ -31,6 +31,11 @@ interface RemediesDetailPageProps {
     slug: string;
   }
   relatedRemedies: Remedy[];
+  review?: {
+    average_rating: number;
+    total_reviews: number;
+    rating_distribution: { [key: string]: number };
+  };
   ailmentContext?: {
     id: string;
     name: string;
@@ -58,7 +63,7 @@ const renderStars = (rating: number) => {
 // ---------------------------
 // Main Component
 // ---------------------------
-export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentContext }: RemediesDetailPageProps) {
+export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentContext ,review }: RemediesDetailPageProps) {
   const [activeTab, setActiveTab] = useState("Overview");
 
   const sectionRefs = {
@@ -124,6 +129,9 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
     .slice(0, 3);
 
 
+    console.log("Remedy Detail Review Data:", review?.average_rating);
+
+
   return (
     <div className="min-h-screen bg-[#F5F1E8] flex flex-col">
       {/* Breadcrumb */}
@@ -173,9 +181,9 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
                 <h1 className="text-[32px] lg:text-[40px] font-serif text-[#0B0C0A] mb-2 lg:mb-0">{remedy.name}</h1>
                 <p className="text[#41463B] text-[16px] mb-4">{remedy.description}</p>
                 <div className="flex items-center gap-2 mb-6">
-                  {renderStars(remedy.average_rating)}
+                  {renderStars(review?.average_rating === 0 ? review?.average_rating : remedy.average_rating)}
                   <span className="text[#41463B] text-sm">
-                    {remedy.average_rating.toFixed(1)} ({remedy.review_count.toLocaleString()} reviews)
+                    {review?.average_rating.toFixed(1) || remedy.average_rating.toFixed(1)} ({ review?.total_reviews.toLocaleString() || remedy.review_count.toLocaleString()} reviews)
                   </span>
                 </div>
 
@@ -201,11 +209,11 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
               <ul className="space-y-3 text-sm text-gray-700">
                 <li className="flex justify-between">
                   <span className="text[#2B2E28] font-medium">Overall Rating</span>
-                  <span className="font-semibold">{remedy.average_rating.toFixed(1)}/5</span>
+                  <span className="font-semibold">{review?.average_rating.toFixed(1) || remedy.average_rating.toFixed(1)}/5</span>
                 </li>
                 <li className="flex justify-between">
                   <span className="text[#2B2E28] font-medium">Total Reviews</span>
-                  <span className="font-semibold">{remedy.review_count}</span>
+                  <span className="font-semibold">{review?.total_reviews !== 0 ? review?.total_reviews : remedy.review_count}</span>
                 </li>
                 <li className="flex justify-between">
                   <span className="text[#2B2E28] font-medium">Success Rate</span>
