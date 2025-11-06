@@ -141,7 +141,7 @@ export default function AdminRemediesManager() {
               placeholder="Search remedies..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-500"
             />
           </div>
           <div className="flex gap-4 text-sm">
@@ -221,7 +221,7 @@ export default function AdminRemediesManager() {
                   <td className="px-6 py-4">
                     <div className="flex items-center">
                       <span className="text-yellow-500 mr-1">★</span>
-                      <span className="text-sm font-medium">{remedy.average_rating.toFixed(1)}</span>
+                      <span className="text-sm font-medium text-gray-500">{remedy.average_rating.toFixed(1)}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">

@@ -211,7 +211,7 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
                       onChange={(e) =>
                         setFormData({ ...formData, name: e.target.value })
                       }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-gray-500"
                       placeholder="e.g., Headache, Common Cold"
                     />
                   </div>
@@ -344,7 +344,7 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
                         setFormData({ ...formData, description: e.target.value })
                       }
                       rows={5}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-gray-500"
                       placeholder="Describe the ailment, its symptoms, and characteristics..."
                     />
                   </div>
@@ -360,7 +360,7 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
                         setFormData({ ...formData, personalizedApproach: e.target.value })
                       }
                       rows={5}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-gray-500"
                       placeholder="Describe the personalized approach and treatment recommendations for this ailment..."
                     />
                   </div>

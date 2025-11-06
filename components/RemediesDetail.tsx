@@ -182,7 +182,7 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
                 <p className="text[#41463B] text-[16px] mb-4 text-[#41463B] font-medium">{remedy.description}</p>
                 <div className="flex items-center gap-2 mb-6">
                   {renderStars(review?.average_rating  ? review?.average_rating : remedy.average_rating)}
-                  <span className="text[#41463B] text-sm">
+                  <span className="text-[#41463B] text-sm">
                     {review?.average_rating.toFixed(1) || remedy.average_rating.toFixed(1)} ({ review?.total_reviews.toLocaleString() || remedy.review_count.toLocaleString()} reviews)
                   </span>
                 </div>

@@ -253,7 +253,7 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
                 value={filters.search}
                 onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value, page: 1 }))}
                 disabled={loading}
-                className="w-full px-3 py-2 pr-8 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-3 py-2 pr-8 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed text-gray-500"
               />
               {loading && filters.search && (
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -272,7 +272,7 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
               value={filters.remedy}
               onChange={(e) => setFilters(prev => ({ ...prev, remedy: e.target.value, page: 1 }))}
               disabled={loading}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed text-gray-500"
             >
               <option value="">All Remedies</option>
               {remedies.map(remedy => (
@@ -292,7 +292,7 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
               value={filters.rating}
               onChange={(e) => setFilters(prev => ({ ...prev, rating: e.target.value, page: 1 }))}
               disabled={loading}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed text-gray-500"
             >
               <option value="">All Ratings</option>
               {[5, 4, 3, 2, 1].map(rating => (
@@ -312,7 +312,7 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
               value={filters.effectivenessRange}
               onChange={(e) => setFilters(prev => ({ ...prev, effectivenessRange: e.target.value, page: 1 }))}
               disabled={loading}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed text-gray-500"
             >
               <option value="">All Effectiveness</option>
               {[5, 4, 3, 2, 1].map(eff => (
@@ -332,7 +332,7 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
               value={filters.sideEffects}
               onChange={(e) => setFilters(prev => ({ ...prev, sideEffects: e.target.value, page: 1 }))}
               disabled={loading}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed text-gray-500"
             >
               <option value="">All</option>
               <option value="yes">With Side Effects</option>
@@ -349,7 +349,7 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
               value={filters.dateRange}
               onChange={(e) => setFilters(prev => ({ ...prev, dateRange: e.target.value, page: 1 }))}
               disabled={loading}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed text-gray-500"
             >
               <option value="">All Time</option>
               <option value="7">Last 7 days</option>
@@ -721,7 +721,7 @@ function ReviewRow({
             </label>
           </div>
         ) : (
-          <div className="text-sm space-y-1 max-w-xs">
+          <div className="text-sm space-y-1 max-w-xs text-gray-500">
             {review.potency && <div><span className="font-medium">Potency:</span> {review.potency}</div>}
             {review.dosage && <div><span className="font-medium">Dosage:</span> {review.dosage}</div>}
             {review.duration_used && <div><span className="font-medium">Duration:</span> {review.duration_used}</div>}
