@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
-import { Star, StarHalf, StarOff } from "lucide-react";
+import Image from "next/image"; // Import next/image
 
 import Breadcrumb from "@/components/Breadcrumb";
 import { breadcrumbPaths } from "@/lib/breadcrumbUtils";
@@ -46,19 +46,52 @@ interface RemediesDetailPageProps {
 // ---------------------------
 // Utility Functions
 // ---------------------------
-const renderStars = (rating: number) => {
-  const stars = [];
-  const fullStars = Math.floor(rating);
-  const hasHalfStar = rating % 1 >= 0.5;
-
-  for (let i = 0; i < 5; i++) {
-    if (i < fullStars) stars.push(<Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />);
-    else if (i === fullStars && hasHalfStar)
-      stars.push(<StarHalf key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />);
-    else stars.push(<StarOff key={i} className="w-5 h-5 text-gray-300" />);
+ const renderStars = (rating: number) => {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+    
+    return (
+      // <div className="flex items-center gap-0.5">
+      //   {[...Array(5)].map((_, i) => (
+      //     <span key={i} className={i < fullStars ? 'text-yellow-400' : i === fullStars && hasHalfStar ? 'text-yellow-400' : 'text-gray-300'  }>
+      //       {i < fullStars ? '★' : i === fullStars && hasHalfStar ? '⯨' : '☆'}
+      //     </span>
+      //   ))}
+      // </div>
+       <div className="flex text-yellow-400">
+        {[...Array(fullStars)].map((_, i) => (
+          <span key={`full-${i}`}>
+            <Image 
+              src="/star.svg" 
+              alt="Star"
+              width={16}
+              height={16}
+            />
+          </span>
+        ))}
+        {hasHalfStar && (
+          <span key="half">
+            <Image 
+              src="/star-half.svg" // Assuming you have a half-star icon
+              alt="Half Star"
+              width={16}
+              height={16}
+            />
+          </span>
+        )}
+        {[...Array(5 - Math.ceil(rating))].map((_, i) => (
+          <span key={`empty-${i}`}>
+            <Image 
+              src="/star-blank.svg" 
+              alt="Empty Star"
+              width={16}
+              height={16}
+            />
+          </span>
+        ))}
+      </div>
+    );
   }
-  return <div className="flex items-center gap-0.5">{stars}</div>;
-};
 
 // ---------------------------
 // Main Component

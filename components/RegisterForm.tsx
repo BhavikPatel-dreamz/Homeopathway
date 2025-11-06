@@ -61,7 +61,7 @@ export default function RegisterForm() {
         </div>
 
         {/* Heading */}
-        <h1 className="text-3xl font-serif text-center mb-2">Signup</h1>
+        <h1 className="text-3xl font-serif text-center mb-2 text-[#0B0C0A]">Signup</h1>
         <p className="text-[#41463B] text-center text-[16px] font-[500] mb-8">
           Enter your details below to create your<br />
           account and get started.

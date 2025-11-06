@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 
 interface Remedy {
@@ -27,15 +28,41 @@ export default function TopRemedies({ remedies, ailmentSlug }: TopRemediesProps)
     const hasHalfStar = rating % 1 >= 0.5;
     
     return (
-      <div className="flex items-center gap-0.5">
-        {[...Array(5)].map((_, i) => (
-          <span key={i} className={i < fullStars ? 'text-yellow-400' : i === fullStars && hasHalfStar ? 'text-yellow-400' : 'text-gray-300'  }>
-            {i < fullStars ? '★' : i === fullStars && hasHalfStar ? '⯨' : '☆'}
+       <div className="flex text-yellow-400">
+        {[...Array(fullStars)].map((_, i) => (
+          <span key={`full-${i}`}>
+            <Image 
+              src="/star.svg" 
+              alt="Star"
+              width={16}
+              height={16}
+            />
+          </span>
+        ))}
+        {hasHalfStar && (
+          <span key="half">
+            <Image 
+              src="/star-half.svg" // Assuming you have a half-star icon
+              alt="Half Star"
+              width={16}
+              height={16}
+            />
+          </span>
+        )}
+        {[...Array(5 - Math.ceil(rating))].map((_, i) => (
+          <span key={`empty-${i}`}>
+            <Image 
+              src="/star-blank.svg" 
+              alt="Empty Star"
+              width={16}
+              height={16}
+            />
           </span>
         ))}
       </div>
     );
-  };
+  }
+
 
   const sortedRemedies = [...remedies].sort((a, b) => {
     switch (sortBy) {
