@@ -2,28 +2,7 @@ import { notFound } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import RemediesDetail from '@/components/RemediesDetail';
 import { getReviewStats } from '@/lib/review';
-
-interface Remedy {
-  id: string;
-  name: string;
-  slug: string;
-  icon: string;
-  key_symptoms: string[];
-  description: string;
-  average_rating: number;
-  review_count: number;
-  usage_instructions: string;
-  precautions: string;
-  side_effects: string;
-  contraindications: string;
-}
-
-interface Ailment {
-  id: string;
-  name: string;
-  slug: string;
-  icon: string;
-}
+import { Remedy, Ailment } from '@/types';
 
 async function getRemedyData(ailmentSlug: string, remedySlug: string) {
   // First, get the ailment to verify it exists
@@ -88,6 +67,7 @@ async function getRemedyData(ailmentSlug: string, remedySlug: string) {
     name: ailmentData.name,
     slug: ailmentData.slug,
     icon: ailmentData.icon || '🩺',
+    remedies_count: 0, // Not needed for this context
   };
 
   const remedy: Remedy = {
@@ -99,10 +79,9 @@ async function getRemedyData(ailmentSlug: string, remedySlug: string) {
     description: remedyData.description || 'No description available.',
     average_rating: remedyData.average_rating || 0,
     review_count: remedyData.review_count || 0,
-    usage_instructions: remedyData.usage_instructions || 'No usage instructions available.',
-    precautions: remedyData.precautions || 'No precautions specified.',
-    side_effects: remedyData.side_effects || 'No side effects documented.',
-    contraindications: remedyData.contraindications || 'No contraindications specified.',
+    rating: remedyData.average_rating || 0,
+    reviewCount: remedyData.review_count || 0,
+    indication: remedyData.indication || '',
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -115,11 +94,14 @@ async function getRemedyData(ailmentSlug: string, remedySlug: string) {
       icon: remedy.icon || '💊',
       average_rating: remedy.average_rating || 0,
       review_count: remedy.review_count || 0,
+      rating: remedy.average_rating || 0,
+      reviewCount: remedy.review_count || 0,
       description: remedy.description || '',
       key_symptoms: remedy.key_symptoms || [],
+      indication: remedy.indication || '',
     };
   });
-  const review = await getReviewStats(remedy.id, ailmentData.id || null);
+  const review = await getReviewStats(remedy.id!, ailmentData.id || null);
 
   return { ailment, remedy, relatedRemedies, review };
 }
@@ -140,13 +122,13 @@ export default async function AilmentRemedyPage({
 
   return (
     <RemediesDetail 
-      remedy={data.remedy} 
+      remedy={data.remedy as Remedy & { id: string; slug: string }}
       relatedRemedies={data.relatedRemedies}
       review={data?.review?.data ?? undefined}
       ailmentContext={{
         id: data.ailment.id,
         name: data.ailment.name,
-        slug: data.ailment.slug
+        slug: data.ailment.slug!
       }}
     />
   );

@@ -79,7 +79,10 @@ export default async function ReviewsPage() {
       slug: remediesResult.data.find(r => r.id === review.remedy_id)?.slug,
       average_rating: 0,
       review_count: 0,
+      rating: 0,
+      reviewCount: 0,
       description: '',
+      indication: '',
     } : undefined
   }));
 

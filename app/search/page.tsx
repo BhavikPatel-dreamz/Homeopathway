@@ -1,7 +1,5 @@
 import { Suspense } from 'react';
 import { createClient } from '@/lib/supabase/server';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import SearchResults from '@/components/SearchResults';
 import { Metadata } from 'next';
 import { Ailment, Remedy } from '@/types';
@@ -28,7 +26,7 @@ async function SearchPageContent({ searchParams }: { searchParams: { q?: string 
           .order("name", { ascending: true }),
         supabase
           .from("remedies")
-          .select("name, average_rating, review_count, description,icon")
+          .select("name, average_rating, review_count, description, icon, indication")
           .ilike("name", `%${query}%`)
           .order("average_rating", { ascending: false })
           .order("review_count", { ascending: false })
@@ -39,7 +37,12 @@ async function SearchPageContent({ searchParams }: { searchParams: { q?: string 
         ailments = ailmentsRes.data || [];
       }
       if (!remediesRes.error) {
-        remedies = remediesRes.data || [];
+        remedies = (remediesRes.data || []).map(remedy => ({
+          ...remedy,
+          rating: remedy.average_rating,
+          reviewCount: remedy.review_count,
+          indication: remedy.indication || "General"
+        }));
       }
     } catch (error) {
       console.error("Error during search:", error);

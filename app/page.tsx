@@ -1,6 +1,4 @@
 import { createClient } from '@/lib/supabase/server';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import HomePageContent from '@/components/HomePageContent';
 import { Metadata } from 'next';
 
@@ -73,37 +71,52 @@ export default async function Home() {
       name: "Nux Vomica", 
       average_rating: 5, 
       review_count: 234,
-      description: "Best for nausea and acidity, especially after..."
+      rating: 5,
+      reviewCount: 234,
+      description: "Best for nausea and acidity, especially after...",
+      indication: "Digestive issues"
     },
     { 
       name: "Belladonna", 
       average_rating: 5, 
       review_count: 324,
-      description: "Best for sudden, intense, throbbing pain that..."
+      rating: 5,
+      reviewCount: 324,
+      description: "Best for sudden, intense, throbbing pain that...",
+      indication: "Fever and pain"
     },
     { 
       name: "Bryonia Alba", 
       average_rating: 5, 
       review_count: 324,
-      description: "Best for dry coughs that worsen with movement."
+      rating: 5,
+      reviewCount: 324,
+      description: "Best for dry coughs that worsen with movement.",
+      indication: "Cough"
     },
     { 
       name: "Coffea Cruda", 
       average_rating: 5, 
       review_count: 143,
-      description: "Best for sleeplessness due to an overactive..."
+      rating: 5,
+      reviewCount: 143,
+      description: "Best for sleeplessness due to an overactive...",
+      indication: "Insomnia"
     },
     { 
       name: "Gelsemium Sempervirens", 
       average_rating: 4, 
       review_count: 247,
-      description: "Best for flu-like symptoms with weakness, achi..."
+      rating: 4,
+      reviewCount: 247,
+      description: "Best for flu-like symptoms with weakness, achi...",
+      indication: "Flu"
     },
   ];
 
   const { data: remediesData, error: remediesError } = await supabase
     .from("remedies")
-    .select("name, average_rating, review_count, description,slug,icon")
+    .select("name, average_rating, review_count, description, slug, icon, indication")
     .order("average_rating", { ascending: false })
     .order("review_count", { ascending: false })
     .limit(5);
@@ -112,7 +125,14 @@ export default async function Home() {
     console.error("Error fetching top remedies:", remediesError);
   }
 
-  const topRemedies = remediesData && remediesData.length > 0 ? remediesData : dummyTopRemedies;
+  const topRemedies = remediesData && remediesData.length > 0 
+    ? remediesData.map(remedy => ({
+        ...remedy,
+        rating: remedy.average_rating,
+        reviewCount: remedy.review_count,
+        indication: remedy.indication || "General"
+      }))
+    : dummyTopRemedies;
 
   const structuredData = {
     "@context": "https://schema.org",

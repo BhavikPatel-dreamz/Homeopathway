@@ -49,7 +49,7 @@ export default function HeroSlider() {
               .limit(5),
             supabase
               .from("remedies")
-              .select("name, average_rating, review_count, description,icon")
+              .select("name, average_rating, review_count, description, icon, indication")
               .ilike("name", `%${searchQuery}%`)
               .order("average_rating", { ascending: false })
               .limit(5),
@@ -59,7 +59,12 @@ export default function HeroSlider() {
           if (remediesRes.error) throw remediesRes.error;
 
           setFilteredAilments(ailmentsRes.data || []);
-          setFilteredRemedies(remediesRes.data || []);
+          setFilteredRemedies((remediesRes.data || []).map(remedy => ({
+            ...remedy,
+            rating: remedy.average_rating,
+            reviewCount: remedy.review_count,
+            indication: remedy.indication || "General"
+          })));
         } catch (error) {
           console.error("Error during search:", error);
         } finally {
