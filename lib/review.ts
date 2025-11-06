@@ -126,6 +126,8 @@ export async function addReview({
  * @param {boolean} [params.experiencedSideEffects] - Filter by side effects.
  * @returns {Promise<{ data: Review[] | null; error: Error | null }>} Reviews with associated profiles.
  */
+
+
 export async function getReviews({
   remedyId,
   ailmentId,
@@ -144,56 +146,26 @@ export async function getReviews({
   potency?: string[];
   searchQuery?: string;
   experiencedSideEffects?: boolean;
-}): Promise<{ data: Review[] | null; error: Error | null; }> {
-  let query = supabase
-    .from('reviews')
-    .select('*')
-    .limit(limit);
+}): Promise<{ data: Review[] | null; error: Error | null }> {
+  let query = supabase.from('reviews').select('*').limit(limit);
 
-  // REMEDY FILTER - Always apply if provided
-  if (remedyId) {
-    query = query.eq('remedy_id', remedyId);
-  }
+  // REMEDY FILTER
+  if (remedyId) query = query.eq('remedy_id', remedyId);
 
-  // AILMENT FILTER with AND logic
-  // This handles the relationship between remedy and ailment filtering
+  // AILMENT FILTER
   if (remedyId && ailmentId !== undefined) {
-    // Both remedy and ailment provided - filter by specific ailment only (strict AND)
-    if (ailmentId === null) {
-      // Get only general reviews (not specific to any ailment) for this remedy
-      query = query.is('ailment_id', null);
-    } else {
-      // Get reviews ONLY for this specific ailment (strict AND logic)
-      query = query.eq('ailment_id', ailmentId);
-    }
+    if (ailmentId === null) query = query.is('ailment_id', null);
+    else query = query.eq('ailment_id', ailmentId);
   } else if (!remedyId && ailmentId !== undefined) {
-    // Only ailment provided - filter by ailment alone
-    if (ailmentId === null) {
-      query = query.is('ailment_id', null);
-    } else {
-      query = query.eq('ailment_id', ailmentId);
-    }
+    if (ailmentId === null) query = query.is('ailment_id', null);
+    else query = query.eq('ailment_id', ailmentId);
   }
-  // If only remedyId is provided (ailmentId undefined), show ALL reviews for that remedy
-  // If neither provided, show ALL reviews
 
   // ADDITIONAL FILTERS
-  if (starCount && starCount.length > 0) {
-    query = query.in('star_count', starCount);
-  }
-
-  if (potency && potency.length > 0) {
-    query = query.in('potency', potency);
-  }
-
-  if (experiencedSideEffects !== undefined) {
+  if (starCount?.length) query = query.in('star_count', starCount);
+  if (potency?.length) query = query.in('potency', potency);
+  if (experiencedSideEffects !== undefined)
     query = query.eq('experienced_side_effects', experiencedSideEffects);
-  }
-
-  if (searchQuery) {
-    const searchString = `%${searchQuery}%`;
-    query = query.or(`notes.ilike.${searchString},potency.ilike.${searchString},dosage.ilike.${searchString}`);
-  }
 
   // SORTING
   switch (sortBy) {
@@ -206,32 +178,17 @@ export async function getReviews({
     case 'lowest_rated':
       query = query.order('star_count', { ascending: true });
       break;
-    case 'newest':
     default:
       query = query.order('created_at', { ascending: false });
       break;
   }
 
   const { data: reviews, error } = await query;
+  if (error) return { data: null, error };
+  if (!reviews?.length) return { data: [], error: null };
 
-  if (error) {
-    return { data: null, error };
-  }
-
-  if (!reviews || reviews.length === 0) {
-    return { data: [], error: null };
-  }
-
-  // FETCH PROFILE DATA
-  const userIds = reviews.map(review => review.user_id).filter(Boolean);
-  
-  if (userIds.length === 0) {
-    return { 
-      data: reviews.map(review => ({ ...review, profiles: null })), 
-      error: null 
-    };
-  }
-
+  // FETCH PROFILES
+  const userIds = reviews.map(r => r.user_id).filter(Boolean);
   const { data: profiles, error: profileError } = await supabase
     .from('profiles')
     .select('id, first_name, last_name, email')
@@ -239,17 +196,35 @@ export async function getReviews({
 
   if (profileError) {
     console.warn('Could not fetch profiles:', profileError);
-    return { 
-      data: reviews.map(review => ({ ...review, profiles: null })), 
-      error: null 
+    return {
+      data: reviews.map(r => ({ ...r, profiles: null })),
+      error: null,
     };
   }
 
-  // Join profile data with reviews
-  const reviewsWithProfiles = reviews.map(review => ({
-    ...review,
-    profiles: profiles?.find(profile => profile.id === review.user_id) || null
+  // Merge profiles
+  let reviewsWithProfiles = reviews.map(r => ({
+    ...r,
+    profiles: profiles?.find(p => p.id === r.user_id) || null,
   }));
+
+  // LOCAL SEARCH FILTER (no join)
+  if (searchQuery && searchQuery.trim() !== '') {
+    const q = searchQuery.trim().toLowerCase();
+    reviewsWithProfiles = reviewsWithProfiles.filter(r => {
+      const matchNotes =
+        r.notes?.toLowerCase().includes(q) ||
+        r.potency?.toLowerCase().includes(q) ||
+        r.dosage?.toLowerCase().includes(q);
+      const matchProfile =
+        r.profiles &&
+        ((r.profiles.first_name &&
+          r.profiles.first_name.toLowerCase().includes(q)) ||
+          (r.profiles.last_name &&
+            r.profiles.last_name.toLowerCase().includes(q)));
+      return matchNotes || matchProfile;
+    });
+  }
 
   return { data: reviewsWithProfiles, error: null };
 }
