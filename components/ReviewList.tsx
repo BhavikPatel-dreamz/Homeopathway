@@ -279,19 +279,22 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         {/* Left – Rating Summary */}
         <aside className="col-span-1">
-          <div className="flex flex-col items-center text-center border border-gray-200 rounded-2xl p-6 bg-[#F9F7F2]">
-             <h2 className="text-3xl font-bold text-gray-800 mb-1">Review</h2>
-            <span className="text-5xl font-serif text-gray-800 mb-2">
+          <div className="flex flex-col items-left text-left p-6">
+            {/* <h2 className="text-2xl font-semibold text-gray-800 mb-3">Review</h2> */}
+            <p className="text-[20px] text-[#0B0C0A] font-semibold mb-2">Reviews</p>
+            <div className="flex items-center gap-3">
+              <span className="text-5xl font-serif text-gray-800">
                <Image 
-                                  src="/star.svg" 
-                                  alt="Star"
-                                  width={45}
-                                  height={45}
-                                />
-            </span>
-            <h2 className="text-4xl font-bold text-gray-800 mb-1">
-              {reviewStats ? reviewStats.average_rating.toFixed(1) : remedy.average_rating.toFixed(1)}
-            </h2>
+                  src="/star.svg" 
+                  alt="Star"
+                  width={48}
+                  height={48}
+                />
+              </span>
+              <h2 className="text-4xl font-bold text-gray-800 mt-3">
+                {reviewStats ? reviewStats.average_rating.toFixed(1) : remedy.average_rating.toFixed(1)}
+              </h2>
+            </div>
             <p className="text-sm text-gray-500 mb-6">
               Based on {reviewStats ? reviewStats.total_reviews.toLocaleString() : remedy.review_count.toLocaleString()} reviews
             </p>
