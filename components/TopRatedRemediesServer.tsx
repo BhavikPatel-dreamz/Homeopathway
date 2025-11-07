@@ -42,7 +42,7 @@ export default function TopRatedRemediesServer({
               className="bg-white rounded-xl p-4 transition-shadow hover:shadow-lg block transition-all duration-500" 
             >
               <div className="flex items-start gap-4">
-                 <div className="w-15 h-15 p-3 bg-green-100 rounded-full flex items-center justify-center text-3xl flex-shrink-0 mr-3">{remedy.icon}</div>
+                 <div className="w-15 h-15 p-3 bg-[#F9F7F2] rounded-full flex items-center justify-center text-3xl flex-shrink-0 mr-3">{remedy.icon}</div>
                 <div className="flex-1">
                   <p className="font-[600] text-[20px] mb-1 text-[#0B0C0A]">{remedy.name}</p>
                   <div className="flex items-center gap-2 mb-3">

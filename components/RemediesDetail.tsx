@@ -208,7 +208,7 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
             {/* Left */}
             <div className="lg:w-[71%] bg-white rounded-[8px]  p-6 flex items-start">
               <div className="flex items-center">
-                <div className="w-15 h-15 p-3 bg-green-100 rounded-full flex items-center justify-center text-3xl flex-shrink-0 mr-3">{remedy.icon}</div>
+                <div className="w-15 h-15 p-3 bg-[#F9F7F2] rounded-full flex items-center justify-center text-3xl flex-shrink-0 mr-3">{remedy.icon}</div>
               </div>
               <div className="w-full">
                 <h1 className="text-[32px] lg:text-[40px] font-serif text-[#0B0C0A] mb-2 lg:mb-0">{remedy.name}</h1>
@@ -263,7 +263,7 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
         </section>
 
         {/* Origin Section */}
-        <section id="Origin" ref={sectionRefs.Origin} className="bg-white rounded-[8px] p-6 scroll-mt-20">
+        <section id="Origin" ref={sectionRefs.Origin} className="bg-white rounded-[8px] p-6 scroll-mt-[19rem]">
           <p className="text-[20px] text-[#0B0C0A] font-semibold  mb-4" >Origin</p>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-15 h-15 p-3 bg-[#F9F7F2] rounded-full flex items-center justify-center text-3xl flex-shrink-0 mr-2">{remedy.icon}</div>
