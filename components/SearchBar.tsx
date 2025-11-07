@@ -108,7 +108,7 @@ export default function SearchBar() {
     setShowSuggestions(false);
     // Use the slug from the database, fallback to generated slug if not available
     const slug = ailment.slug || nameToSlug(ailment.name);
-    router.push(`/ailments/${slug}`);
+    router.push(`/${slug}`);
   };
   const clearSearch = () => {
     setSearchQuery("");

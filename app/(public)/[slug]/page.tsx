@@ -1,6 +1,6 @@
 
 import { notFound } from 'next/navigation';
-import AilmentDetailPage from '../../../../components/AilmentDetailPage';
+import AilmentDetailPage from '../../../components/AilmentDetailPage';
 import { supabase } from '@/lib/supabaseClient';
 
 interface Remedy {

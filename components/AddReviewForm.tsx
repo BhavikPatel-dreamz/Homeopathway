@@ -227,12 +227,12 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
               <p className="text-gray-800 text-base">What was the potency?</p>
               
               {/* Potency Type */}
-              <div className="flex gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 {['Pellet', 'Tincture', 'Ointment'].map((type) => (
                   <button
                     key={type}
                     onClick={() => handlePotencyType(type)}
-                    className={`px-6 py-3 rounded-xl border-2 transition-all font-medium ${
+                    className={`px-4 py-3 rounded-xl border-2 transition-all font-medium ${
                       formData.potencyType === type
                         ? 'border-gray-800 bg-gray-50 text-gray-900'
                         : 'border-gray-300 hover:border-gray-400 text-gray-700'
@@ -426,7 +426,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
               disabled={
                 loading ||
                 (step === 1 && formData.rating === 0) ||
-                (step === 2 && (!formData.potencyType || !formData.potency)) ||
+                (step === 2 && (!formData.potency)) ||
                 (step === 3 && !formData.dosage) ||
                 (step === 4 && !formData.duration) ||
                 (step === 5 && !formData.effectiveness)

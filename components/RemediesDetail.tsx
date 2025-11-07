@@ -173,7 +173,7 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
           ? [
               { label: "Home", href: "/" },
               // { label: "Ailments", href: "/ailments" },
-              { label: ailmentContext.name, href: `/ailments/${ailmentContext.slug}` },
+              { label: ailmentContext.name, href: `/${ailmentContext.slug}` },
               { label: remedy.name, isActive: true }
             ]
           : breadcrumbPaths.remedyDetail(remedy.name, "All Remedies", "/remedies")

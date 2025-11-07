@@ -110,7 +110,7 @@ export default function HeroSlider() {
     setShowSuggestions(false);
     // Use the slug from the database, fallback to generated slug if not available
     const slug = ailment.slug || nameToSlug(ailment.name);
-    router.push(`/ailments/${slug}`, { scroll: false });
+    router.push(`/${slug}`, { scroll: false });
   };
 
   function nameToSlug(name: string) {
