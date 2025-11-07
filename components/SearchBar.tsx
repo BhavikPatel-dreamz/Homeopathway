@@ -41,10 +41,11 @@ export default function SearchBar() {
   }, []);
   // Auto-search as user types (debounced)
   useEffect(() => {
-    const searchTimeout = setTimeout(async () => {
-      if (searchQuery.trim().length > 0) {
-        setLoading(true);
-        setShowSuggestions(true);
+     const searchTimeout = setTimeout(async () => {
+    if (searchQuery.trim().length > 0) {
+      if (isSelectingRef.current) return; // 🧠 Prevent reopening while selecting
+      setLoading(true);
+      setShowSuggestions(true);
 
         try {
           const [ailmentsRes, remediesRes] = await Promise.all([
@@ -103,13 +104,20 @@ export default function SearchBar() {
   const toggleMobileSearch = () => {
     setIsMobileSearchExpanded(!isMobileSearchExpanded);
   };
-  const handleSelectAilment = (ailment: Ailment) => {
-    setSearchQuery(ailment.name);
-    setShowSuggestions(false);
-    // Use the slug from the database, fallback to generated slug if not available
-    const slug = ailment.slug || nameToSlug(ailment.name);
-    router.push(`/${slug}`);
-  };
+  const isSelectingRef = useRef(false);
+
+ const handleSelectAilment = (ailment: Ailment) => {
+  isSelectingRef.current = true;
+  setSearchQuery(ailment.name);
+  setShowSuggestions(false);
+
+  const slug = ailment.slug || nameToSlug(ailment.name);
+  router.push(`/${slug}`);
+
+  setTimeout(() => {
+    isSelectingRef.current = false;
+  }, 500); // small delay to prevent reopening
+};
   const clearSearch = () => {
     setSearchQuery("");
     setShowSuggestions(false);
@@ -120,16 +128,20 @@ export default function SearchBar() {
       setIsMobileSearchExpanded(false);
     }
   };
-  const handleSelectRemedy = (remedy: Remedy) => {
-    setSearchQuery(remedy.name);
-    setShowSuggestions(false);
-    // Navigate to search with remedy name
-    // const searchParams = new URLSearchParams({ q: remedy.name });
-    // router.push(`/search?${searchParams.toString()}`);
-    const slug = remedy.slug || nameToSlug(remedy.name);
-    router.push(`/remedies/${slug}`);
-  };
 
+
+  const handleSelectRemedy = (remedy: Remedy) => {
+  isSelectingRef.current = true;
+  setSearchQuery(remedy.name);
+  setShowSuggestions(false);
+
+  const slug = remedy.slug || nameToSlug(remedy.name);
+  router.push(`/remedies/${slug}`);
+
+  setTimeout(() => {
+    isSelectingRef.current = false;
+  }, 500);
+};
   return (
     <div className='w-full'>
       <div

@@ -105,9 +105,11 @@ export default function HeroSlider() {
     router.push(`/search?${searchParams.toString()}`);
   };
 
-  const handleSelectAilment = (ailment: Ailment) => {
+    const handleSelectAilment = (ailment: Ailment) => {
     setSearchQuery(ailment.name);
     setShowSuggestions(false);
+    setFilteredAilments([]);
+    setFilteredRemedies([]);
     // Use the slug from the database, fallback to generated slug if not available
     const slug = ailment.slug || nameToSlug(ailment.name);
     router.push(`/${slug}`, { scroll: false });
