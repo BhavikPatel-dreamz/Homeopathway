@@ -35,7 +35,7 @@ export default function AilmentDetailPage({ ailment, remedies }: AilmentDetailPa
  
   const breadcrumbItems = [
     { label: "Home", href: "/" },
-    { label: "Ailments", href: "/ailments" },
+    // { label: "Ailments", href: "/ailments" },
     { label: ailment.name, isActive: true }
   ];
 

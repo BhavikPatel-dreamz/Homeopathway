@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { Ailment, Remedy } from "@/types";
+import { checkIsUserLoggedIn } from "@/lib/userUtils";
+import UserAvatar from "./UserAvatar";
 // @ts-expect-error - react-slick types are not available
 import Slider from "react-slick";
 import 'slick-carousel/slick/slick.css';
@@ -13,12 +15,21 @@ export default function HeroSlider() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   
   // Auto-suggestion states
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [filteredAilments, setFilteredAilments] = useState<Ailment[]>([]);
   const [filteredRemedies, setFilteredRemedies] = useState<Remedy[]>([]);
   const searchRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const loggedIn = await checkIsUserLoggedIn();
+      setIsLoggedIn(loggedIn);
+    };
+    checkUser();
+  }, []);
 
   // Close suggestions when clicking outside
   useEffect(() => {
@@ -147,6 +158,11 @@ export default function HeroSlider() {
 
   return (
     <section className="relative">
+      {isLoggedIn && (
+        <div className="absolute top-4 right-3 z-20 mr-10 cursor-pointer">
+          <UserAvatar className="w-11 h-11 text-base" />
+        </div>
+      )}
       <Slider {...settings} className="relative home-slider">
         {slides.map((slide, index) => (
           <div key={index} className="relative">
@@ -181,7 +197,7 @@ export default function HeroSlider() {
             />
             <input
               type="text"
-              placeholder="Search for ailments like 'headache' or 'anxiety' or search for remedies like 'arnica' or 'bella donna'"
+              placeholder="Search for ailments like 'headache' or 'anxiety' or search for remedies like 'arnica' or 'belladonna'"
               className="w-full pl-12 pr-12 py-3 lg:py-6 bg-white rounded-[8px] text-[#0B0C0A] placeholder-[#41463B] focus:outline-none"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -248,7 +264,7 @@ export default function HeroSlider() {
                           onClick={() => handleSelectRemedy(remedy)}
                           className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group"
                         >
-                          <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-xl flex-shrink-0">
+                          <div className="w-10 h-10 rounded-full bg-[#F9F7F2] flex items-center justify-center text-xl flex-shrink-0">
                             {remedy.icon}
                           </div>
                           <div className="flex-1">

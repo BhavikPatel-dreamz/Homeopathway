@@ -172,7 +172,7 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
         items={ailmentContext 
           ? [
               { label: "Home", href: "/" },
-              { label: "Ailments", href: "/ailments" },
+              // { label: "Ailments", href: "/ailments" },
               { label: ailmentContext.name, href: `/ailments/${ailmentContext.slug}` },
               { label: remedy.name, isActive: true }
             ]
@@ -224,7 +224,7 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
                 <div className="grid sm:grid-cols-2 gap-2 gap-y-8">
                   {symptoms.map((s, i) => (
                     <div key={i} className="flex gap-3 items-center">
-                      <div className="w-3 h-3 mt-1.5 bg-[#C3AF76] rounded-full"></div>
+                      <div className="w-3 h-3 bg-[#C3AF76] rounded-full"></div>
                       <div>
                         <p className="tex-[16px] text-[#2B2E28] font-semibold">{s.title}</p>
                         <p className="text-sm text-[#2B2E28] font-medium">{s.desc}</p>
@@ -291,12 +291,12 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
        <section
        id="Related Remedies"
        ref={sectionRefs["Related Remedies"]}
-      className="p-1 scroll-mt-20"
+      className="scroll-mt-20"
         >
     <h3 className="text-3xl font-serif text-gray-800 mb-6">Related Remedies</h3>
 
   {filteredRelatedRemedies && filteredRelatedRemedies.length > 0 ? (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
       {filteredRelatedRemedies.map((item) => (
         <Link href={`/remedies/${item.slug}`} key={item.id}>
           <div

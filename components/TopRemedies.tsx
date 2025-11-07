@@ -89,7 +89,7 @@ export default function TopRemedies({ remedies, ailmentSlug }: TopRemediesProps)
         </div>
         
         {/* Sort Dropdown */}
-        <div className="flex items-center justify-end">
+        <div className="flex items-end justify-end lg:items-center flex-col lg:flex-row">
           <label htmlFor="sort-remedies" className="mr-2 font-semibold text-[#2B2E28]">Sort by:</label>
           <div className="relative">
             <select 

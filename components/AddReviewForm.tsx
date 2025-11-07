@@ -149,7 +149,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
   // Show loading state while checking authentication
   if (isAuthenticated === null) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div className="fixed inset-0 bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
         <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg relative">
           <div className="p-10 pt-12">
             <div className="text-center">
@@ -164,12 +164,12 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
 
   // If we reach here, user is authenticated
   return (
-    <div className="fixed inset-0  bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0  bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg relative">
         {/* Close Button */}
         <button
           onClick={handleClose}
-          className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors z-10"
+          className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors z-[9999]"
         >
           <X size={24} />
         </button>

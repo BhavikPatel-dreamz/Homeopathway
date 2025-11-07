@@ -244,7 +244,7 @@ export default function SearchBar() {
                                 onClick={() => handleSelectRemedy(remedy)}
                                 className='w-full px-4 py-4 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group border-b border-gray-50 last:border-b-0'
                               >
-                                <div className='w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-xl flex-shrink-0'>
+                                <div className='w-10 h-10 rounded-full bg-[#F9F7F2] flex items-center justify-center text-xl flex-shrink-0'>
                                   {remedy.icon}
                                 </div>
                                 <div className='flex-1'>
@@ -295,7 +295,7 @@ export default function SearchBar() {
             />
             <input
               type='text'
-              placeholder="Search for ailments like 'headache' or 'anxiety' or search for remedies like 'arnica' or 'bella donna'"
+              placeholder="Search for ailments like 'headache' or 'anxiety' or search for remedies like 'arnica' or 'belladonna'"
               className='w-full pl-12 pr-12 py-3 lg:py-3 bg-white rounded-[8px] text-[#0B0C0A] placeholder-[#41463B] focus:outline-none'
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -372,7 +372,7 @@ export default function SearchBar() {
                           onClick={() => handleSelectRemedy(remedy)}
                           className='w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group'
                         >
-                          <div className='w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-xl flex-shrink-0'>
+                          <div className='w-10 h-10 rounded-full bg-[#F9F7F2] flex items-center justify-center text-xl flex-shrink-0'>
                             {remedy.icon}
                           </div>
                           <div className='flex-1'>
