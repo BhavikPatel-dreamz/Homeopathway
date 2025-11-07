@@ -137,26 +137,26 @@ export default function SearchBar() {
         className='relative md:max-w-[400px] lg:max-w-[600px] 2xl:max-w-[870px] mx-auto'
       >
         {/* Mobile: Show icon or expanded search with overlay */}
-        <div className='md:hidden'>
+        <div className='md:hidden flex justify-end'>
           {!isMobileSearchExpanded ? (
             // Mobile search icon
             <button
               onClick={toggleMobileSearch}
-              className='flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow'
+              className='flex items-center justify-center w-10 h-10 rounded-full  transition-shadow'
             >
               <Image
-                width={20}
-                height={20}
+                width={24}
+                height={24}
                 src='/search.svg'
-                className='w-5 h-5'
+                className='w-6 h-6'
                 alt='Search'
               />
             </button>
           ) : (
             // Mobile expanded search with full-screen overlay
-            <div className='fixed inset-0 z-50 bg-black bg-opacity-50'>
-              <div className='bg-white w-full'>
-                <div className='flex items-center p-4 gap-3'>
+            <div className='fixed inset-0 z-50 bg-black/30  pt-[30px] px-[16px] '>
+              <div className=' w-full'>
+                <div className='flex bg-white items-center gap-3 rounded-[8px]'>
                   <div className='relative flex-1'>
                     <Image
                       width={20}
@@ -168,7 +168,7 @@ export default function SearchBar() {
                     <input
                       type='text'
                       placeholder="Search ailments or remedies..."
-                      className='w-full pl-12 pr-4 py-3 bg-gray-50 rounded-[8px] text-[#0B0C0A] placeholder-[#41463B] focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#2C3E3E]'
+                      className='w-full pl-12 pr-4 py-3  rounded-[8px] text-[#0B0C0A] placeholder-[#41463B] focus:outline-none'
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -178,7 +178,7 @@ export default function SearchBar() {
                   </div>
                   <button
                     onClick={() => setIsMobileSearchExpanded(false)}
-                    className='p-2 text-gray-600 hover:text-gray-800 transition-colors'
+                    className='text-gray-600 hover:text-gray-800 transition-colors mr-3'
                   >
                     <svg
                       className='w-6 h-6'

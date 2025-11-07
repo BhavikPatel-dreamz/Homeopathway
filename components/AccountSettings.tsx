@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../lib/supabaseClient';
+import UserAvatar from "./UserAvatar";
 
 interface AccountSettingsProps {
   user: {
@@ -81,25 +82,33 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F5F3ED]">
      
       
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-6 py-8">
-        <div className="bg-white rounded-2xl shadow-sm p-8">
+      <main className="max-w-4xl mx-auto px-5 py-9">
+        <div className="bg-white rounded-[12px] py-10 px-6">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-6">
             <h1 className="text-3xl font-serif text-gray-900">Account Settings</h1>
             {!isEditing && (
               <button
                 onClick={() => setIsEditing(true)}
-                className="flex items-center gap-2 px-4 py-2 text-[#6B7B5E] hover:bg-gray-50 rounded-lg transition-colors"
+                className="flex items-center xs:w-[150pxj ustify-end gap-2 py-2 text-[#20231E] cursor-pointer rounded-lg transition-colors"
               >
-                <span>✏️</span>
-                <span className="font-medium">Edit Profile</span>
+                <img src="/edit-profile.svg" alt="" />
+                <span className="font-medium mt-0.5">Edit Profile</span>
               </button>
             )}
+          </div>
+
+          <div className="flex items-start lg:items-center justify-between mb-6 flex-col lg:flex-row gap-4 lg:gap-0">
+            <UserAvatar className=" w-[80px] h-[80px] text-[30px] font-semibold cursor-pointer hover:opacity-80 transition-opacity" />
+            <div className="flex items-center gap-2">
+                <button className='bg-[#6C7463]  hover:bg-[#565D4F] flex items-center text-white text-[16px] font-semibold px-3 py-1.5 rounded-[50px] cursor-pointer  transition-all duration-500'><img className='mr-2' src="/upload-icon.svg" alt="" />Upload Image</button>
+                <button className='bg-[#FCEBEC] flex items-center text-[#B62E31] text-[16px] font-semibold px-3 py-1.5 rounded-[50px] cursor-pointer  transition-all duration-500'><img className='mr-2' src="/remove.svg" alt="" />Remove</button>
+            </div>
           </div>
 
           {/* Success/Error Message */}
@@ -113,28 +122,45 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
           <div className="space-y-6">
             {/* Full Name */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-[#20231E] mb-2">
                 Full Name
               </label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
+                  <img src="/user-gray.svg" alt="" />
                 </span>
                 <input
                   type="text"
                   value={formData.full_name}
                   onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                   disabled={!isEditing}
-                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:bg-gray-50 disabled:text-gray-600"
+                  className="w-full pl-10 pr-4 py-2.5 border border-[#D3D6D1] text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:bg-[#F1F2F0] disabled:text-[#41463B]"
+                />
+              </div>
+            </div>
+
+            {/* User Name */}
+            <div>
+              <label className="block text-sm font-medium text-[#20231E] mb-2">
+                Username
+              </label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                  <img src="/user-gray.svg" alt="" />
+                </span>
+                <input
+                  type="text"
+                  value={formData.full_name}
+                  onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                  disabled={!isEditing}
+                  className="w-full pl-10 pr-4 py-2.5 border border-[#D3D6D1] text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:bg-[#F1F2F0] disabled:text-[#41463B]"
                 />
               </div>
             </div>
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-[#20231E] mb-2">
                 Email
               </label>
               <div className="relative">
@@ -148,15 +174,16 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   disabled={!isEditing}
-                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:bg-gray-50 disabled:text-gray-600"
+                  className="w-full pl-10 pr-4 py-2.5 py-3 border border-[#D3D6D1] text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent  disabled:bg-[#F1F2F0] disabled:text-[#41463B]"
                 />
               </div>
             </div>
 
-            {/* Password */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Password
+            {/* Current Password */}  
+              <p className='text-[20px] font-semibold text-[#0B0C0A] mb-4'>Password</p>
+              <div>
+              <label className="block text-sm font-medium text-[#20231E] mb-2">
+              Current Password
               </label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
@@ -170,7 +197,7 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   disabled={!isEditing}
                   placeholder={isEditing ? "Enter new password to change" : "••••••••••"}
-                  className="w-full pl-12 pr-12 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:bg-gray-50 disabled:text-gray-600"
+                  className="w-full pl-10 pr-4 py-2.5 py-3 border border-[#D3D6D1] text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:bg-[#F1F2F0] disabled:text-[#41463B]"
                 />
                 {isEditing && (
                   <button
@@ -188,18 +215,98 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                   </button>
                 )}
               </div>
-              {!isEditing && (
-                <div className="mt-2 text-right">
-                  <button className="text-sm text-[#6B7B5E] hover:underline">
-                    Reset Password?
-                  </button>
-                </div>
-              )}
             </div>
 
+            {/* New Password */}  
+            <div>
+              <label className="block text-sm font-medium text-[#20231E] mb-2">
+              New Password
+              </label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </span>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  disabled={!isEditing}
+                  placeholder={isEditing ? "Enter new password to change" : "••••••••••"}
+                  className="w-full pl-10 pr-4 py-2.5 py-3 border border-[#D3D6D1] text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:bg-[#F1F2F0] disabled:text-[#41463B]"
+                />
+
+
+                {isEditing && (
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      {showPassword ? (
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      ) : (
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                      )}
+                    </svg>
+                  </button>
+
+                )}
+              </div>
+              <div className='mt-1.5'>
+                <p className='text-[12px] text-[#41463B]'>Minimum 8 character, at least one special character, one number</p>
+              </div>
+              
+            </div>
+
+            {/* Confirmed Password */}  
+            <div>
+              <label className="block text-sm font-medium text-[#20231E] mb-2">Confirmed Password</label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </span>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  disabled={!isEditing}
+                  placeholder={isEditing ? "Enter new password to change" : "••••••••••"}
+                  className="w-full pl-10 pr-4 py-2.5 py-3 border border-[#D3D6D1] text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:bg-[#F1F2F0] disabled:text-[#41463B]"
+                />
+                {isEditing && (
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      {showPassword ? (
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      ) : (
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                      )}
+                    </svg>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* {!isEditing && (
+              <div className="mt-2 text-right">
+                <button className="text-sm text-[#6B7B5E] hover:underline">
+                  Reset Password?
+                </button>
+              </div>
+            )} */}
+
             {/* Action Buttons */}
-            {isEditing && (
-              <div className="flex gap-3 pt-4">
+            {/* {isEditing && ( */}
+              <div className="flex justify-end gap-2">
                 <button
                   onClick={() => {
                     setIsEditing(false);
@@ -211,35 +318,39 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                     setMessage(null);
                   }}
                   disabled={loading}
-                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+                  className="px-2.5 py-3 text-[#2B2E28] rounded-[50px] font-semibold transition-colors transition-all duration-500 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSave}
                   disabled={loading}
-                  className="flex-1 px-6 py-3 bg-[#6B7B5E] text-white rounded-lg font-medium hover:bg-[#5A6A4D] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className=" px-6 py-3 bg-[#6C7463] text-white rounded-[50px] font-semibold hover:bg-[#5A6A4D] transition-colors cursor-pointer transition-all duration-500"
                 >
                   {loading ? 'Saving...' : 'Save Changes'}
                 </button>
               </div>
-            )}
+            {/* // )} */}
 
             {/* Logout Button */}
-            {!isEditing && (
-              <div className="pt-6 border-t border-gray-200">
+        
+          </div>
+        </div>
+
+        {!isEditing && (
+              <div className="flex justify-center mt-6">
                 <button
                   onClick={handleLogout}
-                  className="w-full px-6 py-3 bg-red-50 text-red-600 rounded-lg font-medium hover:bg-red-100 transition-colors flex items-center justify-center gap-2"
+                  className="px-6 py-3 bg-[#FCEBEC] w-full lg:w-auto text-[#B62E31] rounded-[50px] font-semibold cursor-pointer transition-colors flex items-center justify-center gap-2"
                 >
-                  <span>🚪</span>
+                  <img src="/logout.svg" alt="" />
                   <span>Logout</span>
                 </button>
               </div>
             )}
-          </div>
-        </div>
       </main>
+
+      
 
     
     </div>
