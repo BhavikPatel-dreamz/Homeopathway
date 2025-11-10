@@ -1,6 +1,6 @@
-import { getUserProfile } from '../../lib/auth-server';
-import { createClient } from '../../lib/supabase/server';
-import AccountSettings from '../../components/AccountSettings';
+import { getUserProfile } from '../../../lib/auth-server';
+import { createClient } from '../../../lib/supabase/server';
+import AccountSettings from '../../../components/AccountSettings';
 import Link from 'next/link';
 import { Metadata } from 'next';
 
@@ -48,6 +48,7 @@ export default async function ProfilePage() {
   const { profile } = await getUserProfile(userId);
 
   return (
+    
     <AccountSettings 
       user={{
         id: userId,

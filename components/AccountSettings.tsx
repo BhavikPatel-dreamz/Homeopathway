@@ -21,7 +21,7 @@ interface AccountSettingsProps {
 
 
 
-export default function AccountSettings({ user,accountContext }: AccountSettingsProps) {
+export default function AccountSettings({ user }: AccountSettingsProps) {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -90,24 +90,14 @@ export default function AccountSettings({ user,accountContext }: AccountSettings
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F1E8] ">
+   <div className="min-h-screen bg-[#F5F1E8]">
        {/* Header */}
-        <div className="">
-           {/* Breadcrumb */}
-                <Breadcrumb
-        items={
-          accountContext
-            ? [
-                { label: "Home", href: "/" },
+       <Breadcrumb 
+              items={[
+                 { label: "Home", href: "/" },
                 { label: "Account Settings", isActive: true },
-              ]
-            : [
-                { label: "Home", href: "/" },
-                { label: "Account Settings", href: "/account" },
-              ]
-        }
-      />
-      </div>
+              ]} 
+            />
 
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-5 py-9">
@@ -126,13 +116,13 @@ export default function AccountSettings({ user,accountContext }: AccountSettings
             )}
           </div>
 
-          <div className="flex items-start lg:items-center justify-between mb-6 flex-col lg:flex-row gap-4 lg:gap-0">
+          {/* <div className="flex items-start lg:items-center justify-between mb-6 flex-col lg:flex-row gap-4 lg:gap-0">
             <UserAvatar className=" w-[80px] h-[80px] text-[30px] font-semibold cursor-pointer hover:opacity-80 transition-opacity" />
             <div className="flex items-center gap-2">
                 <button className='bg-[#6C7463]  hover:bg-[#565D4F] flex items-center text-white text-[16px] font-semibold px-3 py-1.5 rounded-[50px] cursor-pointer  transition-all duration-500'><img className='mr-2' src="/upload-icon.svg" alt="" />Upload Image</button>
                 <button className='bg-[#FCEBEC] flex items-center text-[#B62E31] text-[16px] font-semibold px-3 py-1.5 rounded-[50px] cursor-pointer  transition-all duration-500'><img className='mr-2' src="/remove.svg" alt="" />Remove</button>
             </div>
-          </div>
+          </div> */}
 
           {/* Success/Error Message */}
           {message && (
@@ -157,7 +147,7 @@ export default function AccountSettings({ user,accountContext }: AccountSettings
                   value={formData.full_name}
                   onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                   disabled={!isEditing}
-                  className="w-full pl-10 pr-4 py-2.5 border border-[#D3D6D1] text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:bg-[#F1F2F0] disabled:text-[#41463B]"
+                  className="w-full pl-10 pr-4 py-2.5 border border-[#D3D6D1] text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:bg-[#F1F2F0] disabled:text-[#41463B] text-gray-500"
                 />
               </div>
             </div>
@@ -176,7 +166,7 @@ export default function AccountSettings({ user,accountContext }: AccountSettings
                   value={formData.full_name}
                   onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                   disabled={!isEditing}
-                  className="w-full pl-10 pr-4 py-2.5 border border-[#D3D6D1] text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:bg-[#F1F2F0] disabled:text-[#41463B]"
+                  className="w-full pl-10 pr-4 py-2.5 border border-[#D3D6D1] text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:bg-[#F1F2F0] disabled:text-[#41463B] text-gray-500"
                 />
               </div>
             </div>
@@ -197,7 +187,7 @@ export default function AccountSettings({ user,accountContext }: AccountSettings
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   disabled={!isEditing}
-                  className="w-full pl-10 pr-4 py-2.5 py-3 border border-[#D3D6D1] text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent  disabled:bg-[#F1F2F0] disabled:text-[#41463B]"
+                  className="w-full pl-10 pr-4 py-2.5 py-3 border border-[#D3D6D1] text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent  disabled:bg-[#F1F2F0] disabled:text-[#41463B] text-gray-500"
                 />
               </div>
             </div>
@@ -219,8 +209,8 @@ export default function AccountSettings({ user,accountContext }: AccountSettings
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   disabled={!isEditing}
-                  placeholder={isEditing ? "Enter new password to change" : "••••••••••"}
-                  className="w-full pl-10 pr-4 py-2.5 py-3 border border-[#D3D6D1] text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:bg-[#F1F2F0] disabled:text-[#41463B]"
+                  placeholder={isEditing ? "Enter current password to change" : "••••••••••"}
+                  className="w-full pl-10 pr-4 py-2.5 py-3 border border-[#D3D6D1] text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:bg-[#F1F2F0] disabled:text-[#41463B] text-gray-500"
                 />
                 {isEditing && (
                   <button
@@ -257,7 +247,7 @@ export default function AccountSettings({ user,accountContext }: AccountSettings
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   disabled={!isEditing}
                   placeholder={isEditing ? "Enter new password to change" : "••••••••••"}
-                  className="w-full pl-10 pr-4 py-2.5 py-3 border border-[#D3D6D1] text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:bg-[#F1F2F0] disabled:text-[#41463B]"
+                  className="w-full pl-10 pr-4 py-2.5 py-3 border border-[#D3D6D1] text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:bg-[#F1F2F0] disabled:text-[#41463B] text-gray-500"
                 />
 
 
@@ -299,7 +289,7 @@ export default function AccountSettings({ user,accountContext }: AccountSettings
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   disabled={!isEditing}
                   placeholder={isEditing ? "Enter new password to change" : "••••••••••"}
-                  className="w-full pl-10 pr-4 py-2.5 py-3 border border-[#D3D6D1] text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:bg-[#F1F2F0] disabled:text-[#41463B]"
+                  className="w-full pl-10 pr-4 py-2.5 py-3 border border-[#D3D6D1] text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:bg-[#F1F2F0] disabled:text-[#41463B] text-gray-500"
                 />
                 {isEditing && (
                   <button

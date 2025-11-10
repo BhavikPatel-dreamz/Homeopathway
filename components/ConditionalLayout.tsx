@@ -12,9 +12,7 @@ export default async function ConditionalLayout({ children }: ConditionalLayoutP
   const headersList = await headers();
   const pathname = headersList.get('x-pathname') || headersList.get('x-url') || '';
   // Check if current page is an auth page
-  const isAuthPage = isPageCheckerSSR(pathname, ['/login', '/register', '/forgot-password','/admin','/profile']);
-
-
+  const isAuthPage = isPageCheckerSSR(pathname, ['/login', '/register', '/forgot-password','/admin']);
   return (
     <div className="min-h-screen bg-[#2C3E3E]">
       {!isAuthPage && <Header />}
