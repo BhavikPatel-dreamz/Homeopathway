@@ -3,6 +3,7 @@ import HeroSlider from "./HeroSlider";
 import { Ailment, Remedy } from "@/types";
 import PopularAilmentsServer from "./PopularAilmentsServer";
 import TopRatedRemediesServer from "./TopRatedRemediesServer";
+import Footer from "./Footer";
 
 interface HomePageContentProps {
   initialAilments: Ailment[];
@@ -22,6 +23,7 @@ export default function HomePageContent({
       <TopRatedRemediesServer 
         topRemedies={initialTopRemedies}
       />
+      <Footer/>
     </div>
   );
 }
