@@ -3,6 +3,7 @@ import React, { useState, useMemo, ReactNode } from 'react';
 import Link from 'next/link';
 import { Remedy } from "@/types";
 import Breadcrumb from "./Breadcrumb";
+import Image from 'next/image';
 
 interface RemedyListPageProps {
   remedies: Remedy[];
@@ -101,8 +102,14 @@ export default function RemedyListPage({
       <main className="max-w-7xl mx-auto px-6 py-8">
         {/* Remedies Section */}
        <div className="bg-white rounded-2xl p-8 shadow-sm">
-          <div className="flex items-center gap-3 mb-8">
-            <span className="text-4xl">💊</span>
+          <div className="flex items-center gap-3 mb-7">
+           <Image 
+                       className="w-[40px] h-[40px] lg:w-[60px] lg:h-[60px]" 
+                       src="/top-remedies.svg" 
+                       alt="Top Remedies Icon"
+                       width={60}
+                       height={60}
+                     />
             <div className="flex-1">
               <h1 className="text-4xl font-serif text-gray-900">All Remedies</h1> 
               <p className="text-gray-600 mt-2">

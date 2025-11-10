@@ -85,7 +85,7 @@ export default function TopRemedies({ remedies, ailmentSlug }: TopRemediesProps)
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <img src="/top-remedies.svg" alt="" className="w-10 h-10 lg:w-12 lg:h-12" />
-          <h2 className="text-[28px] lg:text-[40px] text-[#0B0C0A] ">Top Remedies</h2>
+          <h2 className="text-[28px] lg:text-[40px] text-[#0B0C0A] ">Popular Remedies</h2>
         </div>
         
         {/* Sort Dropdown */}

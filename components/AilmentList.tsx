@@ -144,7 +144,8 @@ export default function AilmentListPage({
         {/* Ailments Section */}
         <div className="bg-white rounded-2xl p-8 shadow-sm">
           <div className="flex items-center gap-3 mb-8">
-            <span className="text-4xl">💊</span>
+            {/* <span className="text-4xl">💊</span> */}
+            <img className="w-[40px] h-[40px] lg:w-[60px] lg:h-[60px]" alt="" src="/ailments-icon.svg"></img>
             <div className="flex-1">
               <h1 className="text-4xl font-serif text-gray-900">All Ailments</h1>
               <p className="text-gray-600 mt-2">
