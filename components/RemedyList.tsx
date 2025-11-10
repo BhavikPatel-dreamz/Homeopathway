@@ -197,7 +197,7 @@ export default function RemedyListPage({
                       onClick={() => goToPage(page)}
                       className={`px-4 py-2 rounded-lg transition-colors font-medium ${
                         currentPage === page
-                          ? 'bg-[#2C5F4F] text-white'
+                          ? 'bg-[#4B544A] text-white'
                           : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                       }`}
                     >
