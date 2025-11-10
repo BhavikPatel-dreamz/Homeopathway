@@ -4,7 +4,11 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Search, Loader2, ChevronDown } from "lucide-react";
 import Image from "next/image";
-import { getReviews, getReviewFilterOptions, getReviewStats } from "@/lib/review";
+import {
+  getReviews,
+  getReviewFilterOptions,
+  getReviewStats,
+} from "@/lib/review";
 import { getCurrentUser } from "@/lib/auth";
 import ReviewFilterModal, { ReviewFilters } from "./ReviewFilterModal";
 import AddReviewForm from "./AddReviewForm";
@@ -38,20 +42,19 @@ const formatTimeAgo = (dateString: string) => {
   const now = new Date();
   const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-  let interval = seconds / 31536000;
-  if (interval > 1) return Math.floor(interval) + " years ago";
+  const intervals: [number, string][] = [
+    [31536000, "year"],
+    [2592000, "month"],
+    [86400, "day"],
+    [3600, "hour"],
+    [60, "minute"],
+  ];
 
-  interval = seconds / 2592000;
-  if (interval > 1) return Math.floor(interval) + " months ago";
-
-  interval = seconds / 86400;
-  if (interval > 1) return Math.floor(interval) + " days ago";
-
-  interval = seconds / 3600;
-  if (interval > 1) return Math.floor(interval) + " hours ago";
-
-  interval = seconds / 60;
-  if (interval > 1) return Math.floor(interval) + " minutes ago";
+  for (const [secondsInUnit, label] of intervals) {
+    const interval = Math.floor(seconds / secondsInUnit);
+    if (interval > 1) return `${interval} ${label}s ago`;
+    if (interval === 1) return `1 ${label} ago`;
+  }
 
   return "Just now";
 };
@@ -83,81 +86,107 @@ const renderStars = (rating: number) => {
 // ---------------------------
 export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPageProps) {
   const router = useRouter();
-  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "highest_rated" | "lowest_rated">(
-    "newest"
-  );
-  const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
-  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+
+  // States
   const [reviews, setReviews] = useState<ReviewType[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [reviewsPerPage] = useState(15);
-  const [isLoading, setIsLoading] = useState(true);
+  const [reviewStats, setReviewStats] = useState<any>(null);
+  const [filterOptions, setFilterOptions] = useState<{ potencies: string[]; forms: string[] }>({
+    potencies: [],
+    forms: [],
+  });
+
   const [filters, setFilters] = useState<ReviewFilters>({
     rating: [],
     dosage: [],
     form: [],
   });
-  const [filterOptions, setFilterOptions] = useState<{ potencies: string[]; forms: string[] }>({
-    potencies: [],
-    forms: [],
-  });
-  const [reviewStats, setReviewStats] = useState<{
-    star_count: number;
-    average_rating: number;
-    total_reviews: number;
-    rating_distribution: Record<number, number>;
-  } | null>(null);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "highest_rated" | "lowest_rated">(
+    "newest"
+  );
+
+  const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+
   const [totalReviews, setTotalReviews] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [reviewsPerPage] = useState(15);
+
+  // 👇 Loading states
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isPageLoading, setIsPageLoading] = useState(false);
+
+  // ---------------------------
+  // Fetch Reviews + Stats
+  // ---------------------------
+  const fetchReviews = async (isPagination = false) => {
+    if (!remedy.id) return;
+    if (isPagination) setIsPageLoading(true);
+    else setIsInitialLoading(true);
+
+    try {
+      const { data: reviewsData } = await getReviews({
+        remedyId: remedy.id,
+        ailmentId: ailmentContext?.id,
+        limit: Math.max(reviewsPerPage * 3, 50),
+        sortBy,
+        starCount: filters.rating,
+        searchQuery,
+        potency: filters.dosage,
+      });
+
+      const allReviews = reviewsData || [];
+      const startIndex = (currentPage - 1) * reviewsPerPage;
+      const endIndex = startIndex + reviewsPerPage;
+      setReviews(allReviews.slice(startIndex, endIndex));
+
+      const { data: statsData } = await getReviewStats(remedy.id, ailmentContext?.id);
+      if (statsData) {
+        setReviewStats({ ...statsData, star_count: statsData.average_rating });
+        setTotalReviews(statsData.total_reviews);
+        setTotalPages(Math.ceil(statsData.total_reviews / reviewsPerPage));
+      }
+
+      const { data: filterData } = await getReviewFilterOptions(remedy.id);
+      if (filterData) setFilterOptions(filterData);
+    } catch (error) {
+      console.error("Failed to fetch reviews:", error);
+    } finally {
+      setIsInitialLoading(false);
+      setIsPageLoading(false);
+    }
+  };
+
+  // ---------------------------
+  // Effects
+  // ---------------------------
+  useEffect(() => {
+    fetchReviews(false);
+  }, [remedy.id]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!remedy.id) return;
-      setIsLoading(true);
+    // When filters, sort, or search change, silently update without spinner
+    fetchReviews(false);
+    setCurrentPage(1);
+  }, [filters, sortBy, searchQuery]);
 
-      try {
-        const { data: reviewsData, error: reviewsError } = await getReviews({
-          remedyId: remedy.id,
-          ailmentId: ailmentContext ? ailmentContext.id : undefined,
-          limit: Math.max(reviewsPerPage * 3, 50),
-          sortBy,
-          starCount: filters.rating,
-          searchQuery,
-          potency: filters.dosage,
-        });
+  useEffect(() => {
+    // When only page changes → show pagination loading
+    if (currentPage > 1 || totalReviews > reviewsPerPage) {
+      fetchReviews(true);
+    }
+  }, [currentPage]);
 
-        if (reviewsError) throw reviewsError;
-        const allReviews = reviewsData || [];
-        const startIndex = (currentPage - 1) * reviewsPerPage;
-        const endIndex = startIndex + reviewsPerPage;
-        setReviews(allReviews.slice(startIndex, endIndex));
-
-        const { data: statsData, error: statsError } = await getReviewStats(
-          remedy.id,
-          ailmentContext ? ailmentContext.id : undefined
-        );
-        if (statsError) throw statsError;
-        if (statsData) {
-          setReviewStats({ ...statsData, star_count: statsData.average_rating });
-          setTotalReviews(statsData.total_reviews);
-          setTotalPages(Math.ceil(statsData.total_reviews / reviewsPerPage));
-        }
-
-        const { data: filterData, error: filterError } = await getReviewFilterOptions(remedy.id);
-        if (filterError) throw filterError;
-        if (filterData) setFilterOptions(filterData);
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [remedy.id, ailmentContext, sortBy, filters, currentPage, reviewsPerPage, searchQuery]);
-
-  useEffect(() => setCurrentPage(1), [filters, sortBy, searchQuery]);
+  // ---------------------------
+  // Handlers
+  // ---------------------------
+  const handleReviewButtonClick = async () => {
+    const { user, error } = await getCurrentUser();
+    if (error || !user) return router.push("/login");
+    setIsReviewFormOpen(true);
+  };
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -166,46 +195,7 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
     }
   };
 
-  const handleReviewButtonClick = async () => {
-    try {
-      const { user, error } = await getCurrentUser();
-      if (error || !user) return router.push("/login");
-      setIsReviewFormOpen(true);
-    } catch {
-      router.push("/login");
-    }
-  };
-
-  const refreshReviews = async () => {
-    if (!remedy.id) return;
-    setIsLoading(true);
-    try {
-      setCurrentPage(1);
-      const { data: statsData } = await getReviewStats(
-        remedy.id,
-        ailmentContext ? ailmentContext.id : undefined
-      );
-      if (statsData) {
-        setReviewStats({ ...statsData, star_count: statsData.average_rating });
-        setTotalReviews(statsData.total_reviews);
-        setTotalPages(Math.ceil(statsData.total_reviews / reviewsPerPage));
-      }
-      const { data: reviewsData } = await getReviews({
-        remedyId: remedy.id,
-        ailmentId: ailmentContext ? ailmentContext.id : undefined,
-        limit: Math.max(reviewsPerPage * 3, 50),
-        sortBy,
-        starCount: filters.rating,
-        searchQuery,
-        potency: filters.dosage,
-      });
-      setReviews((reviewsData || []).slice(0, reviewsPerPage));
-    } catch (error) {
-      console.error("Failed to refresh reviews:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const refreshReviews = () => fetchReviews(false);
 
   const sortOptions = [
     { label: "Most Recent", value: "newest" },
@@ -214,33 +204,30 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
     { label: "Lowest Rated", value: "lowest_rated" },
   ];
 
+  // ---------------------------
+  // Render
+  // ---------------------------
   if (!remedy) return <div>Loading remedy details...</div>;
 
   return (
     <div>
       <section id="Reviews" className="bg-white rounded-2xl shadow-sm p-8 scroll-mt-[19rem]">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-          {/* Left – Rating Summary */}
+          {/* Left Panel – Ratings Summary */}
           <aside className="col-span-1">
             <div className="flex flex-col text-left p-6">
               <p className="text-[20px] text-[#0B0C0A] font-semibold mb-2">Reviews</p>
               <div className="flex items-center gap-3">
                 <Image src="/star.svg" alt="Star" width={48} height={48} />
                 <h2 className="text-4xl font-bold text-gray-800 mt-3">
-                  {reviewStats
-                    ? reviewStats.average_rating.toFixed(1)
-                    : remedy.average_rating.toFixed(1)}
+                  {reviewStats ? reviewStats.average_rating.toFixed(1) : "0.0"}
                 </h2>
               </div>
               <p className="text-sm text-gray-500 mb-6">
-                Based on{" "}
-                {reviewStats
-                  ? reviewStats.total_reviews.toLocaleString()
-                  : remedy.review_count.toLocaleString()}{" "}
-                reviews
+                Based on {reviewStats ? reviewStats.total_reviews : 0} reviews
               </p>
 
-              {/* ⭐ Interactive Rating Bars */}
+              {/* Rating Filters */}
               <div className="w-full space-y-2 mb-6">
                 {reviewStats &&
                   [5, 4, 3, 2, 1].map((star) => {
@@ -252,49 +239,44 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
 
                     return (
                       <button
-                  key={star}
-                  onClick={() =>
-                  setFilters((prev) => ({
-                     ...prev,
-                    rating: prev.rating.includes(star) ? [] : [star], // single-select toggle
-                  }))
-                   }
-               className={`flex items-center gap-2 text-sm w-full ${
-              isActive
-            ? "border-[#6C7463] bg-gray-50 opacity-100 scale-[1.02]" // active state style
-           : "border-[#6C74631A] opacity-80 hover:opacity-100 hover:bg-[#6C74631A] rounded-md"
-           }`}
-               >
-         <span className="w-4 h-4 text-yellow-400">
-          <Image src="/star.svg" alt={`${star} Star`} width={16} height={16} />
-          </span>
-
-       <span className="w-3 text-gray-700 font-medium">{star}</span>
-
-      <div className="flex-1 h-2 bg-gray-200 rounded-xl overflow-hidden relative cursor-pointer">
-        <div
-        className={`h-full transition-all duration-300 rounded-xl ${
-        isActive ? "bg-[#6C7463]" : "bg-[#A6AD9E]"
-        }`}
-        style={{ width: `${percentage}%` }}
-      ></div>
-    </div>
-     </button>
-
+                        key={star}
+                        onClick={() =>
+                          setFilters((prev) => ({
+                            ...prev,
+                            rating: prev.rating.includes(star) ? [] : [star],
+                          }))
+                        }
+                        className={`flex items-center gap-2 text-sm w-full ${
+                          isActive
+                            ? "border-[#6C7463] bg-gray-50 opacity-100 scale-[1.02]"
+                            : "border-[#6C74631A] opacity-80 hover:opacity-100 hover:bg-[#6C74631A] rounded-md"
+                        }`}
+                      >
+                        <Image src="/star.svg" alt={`${star} Star`} width={16} height={16} />
+                        <span className="w-3 text-gray-700 font-medium">{star}</span>
+                        <div className="flex-1 h-2 bg-gray-200 rounded-xl overflow-hidden">
+                          <div
+                            className={`h-full transition-all duration-300 rounded-xl ${
+                              isActive ? "bg-[#6C7463]" : "bg-[#A6AD9E]"
+                            }`}
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
+                      </button>
                     );
                   })}
               </div>
 
               <button
                 onClick={handleReviewButtonClick}
-                className="bg-[#6C7463] hover:bg-[#5A6B5D] text-white px-5 py-2 rounded-full text-sm font-medium transition cursor-pointer"
+                className="bg-[#6C7463] hover:bg-[#5A6B5D] text-white px-5 py-2 rounded-full text-sm font-medium transition"
               >
                 Review Remedy
               </button>
             </div>
           </aside>
 
-          {/* Right – Reviews List */}
+          {/* Right Panel – Reviews List */}
           <div className="col-span-2">
             <div className="flex flex-wrap items-center gap-3 mb-6">
               <div className="relative flex-1 max-w-md mr-[5pc]">
@@ -323,32 +305,39 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
               </div>
             </div>
 
-            {/* Reviews */}
-            <div className="space-y-6">
-              {isLoading ? (
-                <div className="flex justify-center items-center py-10">
-                  <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
-                  <span className="ml-2 text-gray-600">Loading reviews...</span>
-                </div>
-              ) : reviews.length === 0 ? (
-                <div className="text-center py-10 text-gray-500">
-                  <p className="font-medium">No reviews yet.</p>
-                  <p className="text-sm">Be the first to review this remedy!</p>
-                </div>
-              ) : (
-                reviews.map((review) => {
-                  const userName = review.profiles?.first_name
-                    ? `${review.profiles.first_name} ${review.profiles.last_name?.charAt(0) || ""}.`
-                    : "Anonymous";
-                  const userInitial = userName.charAt(0).toUpperCase();
-                  const tags = [review.dosage, review.potency].filter(Boolean);
+            {/* Main Review Section */}
+            {isInitialLoading ? (
+              <div className="flex justify-center items-center py-10">
+                <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
+                <span className="ml-2 text-gray-600">Loading reviews...</span>
+              </div>
+            ) : reviews.length === 0 ? (
+              <div className="text-center py-10 text-gray-500">
+                <p className="font-medium">No reviews yet.</p>
+                <p className="text-sm">Be the first to review this remedy!</p>
+              </div>
+            ) : (
+              <>
+                {/* Lazy Loading Spinner — only for pagination */}
+                {isPageLoading && (
+                  <div className="flex justify-center items-center py-3">
+                    <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />
+                    <span className="ml-2 text-gray-500 text-sm">Loading more...</span>
+                  </div>
+                )}
 
+                {reviews.map((review) => {
+                  const userName =
+                    review.profiles?.first_name || review.profiles?.last_name
+                      ? `${review.profiles?.first_name || ""} ${review.profiles?.last_name?.[0] || ""}.`
+                      : "Anonymous";
+                  const tags = [review.dosage, review.potency].filter(Boolean);
                   return (
                     <div key={review.id} className="border-b border-[#B5B6B1] w-full p-6">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-start gap-3">
                           <div className="w-10 h-10 rounded-full bg-[#E6E3DA] flex items-center justify-center text-sm font-semibold text-gray-700">
-                            {userInitial}
+                            {userName.charAt(0)}
                           </div>
                           <div>
                             <p className="font-semibold text-gray-800">{userName}</p>
@@ -360,7 +349,9 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
                             </div>
                           </div>
                         </div>
-                        <p className="text-sm text-gray-500">{formatTimeAgo(review.created_at)}</p>
+                        <p className="text-sm text-gray-500">
+                          {formatTimeAgo(review.created_at)}
+                        </p>
                       </div>
 
                       {tags.length > 0 && (
@@ -381,50 +372,51 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
                       )}
                     </div>
                   );
-                })
-              )}
-            </div>
+                })}
 
-            {/* Pagination */}
-            {totalReviews > 15 && (
-              <div className="flex items-center justify-center gap-2 mt-8">
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="w-10 h-10 rounded-full flex items-center justify-center bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-                >
-                  <ChevronDown className="w-5 h-5 rotate-90" />
-                </button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1)
-                  .slice(
-                    Math.max(0, currentPage - 2),
-                    Math.min(totalPages, currentPage + 1)
-                  )
-                  .map((page) => (
+                {/* Pagination */}
+                {totalReviews > reviewsPerPage && (
+                  <div className="flex items-center justify-center gap-2 mt-8">
                     <button
-                      key={page}
-                      onClick={() => handlePageChange(page)}
-                      className={`w-10 h-10 rounded-full text-sm font-semibold ${
-                        currentPage === page
-                          ? "bg-[#6C7463] text-white"
-                          : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
-                      }`}
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className="w-10 h-10 rounded-full flex items-center justify-center bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
                     >
-                      {page}
+                      <ChevronDown className="w-5 h-5 rotate-90" />
                     </button>
-                  ))}
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="w-10 h-10 rounded-full flex items-center justify-center bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-                >
-                  <ChevronDown className="w-5 h-5 -rotate-90" />
-                </button>
-              </div>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                      .slice(
+                        Math.max(0, currentPage - 2),
+                        Math.min(totalPages, currentPage + 1)
+                      )
+                      .map((page) => (
+                        <button
+                          key={page}
+                          onClick={() => handlePageChange(page)}
+                          className={`w-10 h-10 rounded-full text-sm font-semibold ${
+                            currentPage === page
+                              ? "bg-[#6C7463] text-white"
+                              : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      ))}
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className="w-10 h-10 rounded-full flex items-center justify-center bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      <ChevronDown className="w-5 h-5 -rotate-90" />
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
 
+        {/* Filter Modal */}
         <ReviewFilterModal
           isOpen={isFilterModalOpen}
           onClose={() => setIsFilterModalOpen(false)}
@@ -435,6 +427,7 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
         />
       </section>
 
+      {/* Add Review Modal */}
       {isReviewFormOpen && (
         <AddReviewForm
           onClose={() => {

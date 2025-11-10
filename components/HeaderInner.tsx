@@ -28,7 +28,7 @@ export default function HeaderInner() {
 
   return (
   <header
-    className={`bg-[#F5F3ED] w-full px-4 lg:px-6 py-[16px] text-white z-50 transition-all duration-500 ${
+    className={`bg-[#f5f1e8] w-full px-4 lg:px-6 py-[16px] text-white z-50 transition-all duration-500 ${
       isSticky ? 'fixed top-0 left-0 shadow-md z-[1000]' : 'relative'
     }`}
   >

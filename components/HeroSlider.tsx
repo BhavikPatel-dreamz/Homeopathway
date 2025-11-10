@@ -160,11 +160,14 @@ export default function HeroSlider() {
 
   return (
     <section className="relative">
+     <div className="max-w-7xl mx-auto px-0 lg:px-5 flex justify-between items-center relative">
       {isLoggedIn && (
-        <div className="absolute top-4 right-3 z-20 mr-10 cursor-pointer">
+        <div className="absolute top-4 right-3 z-20 cursor-pointer">
           <UserAvatar className="w-11 h-11 text-base" />
         </div>
+        
       )}
+      </div>
       <Slider {...settings} className="relative home-slider">
         {slides.map((slide, index) => (
           <div key={index} className="relative">

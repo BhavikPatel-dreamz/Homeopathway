@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../lib/supabaseClient';
 import UserAvatar from "./UserAvatar";
+import Breadcrumb from './Breadcrumb';
 
 interface AccountSettingsProps {
   user: {
@@ -11,9 +12,16 @@ interface AccountSettingsProps {
     first_name: string;
     last_name: string;
   };
+   accountContext?: {
+    id: string;
+    name: string;
+    slug: string;
+  };
 }
 
-export default function AccountSettings({ user }: AccountSettingsProps) {
+
+
+export default function AccountSettings({ user,accountContext }: AccountSettingsProps) {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -82,9 +90,24 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F3ED]">
-     
-      
+    <div className="min-h-screen bg-[#F5F1E8] ">
+       {/* Header */}
+        <div className="">
+           {/* Breadcrumb */}
+                <Breadcrumb
+        items={
+          accountContext
+            ? [
+                { label: "Home", href: "/" },
+                { label: "Account Settings", isActive: true },
+              ]
+            : [
+                { label: "Home", href: "/" },
+                { label: "Account Settings", href: "/account" },
+              ]
+        }
+      />
+      </div>
 
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-5 py-9">

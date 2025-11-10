@@ -70,7 +70,7 @@ export default function UserAvatar({ className = "" }: UserAvatarProps) {
   if (!user || !profile) {
     // Guest user - show a generic icon
     return (
-      <div className="relative">
+      <div className="relative mr-[10pc]">
             <Link href="/login">
                 <button className="text-montserrat px-4 py-[5px] hover:bg-transparent hover:text-[#20231E] border border-[#D3D6D1] hover:border-[#20231E] rounded-full transition-colors font-semibold text-[16px] leading-[24px] text-[#D3D6D1] cursor-pointer transition-all duration-500">
                   Login
