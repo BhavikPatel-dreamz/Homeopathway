@@ -8,15 +8,16 @@ import { checkIsUserLoggedIn } from "@/lib/userUtils";
 import UserAvatar from "./UserAvatar";
 // @ts-expect-error - react-slick types are not available
 import Slider from "react-slick";
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import Link from "next/link";
 
 export default function HeroSlider() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  
+
   // Auto-suggestion states
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [filteredAilments, setFilteredAilments] = useState<Ailment[]>([]);
@@ -38,9 +39,8 @@ export default function HeroSlider() {
         setShowSuggestions(false);
       }
     };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Auto-search as user types (debounced)
@@ -49,7 +49,7 @@ export default function HeroSlider() {
       if (searchQuery.trim().length > 0) {
         setLoading(true);
         setShowSuggestions(true);
-        
+
         try {
           const [ailmentsRes, remediesRes] = await Promise.all([
             supabase
@@ -60,7 +60,7 @@ export default function HeroSlider() {
               .limit(5),
             supabase
               .from("remedies")
-              .select("name, average_rating, review_count, description, icon")
+              .select("name, average_rating, review_count, description, icon, slug")
               .ilike("name", `%${searchQuery}%`)
               .order("average_rating", { ascending: false })
               .limit(5),
@@ -70,12 +70,14 @@ export default function HeroSlider() {
           if (remediesRes.error) throw remediesRes.error;
 
           setFilteredAilments(ailmentsRes.data || []);
-          setFilteredRemedies((remediesRes.data || []).map(remedy => ({
-            ...remedy,
-            rating: remedy.average_rating,
-            reviewCount: remedy.review_count,
-            indication: "General" // Default value since indication field doesn't exist in DB
-          })));
+          setFilteredRemedies(
+            (remediesRes.data || []).map((remedy) => ({
+              ...remedy,
+              rating: remedy.average_rating,
+              reviewCount: remedy.review_count,
+              indication: "General", // Default since not in DB
+            }))
+          );
         } catch (error) {
           console.error("Error during search:", error);
         } finally {
@@ -86,7 +88,7 @@ export default function HeroSlider() {
         setFilteredAilments([]);
         setFilteredRemedies([]);
       }
-    }, 300); // 300ms debounce
+    }, 300);
 
     return () => clearTimeout(searchTimeout);
   }, [searchQuery]);
@@ -96,41 +98,33 @@ export default function HeroSlider() {
       setShowSuggestions(false);
       return;
     }
-
     setLoading(true);
     setShowSuggestions(false);
-    
-    // Navigate to search results page with query
     const searchParams = new URLSearchParams({ q: searchQuery });
     router.push(`/search?${searchParams.toString()}`);
   };
 
-    const handleSelectAilment = (ailment: Ailment) => {
+  const nameToSlug = (name: string) =>
+    name.toLowerCase().replace(/ & /g, " and ").replace(/\s+/g, "-");
+
+  const handleSelectAilment = (ailment: Ailment) => {
     setSearchQuery(ailment.name);
     setShowSuggestions(false);
     setFilteredAilments([]);
     setFilteredRemedies([]);
-    // Use the slug from the database, fallback to generated slug if not available
     const slug = ailment.slug || nameToSlug(ailment.name);
     router.push(`/${slug}`, { scroll: false });
   };
 
-  function nameToSlug(name: string) {
-    return name.toLowerCase().replace(/ & /g, ' and ').replace(/\s+/g, '-');
-  }
-
   const handleSelectRemedy = (remedy: Remedy) => {
     setSearchQuery(remedy.name);
     setShowSuggestions(false);
-    // Navigate to search with remedy name
-    // const searchParams = new URLSearchParams({ q: remedy.name });
-    // router.push(`/search?${searchParams.toString()}`);
-      const slug = remedy.slug || nameToSlug(remedy.name);
+    const slug = remedy.slug || nameToSlug(remedy.name);
     router.push(`/remedies/${slug}`, { scroll: false });
   };
 
   const clearSearch = () => {
-    setSearchQuery('');
+    setSearchQuery("");
     setShowSuggestions(false);
     setFilteredAilments([]);
     setFilteredRemedies([]);
@@ -140,13 +134,13 @@ export default function HeroSlider() {
     dots: true,
     arrows: false,
     infinite: true,
-    speed: 1200, 
+    speed: 1200,
     slidesToShow: 1,
     slidesToScroll: 1,
-    autoplay: true, 
+    autoplay: true,
     autoplaySpeed: 3000,
     fade: true,
-    cssEase: "ease-in-out", 
+    cssEase: "ease-in-out",
   };
 
   const slides = [
@@ -155,34 +149,53 @@ export default function HeroSlider() {
     "/home-slide-3.png",
     "/home-slide-4.png",
     "/home-slide-5.png",
-    "/home-slide-6.png"
+    "/home-slide-6.png",
   ];
 
   return (
     <section className="relative">
-     <div className="max-w-7xl mx-auto px-0 lg:px-5 flex justify-between items-center relative">
-      {isLoggedIn && (
-        <div className="absolute top-4 right-3 z-20 cursor-pointer">
-          <UserAvatar className="w-11 h-11 text-base" />
+      <div className="max-w-7xl mx-auto px-0 lg:px-5 flex justify-between items-center relative">
+        {/* ✅ Conditionally render Login or Avatar */}
+        <div className="absolute top-4 right-3 z-20">
+          {isLoggedIn ? (
+            <UserAvatar className="w-11 h-11 text-base cursor-pointer" />
+          ) : (
+            <Link href="/login">
+              <button className="text-montserrat px-4 py-[5px] hover:bg-transparent border border-[#D3D6D1]  rounded-full transition-colors font-semibold text-[16px] leading-[24px] text-[#D3D6D1] cursor-pointer transition-all duration-500">
+                Login
+              </button>
+            </Link>
+          )}
         </div>
-        
-      )}
       </div>
+
+      {/* Slider */}
       <Slider {...settings} className="relative home-slider">
         {slides.map((slide, index) => (
           <div key={index} className="relative">
             <div className="absolute top-0 left-0 w-full h-full">
-              <img className="object-cover h-full w-full" src={slide} alt={`Homeopathway slide ${index + 1}`} />
+              <img
+                className="object-cover h-full w-full"
+                src={slide}
+                alt={`Homeopathway slide ${index + 1}`}
+              />
             </div>
             <div className="relative flex pt-25 pb-30 lg:pb-48 pl-[15px] pr-[15px]">
               <div className="flex items-center flex-col lg:flex-row justify-center mb-6 max-w-[900px] mx-auto">
                 <div className="w-35 h-35 md:w-48 md:h-48 lg:w-48 lg:h-48 mr-6 flex-shrink-0 lg:mb-0 mb-2">
-                  <img className="w-full h-full object-contain" src="/banner-home.svg" alt="Homeopathway Logo" />
+                  <img
+                    className="w-full h-full object-contain"
+                    src="/banner-home.svg"
+                    alt="Homeopathway Logo"
+                  />
                 </div>
                 <div className="text-white lg:text-left text-center">
-                  <h1 className="text-[32px] md:text-[32px] lg:text-[40px]">Your Path to Healing</h1>
+                  <h1 className="text-[32px] md:text-[32px] lg:text-[40px]">
+                    Your Path to Healing
+                  </h1>
                   <h6 className="text-[24px] font-[400]">
-                    Find trusted homeopathic solutions for your health concerns, backed by community reviews and expert guidance.
+                    Find trusted homeopathic solutions for your health concerns, backed by
+                    community reviews and expert guidance.
                   </h6>
                 </div>
               </div>
@@ -191,12 +204,12 @@ export default function HeroSlider() {
         ))}
       </Slider>
 
-      {/*------ Searchbar with Auto-Suggestions -----*/}
+      {/* Searchbar with Auto-Suggestions */}
       <div className="absolute bottom-[60px] lg:bottom-[100px] w-full left-1/2 -translate-x-1/2 z-10 pr-[15px] pl-[15px]">
         <div ref={searchRef} className="relative max-w-[870px] mx-auto">
           <div className="relative">
-            <img 
-              src="/search.svg" 
+            <img
+              src="/search.svg"
               className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none z-10"
               alt="Search"
             />
@@ -206,7 +219,7 @@ export default function HeroSlider() {
               className="w-full pl-12 pr-12 py-3 lg:py-6 bg-white rounded-[8px] text-[#0B0C0A] placeholder-[#41463B] focus:outline-none"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               onFocus={() => searchQuery && setShowSuggestions(true)}
             />
             {searchQuery && (
@@ -214,8 +227,18 @@ export default function HeroSlider() {
                 onClick={clearSearch}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors z-10"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             )}
@@ -235,7 +258,12 @@ export default function HeroSlider() {
                   {filteredAilments.length > 0 && (
                     <div className="border-b border-gray-100">
                       <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
-                         <img className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]" src="/ailments-icon.svg" alt="" /> Ailments
+                        <img
+                          className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]"
+                          src="/ailments-icon.svg"
+                          alt=""
+                        />{" "}
+                        Ailments
                       </div>
                       {filteredAilments.map((ailment) => (
                         <button
@@ -261,7 +289,12 @@ export default function HeroSlider() {
                   {filteredRemedies.length > 0 && (
                     <div>
                       <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
-                        <img className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]" src="/top-remedies.svg" alt="Top Remedies Icon"/> Remedies
+                        <img
+                          className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]"
+                          src="/top-remedies.svg"
+                          alt="Top Remedies Icon"
+                        />{" "}
+                        Remedies
                       </div>
                       {filteredRemedies.map((remedy, index) => (
                         <button
@@ -280,22 +313,21 @@ export default function HeroSlider() {
                               {remedy.description}
                             </div>
                           </div>
-                          {/* <div className="text-sm text-yellow-600 font-medium flex items-center gap-1">
-                            <span>⭐</span>
-                            {remedy.average_rating.toFixed(1)}
-                          </div> */}
                         </button>
                       ))}
                     </div>
                   )}
 
                   {/* No Results */}
-                  {filteredAilments.length === 0 && filteredRemedies.length === 0 && (
-                    <div className="p-8 text-center text-[#0B0C0A]">
-                      <p className="text-lg font-medium">No results found</p>
-                      <p className="text-sm mt-1">Try searching for different keywords</p>
-                    </div>
-                  )}
+                  {filteredAilments.length === 0 &&
+                    filteredRemedies.length === 0 && (
+                      <div className="p-8 text-center text-[#0B0C0A]">
+                        <p className="text-lg font-medium">No results found</p>
+                        <p className="text-sm mt-1">
+                          Try searching for different keywords
+                        </p>
+                      </div>
+                    )}
                 </>
               )}
             </div>

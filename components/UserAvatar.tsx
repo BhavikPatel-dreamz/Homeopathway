@@ -72,18 +72,10 @@ export default function UserAvatar({ className = "" }: UserAvatarProps) {
     return (
       <div className="relative">
             <Link href="/login">
-                <button className="text-montserrat px-4 py-[5px] hover:bg-transparent hover:text-[#20231E] border border-[#D3D6D1] hover:border-[#20231E] rounded-full transition-colors font-semibold text-[16px] leading-[24px] text-[#D3D6D1] cursor-pointer transition-all duration-500">
+                <button className="text-montserrat px-4 py-[5px]  border border-[#20231E] rounded-full transition-colors font-semibold text-[16px] leading-[24px] text-[#20231E] cursor-pointer transition-all duration-500">
                   Login
                 </button>
               </Link>
-        {/* <div 
-          className={`bg-gray-400 rounded-full flex items-center justify-center ${className}`}
-          onClick={() => setShowDropdown(!showDropdown)}
-        >
-          <svg className="w-1/2 h-1/2 text-white" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-          </svg>
-        </div> */}
         <UserDropdown 
           isOpen={showDropdown} 
           onClose={() => setShowDropdown(false)}
