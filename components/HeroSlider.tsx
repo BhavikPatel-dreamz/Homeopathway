@@ -177,7 +177,7 @@ export default function HeroSlider() {
             <div className="relative flex pt-25 pb-30 lg:pb-48 pl-[15px] pr-[15px]">
               <div className="flex items-center flex-col lg:flex-row justify-center mb-6 max-w-[900px] mx-auto">
                 <div className="w-35 h-35 md:w-48 md:h-48 lg:w-48 lg:h-48 mr-6 flex-shrink-0 lg:mb-0 mb-2">
-                  <img className="w-full h-full object-contain" src="/home-banner-logo.svg" alt="Homeopathway Logo" />
+                  <img className="w-full h-full object-contain" src="/banner-home.svg" alt="Homeopathway Logo" />
                 </div>
                 <div className="text-white lg:text-left text-center">
                   <h1 className="text-[32px] md:text-[32px] lg:text-[40px]">Your Path to Healing</h1>
@@ -235,7 +235,7 @@ export default function HeroSlider() {
                   {filteredAilments.length > 0 && (
                     <div className="border-b border-gray-100">
                       <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
-                        <span>😷</span> Ailments
+                         <img className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]" src="/ailments-icon.svg" alt="" /> Ailments
                       </div>
                       {filteredAilments.map((ailment) => (
                         <button
@@ -261,7 +261,7 @@ export default function HeroSlider() {
                   {filteredRemedies.length > 0 && (
                     <div>
                       <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
-                        <span>💊</span> Remedies
+                        <img className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]" src="/top-remedies.svg" alt="Top Remedies Icon"/> Remedies
                       </div>
                       {filteredRemedies.map((remedy, index) => (
                         <button
@@ -280,10 +280,10 @@ export default function HeroSlider() {
                               {remedy.description}
                             </div>
                           </div>
-                          <div className="text-sm text-yellow-600 font-medium flex items-center gap-1">
+                          {/* <div className="text-sm text-yellow-600 font-medium flex items-center gap-1">
                             <span>⭐</span>
                             {remedy.average_rating.toFixed(1)}
-                          </div>
+                          </div> */}
                         </button>
                       ))}
                     </div>

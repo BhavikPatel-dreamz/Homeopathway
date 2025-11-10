@@ -172,24 +172,30 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
             </div>
 
             {/* Email */}
-            <div>
-              <label className="block text-sm font-medium text-[#20231E] mb-2">
-                Email
-              </label>
+             <div>
+              <label className="block text-sm font-medium text-[#20231E] mb-2">Email Address</label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
                   </svg>
                 </span>
                 <input
                   type="email"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  disabled={!isEditing}
-                  className="w-full pl-10 pr-4 py-2.5 py-3 border border-[#D3D6D1] text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent  disabled:bg-[#F1F2F0] disabled:text-[#41463B] text-gray-500"
+                  disabled
+                  className="w-full pl-10 pr-4 py-2.5 border border-[#D3D6D1] text-[16px] rounded-lg 
+                  bg-[#F1F2F0] text-[#41463B] cursor-not-allowed"
                 />
               </div>
+              <p className="text-xs text-[#6B7B5E] mt-1">
+                Email address cannot be changed.
+              </p>
             </div>
 
             {/* Current Password */}  

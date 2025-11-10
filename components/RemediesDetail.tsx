@@ -221,17 +221,21 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
                 </div>
 
                 <h4 className="text-[20px] text-[#2B2E28] font-bold mb-5 text-montserrat">Key Symptoms for {remedy.name} Headaches:</h4>
-                <div className="grid sm:grid-cols-2 gap-2 gap-y-8">
-                  {symptoms.map((s, i) => (
-                    <div key={i} className="flex gap-3 items-center">
-                      <div className="w-3 h-3 bg-[#C3AF76] rounded-full"></div>
-                      <div>
-                        <p className="tex-[16px] text-[#2B2E28] font-semibold">{s.title}</p>
-                        <p className="text-sm text-[#2B2E28] font-medium">{s.desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+               <div className="grid sm:grid-cols-2 gap-2 gap-y-8">
+                   {symptoms.map((s, i) => (
+                     <div key={i} className="flex gap-3 items-center">
+                     <div className="w-3 h-3 bg-[#C3AF76] rounded-full"></div>
+                <div>
+                 <p className="text-[16px] text-[#2B2E28] font-semibold">
+               {(s.title || '').replace(/^'+|'+$/g, '').replace(/^"+|"+$/g, '')}
+               </p>
+                <p className="text-sm text-[#2B2E28] font-medium">
+                      {(s.desc || '').replace(/^'+|'+$/g, '').replace(/^"+|"+$/g, '')}
+                 </p>
+               </div>
+                 </div>
+              ))}
+            </div>
               </div>
          
             </div>
@@ -253,12 +257,18 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
                   <span className="font-semibold text-[#175F3D]">N/A</span>
                 </li>
               </ul>
-              <div className="mt-6">
-                <p className="text-[16px] text-[#0B0C0A] mb-2 font-semibold">Common Potencies</p>
-                <div className="flex justify-between flex-wrap font-medium text-[#2B2E28]">
-                  <div className="">{(remedy.dosage_forms || []).join(', ')} <span className="text-xs text-[#2B2E28]"></span></div>
-                </div>
-              </div>
+        
+           <div className="mt-6">
+                  <p className="text-[16px] text-[#0B0C0A] mb-2 font-semibold">Common Potencies</p>
+                 <div className="flex justify-between flex-wrap font-medium text-[#2B2E28]">
+                <div>
+              {(remedy.dosage_forms || [])
+              .map(item => item.replace(/^'+|'+$/g, '').replace(/^"+|"+$/g, '')) // remove single or double quotes
+              .join(', ')}
+             <span className="text-xs text-[#2B2E28]"></span>
+          </div>
+      </div>
+      </div>
             </aside>
         </section>
 
@@ -269,7 +279,7 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
               <div className="w-15 h-15 p-3 bg-[#F9F7F2] rounded-full flex items-center justify-center text-3xl flex-shrink-0 mr-2">{remedy.icon}</div>
               <div>
                 <h6 className="text-[16px] text-[#0B0C0A] font-semibold text-montserrat mb-1">{remedy.scientific_name || remedy.name}</h6>
-                <p className="text-sm text-[#0B0C0A] font-medium">Also known as “{remedy.common_name}”</p>
+                <p className="text-sm text-[#0B0C0A] font-medium">Also known as {remedy.common_name}</p>
               </div>
             </div>
             <p className="text-[#41463B] font-medium mb-4">{remedy.description}</p>

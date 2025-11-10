@@ -222,7 +222,7 @@ export default function SearchBar() {
                         {filteredAilments.length > 0 && (
                           <div className='border-b border-gray-100'>
                             <div className='px-4 py-3 bg-gray-50 text-sm font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2'>
-                              <span>😷</span> Ailments
+                              <img className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]" src="/ailments-icon.svg" alt="" /> Ailments
                             </div>
                             {filteredAilments.map((ailment) => (
                               <button
@@ -248,7 +248,7 @@ export default function SearchBar() {
                         {filteredRemedies.length > 0 && (
                           <div>
                             <div className='px-4 py-3 bg-gray-50 text-sm font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2'>
-                              <span>💊</span> Remedies
+                                <img className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]" src="/top-remedies.svg" alt="Top Remedies Icon"/> Remedies
                             </div>
                             {filteredRemedies.map((remedy, index) => (
                               <button
@@ -267,10 +267,10 @@ export default function SearchBar() {
                                     {remedy.description}
                                   </div>
                                 </div>
-                                <div className='text-sm text-yellow-600 font-medium flex items-center gap-1'>
+                                {/* <div className='text-sm text-yellow-600 font-medium flex items-center gap-1'>
                                   <span>⭐</span>
                                   {remedy.average_rating.toFixed(1)}
-                                </div>
+                                </div> */}
                               </button>
                             ))}
                           </div>
@@ -350,7 +350,7 @@ export default function SearchBar() {
                   {filteredAilments.length > 0 && (
                     <div className='border-b border-gray-100'>
                       <div className='px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2'>
-                        <span>😷</span> Ailments
+                       <img className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]" src="/ailments-icon.svg" alt="" /> Ailments
                       </div>
                       {filteredAilments.map((ailment) => (
                         <button
@@ -376,7 +376,7 @@ export default function SearchBar() {
                   {filteredRemedies.length > 0 && (
                     <div>
                       <div className='px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2'>
-                        <span>💊</span> Remedies
+                          <img className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]" src="/top-remedies.svg" alt="Top Remedies Icon"/> Remedies
                       </div>
                       {filteredRemedies.map((remedy, index) => (
                         <button
@@ -395,10 +395,10 @@ export default function SearchBar() {
                               {remedy.description}
                             </div>
                           </div>
-                          <div className='text-sm text-yellow-600 font-medium flex items-center gap-1'>
+                          {/* <div className='text-sm text-yellow-600 font-medium flex items-center gap-1'>
                             <span>⭐</span>
                             {remedy.average_rating.toFixed(1)}
-                          </div>
+                          </div> */}
                         </button>
                       ))}
                     </div>

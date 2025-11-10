@@ -3,6 +3,7 @@ import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { Ailment } from "@/types";
 import Breadcrumb from "./Breadcrumb";
+import Image from 'next/image';
 
 // interface Ailment {
 //   id: string;
@@ -167,9 +168,12 @@ export default function AilmentListPage({
                         {ailment.name}
                       </h4>
                     </div>
-                    <p className="text-sm text-gray-500 mt-3 flex items-center gap-1">
+                    {/* <p className="text-sm text-gray-500 mt-3 flex items-center gap-1">
                       <span>🔬</span>
                       <span>{ailment.remedies_count} remedies</span>
+                    </p> */}
+                    <p className="text-[#7D5C4E] text-[12px] font-[500] flex items-center">
+                      <Image className="mr-1" src="/remedies.svg" alt="remedies icon" width={16} height={16} /> {ailment.remedies_count} remedies
                     </p>
                   </div>
                 </Link>
