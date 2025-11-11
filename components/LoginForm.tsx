@@ -118,13 +118,14 @@ export default function LoginForm() {
                 <img src="/email.svg" alt="" />
               </span>
               <input
-                type="email"
-                value={email}
+                  type="email"
+                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                className="w-full pl-9 pr-4 py-2.5 placeholder-[#41463B] font-[500] placeholder:font-[400] text-[16px] text-[#41463B] bg-[#F1F2F0] hover:bg-[#D3D6D1] focus:bg-[#ffffff]  border border-[#D3D6D1] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#6C7463] focus:border-transparent transition-all duration-500"
-                required
-              />
+               placeholder="Enter your email"
+               className="w-full pl-9 pr-4 py-2.5 placeholder-[#41463B] font-[500] placeholder:font-[400] text-[16px] text-[#41463B] bg-[#F1F2F0] hover:bg-[#D3D6D1] focus:bg-[#ffffff] border border-[#D3D6D1] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#6C7463] focus:border-transparent transition-all duration-500"
+               required
+               autoFocus
+             />
             </div>
           </div>
 

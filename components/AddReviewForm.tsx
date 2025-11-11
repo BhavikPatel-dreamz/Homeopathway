@@ -382,6 +382,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                 placeholder="Share any other details about your experience..."
                 className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-gray-800 focus:outline-none resize-none text-gray-700"
                 rows={6}
+                autoFocus
               />
               
               <div className="space-y-3">

@@ -85,6 +85,7 @@ export default function RegisterForm() {
                 placeholder="Mack Smith"
                 className="w-full pl-9 pr-4 py-[9px] text-[16px] text-[#41463B] font-[500] placeholder-[#41463B] placeholder:font-[400] border border-[#20231E] bg-[#F1F2F0] focus:bg-[#ffffff] hover:bg-[#D3D6D1]  rounded-lg shadow-[0_0_8px_-2px_#1A1A1A1F]  focus:outline-none  transition-all duration-500"
                 required
+                autoFocus
               />
             </div>
           </div>
