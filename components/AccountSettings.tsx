@@ -324,31 +324,33 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
             )} */}
 
             {/* Action Buttons */}
-            {/* {isEditing && ( */}
-              <div className="flex justify-end gap-2">
+         
+              {isEditing && (
+                <div className="flex justify-end gap-2">
                 <button
-                  onClick={() => {
+                   onClick={() => {
                     setIsEditing(false);
                     setFormData({
-                      full_name: `${user.first_name} ${user.last_name}`.trim(),
-                      email: user.email,
-                      password: '',
-                    });
-                    setMessage(null);
-                  }}
-                  disabled={loading}
-                  className="px-2.5 py-3 text-[#2B2E28] rounded-[50px] font-semibold transition-colors transition-all duration-500 cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSave}
-                  disabled={loading}
-                  className=" px-6 py-3 bg-[#6C7463] text-white rounded-[50px] font-semibold hover:bg-[#5A6A4D] transition-colors cursor-pointer transition-all duration-500"
-                >
-                  {loading ? 'Saving...' : 'Save Changes'}
-                </button>
-              </div>
+                     full_name: `${user.first_name} ${user.last_name}`.trim(),
+                   email: user.email,
+                     password: '',
+                 });
+               setMessage(null);
+               }}
+               disabled={loading}
+               className="px-2.5 py-3 text-[#2B2E28] rounded-[50px] font-semibold transition-all duration-500 cursor-pointer"
+             >
+            Cancel
+         </button>
+         <button
+      onClick={handleSave}
+      disabled={loading}
+      className="px-6 py-3 bg-[#6C7463] text-white rounded-[50px] font-semibold hover:bg-[#5A6A4D] transition-all duration-500 cursor-pointer"
+    >
+      {loading ? 'Saving...' : 'Save Changes'}
+    </button>
+  </div>
+   )}
             {/* // )} */}
 
             {/* Logout Button */}
