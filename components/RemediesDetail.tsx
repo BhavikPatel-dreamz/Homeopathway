@@ -207,7 +207,7 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
         <section
           id="Overview"
           ref={sectionRefs.Overview}
-          className="flex flex-col lg:flex-row gap-4 sm:gap-6 scroll-mt-20"
+          className="flex flex-col lg:flex-row gap-4 sm:gap-6 md:gap-8 scroll-mt-[15rem]"
         >
           {/* Left */}
           <div className="lg:w-[71%] bg-white rounded-[8px] p-4 sm:p-6 flex items-start">

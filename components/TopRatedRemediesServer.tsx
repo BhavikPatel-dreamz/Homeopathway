@@ -45,7 +45,7 @@ export default function TopRatedRemediesServer({
                  <div className="w-15 h-15 p-3 bg-[#F9F7F2] rounded-full flex items-center justify-center text-3xl flex-shrink-0 mr-3">{remedy.icon}</div>
                 <div className="flex-1">
                   <p className="font-[600] text-[20px] mb-1 text-[#0B0C0A]">{remedy.name}</p>
-                  <div className="flex items-center gap-2 mb-3">
+                  <div className="flex items-center gap-2 mb-3 flex-wrap">
                     <div className="flex text-yellow-400">
                       {[...Array(Math.floor(remedy.average_rating))].map((_, i) => (
                         <span key={i}>
@@ -68,7 +68,7 @@ export default function TopRatedRemediesServer({
                         </span>
                       ))}
                     </div>
-                    <span className="text-[#41463B] font-[500]">
+                    <span className="text-[#41463B] font-[500] text-sm sm:text-base break-words max-w-[120px] sm:max-w-none">
                       {remedy.average_rating.toFixed(1)} ({remedy.review_count}{" "}
                       reviews)
                     </span>

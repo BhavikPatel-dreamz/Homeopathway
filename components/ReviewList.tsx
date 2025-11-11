@@ -211,24 +211,24 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
 
   return (
     <div>
-      <section id="Reviews" className="bg-white rounded-2xl shadow-sm p-8 scroll-mt-[19rem]">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+      <section id="Reviews" className="bg-white rounded-2xl shadow-sm p-4 sm:p-8 scroll-mt-[19rem] sm:scroll-mt-[19rem]">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-10">
           {/* Left Panel – Ratings Summary */}
-          <aside className="col-span-1">
-            <div className="flex flex-col text-left p-6">
-              <p className="text-[20px] text-[#0B0C0A] font-semibold mb-2">Reviews</p>
-              <div className="flex items-center gap-3">
-                <Image src="/star.svg" alt="Star" width={48} height={48} />
-                <h2 className="text-4xl font-bold text-gray-800 mt-3">
+          <aside className="col-span-1 mb-6 lg:mb-0">
+            <div className="flex flex-col text-left p-3 sm:p-6">
+              <p className="text-base sm:text-[20px] text-[#0B0C0A] font-semibold mb-2">Reviews</p>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <Image src="/star.svg" alt="Star" width={36} height={36} className="sm:w-12 sm:h-12" />
+                <h2 className="text-2xl sm:text-4xl font-bold text-gray-800 mt-2 sm:mt-3">
                   {reviewStats ? reviewStats.average_rating.toFixed(1) : "0.0"}
                 </h2>
               </div>
-              <p className="text-sm text-gray-500 mb-6">
+              <p className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6">
                 Based on {reviewStats ? reviewStats.total_reviews : 0} reviews
               </p>
 
               {/* Rating Filters */}
-              <div className="w-full space-y-2 mb-6">
+              <div className="w-full space-y-1 sm:space-y-2 mb-4 sm:mb-6">
                 {reviewStats &&
                   [5, 4, 3, 2, 1].map((star) => {
                     const percentage =
@@ -246,13 +246,13 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
                             rating: prev.rating.includes(star) ? [] : [star],
                           }))
                         }
-                        className={`flex items-center gap-2 text-sm w-full ${
+                        className={`flex items-center gap-2 text-xs sm:text-sm w-full ${
                           isActive
                             ? "border-[#6C7463] bg-gray-50 opacity-100 scale-[1.02]"
                             : "border-[#6C74631A] opacity-80 hover:opacity-100 hover:bg-[#6C74631A] rounded-md"
                         }`}
                       >
-                        <Image src="/star.svg" alt={`${star} Star`} width={16} height={16} />
+                        <Image src="/star.svg" alt={`${star} Star`} width={14} height={14} className="sm:w-4 sm:h-4" />
                         <span className="w-3 text-gray-700 font-medium">{star}</span>
                         <div className="flex-1 h-2 bg-gray-200 rounded-xl overflow-hidden">
                           <div
@@ -269,7 +269,7 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
 
               <button
                 onClick={handleReviewButtonClick}
-                className="bg-[#6C7463] hover:bg-[#5A6B5D] text-white px-5 py-2 rounded-full text-sm font-medium transition"
+                className="bg-[#6C7463] hover:bg-[#5A6B5D] text-white px-3 py-2 sm:px-5 rounded-full text-xs sm:text-sm font-medium transition w-full sm:w-auto"
               >
                 Review Remedy
               </button>
@@ -278,46 +278,46 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
 
           {/* Right Panel – Reviews List */}
           <div className="col-span-2">
-            <div className="flex flex-wrap items-center gap-3 mb-6">
-              <div className="relative flex-1 max-w-md mr-[5pc]">
+            <div className="flex flex-col sm:flex-row flex-wrap items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+              <div className="relative flex-1 w-full max-w-full sm:max-w-md sm:mr-[5pc]">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   placeholder="Search reviews..."
-                  className="w-full pl-11 pr-14 py-2.5 border border-gray-300 rounded-xl text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent"
+                  className="w-full pl-11 pr-10 py-2 border border-gray-300 rounded-xl text-xs sm:text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
 
-              <div className="flex items-center gap-2">
-  <span className="text-sm text-gray-600">Sort by:</span>
-  <div className="relative">
-    <select
-      value={sortBy}
-      onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-      className="appearance-none px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-xl bg-transparent border border-gray-200 pr-10"
-    >
-      {sortOptions.map((opt) => (
-        <option key={opt.value} value={opt.value}>
-          {opt.label}
-        </option>
-      ))}
-    </select>
-    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
-  </div>
-</div>
+              <div className="flex items-center gap-1 sm:gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+                <span className="text-xs sm:text-sm text-gray-600">Sort by:</span>
+                <div className="relative w-full sm:w-auto">
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                    className="appearance-none w-full px-3 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-50 rounded-xl bg-transparent border border-gray-200 pr-8 sm:pr-10"
+                  >
+                    {sortOptions.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                </div>
+              </div>
             </div>
 
             {/* Main Review Section */}
             {isInitialLoading ? (
-              <div className="flex justify-center items-center py-10">
+              <div className="flex justify-center items-center py-6 sm:py-10">
                 <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
                 <span className="ml-2 text-gray-600">Loading reviews...</span>
               </div>
             ) : reviews.length === 0 ? (
-              <div className="text-center py-10 text-gray-500">
+              <div className="text-center py-6 sm:py-10 text-gray-500">
                 <p className="font-medium">No reviews yet.</p>
-                <p className="text-sm">Be the first to review this remedy!</p>
+                <p className="text-xs sm:text-sm">Be the first to review this remedy!</p>
               </div>
             ) : (
               <>
@@ -336,33 +336,33 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
                       : "Anonymous";
                   const tags = [review.dosage, review.potency].filter(Boolean);
                   return (
-                    <div key={review.id} className="border-b border-[#B5B6B1] w-full p-6">
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-start gap-3">
-                          <div className="w-10 h-10 rounded-full bg-[#E6E3DA] flex items-center justify-center text-sm font-semibold text-gray-700">
+                    <div key={review.id} className="border-b border-[#B5B6B1] w-full p-4 sm:p-6">
+                      <div className="flex flex-col sm:flex-row items-start justify-between mb-2 sm:mb-3 gap-2 sm:gap-0">
+                        <div className="flex items-start gap-2 sm:gap-3">
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#E6E3DA] flex items-center justify-center text-xs sm:text-sm font-semibold text-gray-700">
                             {userName.charAt(0)}
                           </div>
                           <div>
-                            <p className="font-semibold text-gray-800">{userName}</p>
+                            <p className="font-semibold text-gray-800 text-xs sm:text-base">{userName}</p>
                             <div className="flex items-center gap-1">
                               {renderStars(review.star_count)}
-                              <span className="ml-1 text-sm text-gray-600">
+                              <span className="ml-1 text-xs sm:text-sm text-gray-600">
                                 {review.star_count.toFixed(1)}
                               </span>
                             </div>
                           </div>
                         </div>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-xs sm:text-sm text-gray-500">
                           {formatTimeAgo(review.created_at)}
                         </p>
                       </div>
 
                       {tags.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mb-3">
+                        <div className="flex flex-wrap gap-1 sm:gap-2 mb-2 sm:mb-3">
                           {tags.map((tag, i) => (
                             <span
                               key={i}
-                              className="text-xs bg-[#F5F1E8] px-2 py-1 rounded-md text-gray-700 border"
+                              className="text-[10px] sm:text-xs bg-[#F5F1E8] px-2 py-1 rounded-md text-gray-700 border"
                             >
                               {tag}
                             </span>
@@ -371,7 +371,7 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
                       )}
 
                       {review.notes && (
-                        <p className="text-gray-700 text-sm leading-relaxed">{review.notes}</p>
+                        <p className="text-gray-700 text-xs sm:text-sm leading-relaxed">{review.notes}</p>
                       )}
                     </div>
                   );
@@ -379,13 +379,13 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
 
                 {/* Pagination */}
                 {totalReviews > reviewsPerPage && (
-                  <div className="flex items-center justify-center gap-2 mt-8">
+                  <div className="flex items-center justify-center gap-1 sm:gap-2 mt-6 sm:mt-8">
                     <button
                       onClick={() => handlePageChange(currentPage - 1)}
                       disabled={currentPage === 1}
-                      className="w-10 h-10 rounded-full flex items-center justify-center bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
                     >
-                      <ChevronDown className="w-5 h-5 rotate-90" />
+                      <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 rotate-90" />
                     </button>
                     {Array.from({ length: totalPages }, (_, i) => i + 1)
                       .slice(
@@ -396,7 +396,7 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
                         <button
                           key={page}
                           onClick={() => handlePageChange(page)}
-                          className={`w-10 h-10 rounded-full text-sm font-semibold ${
+                          className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full text-xs sm:text-sm font-semibold ${
                             currentPage === page
                               ? "bg-[#6C7463] text-white"
                               : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
@@ -408,9 +408,9 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
                     <button
                       onClick={() => handlePageChange(currentPage + 1)}
                       disabled={currentPage === totalPages}
-                      className="w-10 h-10 rounded-full flex items-center justify-center bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
                     >
-                      <ChevronDown className="w-5 h-5 -rotate-90" />
+                      <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 -rotate-90" />
                     </button>
                   </div>
                 )}
