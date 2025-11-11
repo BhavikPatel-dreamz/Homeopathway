@@ -246,7 +246,7 @@ export default function HeroSlider() {
 
           {/* Auto-Suggestions Dropdown */}
           {showSuggestions && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-2xl border border-gray-100 max-h-96 overflow-y-auto z-20">
+            <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-2xl border border-gray-100 max-h-96 overflow-y-auto z-20">
               {loading ? (
                 <div className="p-8 text-center text-gray-500">
                   <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#2C3E3E]"></div>

@@ -153,7 +153,7 @@ export default function TopRemedies({ remedies, ailmentSlug }: TopRemediesProps)
       {/* Load More */}
       <div className="mt-8 text-center">
         <Link href="/remedies" className="bg-[#6C7463] text-white px-20 py-3 font-[600] rounded-full hover:bg-[#565D4F] transition-colors cursor-pointer duration-500">
-          View all Remedies
+          View All Remedies
         </Link>
       </div>
     </div>

@@ -80,7 +80,7 @@ export default function TopRatedRemediesServer({
           ))}
           {!searchQuery.trim() && (
             <Link href="/remedies" className="bg-[#4B544A] text-white rounded-xl py-14 px-6 flex items-center justify-center hover:bg-[#2B2E28] transition-colors cursor-pointer transition-all duration-500">
-              <span className="font-[600] text-[20px] text-white">View all Remedies</span>
+              <span className="font-[600] text-[20px] text-white">View All Remedies</span>
             </Link>
           )}
         </div>

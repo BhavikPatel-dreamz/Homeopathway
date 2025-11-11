@@ -32,6 +32,8 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
     full_name: `${user.first_name} ${user.last_name}`.trim(),
     email: user.email,
     password: '',
+    newpassword: '',
+    confirmpassword: '',
   });
 
   const handleSave = async () => {
@@ -196,6 +198,7 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   disabled={!isEditing}
+                  autoComplete="off"
                   placeholder={isEditing ? "Enter current password to change" : "••••••••••"}
                   className="w-full pl-10 pr-4 py-2.5 py-3 border border-[#D3D6D1] text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:bg-[#F1F2F0] disabled:text-[#41463B] text-gray-500"
                 />
@@ -230,9 +233,10 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                 </span>
                 <input
                   type={showPassword ? "text" : "password"}
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  value={formData.newpassword}
+                  onChange={(e) => setFormData({ ...formData, newpassword: e.target.value })}
                   disabled={!isEditing}
+                  autoComplete="new-password"
                   placeholder={isEditing ? "Enter new password to change" : "••••••••••"}
                   className="w-full pl-10 pr-4 py-2.5 py-3 border border-[#D3D6D1] text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:bg-[#F1F2F0] disabled:text-[#41463B] text-gray-500"
                 />
@@ -272,8 +276,8 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                 </span>
                 <input
                   type={showPassword ? "text" : "password"}
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  value={formData.confirmpassword}
+                  onChange={(e) => setFormData({ ...formData, confirmpassword: e.target.value })}
                   disabled={!isEditing}
                   placeholder={isEditing ? "Enter new password to change" : "••••••••••"}
                   className="w-full pl-10 pr-4 py-2.5 py-3 border border-[#D3D6D1] text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:bg-[#F1F2F0] disabled:text-[#41463B] text-gray-500"
@@ -311,11 +315,13 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                 <button
                    onClick={() => {
                     setIsEditing(false);
-                    setFormData({
-                     full_name: `${user.first_name} ${user.last_name}`.trim(),
-                   email: user.email,
-                     password: '',
-                 });
+                setFormData({
+                  full_name: `${user.first_name} ${user.last_name}`.trim(),
+                  email: user.email,
+                  password: '',
+                  newpassword: '',
+                  confirmpassword: '',
+                });
                setMessage(null);
                }}
                disabled={loading}
