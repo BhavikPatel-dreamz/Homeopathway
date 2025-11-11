@@ -23,20 +23,20 @@ export default function Footer() {
         <div  className="col-span-12 md:col-span-3 lg:col-span-3">
           <p className="text-[#fff] text-[16px] font-[600] mb-5 ">About</p>
           <ul className="space-y-4 text-sm text-gray-300">
-            <li><a href="/what-homeopathy" className="text-[#C4C7C1] font-[600] hover:text-[#2B2E28] transition-all duration-500">What is Homeopathy?</a></li>
-            <li><a href="/how-it-works" className="text-[#C4C7C1] font-[600] hover:text-[#2B2E28] transition-all duration-500">How it Works</a></li>
-            <li><a href="/safety-and-research" className="text-[#C4C7C1] font-[600] hover:text-[#2B2E28] transition-all duration-500">Safety & Research</a></li>
-            <li><a href="/getting-started" className="text-[#C4C7C1] font-[600] hover:text-[#2B2E28] transition-all duration-500">Getting Started</a></li>
+            <li><a href="/what-homeopathy" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">What is Homeopathy?</a></li>
+            <li><a href="/how-it-works" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">How it Works</a></li>
+            <li><a href="/safety-and-research" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">Safety & Research</a></li>
+            <li><a href="/getting-started" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">Getting Started</a></li>
           </ul>
         </div>
 
         <div className="col-span-12 md:col-span-3 lg:col-span-2">
         <p className="text-[#fff] text-[16px] font-[600] mb-5 ">Support</p>
           <ul className="space-y-4 text-sm text-gray-300">
-            <li><a href="/contact-us" className="text-[#C4C7C1] font-[600] hover:text-[#2B2E28] transition-all duration-500">Contact Us</a></li>
-            <li><a href="/help-center" className="text-[#C4C7C1] font-[600] hover:text-[#2B2E28] transition-all duration-500">Help Center</a></li>
-            <li><a href="/safety-guidelines" className="text-[#C4C7C1] font-[600] hover:text-[#2B2E28] transition-all duration-500">Safety Guidelines</a></li>
-            <li><a href="/faq" className="text-[#C4C7C1] font-[600] hover:text-[#2B2E28] transition-all duration-500">FAQ</a></li>
+            <li><a href="/contact-us" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">Contact Us</a></li>
+            <li><a href="/help-center" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">Help Center</a></li>
+            <li><a href="/safety-guidelines" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">Safety Guidelines</a></li>
+            <li><a href="/faq" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">FAQ</a></li>
           </ul>
         </div>
       </div>

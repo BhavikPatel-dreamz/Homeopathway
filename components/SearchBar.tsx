@@ -391,9 +391,12 @@ export default function SearchBar() {
                             <div className='font-medium text-gray-900 group-hover:text-[#2C3E3E]'>
                               {remedy.name}
                             </div>
-                            <div className='text-sm text-gray-500 truncate'>
+                            {/* <div className='text-sm text-gray-500 truncate'>
                               {remedy.description}
-                            </div>
+                            </div> */}
+                            <div className="text-sm text-gray-500 break-words whitespace-pre-wrap line-clamp-3">
+                            {remedy.description}
+                           </div>
                           </div>
                           {/* <div className='text-sm text-yellow-600 font-medium flex items-center gap-1'>
                             <span>⭐</span>

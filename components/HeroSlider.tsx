@@ -309,9 +309,9 @@ export default function HeroSlider() {
                             <div className="font-medium text-gray-900 group-hover:text-[#2C3E3E]">
                               {remedy.name}
                             </div>
-                            <div className="text-sm text-gray-500 truncate">
-                              {remedy.description}
-                            </div>
+                            <div className="text-sm text-gray-500 break-words whitespace-pre-wrap line-clamp-3">
+                            {remedy.description}
+                           </div>
                           </div>
                         </button>
                       ))}
