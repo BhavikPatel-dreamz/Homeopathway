@@ -98,9 +98,9 @@ export default function TopRemedies({ remedies, ailmentSlug }: TopRemediesProps)
               onChange={(e) => setSortBy(e.target.value)}
               className="block appearance-none bg-transparent text-[#20231E] text-[16px] focus:outline-none pr-5"
             >
-              <option>Overall Rating</option>
-              <option>Most Reviewed</option>
-              <option>Alphabetical</option>
+              <option className="pt-5">Overall Rating</option>
+              <option className="pt-5">Most Reviewed</option>
+              <option className="pt-5">Alphabetical</option>
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
               <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">

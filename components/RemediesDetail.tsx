@@ -204,7 +204,7 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
       {/* Main Content */}
       <main className="flex-1 max-w-7xl mx-auto px-6 py-10 space-y-10">
         {/* Overview Section */}
-        <section id="Overview" ref={sectionRefs.Overview} className="flex gap-6 scroll-mt-20">
+        <section id="Overview" ref={sectionRefs.Overview} className="flex gap-6 scroll-mt-[14rem]">
             {/* Left */}
             <div className="lg:w-[71%] bg-white rounded-[8px]  p-6 flex items-start">
               <div className="flex items-center">
@@ -350,3 +350,4 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
     </div>
   );
 }
+

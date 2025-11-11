@@ -290,19 +290,22 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">Sort by:</span>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-                  className="px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-xl bg-transparent border border-gray-200"
-                >
-                  {sortOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+  <span className="text-sm text-gray-600">Sort by:</span>
+  <div className="relative">
+    <select
+      value={sortBy}
+      onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+      className="appearance-none px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-xl bg-transparent border border-gray-200 pr-10"
+    >
+      {sortOptions.map((opt) => (
+        <option key={opt.value} value={opt.value}>
+          {opt.label}
+        </option>
+      ))}
+    </select>
+    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+  </div>
+</div>
             </div>
 
             {/* Main Review Section */}

@@ -386,11 +386,11 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
               />
               
               <div className="space-y-3">
-                <label className="flex items-start gap-3 cursor-pointer">
+                <label className="flex items-center gap-3 cursor-pointer">
                   <input
                     type="checkbox"
                     onChange={(e) => setFormData({ ...formData, sideEffects: e.target.checked ? 'Yes' : 'No' })}
-                    className="mt-1 w-4 h-4"
+                    className="w-4 h-4"
                   />
                   <span className="text-sm text-gray-700">
                     I experienced side effects or aggravations

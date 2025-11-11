@@ -2,6 +2,7 @@ import Footer from "@/components/Footer";
 import Header from "./Header";
 import Breadcrumb from "./Breadcrumb";
 import TopRemedies from "./TopRemedies";
+import Image from "next/image";
 
 interface Remedy {
   id: string;
@@ -56,9 +57,9 @@ export default function AilmentDetailPage({ ailment, remedies }: AilmentDetailPa
               <h1 className="text-[32px] lg:text-[40px] mt-2 font-serif text-[#0B0C0A] mb-2 lg:mb-0">{ailment.name}</h1>
             </div>
             <div className="flex-1 ">
-              <p className="text-[#7D5C4E] text-[12px] font-[500] flex items-center justify-end">
-                <img className="mr-1" src="/remedies.svg" alt="" /> {ailment.remedies_count} remedies
-              </p>            
+               <p className="text-[#7D5C4E] text-[12px] font-[500] flex items-center justify-end">
+                    <Image className="mr-1" src="/remedies.svg" alt="remedies icon" width={16} height={16} /> {ailment.remedies_count} remedies
+              </p>
             </div>
           </div>
 
