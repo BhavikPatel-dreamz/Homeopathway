@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { User } from '@supabase/supabase-js';
 import UserDropdown from './UserDropdown';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 interface UserAvatarProps {
   className?: string;
@@ -69,13 +70,20 @@ export default function UserAvatar({ className = "" }: UserAvatarProps) {
 
   if (!user || !profile) {
     // Guest user - show a generic icon
+    const pathname = usePathname();
+    const isHome = pathname === '/';
+    const borderColor = isHome ? '#fff' : '#20231E';
+    const textColor = isHome ? '#fff' : '#20231E';
     return (
       <div className="relative">
-            <Link href="/login">
-                <button className="text-montserrat px-4 py-[5px]  border border-[#20231E] rounded-full transition-colors font-semibold text-[16px] leading-[24px] text-[#20231E] cursor-pointer transition-all duration-500">
-                  Login
-                </button>
-              </Link>
+        <Link href="/login">
+          <button
+            className={`text-montserrat px-4 py-[5px] border rounded-full transition-colors font-semibold text-[16px] leading-[24px] cursor-pointer transition-all duration-500`}
+            style={{ borderColor, color: textColor }}
+          >
+            Login
+          </button>
+        </Link>
         <UserDropdown 
           isOpen={showDropdown} 
           onClose={() => setShowDropdown(false)}
