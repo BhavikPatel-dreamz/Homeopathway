@@ -93,7 +93,9 @@ export default function LoginForm() {
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <div className="w-25 h-22">
+            <Link href="/" className='cursor-pointer'>
             <img src="/login-logo.svg" alt="" />
+            </Link>
           </div>
         </div>
 
