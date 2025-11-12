@@ -181,7 +181,7 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
       />
 
       {/* Tabs */}
-      <div className="sticky top-0 z-10 backdrop-blur-sm">
+      <div className="sticky top-[98px] sm:top-[100px] md:top-[120px] lg:top-[140px] z-10 bg-[#F5F1E8]">
         <div className="max-w-7xl mx-auto px-5 sm:px-6">
           <div className="border-t border-[#B5B6B1] w-full flex gap-4 sm:gap-6 md:gap-9 overflow-x-auto scrollbar-hide">
             {["Overview", "Origin", "Reviews", "Related Remedies"].map((tab) => (
@@ -314,7 +314,7 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
         <section
           id="Origin"
           ref={sectionRefs.Origin}
-          className="bg-white rounded-[8px] p-4 sm:p-6 scroll-mt-[19rem]"
+          className="bg-white rounded-[8px] p-4 sm:p-6 scroll-mt-[23rem]"
         >
           <p className="text-lg sm:text-xl md:text-[20px] text-[#0B0C0A] font-semibold mb-4">
             Origin

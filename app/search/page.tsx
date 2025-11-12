@@ -9,8 +9,10 @@ export const metadata: Metadata = {
   description: "Search results for homeopathic remedies and ailments",
 };
 
-async function SearchPageContent({ searchParams }: { searchParams: { q?: string } }) {
-  const query = searchParams.q || '';
+async function SearchPageContent({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const resolvedParams = await searchParams;
+  const query = resolvedParams.q || '';
+
   const supabase = await createClient();
 
   let ailments: Ailment[] = [];
@@ -58,14 +60,12 @@ async function SearchPageContent({ searchParams }: { searchParams: { q?: string 
   );
 }
 
-export default function SearchPage({ searchParams }: { searchParams: { q?: string } }) {
+export default function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   return (
     <div className="min-h-screen bg-[#F5F3ED]">
-      
       <Suspense fallback={<div className="p-8 text-center">Loading search results...</div>}>
         <SearchPageContent searchParams={searchParams} />
       </Suspense>
-      
     </div>
   );
 }

@@ -21,7 +21,7 @@ export default function SearchResults({
       <div className="px-4 py-8 bg-[#2C3E3E] text-white">
         <div className="max-w-7xl px-0 lg:px-5 mx-auto">
           <h1 className="text-2xl lg:text-4xl font-bold mb-2">
-            Search Results
+            Search Results:{searchQuery ? ` ${searchQuery}` : ""}
           </h1>
           {searchQuery && (
             <p className="text-lg">
@@ -64,7 +64,7 @@ export default function SearchResults({
               Try searching with different keywords.
             </p>
             <div className="bg-white rounded-lg p-6 max-w-md mx-auto">
-              <h3 className="font-semibold text-[#0B0C0A] mb-3">Search suggestions:</h3>
+              <h3 className="font-semibold text-[#0B0C0A] mb-3">Search suggestions:{searchQuery}</h3>
               <ul className="text-sm text-[#7D5C4E] space-y-1 text-left">
                 <li>• Check your spelling</li>
                 <li>• Try more general terms</li>
@@ -79,10 +79,10 @@ export default function SearchResults({
           <div className="max-w-7xl mx-auto text-center">
             <div className="text-6xl mb-4">🔍</div>
             <h2 className="text-2xl font-bold text-[#0B0C0A] mb-4">
-              Enter a search term
+              No results found.
             </h2>
             <p className="text-[#7D5C4E]">
-              Use the search bar above to find ailments and remedies.
+               Try searching with different keywords.
             </p>
           </div>
         </div>
