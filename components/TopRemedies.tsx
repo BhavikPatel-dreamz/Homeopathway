@@ -112,7 +112,7 @@ export default function TopRemedies({ remedies, ailmentSlug }: TopRemediesProps)
   <div className="flex flex-row items-center gap-2 sm:ml-auto">
     <label
       htmlFor="sort-remedies"
-      className="font-semibold text-[#2B2E28] text-xs sm:text-sm whitespace-nowrap"
+      className="font-semibold text-[#2B2E28] text-xs sm:text-sm whitespace-nowrap sm:pl-3"
     >
       Sort by:
     </label>
@@ -122,7 +122,7 @@ export default function TopRemedies({ remedies, ailmentSlug }: TopRemediesProps)
       <button
         id="sort-remedies"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="flex items-center justify-between gap-2 min-w-[135px] sm:min-w-[152px] pl-0 sm:pl-2 py-2 text-sm sm:text-base text-[#20231E]  focus:outline-none"
+        className="flex items-center justify-between gap-1 min-w-[133px] sm:min-w-[148px] sm:pl-1  py-2 text-sm sm:text-base text-[#20231E]  focus:outline-none"
       >
         <span className="truncate">{sortBy}</span>
         <svg

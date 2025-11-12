@@ -179,40 +179,40 @@ export default function HeroSlider() {
         </div>
       </div>
 
-      {/* Slider */}
+      {/* Slider */}  
       <Slider {...settings} className="relative home-slider">
-        {slides.map((slide, index) => (
-          <div key={index} className="relative">
-            <div className="absolute top-0 left-0 w-full h-full">
-              <img
-                className="object-cover h-full w-full"
-                src={slide}
-                alt={`Homeopathway slide ${index + 1}`}
-              />
-            </div>
-            <div className="relative flex pt-25 pb-30 lg:pb-48 pl-[15px] pr-[15px]">
-              <div className="flex items-center flex-col lg:flex-row justify-center mb-6 max-w-[900px] mx-auto">
-                <div className="w-35 h-35 md:w-48 md:h-48 lg:w-48 lg:h-48 mr-6 flex-shrink-0 lg:mb-0 mb-2">
-                  <img
-                    className="w-full h-full object-contain"
-                    src="/banner-home.svg"
-                    alt="Homeopathway Logo"
-                  />
-                </div>
-                <div className="text-white lg:text-left text-center">
-                  <h1 className="text-[32px] md:text-[32px] lg:text-[40px]">
-                    Your Path to Healing
-                  </h1>
-                  <h6 className="text-[24px] font-[400]">
-                    Find trusted homeopathic solutions for your health concerns, backed by
-                    community reviews and expert guidance.
-                  </h6>
-                </div>
-              </div>
-            </div>
+  {slides.map((slide, index) => (
+    <div key={index} className="relative min-h-[400px] sm:min-h-[450px] md:min-h-[500px]">
+      <div className="absolute top-0 left-0 w-full h-full">
+        <img
+          className="object-cover h-full w-full"
+          src={slide}
+          alt={`Homeopathway slide ${index + 1}`}
+        />
+      </div>
+      <div className="relative flex pt-16 sm:pt-20 md:pt-25 pb-20 sm:pb-24 md:pb-30 lg:pb-48 px-4">
+        <div className="flex items-center flex-col lg:flex-row justify-center mb-6 max-w-[900px] mx-auto w-full">
+          <div className="w-28 h-28 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 mb-4 lg:mb-0 lg:mr-6 flex-shrink-0">
+            <img
+              className="w-full h-full object-contain"
+              src="/banner-home.svg"
+              alt="Homeopathway Logo"
+            />
           </div>
-        ))}
-      </Slider>
+          <div className="text-white lg:text-left text-center">
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-[40px] mb-3 md:mb-4 leading-tight font-semibold">
+              Your Path to Healing
+            </h1>
+            <h6 className="text-sm sm:text-base md:text-lg lg:text-[24px] font-normal">
+              Find trusted homeopathic solutions for your health concerns, backed by
+              community reviews and expert guidance.
+            </h6>
+          </div>
+        </div>
+      </div>
+    </div>
+  ))}
+</Slider>
 
       {/* Searchbar with Auto-Suggestions */}
       <div className="absolute bottom-[60px] lg:bottom-[100px] w-full left-1/2 -translate-x-1/2 z-10 pr-[15px] pl-[15px]">
