@@ -100,59 +100,62 @@ export default function TopRemedies({ remedies, ailmentSlug }: TopRemediesProps)
 
   return (
     <div className="">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <img src="/top-remedies.svg" alt="" className="w-9 h-9 sm:w-10 sm:h-10 lg:w-12 lg:h-12" />
-          <h2 className="text-[22px] sm:text-[28px] lg:text-[40px] text-[#0B0C0A] leading-tight ">Popular Remedies</h2>
-        </div>
-        {/* Sort Dropdown */}
-        <div className="flex flex-row items-center md:justify-end w-full gap-2">
-  <label
-    htmlFor="sort-remedies"
-    className="font-semibold text-[#2B2E28] text-[12px] sm:text-base whitespace-nowrap"
-  >
-    Sort by:
-  </label>
-
-  <div ref={dropdownRef} className="relative w-auto">
-    {/* Button */}
-    <button
-      id="sort-remedies"
-      onClick={() => setIsOpen((prev) => !prev)}
-      className="flex items-center justify-center gap-1 w-40 sm:w-38 px-3 py-[6px] text-[#20231E] md:text-[15px] sm:text-[13px] focus:outline-none"
+     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
+  <div className="flex items-center gap-3">
+    <img src="/top-remedies.svg" alt="" className="w-9 h-9 sm:w-10 sm:h-10 lg:w-12 lg:h-12" />
+    <h2 className="text-2xl sm:text-3xl lg:text-4xl  text-[#0B0C0A] leading-tight">
+      Popular Remedies
+    </h2>
+  </div>
+  
+  {/* Sort Dropdown */}
+  <div className="flex flex-row items-center gap-2 sm:ml-auto">
+    <label
+      htmlFor="sort-remedies"
+      className="font-semibold text-[#2B2E28] text-xs sm:text-sm whitespace-nowrap"
     >
-      <span className="truncate">{sortBy}</span>
-      <svg
-        className={`h-4 w-4 text-gray-700 transform transition-transform duration-200 ${
-          isOpen ? "rotate-180" : "rotate-0"
-        }`}
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 20 20"
-      >
-        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-      </svg>
-    </button>
+      Sort by:
+    </label>
 
-    {/* Dropdown options */}
-    {isOpen && (
-      <ul className="absolute z-10 top-full left-0 w-full bg-white border border-gray-300 rounded-md shadow-md text-black">
-        {["Overall Rating", "Most Reviewed", "Alphabetical"].map((option) => (
-          <li
-            key={option}
-            onClick={() => handleSelect(option)}
-            className={`px-3 py-2 text-sm sm:text-base cursor-pointer ${
-              sortBy === option ? "bg-blue-400" : ""
-            }`}
-          >
-            {option}
-          </li>
-        ))}
-      </ul>
-    )}
+    <div ref={dropdownRef} className="relative w-auto">
+      {/* Button */}
+      <button
+        id="sort-remedies"
+        onClick={() => setIsOpen((prev) => !prev)}
+        className="flex items-center justify-between gap-2 min-w-[135px] sm:min-w-[152px] pl-0 sm:pl-2 py-2 text-sm sm:text-base text-[#20231E]  focus:outline-none"
+      >
+        <span className="truncate">{sortBy}</span>
+        <svg
+          className={`h-4 w-4 flex-shrink-0 text-gray-700 transform transition-transform duration-200 ${
+            isOpen ? "rotate-180" : "rotate-0"
+          }`}
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+        </svg>
+      </button>
+
+      {/* Dropdown options */}
+      {isOpen && (
+        <ul className="absolute z-10 mt-1 top-full left-0 w-full bg-white border border-gray-300 rounded-md shadow-lg">
+          {["Overall Rating", "Most Reviewed", "Alphabetical"].map((option) => (
+            <li
+              key={option}
+              onClick={() => handleSelect(option)}
+              className={`px-3 py-2 text-sm sm:text-base cursor-pointer hover:bg-gray-100 transition-colors ${
+                sortBy === option ? "bg-blue-100 text-blue-700 font-medium" : "text-gray-700"
+              }`}
+            >
+              {option}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   </div>
 </div>
-
-      </div>
 
       {/* Remedies List */}
       <div className="space-y-2.5 mb-[10px]">

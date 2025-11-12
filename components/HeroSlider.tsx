@@ -129,6 +129,16 @@ export default function HeroSlider() {
     setFilteredAilments([]);
     setFilteredRemedies([]);
   };
+  useEffect(() => {
+  if (showSuggestions) {
+    document.body.style.overflow = "hidden";
+  } else {
+    document.body.style.overflow = "";
+  }
+  return () => {
+    document.body.style.overflow = "";
+  };
+}, [showSuggestions]);
 
   const settings = {
     dots: true,

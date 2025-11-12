@@ -370,7 +370,7 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-7">
               {filteredRelatedRemedies.map((item) => (
                 <Link href={`/remedies/${item.slug}`} key={item.id}>
-                  <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-4 sm:p-5 flex flex-col gap-3 h-full cursor-pointer">
+                  <div className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow p-4 sm:p-5 flex flex-col gap-3 h-full cursor-pointer">
                     {/* Header */}
                     <div className="flex items-center gap-3">
                       <span className="text-2xl sm:text-3xl">{item.icon || "💊"}</span>
