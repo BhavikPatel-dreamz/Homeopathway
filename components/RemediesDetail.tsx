@@ -190,7 +190,7 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
                 onClick={() => handleTabClick(tab)}
                 className={`py-3 sm:py-4 md:pt-8  sm:text-sm md:text-base border-t-2 transition-all cursor-pointer whitespace-nowrap ${
                    activeTab === tab
-                     ? "border-[#0B0C0A] text-[#0B0C0A]"
+                     ? "border-[#0B0C0A] text-[#0B0C0A] sm:text-[#0B0C0A] border-[#0B0C0A]"
                      : "border-transparent text-[#41463B] hover:text-[#0B0C0A] hover:border-[#0B0C0A] transition-all duration-500"
                  }`}
                >
