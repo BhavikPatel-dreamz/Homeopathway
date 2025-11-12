@@ -362,7 +362,7 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
                           {tags.map((tag, i) => (
                             <span
                               key={i}
-                              className="text-[10px] sm:text-xs bg-[#F5F1E8] px-2 py-1 rounded-md text-gray-700 border"
+                              className="text-[12px] sm:text-xs bg-[#F5F1E8] px-2 py-1 rounded-md text-gray-700 border"
                             >
                               {tag}
                             </span>

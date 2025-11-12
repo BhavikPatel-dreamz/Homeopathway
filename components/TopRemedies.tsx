@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -22,6 +22,24 @@ interface TopRemediesProps {
 
 export default function TopRemedies({ remedies, ailmentSlug }: TopRemediesProps) {
   const [sortBy, setSortBy] = useState("Overall Rating");
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const handleSelect = (option: string) => {
+    setSortBy(option);
+    setIsOpen(false);
+  };
+
+  // Close dropdown if click happens outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const renderStars = (rating: number) => {
     const fullStars = Math.floor(rating);
@@ -88,26 +106,52 @@ export default function TopRemedies({ remedies, ailmentSlug }: TopRemediesProps)
           <h2 className="text-[22px] sm:text-[28px] lg:text-[40px] text-[#0B0C0A] leading-tight ">Popular Remedies</h2>
         </div>
         {/* Sort Dropdown */}
-        <div className="flex flex-col items-start w-full sm:w-auto sm:flex-row sm:items-center sm:justify-end">
-          <label htmlFor="sort-remedies" className="mb-1 sm:mb-0 sm:mr-2 font-semibold text-[#2B2E28] text-[15px] sm:text-base">Sort by:</label>
-          <div className="relative w-full sm:w-auto">
-            <select 
-              id="sort-remedies"
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="block w-full sm:w-auto appearance-none bg-transparent text-[#20231E] text-[15px] sm:text-[16px] focus:outline-none pr-8 pl-3 py-2 border border-gray-200 rounded-md"
-            >
-              <option className="">Overall Rating</option>
-              <option className="">Most Reviewed</option>
-              <option className="">Alphabetical</option>
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-gray-700">
-              <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
-              </svg>
-            </div>
-          </div>
-        </div>
+        <div className="flex flex-row items-center md:justify-end w-full gap-2">
+  <label
+    htmlFor="sort-remedies"
+    className="font-semibold text-[#2B2E28] text-[12px] sm:text-base whitespace-nowrap"
+  >
+    Sort by:
+  </label>
+
+  <div ref={dropdownRef} className="relative w-auto">
+    {/* Button */}
+    <button
+      id="sort-remedies"
+      onClick={() => setIsOpen((prev) => !prev)}
+      className="flex items-center justify-center gap-1 w-40 sm:w-38 px-3 py-[6px] text-[#20231E] md:text-[15px] sm:text-[13px] focus:outline-none"
+    >
+      <span className="truncate">{sortBy}</span>
+      <svg
+        className={`h-4 w-4 text-gray-700 transform transition-transform duration-200 ${
+          isOpen ? "rotate-180" : "rotate-0"
+        }`}
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 20 20"
+      >
+        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+      </svg>
+    </button>
+
+    {/* Dropdown options */}
+    {isOpen && (
+      <ul className="absolute z-10 top-full left-0 w-full bg-white border border-gray-300 rounded-md shadow-md text-black">
+        {["Overall Rating", "Most Reviewed", "Alphabetical"].map((option) => (
+          <li
+            key={option}
+            onClick={() => handleSelect(option)}
+            className={`px-3 py-2 text-sm sm:text-base cursor-pointer ${
+              sortBy === option ? "bg-blue-400" : ""
+            }`}
+          >
+            {option}
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+</div>
+
       </div>
 
       {/* Remedies List */}

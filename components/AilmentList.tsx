@@ -142,17 +142,16 @@ export default function AilmentListPage({
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-0 lg:px-5 py-8">
         {/* Ailments Section */}
-        <div className="bg-white rounded-2xl p-8 shadow-sm">
-          <div className="flex items-center gap-3 mb-8">
-            {/* <span className="text-4xl">💊</span> */}
-            <img className="w-[40px] h-[40px] lg:w-[60px] lg:h-[60px]" alt="" src="/ailments-icon.svg"></img>
-            <div className="flex-1">
-              <h1 className="text-4xl font-serif text-gray-900">All Ailments</h1>
-              <p className="text-gray-600 mt-2">
-                Browse through our comprehensive collection of ailments and find the right homeopathic remedies for you.
-              </p>
-            </div>
-          </div>
+   <div className="bg-white rounded-2xl p-8 shadow-sm">
+  <div className="mb-8">
+    <div className="flex items-center gap-3 mb-2">
+      <img className="w-[40px] h-[40px] sm:w-[50px] sm:h-[50px] lg:w-[60px] lg:h-[60px]" alt="" src="/ailments-icon.svg" />
+      <h1 className="text-4xl font-serif text-gray-900">All Ailments</h1>
+    </div>
+    <p className="text-gray-600 mt-2">
+      Browse through our comprehensive collection of ailments and find the right homeopathic remedies for you.
+    </p>
+  </div>
 
           
 

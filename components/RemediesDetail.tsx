@@ -58,7 +58,7 @@ interface RemediesDetailPageProps {
       //     </span>
       //   ))}
       // </div>
-       <div className="flex text-yellow-400">
+       <div className="flex text-yellow-400 gap-1">
         {[...Array(fullStars)].map((_, i) => (
           <span key={`full-${i}`}>
             <Image 
@@ -239,20 +239,34 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
                 Key Symptoms for {remedy.name} Headaches:
               </h4>
               <div className="grid gap-3 sm:gap-4 md:gap-y-8 md:grid-cols-2">
-                {symptoms.map((s, i) => (
-                  <div key={i} className="flex gap-2 sm:gap-3 items-start">
-                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-[#C3AF76] rounded-full flex-shrink-0 mt-1" />
-                    <div className="min-w-0">
-                      <p className="text-sm sm:text-base text-[#2B2E28] font-semibold break-words">
-                        {(s.title || "").replace(/^'+|'+$/g, "").replace(/^"+|"+$/g, "")}
-                      </p>
-                      <p className="text-xs sm:text-sm text-[#2B2E28] font-medium">
-                        {(s.desc || "").replace(/^'+|'+$/g, "").replace(/^"+|"+$/g, "")}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              {symptoms.map((s, i) => {
+               const cleanTitle = (s.title || "")
+                 .replace(/^'+|'+$/g, "")
+                 .replace(/^"+|"+$/g, "")
+                 .trim();
+             const cleanDesc = (s.desc || "")
+                  .replace(/^'+|'+$/g, "")
+                  .replace(/^"+|"+$/g, "")
+                  .trim();
+    const capitalize = (str: string) =>
+      str.charAt(0).toUpperCase() + str.slice(1);
+
+    return (
+      <div key={i} className="flex gap-2 sm:gap-3 items-start">
+        <div className="w-2 h-2 sm:w-3 sm:h-3 bg-[#C3AF76] rounded-full flex-shrink-0 mt-1" />
+        <div className="min-w-0">
+          <p className="text-sm sm:text-base text-[#2B2E28] font-semibold break-words">
+            {capitalize(cleanTitle)}
+          </p>
+          <p className="text-xs sm:text-sm text-[#2B2E28] font-medium">
+            {capitalize(cleanDesc)}
+          </p>
+        </div>
+      </div>
+    );
+  })}
+</div>
+
             </div>
           </div>
 

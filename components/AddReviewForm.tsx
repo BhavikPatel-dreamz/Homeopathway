@@ -34,15 +34,13 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
 
   const totalSteps = 6;
 
-  // Check authentication on component mount
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const { user, error } = await getCurrentUser();
         if (error || !user) {
-          // User is not authenticated, redirect to login
           router.push('/login');
-          onClose(); // Close the modal
+          onClose();
           return;
         }
         setIsAuthenticated(true);
@@ -55,6 +53,26 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
 
     checkAuth();
   }, [router, onClose]);
+
+  // Prevent background scrolling when modal is open
+  useEffect(() => {
+    // Save original body overflow style
+    const originalOverflow = document.body.style.overflow;
+    const originalPaddingRight = document.body.style.paddingRight;
+    
+    // Get scrollbar width to prevent layout shift
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    
+    // Lock body scroll
+    document.body.style.overflow = 'hidden';
+    document.body.style.paddingRight = `${scrollbarWidth}px`;
+    
+    // Restore original styles on cleanup
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.body.style.paddingRight = originalPaddingRight;
+    };
+  }, []);
 
   const handleClose = () => {
     onClose();
@@ -97,7 +115,6 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
 
       const result = await response.json();
       
-      // Close the form on success
       onClose();
     } catch (err) {
       console.error('Error submitting review:', err);
@@ -111,7 +128,6 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
     if (step < totalSteps) {
       setStep(step + 1);
     } else {
-      // Submit form
       submitReview();
     }
   };
@@ -146,15 +162,14 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
     setFormData({ ...formData, effectiveness });
   };
 
-  // Show loading state while checking authentication
   if (isAuthenticated === null) {
     return (
-      <div className="fixed inset-0 bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
-        <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg relative">
-          <div className="p-10 pt-12">
+      <div className="fixed inset-0 bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 z-[9999]">
+        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-lg relative">
+          <div className="p-6 sm:p-10 pt-8 sm:pt-12">
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-              <p className="text-gray-600">Checking authentication...</p>
+              <p className="text-gray-600 text-sm sm:text-base">Checking authentication...</p>
             </div>
           </div>
         </div>
@@ -162,42 +177,42 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
     );
   }
 
-  // If we reach here, user is authenticated
   return (
-    <div className="fixed inset-0  bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg relative">
+    <div className="fixed inset-0 bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 z-[9999]">
+      <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-lg relative max-h-[95vh] overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={handleClose}
-          className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors z-[9999]"
+          className="absolute top-4 right-4 sm:top-6 sm:right-6 text-gray-400 hover:text-gray-600 transition-colors z-[9999]"
         >
-          <X size={24} />
+          <X size={20} className="sm:hidden" />
+          <X size={24} className="hidden sm:block" />
         </button>
 
         {/* Content */}
-        <div className="p-10 pt-12">
+        <div className="p-5 pt-8 sm:p-10 sm:pt-12">
           {/* Header */}
-          <div className="mb-10">
-            <h2 className="text-2xl font-serif text-gray-900 leading-tight">
+          <div className="mb-6 sm:mb-10 pr-8">
+            <h2 className="text-lg sm:text-2xl font-serif text-gray-900 leading-tight">
               Your experience with
             </h2>
-            <h3 className="text-2xl font-serif text-gray-900 leading-tight">
+            <h3 className="text-lg sm:text-2xl font-serif text-gray-900 leading-tight break-words">
               <span className="font-semibold">{formData.remedy}</span> for {formData.condition}
             </h3>
           </div>
 
           {/* Error Display */}
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
-              <p className="text-red-800 text-sm">{error}</p>
+            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-xl">
+              <p className="text-red-800 text-xs sm:text-sm">{error}</p>
             </div>
           )}
 
           {/* Step 1: Rating */}
           {step === 1 && (
-            <div className="space-y-8">
-              <p className="text-gray-800 text-base">How do you rate the remedy?</p>
-              <div className="flex gap-3 justify-start">
+            <div className="space-y-6 sm:space-y-8">
+              <p className="text-gray-800 text-sm sm:text-base">How do you rate the remedy?</p>
+              <div className="flex gap-2 sm:gap-3 justify-start">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     key={star}
@@ -205,13 +220,13 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                     className="focus:outline-none transition-all hover:scale-110"
                   >
                     <svg
-                      width="56"
-                      height="56"
+                      width="44"
+                      height="44"
                       viewBox="0 0 24 24"
                       fill={star <= formData.rating ? "#F59E0B" : "none"}
                       stroke={star <= formData.rating ? "#F59E0B" : "#D1D5DB"}
                       strokeWidth="1.5"
-                      className="transition-all"
+                      className="transition-all sm:w-14 sm:h-14"
                     >
                       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                     </svg>
@@ -223,16 +238,16 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
 
           {/* Step 2: Potency */}
           {step === 2 && (
-            <div className="space-y-6">
-              <p className="text-gray-800 text-base">What was the potency?</p>
+            <div className="space-y-4 sm:space-y-6">
+              <p className="text-gray-800 text-sm sm:text-base">What was the potency?</p>
               
               {/* Potency Type */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3">
                 {['Pellet', 'Tincture', 'Ointment'].map((type) => (
                   <button
                     key={type}
                     onClick={() => handlePotencyType(type)}
-                    className={`px-4 py-3 rounded-xl border-2 transition-all font-medium ${
+                    className={`px-2 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all font-medium text-xs sm:text-base ${
                       formData.potencyType === type
                         ? 'border-gray-800 bg-gray-50 text-gray-900'
                         : 'border-gray-300 hover:border-gray-400 text-gray-700'
@@ -240,19 +255,19 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                   >
                     {type}
                     {formData.potencyType === type && (
-                      <span className="ml-2">✓</span>
+                      <span className="ml-1 sm:ml-2">✓</span>
                     )}
                   </button>
                 ))}
               </div>
 
               {/* Potency Level */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-4 gap-2 sm:gap-3">
                 {['6C', '6X', '12C', '30C', '200C', '1M', '10M', 'CM'].map((pot) => (
                   <button
                     key={pot}
                     onClick={() => handlePotency(pot)}
-                    className={`px-4 py-3 rounded-xl border-2 transition-all font-medium ${
+                    className={`px-2 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all font-medium text-xs sm:text-base ${
                       formData.potency === pot
                         ? 'border-gray-800 bg-gray-50 text-gray-900'
                         : 'border-gray-300 hover:border-gray-400 text-gray-700'
@@ -260,7 +275,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                   >
                     {pot}
                     {formData.potency === pot && (
-                      <span className="ml-2">✓</span>
+                      <span className="ml-1 sm:ml-2">✓</span>
                     )}
                   </button>
                 ))}
@@ -270,10 +285,10 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
 
           {/* Step 3: Dosage */}
           {step === 3 && (
-            <div className="space-y-6">
-              <p className="text-gray-800 text-base">What was the dosage?</p>
+            <div className="space-y-4 sm:space-y-6">
+              <p className="text-gray-800 text-sm sm:text-base">What was the dosage?</p>
               
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                 {[
                   'One-time dose',
                   'Once daily',
@@ -287,7 +302,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                   <button
                     key={dose}
                     onClick={() => handleDosage(dose)}
-                    className={`px-4 py-3 rounded-xl border-2 transition-all text-left font-medium ${
+                    className={`px-3 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all text-left font-medium text-xs sm:text-base ${
                       formData.dosage === dose
                         ? 'border-gray-800 bg-gray-50 text-gray-900'
                         : 'border-gray-300 hover:border-gray-400 text-gray-700'
@@ -305,10 +320,10 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
 
           {/* Step 4: Duration */}
           {step === 4 && (
-            <div className="space-y-6">
-              <p className="text-gray-800 text-base">How long did you use it?</p>
+            <div className="space-y-4 sm:space-y-6">
+              <p className="text-gray-800 text-sm sm:text-base">How long did you use it?</p>
               
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                 {[
                   '1 day',
                   '2-3 days',
@@ -322,7 +337,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                   <button
                     key={dur}
                     onClick={() => handleDuration(dur)}
-                    className={`px-4 py-3 rounded-xl border-2 transition-all font-medium ${
+                    className={`px-3 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all font-medium text-xs sm:text-base ${
                       formData.duration === dur
                         ? 'border-gray-800 bg-gray-50 text-gray-900'
                         : 'border-gray-300 hover:border-gray-400 text-gray-700'
@@ -340,10 +355,10 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
 
           {/* Step 5: Effectiveness */}
           {step === 5 && (
-            <div className="space-y-6">
-              <p className="text-gray-800 text-base">How effective was it?</p>
+            <div className="space-y-4 sm:space-y-6">
+              <p className="text-gray-800 text-sm sm:text-base">How effective was it?</p>
               
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {[
                   'Completely resolved symptoms',
                   'Significantly improved',
@@ -355,7 +370,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                   <button
                     key={eff}
                     onClick={() => handleEffectiveness(eff)}
-                    className={`w-full px-4 py-3 rounded-xl border-2 transition-all text-left font-medium ${
+                    className={`w-full px-3 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all text-left font-medium text-xs sm:text-base ${
                       formData.effectiveness === eff
                         ? 'border-gray-800 bg-gray-50 text-gray-900'
                         : 'border-gray-300 hover:border-gray-400 text-gray-700'
@@ -373,15 +388,15 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
 
           {/* Step 6: Additional Notes */}
           {step === 6 && (
-            <div className="space-y-6">
-              <p className="text-gray-800 text-base">Any additional notes?</p>
+            <div className="space-y-4 sm:space-y-6">
+              <p className="text-gray-800 text-sm sm:text-base">Any additional notes?</p>
               
               <textarea
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 placeholder="Share any other details about your experience..."
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-gray-800 focus:outline-none resize-none text-gray-700"
-                rows={6}
+                className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-gray-300 rounded-lg sm:rounded-xl focus:border-gray-800 focus:outline-none resize-none text-gray-700 text-sm sm:text-base"
+                rows={5}
                 autoFocus
               />
               
@@ -392,7 +407,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                     onChange={(e) => setFormData({ ...formData, sideEffects: e.target.checked ? 'Yes' : 'No' })}
                     className="w-4 h-4"
                   />
-                  <span className="text-sm text-gray-700">
+                  <span className="text-xs sm:text-sm text-gray-700">
                     I experienced side effects or aggravations
                   </span>
                 </label>
@@ -401,7 +416,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
           )}
 
           {/* Progress Bar */}
-          <div className="flex gap-1.5 mt-10 mb-8">
+          <div className="flex gap-1 sm:gap-1.5 mt-6 sm:mt-10 mb-6 sm:mb-8">
             {Array.from({ length: totalSteps }).map((_, idx) => (
               <div
                 key={idx}
@@ -413,11 +428,11 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
           </div>
 
           {/* Navigation Buttons */}
-          <div className="flex gap-3">
+          <div className="flex gap-2 sm:gap-3">
             {step > 1 && (
               <button
                 onClick={handleBack}
-                className="px-8 py-3 rounded-xl border border-gray-300 hover:bg-gray-50 transition-all font-medium text-gray-700"
+                className="px-5 py-2.5 sm:px-8 sm:py-3 rounded-lg sm:rounded-xl border border-gray-300 hover:bg-gray-50 transition-all font-medium text-gray-700 text-sm sm:text-base"
               >
                 Back
               </button>
@@ -432,7 +447,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                 (step === 4 && !formData.duration) ||
                 (step === 5 && !formData.effectiveness)
               }
-              className="flex-1 px-8 py-3 rounded-xl bg-gray-800 text-white hover:bg-gray-900 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all font-medium"
+              className="flex-1 px-5 py-2.5 sm:px-8 sm:py-3 rounded-lg sm:rounded-xl bg-gray-800 text-white hover:bg-gray-900 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all font-medium text-sm sm:text-base"
             >
               {loading ? 'Submitting...' : (step === totalSteps ? 'Submit Review' : 'Next')}
             </button>
