@@ -6,11 +6,96 @@ import { supabase } from "@/lib/supabaseClient";
 import { Ailment, Remedy } from "@/types";
 import { checkIsUserLoggedIn } from "@/lib/userUtils";
 import UserAvatar from "./UserAvatar";
-// @ts-expect-error - react-slick types are not available
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 import Link from "next/link";
+
+// Custom Slider Component
+const CustomSlider = ({ slides }: { slides: string[] }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+
+  // Auto-play functionality
+  useEffect(() => {
+    if (!isAutoPlaying) return;
+    
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => 
+        prevIndex === slides.length - 1 ? 0 : prevIndex + 1
+      );
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [isAutoPlaying, slides.length]);
+
+  const goToSlide = (index: number) => {
+    setCurrentIndex(index);
+    setIsAutoPlaying(false);
+    setTimeout(() => setIsAutoPlaying(true), 8000);
+  };
+
+  return (
+    <div className="relative overflow-hidden">
+      {/* Slides Container */}
+      <div 
+        className="flex transition-all duration-1000 ease-in-out"
+        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+      >
+        {slides.map((slide, index) => (
+          <div 
+            key={index} 
+            className="relative min-h-[400px] sm:min-h-[460px] md:min-h-[500px] w-full flex-shrink-0"
+          >
+            {/* Background Image */}
+            <div className="absolute top-0 left-0 w-full h-full">
+              <img
+                className="object-cover h-full w-full"
+                src={slide}
+                alt={`Homeopathway slide ${index + 1}`}
+              />
+            </div>
+
+            {/* Content */}
+            <div className="relative flex pt-16 sm:pt-20 md:pt-25 pb-20 sm:pb-24 md:pb-30 lg:pb-48 px-4">
+              <div className="flex items-center flex-col lg:flex-row justify-center mb-6 max-w-[900px] mx-auto w-full">
+                <div className="w-28 h-28 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 mb-4 lg:mb-0 lg:mr-6 flex-shrink-0">
+                  <img
+                    className="w-full h-full object-contain"
+                    src="/banner-home.svg"
+                    alt="Homeopathway Logo"
+                  />
+                </div>
+                <div className="text-white lg:text-left text-center">
+                  <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-[40px] mb-3 md:mb-4 leading-tight font-semibold">
+                    Your Path to Healing
+                  </h1>
+                  <h6 className="text-sm sm:text-base md:text-lg lg:text-[24px] font-normal">
+                    Find trusted homeopathic solutions for your health concerns, backed by
+                    community reviews and expert guidance.
+                  </h6>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Dots Navigation */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
+        {slides.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => goToSlide(index)}
+            className={`transition-all duration-300 rounded-full ${
+              index === currentIndex 
+                ? 'bg-white w-8 h-3' 
+                : 'bg-white/50 hover:bg-white/75 w-3 h-3'
+            }`}
+            aria-label={`Go to slide ${index + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
 
 export default function HeroSlider() {
   const router = useRouter();
@@ -75,7 +160,7 @@ export default function HeroSlider() {
               ...remedy,
               rating: remedy.average_rating,
               reviewCount: remedy.review_count,
-              indication: "General", // Default since not in DB
+              indication: "General",
             }))
           );
         } catch (error) {
@@ -129,29 +214,17 @@ export default function HeroSlider() {
     setFilteredAilments([]);
     setFilteredRemedies([]);
   };
-  useEffect(() => {
-  if (showSuggestions) {
-    document.body.style.overflow = "hidden";
-  } else {
-    document.body.style.overflow = "";
-  }
-  return () => {
-    document.body.style.overflow = "";
-  };
-}, [showSuggestions]);
 
-  const settings = {
-    dots: true,
-    arrows: false,
-    infinite: true,
-    speed: 1200,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 3000,
-    fade: true,
-    cssEase: "ease-in-out",
-  };
+  useEffect(() => {
+    if (showSuggestions) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [showSuggestions]);
 
   const slides = [
     "/home-slide-1.png",
@@ -165,13 +238,13 @@ export default function HeroSlider() {
   return (
     <section className="relative">
       <div className="max-w-7xl mx-auto px-0 lg:px-5 flex justify-between items-center relative">
-        {/* ✅ Conditionally render Login or Avatar */}
+        {/* Login/Avatar Button */}
         <div className="absolute top-4 right-3 z-20">
           {isLoggedIn ? (
             <UserAvatar className="w-11 h-11 text-base cursor-pointer" />
           ) : (
             <Link href="/login">
-              <button className="text-montserrat px-4 py-[5px]  border border-[#D3D6D1]  rounded-full transition-colors font-semibold text-[16px] leading-[24px] text-[#D3D6D1] cursor-pointer transition-all duration-500 hover:text-white  hover:bg-gray-400">
+              <button className="text-montserrat px-4 py-[5px] border border-[#D3D6D1] rounded-full transition-colors font-semibold text-[16px] leading-[24px] text-[#D3D6D1] cursor-pointer transition-all duration-500 hover:text-white hover:bg-gray-400">
                 Login
               </button>
             </Link>
@@ -179,40 +252,8 @@ export default function HeroSlider() {
         </div>
       </div>
 
-      {/* Slider */}  
-      <Slider {...settings} className="relative home-slider">
-  {slides.map((slide, index) => (
-    <div key={index} className="relative min-h-[400px] sm:min-h-[450px] md:min-h-[500px]">
-      <div className="absolute top-0 left-0 w-full h-full">
-        <img
-          className="object-cover h-full w-full"
-          src={slide}
-          alt={`Homeopathway slide ${index + 1}`}
-        />
-      </div>
-      <div className="relative flex pt-16 sm:pt-20 md:pt-25 pb-20 sm:pb-24 md:pb-30 lg:pb-48 px-4">
-        <div className="flex items-center flex-col lg:flex-row justify-center mb-6 max-w-[900px] mx-auto w-full">
-          <div className="w-28 h-28 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 mb-4 lg:mb-0 lg:mr-6 flex-shrink-0">
-            <img
-              className="w-full h-full object-contain"
-              src="/banner-home.svg"
-              alt="Homeopathway Logo"
-            />
-          </div>
-          <div className="text-white lg:text-left text-center">
-            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-[40px] mb-3 md:mb-4 leading-tight font-semibold">
-              Your Path to Healing
-            </h1>
-            <h6 className="text-sm sm:text-base md:text-lg lg:text-[24px] font-normal">
-              Find trusted homeopathic solutions for your health concerns, backed by
-              community reviews and expert guidance.
-            </h6>
-          </div>
-        </div>
-      </div>
-    </div>
-  ))}
-</Slider>
+      {/* Custom Slider */}
+      <CustomSlider slides={slides} />
 
       {/* Searchbar with Auto-Suggestions */}
       <div className="absolute bottom-[60px] lg:bottom-[100px] w-full left-1/2 -translate-x-1/2 z-10 pr-[15px] pl-[15px]">
