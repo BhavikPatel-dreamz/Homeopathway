@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Montserrat } from "next/font/google";
 import "./globals.css";
 import ConditionalLayout from "@/components/ConditionalLayout";
@@ -90,36 +90,65 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
 };
 
+
+// ✅ Proper viewport setup for all devices
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
       <head>
-        <meta name="theme-color" content="#10b981" />
-        <meta name="msapplication-TileColor" content="#10b981" />
+        {/* Mobile app meta tags */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Homeopathway" />
-         <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-        />
-        <link rel="icon" href="/favicon.ico" sizes="32x32" />
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link rel="icon" href="/favicon-16x16.svg" type="image/svg+xml" sizes="16x16" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
+        <meta name="msapplication-TileColor" content="#10b981" />
         <link rel="mask-icon" href="/favicon.svg" color="#10b981" />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} antialiased`}
-      > 
-      
-          {children}
-        
+      <body className="antialiased bg-white text-gray-900">
+        {children}
       </body>
     </html>
   );
 }
+
+// export default function RootLayout({
+//   children,
+// }: Readonly<{
+//   children: React.ReactNode;
+// }>) {
+//   return (
+//     <html lang="en">
+//       <head>
+//         <meta name="theme-color" content="#10b981" />
+//         <meta name="msapplication-TileColor" content="#10b981" />
+//         <meta name="apple-mobile-web-app-capable" content="yes" />
+//         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+//         <meta name="apple-mobile-web-app-title" content="Homeopathway" />
+//          <meta
+//           name="viewport"
+//           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+//         />
+//         <link rel="icon" href="/favicon.ico" sizes="32x32" />
+//         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+//         <link rel="icon" href="/favicon-16x16.svg" type="image/svg+xml" sizes="16x16" />
+//         <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
+//         <link rel="mask-icon" href="/favicon.svg" color="#10b981" />
+//       </head>
+//       <body
+//         className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} antialiased`}
+//       > 
+      
+//           {children}
+        
+//       </body>
+//     </html>
+//   );
+// }

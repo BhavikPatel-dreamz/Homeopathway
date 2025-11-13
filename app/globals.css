@@ -25,6 +25,37 @@
   --font-mono: var(--font-geist-mono);
 
 }
+/* ✅ I------------------- */
+html,
+body {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+  overscroll-behavior: none;
+}
+
+/* ✅ Prevent iOS bounce effect (optional) */
+body {
+  position: relative;
+  min-height: 100%;
+  background-color: #ffffff;
+}
+
+/* ✅ Tailwind customizations (optional) */
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold;
+  }
+  p {
+    @apply text-gray-700;
+  }
+}
+
+/* ✅ When you want to freeze scrolling (for modals/menus) */
+body.overflow-hidden {
+  overflow: hidden !important;
+}
+/* ✅ ----------------------- */
 
 @media (prefers-color-scheme: dark) {
 :root {
