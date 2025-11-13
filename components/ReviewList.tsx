@@ -72,10 +72,10 @@ const renderStars = (rating: number) => {
         <Image key={`full-${i}`} src="/star.svg" alt="Star" width={16} height={16} />
       ))}
       {hasHalfStar && (
-        <Image key="half" src="/star-half.svg" alt="Half Star" width={16} height={16} />
+        <Image key="half" src="/star-half-fill.svg" alt="Half Star" width={16} height={16} />
       )}
       {[...Array(5 - Math.ceil(rating))].map((_, i) => (
-        <Image key={`empty-${i}`} src="/star-blank.svg" alt="Empty Star" width={16} height={16} />
+        <Image key={`empty-${i}`} src="/star-line.svg" alt="Empty Star" width={16} height={16} />
       ))}
     </div>
   );
@@ -113,6 +113,7 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [reviewsPerPage] = useState(15);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // 👇 Loading states
   const [isInitialLoading, setIsInitialLoading] = useState(true);
@@ -289,24 +290,38 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
                 />
               </div>
 
-              <div className="flex items-center justify-between sm:justify-start gap-2 w-full sm:w-auto mt-2 sm:mt-0">
-              <span className="text-xs sm:text-sm text-gray-600 flex-shrink-0">Sort by:</span>
+              <div className="flex items-center  sm:justify-start gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+              <span className="font-semibold text-[#2B2E28] text-xs sm:text-sm whitespace-nowrap sm:pl-3">Sort by:</span>
 
-               <div className="relative flex-1 sm:flex-none min-w-[120px]">
-               <select
-                 value={sortBy}
-                 onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-                 className="appearance-none w-full px-2.5 sm:px-3 py-2 text-xs sm:text-sm text-gray-700 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 pr-7 sm:pr-9"
-             >
-           {sortOptions.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-            {opt.label}
-            </option>
-          ))}
-      </select>
-    <ChevronDown className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
-  </div>
-</div>
+                 <div className="relative w-auto">
+                <button
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="appearance-none flex items-center justify-between gap-1 min-w-[133px] sm:min-w-[148px] sm:pl-1  py-2 text-sm sm:text-base text-[#20231E]  focus:outline-none"
+                >
+                  {sortOptions.find(opt => opt.value === sortBy)?.label}
+                </button>
+                <ChevronDown className={`absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                
+                {isDropdownOpen && (
+                  <div className="absolute z-10  top-full w-full bg-white border border-gray-300 rounded-md shadow-lg">
+                    {sortOptions.map((opt) => (
+                      <button
+                        key={opt.value}
+                        onClick={() => {
+                          setSortBy(opt.value as typeof sortBy);
+                          setIsDropdownOpen(false);
+                        }}
+                        className={`px-2 w-full py-2 text-xs sm:text-base cursor-pointer hover:bg-blue-200 hover:text-blue-700 transition-colors ${
+                          sortBy === opt.value ? "bg-blue-200 text-blue-700" : "text-gray-700"
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
 
             </div>
 

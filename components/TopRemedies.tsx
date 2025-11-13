@@ -60,7 +60,7 @@ export default function TopRemedies({ remedies, ailmentSlug }: TopRemediesProps)
         {hasHalfStar && (
           <span key="half">
             <Image 
-              src="/star-half.svg" // Assuming you have a half-star icon
+              src="/star-half-fill.svg" // Assuming you have a half-star icon
               alt="Half Star"
               width={16}
               height={16}
@@ -70,7 +70,7 @@ export default function TopRemedies({ remedies, ailmentSlug }: TopRemediesProps)
         {[...Array(5 - Math.ceil(rating))].map((_, i) => (
           <span key={`empty-${i}`}>
             <Image 
-              src="/star-blank.svg" 
+              src="/star-line.svg" 
               alt="Empty Star"
               width={16}
               height={16}
@@ -144,7 +144,7 @@ export default function TopRemedies({ remedies, ailmentSlug }: TopRemediesProps)
             <li
               key={option}
               onClick={() => handleSelect(option)}
-              className={`px-3 py-2 text-sm sm:text-base cursor-pointer hover:bg-gray-100 transition-colors ${
+              className={`px-3 py-2 text-sm sm:text-base cursor-pointer hover:bg-blue-100 hover:text-blue-700 transition-colors ${
                 sortBy === option ? "bg-blue-100 text-blue-700 font-medium" : "text-gray-700"
               }`}
             >

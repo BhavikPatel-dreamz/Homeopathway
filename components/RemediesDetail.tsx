@@ -72,7 +72,7 @@ interface RemediesDetailPageProps {
         {hasHalfStar && (
           <span key="half">
             <Image 
-              src="/star-half.svg" // Assuming you have a half-star icon
+              src="/star-half-fill.svg" // Assuming you have a half-star icon
               alt="Half Star"
               width={16}
               height={16}
@@ -82,7 +82,7 @@ interface RemediesDetailPageProps {
         {[...Array(5 - Math.ceil(rating))].map((_, i) => (
           <span key={`empty-${i}`}>
             <Image 
-              src="/star-blank.svg" 
+              src="/star-line.svg" 
               alt="Empty Star"
               width={16}
               height={16}

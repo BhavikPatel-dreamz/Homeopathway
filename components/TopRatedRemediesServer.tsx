@@ -60,7 +60,7 @@ export default function TopRatedRemediesServer({
                        {[...Array(5-Math.floor(remedy.average_rating))].map((_, i) => (
                         <span key={i}>
                           <Image 
-                            src="/star-blank.svg" 
+                            src="/star-line.svg" 
                             alt="Star"
                             width={16}
                             height={16}
