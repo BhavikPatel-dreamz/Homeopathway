@@ -123,351 +123,168 @@ export default function SearchBar() {
     setTimeout(() => (isSelectingRef.current = false), 500);
   };
 
-  return (
-    <div className="w-full">
-      <div
-        ref={searchRef}
-        className="relative md:max-w-[400px] lg:max-w-[600px] 2xl:max-w-[870px] mx-auto"
-      >
-        {/* Mobile view */}
-        <div className="md:hidden flex justify-end">
-          {!isMobileSearchExpanded ? (
-            <button
-              onClick={toggleMobileSearch}
-              className="flex items-center justify-center w-10 h-10 rounded-full transition-shadow"
-            >
-              <Image
-                width={24}
-                height={24}
-                src="/search.svg"
-                className="w-6 h-6"
-                alt="Search"
-              />
-            </button>
-          ) : (
-            <div className="fixed inset-0 z-50 bg-black/30 pt-[20px] px-[10px] sm:px-[16px]">
-              <div className="w-full">
-                <div className="flex bg-white items-center gap-2 sm:gap-3 rounded-[8px]">
-                  <div className="relative flex-1">
-                    <Image
-                      width={18}
-                      height={18}
-                      src="/search.svg"
-                      className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 pointer-events-none z-10"
-                      alt="Search"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Search..."
-                      className="w-full pl-9 pr-3 py-2.5 text-sm rounded-[6px] text-[#0B0C0A] placeholder-[#41463B] focus:outline-none sm:text-base sm:py-3 sm:pl-12 sm:pr-4"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                      onFocus={() => searchQuery && setShowSuggestions(true)}
-                      autoFocus
-                    />
-                  </div>
-                  <button
-                    onClick={() => setIsMobileSearchExpanded(false)}
-                    className="text-gray-600 hover:text-gray-800 transition-colors mr-2 sm:mr-3"
-                  >
-                    <svg
-                      className="w-5 h-5 sm:w-6 sm:h-6"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                </div>
-
-                {/* Suggestions */}
-                {showSuggestions && (
-                  <div className="max-h-[calc(100vh-100px)] overflow-y-auto bg-white border-t border-gray-100 rounded-b-md">
-                    {loading ? (
-                      <div className="p-8 text-center text-gray-500">
-                        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#2C3E3E]"></div>
-                        <p className="mt-2">Searching...</p>
-                      </div>
-                    ) : (
-                      <>
-                        {/* Ailments */}
-                    {filteredAilments.length > 0 && (
-                    <div className="border-b border-gray-100">
-                      <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
-                        <img
-                          className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]"
-                          src="/ailments-icon.svg"
-                          alt=""
-                        />{" "}
-                        Ailments
-                      </div>
-                      {filteredAilments.map((ailment) => (
-                        <button
-                          key={ailment.id}
-                          onClick={() => handleSelectAilment(ailment)}
-                          className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group"
-                        >
-                          <span className="text-2xl">{ailment.icon}</span>
-                          <div className="flex-1">
-                            <div className="font-medium text-gray-900 group-hover:text-[#2C3E3E]">
-                              {ailment.name}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              🔬 {ailment.remedies_count} remedies available
-                            </div>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Remedies Section */}
-                  {filteredRemedies.length > 0 && (
-                    <div>
-                      <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
-                        <img
-                          className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]"
-                          src="/top-remedies.svg"
-                          alt="Top Remedies Icon"
-                        />{" "}
-                        Remedies
-                      </div>
-                      {filteredRemedies.map((remedy, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handleSelectRemedy(remedy)}
-                          className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group"
-                        >
-                          <div className="w-10 h-10 rounded-full bg-[#F9F7F2] flex items-center justify-center text-xl flex-shrink-0">
-                            {remedy.icon}
-                          </div>
-                          <div className="flex-1">
-                            <div className="font-medium text-gray-900 group-hover:text-[#2C3E3E]">
-                              {remedy.name}
-                            </div>
-                            <div className="text-sm text-gray-500 break-words whitespace-pre-wrap line-clamp-3">
-                            {remedy.description}
-                           </div>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                        {/* Empty */}
-                        {filteredAilments.length === 0 &&
-                          filteredRemedies.length === 0 && (
-                            <div className="p-8 text-center text-[#0B0C0A]">
-                              <p className="text-base font-medium">No results found</p>
-                              <p className="text-sm mt-1">
-                                Try searching for different keywords
-                              </p>
-                            </div>
-                          )}
-                      </>
-                    )}
-                  </div>
-                )}
+  // Unified Suggestions Component
+  const SuggestionsDropdown = () => (
+    <div className="md:absolute md:top-full md:left-0 md:right-0 md:mt-1 md:rounded-lg md:shadow-2xl md:border md:border-gray-100 md:max-h-96 max-h-[calc(100vh-100px)] overflow-y-auto bg-white md:border-t border-gray-100 rounded-b-md md:z-20">
+      {loading ? (
+        <div className="p-8 text-center text-gray-500">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#2C3E3E]"></div>
+          <p className="mt-2">Searching...</p>
+        </div>
+      ) : (
+        <>
+          {/* Ailments Section */}
+          {filteredAilments.length > 0 && (
+            <div className="border-b border-gray-100">
+              <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
+                <img
+                  className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]"
+                  src="/ailments-icon.svg"
+                  alt=""
+                />
+                Ailments
               </div>
+              {filteredAilments.map((ailment) => (
+                <button
+                  key={ailment.id}
+                  onClick={() => handleSelectAilment(ailment)}
+                  className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group"
+                >
+                  <span className="text-2xl">{ailment.icon}</span>
+                  <div className="flex-1">
+                    <div className="font-medium text-gray-900 group-hover:text-[#2C3E3E]">
+                      {ailment.name}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      🔬 {ailment.remedies_count} remedies available
+                    </div>
+                  </div>
+                </button>
+              ))}
             </div>
           )}
-        </div>
 
-        {/* Desktop View */}
-        <div className="hidden md:block">
-          <div className="relative">
+          {/* Remedies Section */}
+          {filteredRemedies.length > 0 && (
+            <div>
+              <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
+                <img
+                  className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]"
+                  src="/top-remedies.svg"
+                  alt="Top Remedies Icon"
+                />
+                Remedies
+              </div>
+              {filteredRemedies.map((remedy, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleSelectRemedy(remedy)}
+                  className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group"
+                >
+                  <div className="w-10 h-10 rounded-full bg-[#F9F7F2] flex items-center justify-center text-xl flex-shrink-0">
+                    {remedy.icon}
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-medium text-gray-900 group-hover:text-[#2C3E3E]">
+                      {remedy.name}
+                    </div>
+                    <div className="text-sm text-gray-500 break-words whitespace-pre-wrap line-clamp-3">
+                      {remedy.description}
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Empty State */}
+          {filteredAilments.length === 0 && filteredRemedies.length === 0 && (
+            <div className="p-8 text-center text-[#0B0C0A]">
+              <p className="text-base md:text-lg font-medium">No results found</p>
+              <p className="text-sm mt-1">Try searching for different keywords</p>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+
+  return (
+    <div className="w-full">
+      {/* Mobile Search Icon Button */}
+      <div className="md:hidden flex justify-end">
+        {!isMobileSearchExpanded && (
+          <button
+            onClick={toggleMobileSearch}
+            className="flex items-center justify-center w-10 h-10 rounded-full transition-shadow"
+          >
             <Image
-              width={20}
-              height={20}
+              width={24}
+              height={24}
               src="/search.svg"
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none z-10"
+              className="w-6 h-6"
               alt="Search"
             />
-            <input
-              type="text"
-              placeholder="Search for ailments like 'headache' or 'anxiety' or remedies like 'arnica' or 'belladonna'"
-              className="w-full pl-12 pr-12 py-3 bg-white rounded-[8px] text-[#0B0C0A] placeholder-[#41463B] focus:outline-none"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              onFocus={() => searchQuery && setShowSuggestions(true)}
-            />
-            {searchQuery && (
-              <button
-                onClick={clearSearch}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors z-10"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+          </button>
+        )}
+      </div>
+
+      {/* Unified Search Container */}
+      <div
+        ref={searchRef}
+        className={`
+          ${isMobileSearchExpanded ? 'fixed inset-0 z-50 bg-black/30 pt-[20px] px-[10px] sm:px-[16px] md:relative md:inset-auto md:bg-transparent md:pt-0 md:px-0' : 'hidden md:block'}
+          md:max-w-[400px] lg:max-w-[600px] 2xl:max-w-[870px] md:mx-auto
+        `}
+      >
+        <div className="relative">
+          {/* Search Input Container */}
+          <div className="flex bg-white items-center gap-2 sm:gap-3 rounded-[8px] md:relative">
+            <div className="relative flex-1">
+              <Image
+                width={20}
+                height={20}
+                src="/search.svg"
+                className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 pointer-events-none z-10"
+                alt="Search"
+              />
+              <input
+                type="text"
+                placeholder="Search for ailments like 'headache' or 'anxiety' or remedies like 'arnica' or 'belladonna'"
+                className="w-full pl-9 sm:pl-12 md:pl-12 pr-3 md:pr-12 py-2.5 sm:py-3 text-sm sm:text-base rounded-[6px] md:rounded-[8px] text-[#0B0C0A] placeholder-[#41463B] focus:outline-none md:placeholder:text-sm lg:placeholder:text-base"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                onFocus={() => searchQuery && setShowSuggestions(true)}
+                autoFocus={isMobileSearchExpanded}
+              />
+              {searchQuery && (
+                <button
+                  onClick={clearSearch}
+                  className="hidden md:block absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors z-10"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
+            
+            {/* Mobile Close Button */}
+            {isMobileSearchExpanded && (
+              <button
+                onClick={() => setIsMobileSearchExpanded(false)}
+                className="md:hidden text-gray-600 hover:text-gray-800 transition-colors mr-2 sm:mr-3"
+              >
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             )}
           </div>
 
-          {/* Desktop Dropdown */}
-          {showSuggestions && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-2xl border border-gray-100 max-h-96 overflow-y-auto z-20">
-              {loading ? (
-                <div className="p-8 text-center text-gray-500">
-                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#2C3E3E]"></div>
-                  <p className="mt-2">Searching...</p>
-                </div>
-              ) : (
-                <>
-                  {/* {filteredAilments.length > 0 && (
-                    <div className="border-b border-gray-100">
-                      <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
-                        <img
-                          className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]"
-                          src="/ailments-icon.svg"
-                          alt=""
-                        />{" "}
-                        Ailments
-                      </div>
-                      {filteredAilments.map((ailment) => (
-                        <button
-                          key={ailment.id}
-                          onClick={() => handleSelectAilment(ailment)}
-                          className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group"
-                        >
-                          <span className="text-2xl">{ailment.icon}</span>
-                          <div className="flex-1">
-                            <div className="font-medium text-gray-900 group-hover:text-[#2C3E3E]">
-                              {ailment.name}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              🔬 {ailment.remedies_count} remedies available
-                            </div>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  {filteredRemedies.length > 0 && (
-                    <div>
-                      <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
-                        <img
-                          className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]"
-                          src="/top-remedies.svg"
-                          alt=""
-                        />{" "}
-                        Remedies
-                      </div>
-                      {filteredRemedies.map((remedy, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handleSelectRemedy(remedy)}
-                          className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group"
-                        >
-                          <div className="w-10 h-10 rounded-full bg-[#F9F7F2] flex items-center justify-center text-xl flex-shrink-0">
-                            {remedy.icon}
-                          </div>
-                          <div className="flex-1">
-                            <div className="font-medium text-gray-900 group-hover:text-[#2C3E3E]">
-                              {remedy.name}
-                            </div>
-                            <div className="text-sm text-gray-500 line-clamp-3">
-                              {remedy.description}
-                            </div>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  )} */}
-      {filteredAilments.length > 0 && (
-                    <div className="border-b border-gray-100">
-                      <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
-                        <img
-                          className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]"
-                          src="/ailments-icon.svg"
-                          alt=""
-                        />{" "}
-                        Ailments
-                      </div>
-                      {filteredAilments.map((ailment) => (
-                        <button
-                          key={ailment.id}
-                          onClick={() => handleSelectAilment(ailment)}
-                          className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group"
-                        >
-                          <span className="text-2xl">{ailment.icon}</span>
-                          <div className="flex-1">
-                            <div className="font-medium text-gray-900 group-hover:text-[#2C3E3E]">
-                              {ailment.name}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              🔬 {ailment.remedies_count} remedies available
-                            </div>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Remedies Section */}
-                  {filteredRemedies.length > 0 && (
-                    <div>
-                      <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
-                        <img
-                          className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]"
-                          src="/top-remedies.svg"
-                          alt="Top Remedies Icon"
-                        />{" "}
-                        Remedies
-                      </div>
-                      {filteredRemedies.map((remedy, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handleSelectRemedy(remedy)}
-                          className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group"
-                        >
-                          <div className="w-10 h-10 rounded-full bg-[#F9F7F2] flex items-center justify-center text-xl flex-shrink-0">
-                            {remedy.icon}
-                          </div>
-                          <div className="flex-1">
-                            <div className="font-medium text-gray-900 group-hover:text-[#2C3E3E]">
-                              {remedy.name}
-                            </div>
-                            <div className="text-sm text-gray-500 break-words whitespace-pre-wrap line-clamp-3">
-                            {remedy.description}
-                           </div>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  {filteredAilments.length === 0 &&
-                    filteredRemedies.length === 0 && (
-                      <div className="p-8 text-center text-[#0B0C0A]">
-                        <p className="text-lg font-medium">No results found</p>
-                        <p className="text-sm mt-1">
-                          Try searching for different keywords
-                        </p>
-                      </div>
-                    )}
-                </>
-              )}
-            </div>
-          )}
+          {/* Suggestions Dropdown - Unified for both mobile and desktop */}
+          {showSuggestions && <SuggestionsDropdown />}
         </div>
       </div>
     </div>
