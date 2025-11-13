@@ -102,21 +102,25 @@ export default function RemedyListPage({
       <main className="max-w-7xl mx-auto px-6 py-8">
         {/* Remedies Section */}
        <div className="bg-white rounded-2xl p-8 shadow-sm">
-          <div className="flex items-center gap-3 mb-7">
-           <Image 
-                       className="w-[40px] h-[40px] lg:w-[60px] lg:h-[60px]" 
-                       src="/top-remedies.svg" 
-                       alt="Top Remedies Icon"
-                       width={60}
-                       height={60}
-                     />
-            <div className="flex-1">
-              <h1 className="text-4xl font-serif text-gray-900">All Remedies</h1> 
-              <p className="text-gray-600 mt-2">
-                Browse through our comprehensive collection of homeopathic remedies.
-              </p>
-            </div>
-          </div>
+          {/* Header */}
+          <div className="flex items-center gap-3 mb-7 flex-wrap sm:flex-nowrap">
+  <Image
+    className="w-[40px] h-[40px] sm:w-[50px] sm:h-[50px] lg:w-[60px] lg:h-[60px]"
+    src="/top-remedies.svg"
+    alt="Top Remedies Icon"
+    width={60}
+    height={60}
+  />
+  
+  <div className="flex-1 min-w-[200px]">
+    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif text-gray-900 leading-tight">
+      All Remedies
+    </h1>
+    <p className="text-sm sm:text-base text-gray-600 mt-2">
+      Browse through our comprehensive collection of homeopathic remedies.
+    </p>
+  </div>
+</div>
 
           {/* Search Results Info */}
           {searchQuery && (
@@ -144,7 +148,7 @@ export default function RemedyListPage({
                 return (
                 <Link href={`/remedies/${remedy.slug}`} key={remedy.slug}>
                   <div
-                    className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg hover:border-[#2C5F4F] transition-all text-left h-full flex flex-col justify-between group cursor-pointer"
+                    className="bg-white rounded-xl p-6 border border-gray-200 hover:shadow-lg  transition-all text-left h-full flex flex-col justify-between group cursor-pointer"
                   >
                   <div>
                     <div className="text-5xl mb-3">{remedy.icon || '🌿'}</div>

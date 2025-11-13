@@ -46,7 +46,7 @@ export default function TopRatedRemediesServer({
                 <div className="flex-1">
                   <p className="font-[600] text-[20px] mb-1 text-[#0B0C0A]">{remedy.name}</p>
                   <div className="flex items-center gap-2 mb-3 flex-wrap">
-                    <div className="flex text-yellow-400">
+                    <div className="flex text-yellow-400 gap-1">
                       {[...Array(Math.floor(remedy.average_rating))].map((_, i) => (
                         <span key={i}>
                           <Image 

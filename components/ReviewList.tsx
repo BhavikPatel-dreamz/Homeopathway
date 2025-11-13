@@ -67,7 +67,7 @@ const renderStars = (rating: number) => {
   const hasHalfStar = rating % 1 >= 0.5;
 
   return (
-    <div className="flex text-yellow-400">
+    <div className="flex text-yellow-400 gap-1">
       {[...Array(fullStars)].map((_, i) => (
         <Image key={`full-${i}`} src="/star.svg" alt="Star" width={16} height={16} />
       ))}

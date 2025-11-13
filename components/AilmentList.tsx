@@ -161,7 +161,7 @@ export default function AilmentListPage({
             {paginatedAilments.length > 0 ? (
               paginatedAilments.map((ailment) => (
                 <Link href={`/${ailment.slug}`} key={ailment.slug}>
-                  <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg hover:border-[#2C5F4F] transition-all text-left h-full flex flex-col justify-between group cursor-pointer">
+                  <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg  transition-all text-left h-full flex flex-col justify-between group cursor-pointer">
                     <div>
                       <div className="text-5xl mb-3">{ailment.icon}</div>
                       <h4 className="font-semibold text-lg mb-2 text-gray-900 group-hover:text-[#2C5F4F] transition-colors">
