@@ -289,23 +289,25 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
                 />
               </div>
 
-              <div className="flex items-center gap-1 sm:gap-2 w-full sm:w-auto mt-2 sm:mt-0">
-                <span className="text-xs sm:text-sm text-gray-600">Sort by:</span>
-                <div className="relative w-full sm:w-auto">
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-                    className="appearance-none w-full px-3 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-50 rounded-xl bg-transparent border border-gray-200 pr-8 sm:pr-10"
-                  >
-                    {sortOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
-                </div>
-              </div>
+              <div className="flex items-center justify-between sm:justify-start gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+              <span className="text-xs sm:text-sm text-gray-600 flex-shrink-0">Sort by:</span>
+
+               <div className="relative flex-1 sm:flex-none min-w-[120px]">
+               <select
+                 value={sortBy}
+                 onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                 className="appearance-none w-full px-2.5 sm:px-3 py-2 text-xs sm:text-sm text-gray-700 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 pr-7 sm:pr-9"
+             >
+           {sortOptions.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+            {opt.label}
+            </option>
+          ))}
+      </select>
+    <ChevronDown className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+  </div>
+</div>
+
             </div>
 
             {/* Main Review Section */}

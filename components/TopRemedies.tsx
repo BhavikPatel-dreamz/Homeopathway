@@ -46,7 +46,7 @@ export default function TopRemedies({ remedies, ailmentSlug }: TopRemediesProps)
     const hasHalfStar = rating % 1 >= 0.5;
     
     return (
-       <div className="flex text-yellow-400">
+       <div className="flex text-yellow-400 gap-1">
         {[...Array(fullStars)].map((_, i) => (
           <span key={`full-${i}`}>
             <Image 
