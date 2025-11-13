@@ -200,9 +200,9 @@ export default function SearchBar() {
                         {/* Ailments */}
                         {filteredAilments.length > 0 && (
                           <div className="border-b border-gray-100">
-                            <div className="px-3 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2 sm:px-4 sm:py-3">
+                            <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
                               <img
-                                className="w-[16px] h-[16px] sm:w-[20px] sm:h-[20px]"
+                                className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]"
                                 src="/ailments-icon.svg"
                                 alt="Ailments"
                               />
@@ -212,14 +212,14 @@ export default function SearchBar() {
                               <button
                                 key={ailment.id}
                                 onClick={() => handleSelectAilment(ailment)}
-                                className="w-full px-3 py-3 flex items-center gap-2 hover:bg-gray-50 transition-colors text-left group border-b border-gray-50 last:border-b-0 text-sm sm:text-base"
+                                className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group"
                               >
-                                <span className="text-xl sm:text-2xl">{ailment.icon}</span>
-                                <div className="flex-1 truncate max-w-[230px] sm:max-w-none">
+                                <span className="text-2xl">{ailment.icon}</span>
+                                <div className="flex-1">
                                   <div className="font-medium text-gray-900 group-hover:text-[#2C3E3E]">
                                     {ailment.name}
                                   </div>
-                                  <div className="text-xs sm:text-sm text-gray-500">
+                                  <div className="text-sm text-gray-500">
                                     🔬 {ailment.remedies_count} remedies
                                   </div>
                                 </div>
@@ -231,9 +231,9 @@ export default function SearchBar() {
                         {/* Remedies */}
                         {filteredRemedies.length > 0 && (
                           <div>
-                            <div className="px-3 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2 sm:px-4 sm:py-3">
+                            <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
                               <img
-                                className="w-[16px] h-[16px] sm:w-[20px] sm:h-[20px]"
+                                className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]"
                                 src="/top-remedies.svg"
                                 alt="Remedies"
                               />
@@ -243,16 +243,16 @@ export default function SearchBar() {
                               <button
                                 key={index}
                                 onClick={() => handleSelectRemedy(remedy)}
-                                className="w-full px-3 py-3 flex items-center gap-2 hover:bg-gray-50 transition-colors text-left group border-b border-gray-50 last:border-b-0 text-sm sm:text-base"
+                                className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group"
                               >
-                                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#F9F7F2] flex items-center justify-center text-lg sm:text-xl flex-shrink-0">
+                                <div className="w-10 h-10 rounded-full bg-[#F9F7F2] flex items-center justify-center text-xl flex-shrink-0">
                                   {remedy.icon}
                                 </div>
-                                <div className="flex-1 truncate max-w-[230px] sm:max-w-none">
+                                <div className="flex-1">
                                   <div className="font-medium text-gray-900 group-hover:text-[#2C3E3E]">
                                     {remedy.name}
                                   </div>
-                                  <div className="text-xs sm:text-sm text-gray-500 line-clamp-2">
+                                  <div className="text-sm text-gray-500 break-words whitespace-pre-wrap line-clamp-3">
                                     {remedy.description}
                                   </div>
                                 </div>

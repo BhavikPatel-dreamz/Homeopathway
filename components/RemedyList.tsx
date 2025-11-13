@@ -99,27 +99,26 @@ export default function RemedyListPage({
       />
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-0 lg:px-5 py-8">
         {/* Remedies Section */}
-       <div className="bg-white rounded-2xl p-8 shadow-sm">
+       <div className="bg-white rounded-2xl p-6 shadow-sm">
           {/* Header */}
-          <div className="flex items-center gap-3 mb-7 flex-wrap sm:flex-nowrap">
-  <Image
-    className="w-[40px] h-[40px] sm:w-[50px] sm:h-[50px] lg:w-[60px] lg:h-[60px]"
-    src="/top-remedies.svg"
-    alt="Top Remedies Icon"
-    width={60}
-    height={60}
-  />
-  
-  <div className="flex-1 min-w-[200px]">
-    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif text-gray-900 leading-tight">
-      All Remedies
-    </h1>
-    <p className="text-sm sm:text-base text-gray-600 mt-2">
+          <div className="mb-8">
+     <div className="flex items-center gap-3 mb-2">
+       <Image
+        className="w-[40px] h-[40px] sm:w-[50px] sm:h-[50px] lg:w-[60px] lg:h-[60px]"
+        src="/top-remedies.svg"
+        alt="Top Remedies Icon"
+        width={60}
+        height={60}
+      />
+      <h1 className="text-4xl font-serif text-gray-900">
+         All Remedies
+     </h1>
+  </div>
+  <p className="text-gray-600 mt-2">
       Browse through our comprehensive collection of homeopathic remedies.
     </p>
-  </div>
 </div>
 
           {/* Search Results Info */}

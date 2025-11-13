@@ -227,7 +227,7 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
         <button
           key={tab}
           onClick={() => handleTabClick(tab)}
-          className={`snap-start py-2 sm:py-3 md:pt-8 px-1 sm:px-2 text-[10px] sm:text-sm md:text-sm lg:text-base border-t-2 transition-all cursor-pointer whitespace-nowrap flex-shrink-0 ${
+          className={`snap-start py-2 sm:py-3 md:pt-8 px-1 sm:px-2 text-[12px] sm:text-sm md:text-sm lg:text-base border-t-2 transition-all cursor-pointer whitespace-nowrap flex-shrink-0 ${
             activeTab.toLowerCase() === tab.toLowerCase()
               ? "border-[#0B0C0A] text-[#0B0C0A] font-medium"
               : "border-transparent text-[#41463B] hover:text-[#0B0C0A] hover:border-[#0B0C0A] transition-all duration-300"
