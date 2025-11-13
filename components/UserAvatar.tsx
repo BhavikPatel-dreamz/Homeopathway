@@ -79,7 +79,7 @@ return (
   <div className="relative">
     <Link href="/login">
       <button
-        className={`text-montserrat px-4 py-[5px] border rounded-full transition-colors font-semibold text-[16px] leading-[24px] cursor-pointer transition-all duration-500 hover:bg-gray-400 hover:text-white hover:border-black`}
+        className={`text-montserrat px-4 py-[5px] border rounded-full transition-colors font-semibold text-[16px] leading-[24px] cursor-pointer transition-all duration-500 hover:bg-gray-300 hover:text-white hover:border-black`}
         style={{ borderColor, color: textColor }}
       >
         Login

@@ -21,7 +21,7 @@ export default function SearchResults({
       <div className="px-4 py-8 bg-[#2C3E3E] text-white">
         <div className="max-w-7xl px-0 lg:px-5 mx-auto">
           <h1 className="text-2xl lg:text-4xl font-bold mb-2">
-            Search Results:{searchQuery ? ` ${searchQuery}` : ""}
+            Search Results :{searchQuery ? ` ${searchQuery}` : ""}
           </h1>
           {searchQuery && (
             <p className="text-lg">

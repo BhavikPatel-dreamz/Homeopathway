@@ -171,7 +171,7 @@ export default function HeroSlider() {
             <UserAvatar className="w-11 h-11 text-base cursor-pointer" />
           ) : (
             <Link href="/login">
-              <button className="text-montserrat px-4 py-[5px] hover:bg-transparent border border-[#D3D6D1]  rounded-full transition-colors font-semibold text-[16px] leading-[24px] text-[#D3D6D1] cursor-pointer transition-all duration-500">
+              <button className="text-montserrat px-4 py-[5px]  border border-[#D3D6D1]  rounded-full transition-colors font-semibold text-[16px] leading-[24px] text-[#D3D6D1] cursor-pointer transition-all duration-500 hover:text-white  hover:bg-gray-400">
                 Login
               </button>
             </Link>
