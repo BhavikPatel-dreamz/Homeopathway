@@ -125,7 +125,7 @@ export default function SearchBar() {
 
   // Unified Suggestions Component
   const SuggestionsDropdown = () => (
-    <div className="md:absolute md:top-full md:left-0 md:right-0 md:mt-1 md:rounded-lg md:shadow-2xl md:border md:border-gray-100 md:max-h-96 max-h-[calc(100vh-100px)] overflow-y-auto bg-white md:border-t border-gray-100 rounded-b-md md:z-20">
+    <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-2xl border border-gray-100 max-h-96 overflow-y-auto z-20">
       {loading ? (
         <div className="p-8 text-center text-gray-500">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#2C3E3E]"></div>
