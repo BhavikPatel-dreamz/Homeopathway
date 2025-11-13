@@ -211,7 +211,7 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
 
   return (
     <div>
-      <section id="Reviews" className="bg-white rounded-2xl shadow-sm p-4 sm:p-8 md:scroll-mt-[15rem] sm:scroll-mt-[10rem]">
+      <section id="Reviews" className="bg-white rounded-2xl shadow-sm p-4 sm:p-8 lg:scroll-mt-[19rem] sm:scroll-mt-[10rem]">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-10">
           {/* Left Panel – Ratings Summary */}
           <aside className="col-span-1 mb-6 lg:mb-0">

@@ -103,7 +103,7 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
  Overview: useRef<HTMLDivElement>(null),
  Origin: useRef<HTMLDivElement>(null),
  Reviews: useRef<HTMLDivElement>(null),
-    "Related Remedies": useRef<HTMLElement>(null),
+    "RelatedRemedies": useRef<HTMLElement>(null),
   };
 
   useEffect(() => {
@@ -133,12 +133,51 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
     };
   }, []);
 
-  const handleTabClick = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
+  useEffect(() => {
+  const handleScroll = () => {
+    const scrollPosition = window.scrollY + 250;
+    const sections = ["Overview", "Origin", "Reviews", "RelatedRemedies"];
+    
+    for (const sectionId of sections) {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        const { offsetTop, offsetHeight } = element;
+        if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+          const tabName = sectionId === "RelatedRemedies" ? "Related Remedies" : sectionId;
+          setActiveTab(tabName);
+          break;
+        }
+      }
     }
   };
+  
+  window.addEventListener("scroll", handleScroll, { passive: true });
+  return () => window.removeEventListener("scroll", handleScroll);
+}, []);
+  // const handleTabClick = (id: string) => {
+  //   const element = document.getElementById(id);
+  //   if (element) {
+  //     element.scrollIntoView({ behavior: "smooth", block: "start" });
+  //   }
+  // };
+
+  const handleTabClick = (tab: string) => {
+  setActiveTab(tab); // Make sure this line exists
+  
+  const sectionId = tab.replace(/\s+/g, ''); // "Related Remedies" → "RelatedRemedies"
+  const element = document.getElementById(sectionId);
+  
+  if (element) {
+    const offset = 200; // Adjust based on your sticky header height
+    const elementPosition = element.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.pageYOffset - offset;
+    
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: 'smooth'
+    });
+  }
+};
 
   const symptoms: Symptom[] = useMemo(() => {
     if (!remedy.key_symptoms) return [];
@@ -179,27 +218,27 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
           : breadcrumbPaths.remedyDetail(remedy.name, "All Remedies", "/remedies")
         }
       />
-
+  
       {/* Tabs */}
       <div className="sticky top-[99px] sm:top-[100px] md:top-[120px] lg:top-[142px] z-10 bg-[#F5F1E8]">
-        <div className="max-w-7xl mx-auto px-5 sm:px-6">
-         <div className="border-t border-[#B5B6B1] w-full flex gap-2 sm:gap-6 md:gap-9 overflow-x-auto scrollbar-hide snap-x snap-mandatory">
-             {["Overview", "Origin", "Reviews", "Related Remedies"].map((tab) => (
-           <button
-              key={tab}
-                onClick={() => handleTabClick(tab)}
-                className={`snap-start py-2 sm:py-3 md:pt-8 text-xs sm:text-sm md:text-base border-t-2 transition-all cursor-pointer whitespace-nowrap flex-shrink-0 ${
-                activeTab === tab
-                ? "border-[#0B0C0A] text-[#0B0C0A]"
-                 : "border-transparent text-[#41463B] hover:text-[#0B0C0A] hover:border-[#0B0C0A] transition-all duration-500"
-           }`}
+  <div className="max-w-7xl mx-auto px-3 sm:px-5 md:px-6">
+    <div className="border-t border-[#B5B6B1] w-full flex gap-1 sm:gap-1 md:gap-6 lg:gap-9 overflow-x-auto scrollbar-hide snap-x snap-mandatory">
+      {["Overview", "Origin", "Reviews", "Related Remedies"].map((tab) => (
+        <button
+          key={tab}
+          onClick={() => handleTabClick(tab)}
+          className={`snap-start py-2 sm:py-3 md:pt-8 px-1 sm:px-2 text-[10px] sm:text-sm md:text-sm lg:text-base border-t-2 transition-all cursor-pointer whitespace-nowrap flex-shrink-0 ${
+            activeTab.toLowerCase() === tab.toLowerCase()
+              ? "border-[#0B0C0A] text-[#0B0C0A] font-medium"
+              : "border-transparent text-[#41463B] hover:text-[#0B0C0A] hover:border-[#0B0C0A] transition-all duration-300"
+          }`}
         >
-      {tab}
-    </button>
-  ))}
+          {tab}
+        </button>
+      ))}
+    </div>
+  </div>
 </div>
-         </div>
-      </div>
 
       {/* Main Content */}
     <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 md:py-10 space-y-4 sm:space-y-6 md:space-y-10">
@@ -358,9 +397,9 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
 
         {/* Related Remedies Section */}
         <section
-          id="Related Remedies"
-          ref={sectionRefs["Related Remedies"]}
-          className="scroll-mt-20"
+          id="RelatedRemedies"
+          ref={sectionRefs.RelatedRemedies}
+          className="scroll-mt-[19rem]"
         >
           <h3 className="text-2xl sm:text-3xl font-serif text-gray-800 mb-4 sm:mb-6">
             Related Remedies
