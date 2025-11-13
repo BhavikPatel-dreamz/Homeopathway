@@ -198,68 +198,68 @@ export default function SearchBar() {
                     ) : (
                       <>
                         {/* Ailments */}
-                        {filteredAilments.length > 0 && (
-                          <div className="border-b border-gray-100">
-                            <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
-                              <img
-                                className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]"
-                                src="/ailments-icon.svg"
-                                alt="Ailments"
-                              />
-                              Ailments
+                    {filteredAilments.length > 0 && (
+                    <div className="border-b border-gray-100">
+                      <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
+                        <img
+                          className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]"
+                          src="/ailments-icon.svg"
+                          alt=""
+                        />{" "}
+                        Ailments
+                      </div>
+                      {filteredAilments.map((ailment) => (
+                        <button
+                          key={ailment.id}
+                          onClick={() => handleSelectAilment(ailment)}
+                          className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group"
+                        >
+                          <span className="text-2xl">{ailment.icon}</span>
+                          <div className="flex-1">
+                            <div className="font-medium text-gray-900 group-hover:text-[#2C3E3E]">
+                              {ailment.name}
                             </div>
-                            {filteredAilments.map((ailment) => (
-                              <button
-                                key={ailment.id}
-                                onClick={() => handleSelectAilment(ailment)}
-                                className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group"
-                              >
-                                <span className="text-2xl">{ailment.icon}</span>
-                                <div className="flex-1">
-                                  <div className="font-medium text-gray-900 group-hover:text-[#2C3E3E]">
-                                    {ailment.name}
-                                  </div>
-                                  <div className="text-sm text-gray-500">
-                                    🔬 {ailment.remedies_count} remedies
-                                  </div>
-                                </div>
-                              </button>
-                            ))}
+                            <div className="text-sm text-gray-500">
+                              🔬 {ailment.remedies_count} remedies available
+                            </div>
                           </div>
-                        )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
 
-                        {/* Remedies */}
-                        {filteredRemedies.length > 0 && (
-                          <div>
-                            <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
-                              <img
-                                className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]"
-                                src="/top-remedies.svg"
-                                alt="Remedies"
-                              />
-                              Remedies
-                            </div>
-                            {filteredRemedies.map((remedy, index) => (
-                              <button
-                                key={index}
-                                onClick={() => handleSelectRemedy(remedy)}
-                                className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group"
-                              >
-                                <div className="w-10 h-10 rounded-full bg-[#F9F7F2] flex items-center justify-center text-xl flex-shrink-0">
-                                  {remedy.icon}
-                                </div>
-                                <div className="flex-1">
-                                  <div className="font-medium text-gray-900 group-hover:text-[#2C3E3E]">
-                                    {remedy.name}
-                                  </div>
-                                  <div className="text-sm text-gray-500 break-words whitespace-pre-wrap line-clamp-3">
-                                    {remedy.description}
-                                  </div>
-                                </div>
-                              </button>
-                            ))}
+                  {/* Remedies Section */}
+                  {filteredRemedies.length > 0 && (
+                    <div>
+                      <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
+                        <img
+                          className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]"
+                          src="/top-remedies.svg"
+                          alt="Top Remedies Icon"
+                        />{" "}
+                        Remedies
+                      </div>
+                      {filteredRemedies.map((remedy, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleSelectRemedy(remedy)}
+                          className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group"
+                        >
+                          <div className="w-10 h-10 rounded-full bg-[#F9F7F2] flex items-center justify-center text-xl flex-shrink-0">
+                            {remedy.icon}
                           </div>
-                        )}
+                          <div className="flex-1">
+                            <div className="font-medium text-gray-900 group-hover:text-[#2C3E3E]">
+                              {remedy.name}
+                            </div>
+                            <div className="text-sm text-gray-500 break-words whitespace-pre-wrap line-clamp-3">
+                            {remedy.description}
+                           </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
 
                         {/* Empty */}
                         {filteredAilments.length === 0 &&
@@ -331,7 +331,7 @@ export default function SearchBar() {
                 </div>
               ) : (
                 <>
-                  {filteredAilments.length > 0 && (
+                  {/* {filteredAilments.length > 0 && (
                     <div className="border-b border-gray-100">
                       <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
                         <img
@@ -387,6 +387,68 @@ export default function SearchBar() {
                             <div className="text-sm text-gray-500 line-clamp-3">
                               {remedy.description}
                             </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )} */}
+      {filteredAilments.length > 0 && (
+                    <div className="border-b border-gray-100">
+                      <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
+                        <img
+                          className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]"
+                          src="/ailments-icon.svg"
+                          alt=""
+                        />{" "}
+                        Ailments
+                      </div>
+                      {filteredAilments.map((ailment) => (
+                        <button
+                          key={ailment.id}
+                          onClick={() => handleSelectAilment(ailment)}
+                          className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group"
+                        >
+                          <span className="text-2xl">{ailment.icon}</span>
+                          <div className="flex-1">
+                            <div className="font-medium text-gray-900 group-hover:text-[#2C3E3E]">
+                              {ailment.name}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              🔬 {ailment.remedies_count} remedies available
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Remedies Section */}
+                  {filteredRemedies.length > 0 && (
+                    <div>
+                      <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
+                        <img
+                          className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]"
+                          src="/top-remedies.svg"
+                          alt="Top Remedies Icon"
+                        />{" "}
+                        Remedies
+                      </div>
+                      {filteredRemedies.map((remedy, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleSelectRemedy(remedy)}
+                          className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group"
+                        >
+                          <div className="w-10 h-10 rounded-full bg-[#F9F7F2] flex items-center justify-center text-xl flex-shrink-0">
+                            {remedy.icon}
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-medium text-gray-900 group-hover:text-[#2C3E3E]">
+                              {remedy.name}
+                            </div>
+                            <div className="text-sm text-gray-500 break-words whitespace-pre-wrap line-clamp-3">
+                            {remedy.description}
+                           </div>
                           </div>
                         </button>
                       ))}
