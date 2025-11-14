@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Search, Loader2, ChevronDown } from "lucide-react";
 import Image from "next/image";
@@ -105,9 +105,11 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "highest_rated" | "lowest_rated">(
     "newest"
   );
+const dropdownRef = useRef<HTMLDivElement>(null);
 
   const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  
 
   const [totalReviews, setTotalReviews] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -195,6 +197,18 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
       document.getElementById("Reviews")?.scrollIntoView({ behavior: "smooth" });
     }
   };
+  useEffect(() => {
+  const handleClickOutside = (event: MouseEvent) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      setIsDropdownOpen(false);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
 
   const refreshReviews = () => fetchReviews(false);
 
@@ -294,34 +308,44 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
               <div className="flex items-center  sm:justify-start gap-2 w-full sm:w-auto mt-2 sm:mt-0">
               <span className="font-semibold text-[#2B2E28] text-xs sm:text-sm whitespace-nowrap sm:pl-3">Sort by:</span>
 
-                 <div className="relative w-auto">
-                <button
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="appearance-none flex items-left justify-between gap-1 min-w-[133px] sm:min-w-[148px] sm:pl-1  py-2 text-sm sm:text-base text-[#20231E]  focus:outline-none"
-                >
-                  {sortOptions.find(opt => opt.value === sortBy)?.label}
-                </button>
-                <ChevronDown className={`absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
-                
-                {isDropdownOpen && (
-                  <div className="absolute z-10  top-full w-full bg-white border border-gray-300 rounded-md shadow-lg">
-                    {sortOptions.map((opt) => (
-                      <button
-                        key={opt.value}
-                        onClick={() => {
-                          setSortBy(opt.value as typeof sortBy);
-                          setIsDropdownOpen(false);
-                        }}
-                        className={`px-2 w-full py-2 text-xs text-start sm:text-base cursor-pointer hover:bg-blue-200 hover:text-blue-700 transition-colors ${
-                          sortBy === opt.value ? "bg-blue-200 text-blue-700 font-medium" : "text-gray-700"
-                        }`}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <div
+             className="relative w-auto"
+              ref={dropdownRef}
+             >
+           <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="appearance-none flex items-left justify-between gap-1 min-w-[133px] sm:min-w-[148px] sm:pl-1 py-2 text-sm sm:text-base text-[#20231E] focus:outline-none"
+             >
+                {sortOptions.find(opt => opt.value === sortBy)?.label}
+            </button>
+
+           <ChevronDown
+             className={`absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none transition-transform duration-200 ${
+            isDropdownOpen ? "rotate-180" : ""
+            }`}
+         />
+
+  {isDropdownOpen && (
+    <div className="absolute z-10 top-full w-full bg-white border border-gray-300 rounded-md shadow-lg">
+      {sortOptions.map((opt) => (
+        <button
+          key={opt.value}
+          onClick={() => {
+            setSortBy(opt.value as typeof sortBy);
+            setIsDropdownOpen(false);
+          }}
+          className={`px-2 w-full py-2 text-xs text-start sm:text-base cursor-pointer hover:bg-blue-200 hover:text-blue-700 transition-colors ${
+            sortBy === opt.value
+              ? "bg-blue-200 text-blue-700 font-medium"
+              : "text-gray-700"
+          }`}
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  )}
+</div>
             </div>
 
             </div>
