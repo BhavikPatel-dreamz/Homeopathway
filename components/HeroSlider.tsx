@@ -58,7 +58,7 @@ const CustomSlider = ({ slides }: { slides: string[] }) => {
               <div className="flex items-center flex-col lg:flex-row justify-center mb-6 max-w-[900px] mx-auto w-full">
                 <div className="w-28 h-28 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 mb-4 lg:mb-0 lg:mr-6 flex-shrink-0">
                   <img
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-contain cursor-pointer"
                     src="/banner-home.svg"
                     alt="Homeopathway Logo"
                   />

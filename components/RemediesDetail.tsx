@@ -201,8 +201,6 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
     .slice(0, 3);
 
 
-    console.log("Remedy Detail Review Data:", review?.average_rating);
-
 
   return (
     <div className="min-h-screen bg-[#F5F1E8] flex flex-col">

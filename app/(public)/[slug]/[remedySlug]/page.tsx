@@ -114,7 +114,6 @@ export default async function AilmentRemedyPage({
   const { slug, remedySlug } = await params;
   const data = await getRemedyData(slug, remedySlug);
 
-  console.log("Remedy Page Data:", data?.review?.data);
   
   if (!data) {
     notFound();
