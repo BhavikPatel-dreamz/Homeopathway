@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import Image from "next/image"; // Import next/image
+import Image from "next/image";
 
 import Breadcrumb from "@/components/Breadcrumb";
 import { breadcrumbPaths } from "@/lib/breadcrumbUtils";
@@ -13,23 +13,17 @@ import ReviewListPage from "./ReviewList";
 // ---------------------------
 // Type Definitions
 // ---------------------------
-interface Symptom {
-  title: string;
-  desc: string;
-}
-
 interface RemediesDetailPageProps {
   remedy: Remedy & {
-    id:string,
-    name:string,
-    // Add other fields from your Supabase table here if they are not in the base Remedy type
+    id: string;
+    name: string;
     scientific_name?: string;
     common_name?: string;
     constitutional_type?: string;
     dosage_forms?: string[];
     safety_precautions?: string;
     slug: string;
-  }
+  };
   relatedRemedies: Remedy[];
   review?: {
     average_rating: number;
@@ -46,208 +40,209 @@ interface RemediesDetailPageProps {
 // ---------------------------
 // Utility Functions
 // ---------------------------
- const renderStars = (rating: number) => {
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 >= 0.5;
-    
-    return (
-      // <div className="flex items-center gap-0.5">
-      //   {[...Array(5)].map((_, i) => (
-      //     <span key={i} className={i < fullStars ? 'text-yellow-400' : i === fullStars && hasHalfStar ? 'text-yellow-400' : 'text-gray-300'  }>
-      //       {i < fullStars ? '★' : i === fullStars && hasHalfStar ? '⯨' : '☆'}
-      //     </span>
-      //   ))}
-      // </div>
-       <div className="flex text-yellow-400 gap-1">
-        {[...Array(fullStars)].map((_, i) => (
-          <span key={`full-${i}`}>
-            <Image 
-              src="/star.svg" 
-              alt="Star"
-              width={16}
-              height={16}
-            />
-          </span>
-        ))}
-        {hasHalfStar && (
-          <span key="half">
-            <Image 
-              src="/star-half-fill.svg" // Assuming you have a half-star icon
-              alt="Half Star"
-              width={16}
-              height={16}
-            />
-          </span>
-        )}
-        {[...Array(5 - Math.ceil(rating))].map((_, i) => (
-          <span key={`empty-${i}`}>
-            <Image 
-              src="/star-line.svg" 
-              alt="Empty Star"
-              width={16}
-              height={16}
-            />
-          </span>
-        ))}
-      </div>
-    );
-  }
+const renderStars = (rating: number) => {
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 >= 0.5;
+
+  return (
+    <div className="flex text-yellow-400 gap-1">
+      {[...Array(fullStars)].map((_, i) => (
+        <span key={`full-${i}`}>
+          <Image src="/star.svg" alt="Star" width={16} height={16} />
+        </span>
+      ))}
+      {hasHalfStar && (
+        <span key="half">
+          <Image src="/star-half-fill.svg" alt="Half Star" width={16} height={16} />
+        </span>
+      )}
+      {[...Array(5 - Math.ceil(rating))].map((_, i) => (
+        <span key={`empty-${i}`}>
+          <Image src="/star-line.svg" alt="Empty Star" width={16} height={16} />
+        </span>
+      ))}
+    </div>
+  );
+};
 
 // ---------------------------
 // Main Component
 // ---------------------------
-export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentContext ,review }: RemediesDetailPageProps) {
+export default function RemediesDetailPage({
+  remedy,
+  relatedRemedies,
+  ailmentContext,
+  review,
+}: RemediesDetailPageProps) {
   const [activeTab, setActiveTab] = useState("Overview");
 
-  const sectionRefs = {
- Overview: useRef<HTMLDivElement>(null),
- Origin: useRef<HTMLDivElement>(null),
- Reviews: useRef<HTMLDivElement>(null),
-    "RelatedRemedies": useRef<HTMLElement>(null),
-  };
+    const overviewRef = useRef<HTMLDivElement>(null!);
+   const originRef = useRef<HTMLDivElement>(null!);
+const reviewsRef = useRef<HTMLDivElement>(null!);
+const relatedRef = useRef<HTMLDivElement>(null!);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveTab(entry.target.id);
-          }
-        });
-      },
-      { rootMargin: "-50% 0px -50% 0px", threshold: 0 }
-    );
-
-    Object.values(sectionRefs).forEach((ref) => {
-      if (ref.current) {
-        observer.observe(ref.current);
-      }
-    });
-
-    return () => {
-      Object.values(sectionRefs).forEach((ref) => {
-        if (ref.current) {
-          observer.unobserve(ref.current);
-        }
-      });
-    };
-  }, []);
-
-  useEffect(() => {
-  const handleScroll = () => {
-    const scrollPosition = window.scrollY + 250;
-    const sections = ["Overview", "Origin", "Reviews", "RelatedRemedies"];
-    
-    for (const sectionId of sections) {
-      const element = document.getElementById(sectionId);
-      if (element) {
-        const { offsetTop, offsetHeight } = element;
-        if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
-          const tabName = sectionId === "RelatedRemedies" ? "Related Remedies" : sectionId;
-          setActiveTab(tabName);
-          break;
-        }
-      }
-    }
-  };
-  
-  window.addEventListener("scroll", handleScroll, { passive: true });
-  return () => window.removeEventListener("scroll", handleScroll);
-}, []);
-  // const handleTabClick = (id: string) => {
-  //   const element = document.getElementById(id);
-  //   if (element) {
-  //     element.scrollIntoView({ behavior: "smooth", block: "start" });
-  //   }
-  // };
-
-  const handleTabClick = (tab: string) => {
-  setActiveTab(tab);
-  
-  const sectionId = tab.replace(/\s+/g, ''); // "Related Remedies" → "RelatedRemedies"
-  const element = document.getElementById(sectionId);
-  
-  if (element) {
-    // Get the height of sticky elements (header + tabs)
-    const offset = 290; // Adjust this value based on your header + tabs height
-    const elementPosition = element.getBoundingClientRect().top;
-    const offsetPosition = elementPosition + window.scrollY - offset;
-    
-    window.scrollTo({
-      top: offsetPosition,
-      behavior: 'smooth'
-    });
-  }
-};
-  const symptoms: Symptom[] = useMemo(() => {
+  // Parse symptoms from remedy data
+  const symptoms = React.useMemo(() => {
     if (!remedy.key_symptoms) return [];
-    // Assuming key_symptoms is an array of strings.
-    // If they are in "Title: Description" format, you might need more parsing.
-    return remedy.key_symptoms.map(symptom => {
-      const parts = symptom.split(':');
+    return remedy.key_symptoms.map((symptom) => {
+      const parts = symptom.split(":");
       if (parts.length > 1) {
-        return { title: parts[0].trim(), desc: parts.slice(1).join(':').trim() };
+        return {
+          title: parts[0].trim().replace(/^'+|'+$/g, "").replace(/^"+|"+$/g, ""),
+          desc: parts.slice(1).join(":").trim().replace(/^'+|'+$/g, "").replace(/^"+|"+$/g, ""),
+        };
       }
-      return { title: symptom, desc: '' };
+      return { title: symptom.trim(), desc: "" };
     });
   }, [remedy.key_symptoms]);
 
-  if (!remedy) {
-    return <div>Loading remedy details...</div>; // Or a 404 component
-  }
-
   const filteredRelatedRemedies = relatedRemedies
-    .filter(r => r.slug !== remedy.slug)
+    .filter((r) => r.slug !== remedy.slug)
     .slice(0, 3);
 
+  // Helper to get the tabs sticky element bottom (pixels from viewport top)
+  const getTabsBottom = () => {
+    const tabsEl = document.getElementById("tabs-sticky");
+    if (!tabsEl) {
+      // fallback if not mounted yet
+      return 120;
+    }
+    // bottom relative to viewport top
+    return Math.round(tabsEl.getBoundingClientRect().bottom);
+  };
 
+  // click handler: scroll target so the section top appears just below the sticky tabs
+  const handleTabClick = (tabName: string) => {
+    setActiveTab(tabName);
+
+    type SectionRef = React.RefObject<HTMLDivElement | null>;
+    let targetRef: SectionRef | null = null;
+
+    if (tabName === "Overview") targetRef = overviewRef;
+    if (tabName === "Origin") targetRef = originRef;
+    if (tabName === "Reviews") targetRef = reviewsRef;
+    if (tabName === "Related Remedies") targetRef = relatedRef;
+
+    if (targetRef?.current) {
+      const tabsBottom = getTabsBottom(); // px from viewport top
+      const rect = targetRef.current.getBoundingClientRect();
+      // current top of section relative to viewport; subtract tabsBottom to position it below tabs
+      const desiredScrollY = window.pageYOffset + rect.top - tabsBottom + 8; // small gap
+      window.scrollTo({ top: desiredScrollY, behavior: "smooth" });
+    }
+  };
+
+  // Scroll listener: pick the section whose top is closest to tabs bottom
+  useEffect(() => {
+    let ticking = false;
+
+    const sectionList: { ref: React.RefObject<HTMLDivElement>; tab: string }[] = [
+      { ref: overviewRef, tab: "Overview" },
+      { ref: originRef, tab: "Origin" },
+      { ref: reviewsRef, tab: "Reviews" },
+      { ref: relatedRef, tab: "Related Remedies" },
+    ];
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        const tabsBottom = getTabsBottom(); // viewport y where section should align
+        let closestTab = activeTab;
+        let minDistance = Number.POSITIVE_INFINITY;
+
+        sectionList.forEach((s) => {
+          const el = s.ref.current;
+          if (!el) return;
+          const rect = el.getBoundingClientRect();
+          // compute distance from section top to tabsBottom
+          const distance = Math.abs(rect.top - tabsBottom);
+
+          // Prefer sections that are at or above the tabsBottom (so they "arrive" under the tabs)
+          // But also allow slightly below — distance measure handles it.
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestTab = s.tab;
+          }
+        });
+
+        // only update when it actually changes (avoid re-renders)
+        if (closestTab !== activeTab) {
+          setActiveTab(closestTab);
+        }
+
+        ticking = false;
+      });
+    };
+
+    // trigger once on mount to set right tab (in case user navigated with anchor)
+    onScroll();
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
+
+  const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+
+  if (!remedy) {
+    return <div>Loading remedy details...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-[#F5F1E8] flex flex-col">
       {/* Breadcrumb */}
-      <Breadcrumb 
-        items={ailmentContext 
-          ? [
-              { label: "Home", href: "/" },
-              // { label: "Ailments", href: "/ailments" },
-              { label: ailmentContext.name, href: `/${ailmentContext.slug}` },
-              { label: remedy.name, isActive: true }
-            ]
-          : breadcrumbPaths.remedyDetail(remedy.name, "All Remedies", "/remedies")
+      <Breadcrumb
+        items={
+          ailmentContext
+            ? [
+                { label: "Home", href: "/" },
+                { label: ailmentContext.name, href: `/${ailmentContext.slug}` },
+                { label: remedy.name, isActive: true },
+              ]
+            : breadcrumbPaths.remedyDetail(remedy.name, "All Remedies", "/remedies")
         }
       />
-  
-      {/* Tabs */}
-      <div className="sticky top-[99px] sm:top-[100px] md:top-[120px] lg:top-[142px] z-10 bg-[#F5F1E8]">
-  <div className="max-w-7xl mx-auto px-3 sm:px-5 md:px-6">
-    <div className="border-t border-[#B5B6B1] w-full flex gap-1 sm:gap-1 md:gap-6 lg:gap-9 overflow-x-auto scrollbar-hide snap-x snap-mandatory">
-      {["Overview", "Origin", "Reviews", "Related Remedies"].map((tab) => (
-        <button
-          key={tab}
-          onClick={() => handleTabClick(tab)}
-          className={`snap-start py-2 sm:py-3 md:pt-8 px-1 sm:px-2 text-[12px] sm:text-sm md:text-sm lg:text-base border-t-2 transition-all cursor-pointer whitespace-nowrap flex-shrink-0 ${
-            activeTab.toLowerCase() === tab.toLowerCase()
-              ? "border-[#0B0C0A] text-[#0B0C0A] font-medium"
-              : "border-transparent text-[#41463B] hover:text-[#0B0C0A] hover:border-[#0B0C0A] transition-all duration-300"
-          }`}
-        >
-          {tab}
-        </button>
-      ))}
-    </div>
-  </div>
-</div>
+
+      {/* Sticky Tabs */}
+      <div
+        id="tabs-sticky"
+        className="sticky top-[99px] sm:top-[100px] md:top-[120px] lg:top-[142px] z-10 bg-[#F5F1E8]"
+      >
+        <div className="max-w-7xl mx-auto px-3 sm:px-5 md:px-6">
+          <div className="border-t border-[#B5B6B1] w-full flex gap-1 sm:gap-1 md:gap-6 lg:gap-9 overflow-x-auto scrollbar-hide snap-x snap-mandatory">
+            {["Overview", "Origin", "Reviews", "Related Remedies"].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => handleTabClick(tab)}
+                className={`snap-start py-2 sm:py-3 md:pt-8 px-1 sm:px-2 text-[12px] sm:text-sm md:text-sm lg:text-base border-t-2 transition-all cursor-pointer whitespace-nowrap flex-shrink-0 ${
+                  activeTab === tab
+                    ? "border-[#0B0C0A] text-[#0B0C0A] font-medium"
+                    : "border-transparent text-[#41463B] hover:text-[#0B0C0A] hover:border-[#0B0C0A] transition-all duration-300"
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* Main Content */}
-    <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 md:py-10 space-y-4 sm:space-y-6 md:space-y-10">
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 md:py-10 space-y-4 sm:space-y-6 md:space-y-10">
         {/* Overview Section */}
         <section
-          id="Overview"
-          ref={sectionRefs.Overview}
-          className="flex flex-col lg:flex-row gap-4 sm:gap-6 md:gap-8 scroll-mt-[15rem]"
+          ref={overviewRef}
+          className="relative flex flex-col lg:flex-row gap-4 sm:gap-6 md:gap-8"
         >
-          {/* Left */}
-          <div className="lg:w-[71%] bg-white rounded-[8px] p-4 sm:p-6 flex items-start">
+          {/* Left Content */}
+          <div className="flex flex-col lg:w-[71%] bg-white ">
+            <div className="rounded-[8px] p-4 sm:p-6 flex items-start">
             <div className="flex items-center">
               <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-15 md:h-15 p-2 sm:p-3 bg-[#F9F7F2] rounded-full flex items-center justify-center text-2xl sm:text-3xl flex-shrink-0 mr-2 sm:mr-3">
                 {remedy.icon}
@@ -260,52 +255,41 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
               <p className="text-sm sm:text-base text-[#41463B] mb-3 sm:mb-4 font-medium">
                 {remedy.description}
               </p>
-               <div className="flex items-center gap-2 mb-4 sm:mb-6 flex-wrap">
-                 {renderStars(review?.average_rating ?? remedy.average_rating)}
+              <div className="flex items-center gap-2 mb-4 sm:mb-6 flex-wrap">
+                {renderStars(review?.average_rating || remedy.average_rating)}
+                <span className="text-[#41463B] text-xs sm:text-sm">
+                  {(review?.average_rating || remedy.average_rating).toFixed(1)} (
+                  {(review?.total_reviews || remedy.review_count).toLocaleString()} reviews)
+                </span>
+              </div>
 
-                   <span className="text-[#41463B] text-xs sm:text-sm">
-                  {(review?.average_rating ?? remedy.average_rating)?.toFixed(1)} (
-                  {(review?.total_reviews ?? remedy.review_count)?.toLocaleString()}{" "}
-                  {(review?.total_reviews ?? remedy.review_count) === 1 ? "review" : "reviews"}
-              )
-              </span>
-            </div>
               <h4 className="text-base sm:text-lg md:text-[20px] text-[#2B2E28] font-bold mb-3 sm:mb-5 text-montserrat">
                 Key Symptoms for {remedy.name} Headaches:
               </h4>
+              <div className="text-black" ref={originRef}></div>
               <div className="grid gap-3 sm:gap-4 md:gap-y-8 md:grid-cols-2">
-              {symptoms.map((s, i) => {
-               const cleanTitle = (s.title || "")
-                 .replace(/^'+|'+$/g, "")
-                 .replace(/^"+|"+$/g, "")
-                 .trim();
-             const cleanDesc = (s.desc || "")
-                  .replace(/^'+|'+$/g, "")
-                  .replace(/^"+|"+$/g, "")
-                  .trim();
-    const capitalize = (str: string) =>
-      str.charAt(0).toUpperCase() + str.slice(1);
-
-    return (
-      <div key={i} className="flex gap-2 sm:gap-3 items-start">
-        <div className="w-2 h-2 sm:w-3 sm:h-3 bg-[#C3AF76] rounded-full flex-shrink-0 mt-1" />
-        <div className="min-w-0">
-          <p className="text-sm sm:text-base text-[#2B2E28] font-semibold break-words">
-            {capitalize(cleanTitle)}
-          </p>
-          <p className="text-xs sm:text-sm text-[#2B2E28] font-medium">
-            {capitalize(cleanDesc)}
-          </p>
-        </div>
-      </div>
-    );
-  })}
-</div>
-
+                {symptoms.map((s, i) => (
+                  <div key={i} className="flex gap-2 sm:gap-3 items-start">
+                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-[#C3AF76] rounded-full flex-shrink-0 mt-1" />
+                    <div className="min-w-0">
+                      <p className="text-sm sm:text-base text-[#2B2E28] font-semibold break-words">
+                        {capitalize(s.title)}
+                      </p>
+                      {s.desc && (
+                        <p className="text-xs sm:text-sm text-[#2B2E28] font-medium">
+                          {capitalize(s.desc)}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
+            </div>
+                
           </div>
 
-          {/* Right - Quick Stats */}
+          {/* Right Sidebar - Quick Stats */}
           <aside className="bg-white lg:w-[29%] rounded-[8px] p-4 h-fit">
             <h3 className="text-sm sm:text-base text-[#0B0C0A] font-semibold mb-3 sm:mb-4 text-montserrat">
               Quick Stats
@@ -314,13 +298,13 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
               <li className="flex justify-between">
                 <span className="text-[#2B2E28] font-medium">Overall Rating</span>
                 <span className="font-semibold">
-                  {review?.average_rating.toFixed(1) || remedy.average_rating.toFixed(1)}/5
+                  {(review?.average_rating || remedy.average_rating).toFixed(1)}/5
                 </span>
               </li>
               <li className="flex justify-between">
                 <span className="text-[#2B2E28] font-medium">Total Reviews</span>
                 <span className="font-semibold">
-                  {review?.total_reviews ? review?.total_reviews : remedy.review_count}
+                  {review?.total_reviews || remedy.review_count}
                 </span>
               </li>
               <li className="flex justify-between">
@@ -338,19 +322,17 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
                   {(remedy.dosage_forms || [])
                     .map((item) => item.replace(/^'+|'+$/g, "").replace(/^"+|"+$/g, ""))
                     .join(", ")}
-                  <span className="text-xs text-[#2B2E28]"></span>
                 </div>
               </div>
             </div>
           </aside>
+       
         </section>
 
         {/* Origin Section */}
-        <section
-          id="Origin"
-          ref={sectionRefs.Origin}
-          className="bg-white rounded-[8px] p-3 sm:p-6 scroll-mt-[23rem] sm:scroll-mt-[20rem]"
-        >
+
+        <section className=" bg-white rounded-[8px] p-4 sm:p-6">
+
           <p className="text-lg sm:text-xl md:text-[20px] text-[#0B0C0A] font-semibold mb-4">
             Origin
           </p>
@@ -376,7 +358,7 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
         </section>
 
         {/* Reviews Section */}
-        <div ref={sectionRefs.Reviews}>
+        <div ref={reviewsRef} className=" bg-white rounded-[8px] p-4 sm:p-6">
           <ReviewListPage
             remedy={remedy}
             ailmentContext={
@@ -392,11 +374,7 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
         </div>
 
         {/* Related Remedies Section */}
-        <section
-          id="RelatedRemedies"
-          ref={sectionRefs.RelatedRemedies}
-          className="scroll-mt-[19rem]"
-        >
+        <section ref={relatedRef}>
           <h3 className="text-2xl sm:text-3xl font-serif text-gray-800 mb-4 sm:mb-6">
             Related Remedies
           </h3>
@@ -408,7 +386,7 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
                   <div className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow p-4 sm:p-5 flex flex-col gap-3 h-full cursor-pointer">
                     {/* Header */}
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl sm:text-3xl">{item.icon || "💊"}</span>
+                      <span className="w-13 h-13 p-3 bg-[#F9F7F2] rounded-full flex items-center justify-center text-3xl flex-shrink-0 mr-3">{item.icon || "💊"}</span>
                       <h4 className="font-semibold text-gray-800 text-base sm:text-lg break-words">
                         {item.name}
                       </h4>
@@ -418,9 +396,8 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
                     <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-700 flex-wrap">
                       {renderStars(item.average_rating || 0)}
                       <span className="ml-1">{(item.average_rating || 0).toFixed(1)}</span>
-                     <span className="text-gray-500">
-                      ({(item.review_count || 0).toLocaleString()}{" "}
-                      {(item.review_count || 0) === 1 ? "review" : "reviews"})
+                      <span className="text-gray-500">
+                        ({(item.review_count || 0).toLocaleString()} reviews)
                       </span>
                     </div>
 
@@ -439,7 +416,8 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
           )}
         </section>
       </main>
-             <style jsx>{`
+
+      <style jsx>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
         }
@@ -451,3 +429,4 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
     </div>
   );
 }
+
