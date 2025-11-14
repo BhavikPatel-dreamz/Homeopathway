@@ -260,18 +260,16 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
               <p className="text-sm sm:text-base text-[#41463B] mb-3 sm:mb-4 font-medium">
                 {remedy.description}
               </p>
-              <div className="flex items-center gap-2 mb-4 sm:mb-6 flex-wrap">
-                {renderStars(
-                  review?.average_rating ? review?.average_rating : remedy.average_rating
-                )}
-                <span className="text-[#41463B] text-xs sm:text-sm">
-                  {review?.average_rating.toFixed(1) || remedy.average_rating.toFixed(1)} (
-                  {review?.total_reviews.toLocaleString() ||
-                    remedy.review_count.toLocaleString()}{" "}
-                  reviews)
-                </span>
-              </div>
+               <div className="flex items-center gap-2 mb-4 sm:mb-6 flex-wrap">
+                 {renderStars(review?.average_rating ?? remedy.average_rating)}
 
+                   <span className="text-[#41463B] text-xs sm:text-sm">
+                  {(review?.average_rating ?? remedy.average_rating)?.toFixed(1)} (
+                  {(review?.total_reviews ?? remedy.review_count)?.toLocaleString()}{" "}
+                  {(review?.total_reviews ?? remedy.review_count) === 1 ? "review" : "reviews"}
+              )
+              </span>
+            </div>
               <h4 className="text-base sm:text-lg md:text-[20px] text-[#2B2E28] font-bold mb-3 sm:mb-5 text-montserrat">
                 Key Symptoms for {remedy.name} Headaches:
               </h4>
@@ -420,8 +418,9 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
                     <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-700 flex-wrap">
                       {renderStars(item.average_rating || 0)}
                       <span className="ml-1">{(item.average_rating || 0).toFixed(1)}</span>
-                      <span className="text-gray-500">
-                        ({(item.review_count || 0).toLocaleString()} reviews)
+                     <span className="text-gray-500">
+                      ({(item.review_count || 0).toLocaleString()}{" "}
+                      {(item.review_count || 0) === 1 ? "review" : "reviews"})
                       </span>
                     </div>
 

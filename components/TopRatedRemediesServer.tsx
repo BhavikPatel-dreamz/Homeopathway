@@ -69,8 +69,7 @@ export default function TopRatedRemediesServer({
                       ))}
                     </div>
                     <span className="text-[#41463B] font-[500] text-sm sm:text-base break-words max-w-[120px] sm:max-w-none">
-                      {remedy.average_rating.toFixed(1)} ({remedy.review_count}{" "}
-                      reviews)
+                      {remedy.average_rating.toFixed(1)} ({remedy.reviewCount} {remedy.reviewCount === 1 ? "review" : "reviews"})
                     </span>
                   </div>
                   <p className="text-[#2B2E28] font-[500]">{remedy.description}</p>

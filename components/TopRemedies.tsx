@@ -144,7 +144,7 @@ export default function TopRemedies({ remedies, ailmentSlug }: TopRemediesProps)
             <li
               key={option}
               onClick={() => handleSelect(option)}
-              className={`px-2 py-2 text-sm sm:text-base text-start cursor-pointer hover:bg-blue-100 hover:text-blue-700 transition-colors ${
+              className={`px-2 py-2 text-sm sm:text-base  text-start cursor-pointer hover:bg-blue-100 hover:text-blue-700 transition-colors ${
                 sortBy === option ? "bg-blue-100 text-blue-700 font-medium" : "text-gray-700"
               }`}
             >
@@ -179,12 +179,13 @@ export default function TopRemedies({ remedies, ailmentSlug }: TopRemediesProps)
                     </div>
                   </div>
                   {/* Rating */}
-                  <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                <div className="flex items-center gap-2 mb-2 sm:mb-3">
                     {renderStars(remedy.rating)}
-                    <span className="text-xs sm:text-sm text-[#41463B]">
-                      {typeof remedy.rating === 'number' ? remedy.rating.toFixed(1) : 'N/A'} ({remedy.reviewCount} reviews)
-                    </span>
-                  </div>
+                       <span className="text-xs sm:text-sm text-[#41463B]">
+                       {typeof remedy.rating === "number" ? remedy.rating.toFixed(1) : "N/A"}{" "}
+                       ({remedy.reviewCount} {remedy.reviewCount === 1 ? "review" : "reviews"})
+                     </span>
+                     </div>
                   {/* Description */}
                   <p className="text-xs sm:text-sm text-gray-700 leading-relaxed line-clamp-2 font-medium break-words">{remedy.description}</p>
                 </div>

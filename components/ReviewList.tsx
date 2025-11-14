@@ -225,7 +225,8 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
                 </h2>
               </div>
               <p className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6">
-                Based on {reviewStats ? reviewStats.total_reviews : 0} reviews
+                Based on {reviewStats?.total_reviews ?? 0}{" "}
+             {(reviewStats?.total_reviews ?? 0) === 1 ? "review" : "reviews"}
               </p>
 
               {/* Rating Filters */}

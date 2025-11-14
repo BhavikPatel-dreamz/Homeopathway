@@ -162,7 +162,10 @@ export default function RemedyListPage({
                       <span>{(remedy.rating ?? remedy.average_rating)?.toFixed(1)}</span>
                     </span>
                     <span className="text-gray-400">|</span>
-                    <span>{remedy.reviewCount ?? remedy.review_count} reviews</span>
+                    <span>
+                         {remedy.reviewCount ?? remedy.review_count}{" "}
+                         {(remedy.reviewCount ?? remedy.review_count) === 1 ? "review" : "reviews"}
+                   </span>
                   </p>
                   </div>
                 </Link>
