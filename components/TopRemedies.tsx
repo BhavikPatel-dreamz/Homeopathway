@@ -144,7 +144,7 @@ export default function TopRemedies({ remedies, ailmentSlug }: TopRemediesProps)
             <li
               key={option}
               onClick={() => handleSelect(option)}
-              className={`px-3 py-2 text-sm sm:text-base cursor-pointer hover:bg-blue-100 hover:text-blue-700 transition-colors ${
+              className={`px-2 py-2 text-sm sm:text-base text-start cursor-pointer hover:bg-blue-100 hover:text-blue-700 transition-colors ${
                 sortBy === option ? "bg-blue-100 text-blue-700 font-medium" : "text-gray-700"
               }`}
             >

@@ -162,15 +162,16 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
   // };
 
   const handleTabClick = (tab: string) => {
-  setActiveTab(tab); // Make sure this line exists
+  setActiveTab(tab);
   
   const sectionId = tab.replace(/\s+/g, ''); // "Related Remedies" → "RelatedRemedies"
   const element = document.getElementById(sectionId);
   
   if (element) {
-    const offset = 200; // Adjust based on your sticky header height
+    // Get the height of sticky elements (header + tabs)
+    const offset = 290; // Adjust this value based on your header + tabs height
     const elementPosition = element.getBoundingClientRect().top;
-    const offsetPosition = elementPosition + window.pageYOffset - offset;
+    const offsetPosition = elementPosition + window.scrollY - offset;
     
     window.scrollTo({
       top: offsetPosition,
@@ -178,7 +179,6 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
     });
   }
 };
-
   const symptoms: Symptom[] = useMemo(() => {
     if (!remedy.key_symptoms) return [];
     // Assuming key_symptoms is an array of strings.
@@ -351,7 +351,7 @@ export default function RemediesDetailPage({ remedy, relatedRemedies, ailmentCon
         <section
           id="Origin"
           ref={sectionRefs.Origin}
-          className="bg-white rounded-[8px] p-4 sm:p-6 lg:scroll-mt-[23rem] sm:scroll-mt-[19rem]"
+          className="bg-white rounded-[8px] p-3 sm:p-6 scroll-mt-[23rem] sm:scroll-mt-[20rem]"
         >
           <p className="text-lg sm:text-xl md:text-[20px] text-[#0B0C0A] font-semibold mb-4">
             Origin

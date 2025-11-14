@@ -296,7 +296,7 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
                  <div className="relative w-auto">
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="appearance-none flex items-center justify-between gap-1 min-w-[133px] sm:min-w-[148px] sm:pl-1  py-2 text-sm sm:text-base text-[#20231E]  focus:outline-none"
+                  className="appearance-none flex items-left justify-between gap-1 min-w-[133px] sm:min-w-[148px] sm:pl-1  py-2 text-sm sm:text-base text-[#20231E]  focus:outline-none"
                 >
                   {sortOptions.find(opt => opt.value === sortBy)?.label}
                 </button>
@@ -311,8 +311,8 @@ export default function ReviewListPage({ remedy, ailmentContext }: ReviewListPag
                           setSortBy(opt.value as typeof sortBy);
                           setIsDropdownOpen(false);
                         }}
-                        className={`px-2 w-full py-2 text-xs sm:text-base cursor-pointer hover:bg-blue-200 hover:text-blue-700 transition-colors ${
-                          sortBy === opt.value ? "bg-blue-200 text-blue-700" : "text-gray-700"
+                        className={`px-2 w-full py-2 text-xs text-start sm:text-base cursor-pointer hover:bg-blue-200 hover:text-blue-700 transition-colors ${
+                          sortBy === opt.value ? "bg-blue-200 text-blue-700 font-medium" : "text-gray-700"
                         }`}
                       >
                         {opt.label}
