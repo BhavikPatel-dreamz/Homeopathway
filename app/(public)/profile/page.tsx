@@ -26,6 +26,9 @@ export default async function ProfilePage() {
   const { data: { user } } = await supabase.auth.getUser();
   const userId = user?.id;
 
+  console.log("user",user);
+  
+
   if (!userId) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -46,6 +49,9 @@ export default async function ProfilePage() {
   }
 
   const { profile } = await getUserProfile(userId);
+
+  console.log("profile",profile);
+  
 
   return (
     

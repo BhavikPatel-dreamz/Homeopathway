@@ -215,7 +215,7 @@ const relatedRef = useRef<HTMLDivElement>(null!);
         className="sticky top-[99px] sm:top-[100px] md:top-[120px] lg:top-[142px] z-10 bg-[#F5F1E8]"
       >
         <div className="max-w-7xl mx-auto px-3 sm:px-5 md:px-6">
-          <div className="border-t border-[#B5B6B1] w-full flex gap-1 sm:gap-1 md:gap-6 lg:gap-9 overflow-x-auto scrollbar-hide snap-x snap-mandatory">
+          <div className="border-t border-[#B5B6B1] w-full flex gap-1 sm:gap-1 lg:gap-9 overflow-x-auto scrollbar-hide snap-x snap-mandatory">
             {["Overview", "Origin", "Reviews", "Related Remedies"].map((tab) => (
               <button
                 key={tab}
@@ -241,21 +241,21 @@ const relatedRef = useRef<HTMLDivElement>(null!);
           className="relative flex flex-col lg:flex-row gap-4 sm:gap-6 md:gap-8"
         >
           {/* Left Content */}
-          <div className="flex flex-col lg:w-[71%] bg-white ">
-            <div className="rounded-[8px] p-4 sm:p-6 flex items-start">
+          <div className="flex flex-col lg:w-[71%] bg-white rounded-lg ">
+            <div className="p-4 sm:p-6 flex items-start">
             <div className="flex items-center">
               <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-15 md:h-15 p-2 sm:p-3 bg-[#F9F7F2] rounded-full flex items-center justify-center text-2xl sm:text-3xl flex-shrink-0 mr-2 sm:mr-3">
                 {remedy.icon}
               </div>
             </div>
             <div className="w-full">
-              <h1 className="text-2xl sm:text-3xl lg:text-[32px] xl:text-[40px] font-serif text-[#0B0C0A] mb-2 lg:mb-0 break-words">
+              <h1 className="text-4xl sm:text-4xl lg:text-[32px] xl:text-[40px] font-serif text-[#0B0C0A] mb-2 lg:mb-0 wrap-break-word font-normal">
                 {remedy.name}
               </h1>
-              <p className="text-sm sm:text-base text-[#41463B] mb-3 sm:mb-4 font-medium">
+              <p className="text-[16px] leading-6 sm:text-base text-[#41463B] mb-3 sm:mb-4 font-nomal md:font-medium">
                 {remedy.description}
               </p>
-              <div className="flex items-center gap-2 mb-4 sm:mb-6 flex-wrap">
+              <div className="text-[14px] leading-3.5  flex items-center gap-2 mb-4 sm:mb-6 flex-wrap">
                 {renderStars(review?.average_rating || remedy.average_rating)}
                 <span className="text-[#41463B] text-xs sm:text-sm">
                   {(review?.average_rating || remedy.average_rating).toFixed(1)} (
@@ -270,9 +270,9 @@ const relatedRef = useRef<HTMLDivElement>(null!);
               <div className="grid gap-3 sm:gap-4 md:gap-y-8 md:grid-cols-2">
                 {symptoms.map((s, i) => (
                   <div key={i} className="flex gap-2 sm:gap-3 items-start">
-                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-[#C3AF76] rounded-full flex-shrink-0 mt-1" />
+                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-[#C3AF76] rounded-full shrink-0 mt-1" />
                     <div className="min-w-0">
-                      <p className="text-sm sm:text-base text-[#2B2E28] font-semibold break-words">
+                      <p className="text-md sm:text-base text-[#2B2E28] font-semibold wrap-break-word">
                         {capitalize(s.title)}
                       </p>
                       {s.desc && (
@@ -290,31 +290,31 @@ const relatedRef = useRef<HTMLDivElement>(null!);
           </div>
 
           {/* Right Sidebar - Quick Stats */}
-          <aside className="bg-white lg:w-[29%] rounded-[8px] p-4 h-fit">
-            <h3 className="text-sm sm:text-base text-[#0B0C0A] font-semibold mb-3 sm:mb-4 text-montserrat">
+          <aside className="bg-white lg:w-[29%] rounded-lg p-4 h-fit">
+            <h3 className="text-md sm:text-base text-[#0B0C0A] font-semibold mb-3 sm:mb-4 text-montserrat">
               Quick Stats
             </h3>
-            <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-700">
+            <ul className="space-y-2 sm:space-y-3 text-sm  text-gray-700">
               <li className="flex justify-between">
-                <span className="text-[#2B2E28] font-medium">Overall Rating</span>
-                <span className="font-semibold">
+                <span className="text-[#2B2E28] text-sm font-medium">Overall Rating</span>
+                <span className="font-semibold text-sm">
                   {(review?.average_rating || remedy.average_rating).toFixed(1)}/5
                 </span>
               </li>
               <li className="flex justify-between">
-                <span className="text-[#2B2E28] font-medium">Total Reviews</span>
-                <span className="font-semibold">
+                <span className="text-[#2B2E28] text-sm font-medium">Total Reviews</span>
+                <span className="font-semibold text-sm">
                   {review?.total_reviews || remedy.review_count}
                 </span>
               </li>
-              <li className="flex justify-between">
-                <span className="text-[#2B2E28] font-medium">Success Rate</span>
-                <span className="font-semibold text-[#175F3D]">N/A</span>
+              <li className="flex justify-between text-sm">
+                <span className="text-[#2B2E28] text-sm font-medium">Success Rate</span>
+                <span className="font-semibold text-[#175F3D] text-sm">N/A</span>
               </li>
             </ul>
 
             <div className="mt-4 sm:mt-6">
-              <p className="text-sm sm:text-base text-[#0B0C0A] mb-2 font-semibold">
+              <p className="text-md sm:text-base text-[#0B0C0A] mb-2 font-semibold">
                 Common Potencies
               </p>
               <div className="flex justify-between flex-wrap font-medium text-[#2B2E28] text-xs sm:text-sm">
@@ -358,7 +358,7 @@ const relatedRef = useRef<HTMLDivElement>(null!);
         </section>
 
         {/* Reviews Section */}
-        <div ref={reviewsRef} className=" bg-white rounded-[8px] p-4 sm:p-6">
+        <div ref={reviewsRef} className=" bg-white rounded-lg p-4 sm:py-6">
           <ReviewListPage
             remedy={remedy}
             ailmentContext={
@@ -375,7 +375,7 @@ const relatedRef = useRef<HTMLDivElement>(null!);
 
         {/* Related Remedies Section */}
         <section ref={relatedRef}>
-          <h3 className="text-2xl sm:text-3xl font-serif text-gray-800 mb-4 sm:mb-6">
+          <h3 className="text-2xl sm:text-3xl font-serif text-gray-800 mb-4 sm:mb-6 font-normal">
             Related Remedies
           </h3>
 

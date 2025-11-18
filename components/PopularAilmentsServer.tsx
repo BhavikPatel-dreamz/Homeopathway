@@ -1,7 +1,9 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Ailment } from "@/types";
 import AilmentCard from "./AilmentCard";
-
 
 interface PopularAilmentsServerProps {
   ailments: Ailment[];
@@ -12,6 +14,25 @@ export default function PopularAilmentsServer({
   ailments, 
   searchQuery = "" 
 }: PopularAilmentsServerProps) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    // Check on mount
+    checkScreenSize();
+
+    // Add event listener for resize
+    window.addEventListener("resize", checkScreenSize);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
+
+  const displayCount = isMobile ? 5 : 17;
+
   return (
     <section className="px-4 py-6 lg:py-10 bg-[#f5f3ed]">
       <div className="max-w-7xl px-0 lg:px-5 mx-auto">
@@ -23,7 +44,7 @@ export default function PopularAilmentsServer({
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-6 lg:grid-cols-4 gap-4 lg:gap-6">
-          {ailments.slice(0, 17).map((ailment) => (
+          {ailments.slice(0, displayCount).map((ailment) => (
             <AilmentCard key={ailment.id} ailment={ailment} />
           ))}
           {!searchQuery.trim() && (

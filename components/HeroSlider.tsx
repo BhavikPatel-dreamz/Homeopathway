@@ -52,28 +52,6 @@ const CustomSlider = ({ slides }: { slides: string[] }) => {
                 alt={`Homeopathway slide ${index + 1}`}
               />
             </div>
-
-            {/* Content */}
-            <div className="relative flex pt-16 sm:pt-20 md:pt-25 pb-20 sm:pb-24 md:pb-30 lg:pb-48 px-4">
-              <div className="flex items-center flex-col lg:flex-row justify-center mb-6 max-w-[900px] mx-auto w-full">
-                <div className="w-28 h-28 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 mb-4 lg:mb-0 lg:mr-6 flex-shrink-0">
-                  <img
-                    className="w-full h-full object-contain cursor-pointer"
-                    src="/banner-home.svg"
-                    alt="Homeopathway Logo"
-                  />
-                </div>
-                <div className="text-white lg:text-left text-center">
-                  <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-[40px] mb-3 md:mb-4 leading-tight font-semibold">
-                    Your Path to Healing
-                  </h1>
-                  <h6 className="text-sm sm:text-base md:text-lg lg:text-[24px] font-normal">
-                    Find trusted homeopathic solutions for your health concerns, backed by
-                    community reviews and expert guidance.
-                  </h6>
-                </div>
-              </div>
-            </div>
           </div>
         ))}
       </div>
@@ -86,8 +64,8 @@ const CustomSlider = ({ slides }: { slides: string[] }) => {
             onClick={() => goToSlide(index)}
             className={`transition-all duration-300 rounded-full ${
               index === currentIndex 
-                ? 'bg-white w-8 h-3' 
-                : 'bg-white/50 hover:bg-white/75 w-3 h-3'
+                ? 'bg-white w-10 h-2' 
+                : 'bg-white/50 hover:bg-white/75 w-10 h-2'
             }`}
             aria-label={`Go to slide ${index + 1}`}
           />
@@ -255,9 +233,34 @@ export default function HeroSlider() {
       {/* Custom Slider */}
       <CustomSlider slides={slides} />
 
+
+
       {/* Searchbar with Auto-Suggestions */}
       <div className="absolute bottom-[60px] lg:bottom-[100px] w-full left-1/2 -translate-x-1/2 z-10 pr-[15px] pl-[15px]">
         <div ref={searchRef} className="relative max-w-[870px] mx-auto">
+
+            {/* Content */}
+            <div className="relative  pb-3 md:pb-10">
+              <div className="flex items-center flex-col lg:flex-row justify-center mb-6 max-w-[900px] mx-auto w-full">
+                <div className="w-28 h-28 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 mb-4 lg:mb-0 lg:mr-6 flex-shrink-0">
+                  <img
+                    className="w-full h-full object-contain cursor-pointer"
+                    src="/banner-home.svg"
+                    alt="Homeopathway Logo"
+                  />
+                </div>
+                <div className="text-white lg:text-left text-center">
+                  <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-[40px] mb-3 md:mb-4 leading-tight font-semibold">
+                    Your Path to Healing
+                  </h1>
+                  <h6 className="text-sm sm:text-base md:text-lg lg:text-[24px] font-normal">
+                    Find trusted homeopathic solutions for your health concerns, backed by
+                    community reviews and expert guidance.
+                  </h6>
+                </div>
+              </div>
+            </div>
+            
           <div className="relative">
             <img
               src="/search.svg"

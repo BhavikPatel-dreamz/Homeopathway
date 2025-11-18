@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Remedy } from "@/types";
@@ -11,10 +14,28 @@ export default function TopRatedRemediesServer({
   topRemedies, 
   searchQuery = "" 
 }: TopRatedRemediesServerProps) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    // Check on mount
+    checkScreenSize();
+
+    // Add event listener for resize
+    window.addEventListener("resize", checkScreenSize);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
+
+  const displayCount = isMobile ? 3 : topRemedies.length;
   
   // Just use the original remedy data - no need to refetch stats
   // The stats are already calculated and stored in the remedies table
-  const remediesWithStats = topRemedies;
+  const remediesWithStats = topRemedies.slice(0, displayCount);
 
   return (
     <section className="px-4 py-6 lg:py-10 bg-[#f5f3ed]">

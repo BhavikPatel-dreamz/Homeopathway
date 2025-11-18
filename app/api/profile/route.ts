@@ -97,7 +97,7 @@ export async function PUT(request: NextRequest) {
 export async function GET() {
   try {
     const supabase = await createClient();
-    
+    console.log("profile");
     // Get the current user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
@@ -110,7 +110,7 @@ export async function GET() {
 
     // Get profile from profiles table
     const { profile, error: profileError } = await getUserProfileById(user.id);
-
+  console.log("profile",profile);
     if (profileError) {
       console.error('Profile fetch error:', profileError);
       return NextResponse.json(
@@ -118,6 +118,9 @@ export async function GET() {
         { status: 500 }
       );
     }
+
+  
+    
 
     if (!profile) {
       return NextResponse.json(
