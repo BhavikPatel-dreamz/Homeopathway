@@ -107,7 +107,7 @@ export default function TopRemedies({
             alt=""
             className="w-10 h-10 sm:w-10 sm:h-10 lg:w-12 lg:h-12"
           />
-          <h2 className="text-3xl sm:text-3xl lg:text-4xl font-normal max-w-[100px] md:max-w-[300px] text-[#0B0C0A] leading-tight">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-normal max-w-[100px] md:max-w-[300px] text-[#0B0C0A] leading-tight">
             Top Remedies
           </h2>
         </div>

@@ -292,7 +292,6 @@ export default function ReviewListPage({
 
   const refreshReviews = () => fetchReviews(false);
 
-
   const sortOptions = [
     { label: "Most Recent", value: "newest" },
     { label: "Oldest", value: "oldest" },
@@ -304,6 +303,20 @@ export default function ReviewListPage({
   // Render
   // ---------------------------
   if (!remedy) return <div>Loading remedy details...</div>;
+
+  // Close dropdown if click happens outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <div>
@@ -410,8 +423,9 @@ export default function ReviewListPage({
                   {/* Filter Button */}
                   <button
                     onClick={() => setIsFilterModalOpen(true)}
-                   className="absolute right-2.5 top-1/2 -translate-y-1/2 px-3 py-3 bg-[#6C7463] hover:bg-[#5A6B5D] 
-      text-white rounded-md transition-colors flex items-center gap-1"                  >
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 px-3 py-3 bg-[#6C7463] hover:bg-[#5A6B5D] 
+      text-white rounded-md transition-colors flex items-center gap-1"
+                  >
                     <SlidersHorizontal className="w-4 h-4" />
 
                     {/* Show badge */}
@@ -610,7 +624,9 @@ export default function ReviewListPage({
         <ReviewFilterModal
           isOpen={isFilterModalOpen}
           onClose={() => setIsFilterModalOpen(false)}
-          onApply={(appliedFilters: ReviewFilters) => setFilters(appliedFilters)}
+          onApply={(appliedFilters: ReviewFilters) =>
+            setFilters(appliedFilters)
+          }
           totalResults={totalReviews}
           dosageOptions={filterOptions.potencies}
           formOptions={filterOptions.forms}
