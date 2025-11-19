@@ -32,10 +32,20 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
 
   const [loading, setLoading] = useState(false);
   const [avatarLoading, setAvatarLoading] = useState(false);
-  const [message, setMessage] = useState<{
+  
+  // Toast notification state
+  const [toast, setToast] = useState<{
     type: "success" | "error";
     text: string;
   } | null>(null);
+
+  // Field-specific errors
+  const [fieldErrors, setFieldErrors] = useState<{
+    full_name?: string;
+    password?: string;
+    newpassword?: string;
+    confirmpassword?: string;
+  }>({});
 
   const [avatarUrl, setAvatarUrl] = useState(user.profile_img || "");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -48,6 +58,86 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
     newpassword: "",
     confirmpassword: "",
   });
+
+  // Auto-hide toast after 5 seconds
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => {
+        setToast(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
+  const showToast = (type: "success" | "error", text: string) => {
+    setToast({ type, text });
+  };
+
+  const validateField = (name: string, value: string): string | undefined => {
+    switch (name) {
+      case "full_name":
+        if (!value.trim()) {
+          return "Full name is required";
+        }
+        break;
+      case "password":
+        if (formData.newpassword && !value) {
+          return "Current password is required to change password";
+        }
+        break;
+      case "newpassword":
+        if (value) {
+          if (value.length < 8) {
+            return "Password must be at least 8 characters";
+          }
+          if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) {
+            return "Password must contain at least one special character";
+          }
+          if (!/\d/.test(value)) {
+            return "Password must contain at least one number";
+          }
+        }
+        break;
+      case "confirmpassword":
+        if (formData.newpassword && value !== formData.newpassword) {
+          return "Passwords do not match";
+        }
+        break;
+    }
+    return undefined;
+  };
+
+  const handleFieldChange = (name: string, value: string) => {
+    setFormData({ ...formData, [name]: value });
+    
+    // Clear error for this field when user starts typing
+    if (fieldErrors[name as keyof typeof fieldErrors]) {
+      setFieldErrors({ ...fieldErrors, [name]: undefined });
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const errors: typeof fieldErrors = {};
+
+    // Validate full name
+    const fullNameError = validateField("full_name", formData.full_name);
+    if (fullNameError) errors.full_name = fullNameError;
+
+    // If changing password, validate all password fields
+    if (formData.newpassword || formData.password || formData.confirmpassword) {
+      const passwordError = validateField("password", formData.password);
+      if (passwordError) errors.password = passwordError;
+
+      const newPasswordError = validateField("newpassword", formData.newpassword);
+      if (newPasswordError) errors.newpassword = newPasswordError;
+
+      const confirmPasswordError = validateField("confirmpassword", formData.confirmpassword);
+      if (confirmPasswordError) errors.confirmpassword = confirmPasswordError;
+    }
+
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleAvatarClick = () => {
     if (isEditing && fileInputRef.current) {
@@ -63,18 +153,17 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      setMessage({ type: "error", text: "Please select an image file" });
+      showToast("error", "Please select an image file");
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      setMessage({ type: "error", text: "Image size must be less than 5MB" });
+      showToast("error", "Image size must be less than 5MB");
       return;
     }
 
     setAvatarLoading(true);
-    setMessage(null);
 
     try {
       // Create a preview URL
@@ -125,13 +214,10 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
       }
 
       setAvatarUrl(newAvatarUrl);
-      setMessage({ type: "success", text: "Avatar updated successfully!" });
-    } catch (error:any) {
+      showToast("success", "Avatar updated successfully!");
+    } catch (error: any) {
       console.error("Avatar upload error:", error);
-      setMessage({
-        type: "error",
-        text: error.message || "Failed to upload avatar. Please try again.",
-      });
+      showToast("error", error.message || "Failed to upload avatar. Please try again.");
       // Reset preview on error
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl);
@@ -147,13 +233,8 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
       setIsMobile(window.innerWidth < 768);
     };
 
-    // Check on mount
     checkScreenSize();
-
-    // Add event listener for resize
     window.addEventListener("resize", checkScreenSize);
-
-    // Cleanup
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
@@ -162,7 +243,6 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
 
     setAvatarLoading(true);
     try {
-      // Call the new remove endpoint
       const response = await fetch("/api/avatar/remove", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -175,7 +255,6 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
         throw new Error(data.error);
       }
 
-      // Update profile to remove avatar URL
       const { error: updateError } = await supabase
         .from("profiles")
         .update({ profile_img: null })
@@ -187,21 +266,22 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
 
       setAvatarUrl("");
       setPreviewUrl(null);
-      setMessage({ type: "success", text: "Avatar removed successfully!" });
-    } catch (error:any) {
+      showToast("success", "Avatar removed successfully!");
+    } catch (error: any) {
       console.error("Avatar removal error:", error);
-      setMessage({
-        type: "error",
-        text: error.message || "Failed to remove avatar.",
-      });
+      showToast("error", error.message || "Failed to remove avatar.");
     } finally {
       setAvatarLoading(false);
     }
   };
 
   const handleSave = async () => {
+    // Validate form
+    if (!validateForm()) {
+      return;
+    }
+
     setLoading(true);
-    setMessage(null);
 
     try {
       const response = await fetch("/api/profile", {
@@ -211,6 +291,7 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
           full_name: formData.full_name,
           email: formData.email,
           password: formData.password,
+          newpassword: formData.newpassword,
         }),
       });
 
@@ -220,9 +301,15 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
         throw new Error(data.error || "Failed to update profile");
       }
 
-      setMessage({ type: "success", text: "Profile updated successfully!" });
+      showToast("success", "Profile updated successfully!");
       setIsEditing(false);
-      setFormData((prev) => ({ ...prev, password: "" }));
+      setFormData((prev) => ({ 
+        ...prev, 
+        password: "",
+        newpassword: "",
+        confirmpassword: ""
+      }));
+      setFieldErrors({});
 
       setTimeout(() => {
         router.refresh();
@@ -232,7 +319,7 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
         error instanceof Error
           ? error.message
           : "Failed to update profile. Please try again.";
-      setMessage({ type: "error", text: errorMessage });
+      showToast("error", errorMessage);
     } finally {
       setLoading(false);
     }
@@ -251,6 +338,60 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
 
   return (
     <div className="min-h-screen bg-[#F5F1E8]">
+      {/* Toast Notification */}
+      {toast && (
+        <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2">
+          <div
+            className={`min-w-[300px] max-w-md p-4 rounded-lg shadow-lg flex items-start gap-3 ${
+              toast.type === "success"
+                ? "bg-green-50 text-green-800 border border-green-200"
+                : "bg-red-50 text-red-800 border border-red-200"
+            }`}
+          >
+            {toast.type === "success" ? (
+              <svg
+                className="w-5 h-5 flex-shrink-0 mt-0.5"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            ) : (
+              <svg
+                className="w-5 h-5 flex-shrink-0 mt-0.5"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            )}
+            <div className="flex-1">
+              <p className="text-sm font-medium">{toast.text}</p>
+            </div>
+            <button
+              onClick={() => setToast(null)}
+              className="flex-shrink-0 text-gray-400 hover:text-gray-600"
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="px-3 sm:px-5">
         <Breadcrumb
@@ -280,20 +421,7 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
             )}
           </div>
 
-          {/* Success/Error Message */}
-          {message && (
-            <div
-              className={`mb-6 p-4 rounded-lg break-words ${
-                message.type === "success"
-                  ? "bg-green-50 text-green-800 border border-green-200"
-                  : "bg-red-50 text-red-800 border border-red-200"
-              }`}
-            >
-              {message.text}
-            </div>
-          )}
-
-          {/* Avatar Section - New Feature */}
+          {/* Avatar Section */}
           <div className="mb-8">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-4 justify-between">
               <div className="relative">
@@ -347,7 +475,7 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                       </svg>
                       Upload Image
                     </button>
-                    {fileInputRef && (
+                    {(avatarUrl || previewUrl) && (
                       <button
                         onClick={handleRemoveAvatar}
                         className="px-4 py-2 flex items-center justify-center gap-1 text-[12px] md:text-sm text-red-600 bg-[#FCEBEC] font-semibold rounded-3xl hover:bg-red-50 transition-colors disabled:opacity-50"
@@ -405,14 +533,17 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                 <input
                   type="text"
                   value={formData.full_name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, full_name: e.target.value })
-                  }
+                  onChange={(e) => handleFieldChange("full_name", e.target.value)}
                   disabled={!isEditing}
                   placeholder="Full Name"
-                  className="w-full pl-9 xs:pl-10 sm:pl-12 pr-3 xs:pr-4 py-2 xs:py-2.5 border border-[#D3D6D1] text-xs xs:text-sm sm:text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] disabled:bg-[#F1F2F0] disabled:text-[#41463B] text-gray-500"
+                  className={`w-full pl-9 xs:pl-10 sm:pl-12 pr-3 xs:pr-4 py-2 xs:py-2.5 border text-xs xs:text-sm sm:text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] disabled:bg-[#F1F2F0] disabled:text-[#41463B] text-gray-500 ${
+                    fieldErrors.full_name ? "border-red-500" : "border-[#D3D6D1]"
+                  }`}
                 />
               </div>
+              {fieldErrors.full_name && (
+                <p className="text-red-500 text-xs mt-1">{fieldErrors.full_name}</p>
+              )}
             </div>
 
             {/* Email */}
@@ -473,15 +604,13 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                   <input
                     type={showCurrentPassword ? "text" : "password"}
                     value={formData.password}
-                    onChange={(e) =>
-                      setFormData({ ...formData, password: e.target.value })
-                    }
+                    onChange={(e) => handleFieldChange("password", e.target.value)}
                     disabled={!isEditing}
                     autoComplete="off"
-                    placeholder={
-                      isEditing ? "Enter current password" : "••••••••••"
-                    }
-                    className="w-full pl-9 xs:pl-10 sm:pl-12 pr-10 xs:pr-12 py-2 xs:py-2.5 sm:py-3 border border-[#D3D6D1] text-xs xs:text-sm sm:text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] disabled:bg-[#F1F2F0] disabled:text-[#41463B] text-gray-500"
+                    placeholder={isEditing ? "Enter current password" : "••••••••••"}
+                    className={`w-full pl-9 xs:pl-10 sm:pl-12 pr-10 xs:pr-12 py-2 xs:py-2.5 sm:py-3 border text-xs xs:text-sm sm:text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] disabled:bg-[#F1F2F0] disabled:text-[#41463B] text-gray-500 ${
+                      fieldErrors.password ? "border-red-500" : "border-[#D3D6D1]"
+                    }`}
                   />
                   {isEditing && (
                     <button
@@ -489,7 +618,7 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                       onClick={() => setShowCurrentPassword((s) => !s)}
                       className="absolute right-3 xs:right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                     >
-                      {showCurrentPassword ? (
+                      {!showCurrentPassword ? (
                         <svg
                           className="w-4 h-4 xs:w-5 xs:h-5"
                           fill="none"
@@ -527,6 +656,9 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                     </button>
                   )}
                 </div>
+                {fieldErrors.password && (
+                  <p className="text-red-500 text-xs mt-1">{fieldErrors.password}</p>
+                )}
               </div>
 
               {/* New Password */}
@@ -551,15 +683,13 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                   <input
                     type={showNewPassword ? "text" : "password"}
                     value={formData.newpassword}
-                    onChange={(e) =>
-                      setFormData({ ...formData, newpassword: e.target.value })
-                    }
+                    onChange={(e) => handleFieldChange("newpassword", e.target.value)}
                     disabled={!isEditing}
                     autoComplete="new-password"
-                    placeholder={
-                      isEditing ? "Enter new password" : "••••••••••"
-                    }
-                    className="w-full pl-9 xs:pl-10 sm:pl-12 pr-10 xs:pr-12 py-2 xs:py-2.5 sm:py-3 border border-[#D3D6D1] text-xs xs:text-sm sm:text-[16px] text-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] disabled:bg-[#F1F2F0] disabled:text-[#41463B]"
+                    placeholder={isEditing ? "Enter new password" : "••••••••••"}
+                    className={`w-full pl-9 xs:pl-10 sm:pl-12 pr-10 xs:pr-12 py-2 xs:py-2.5 sm:py-3 border text-xs xs:text-sm sm:text-[16px] text-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] disabled:bg-[#F1F2F0] disabled:text-[#41463B] ${
+                      fieldErrors.newpassword ? "border-red-500" : "border-[#D3D6D1]"
+                    }`}
                   />
                   {isEditing && (
                     <button
@@ -567,7 +697,7 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                       onClick={() => setShowNewPassword((s) => !s)}
                       className="absolute right-3 xs:right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                     >
-                      {showNewPassword ? (
+                      {!showNewPassword ? (
                         <svg
                           className="w-4 h-4 xs:w-5 xs:h-5"
                           fill="none"
@@ -605,9 +735,14 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                     </button>
                   )}
                 </div>
-                <p className="text-[9px] xs:text-[10px] sm:text-xs text-gray-500 mt-1 xs:mt-1.5">
-                  Minimum 8 characters, one special character, one number
-                </p>
+                {fieldErrors.newpassword && (
+                  <p className="text-red-500 text-xs mt-1">{fieldErrors.newpassword}</p>
+                )}
+                {!fieldErrors.newpassword && (
+                  <p className="text-[9px] xs:text-[10px] sm:text-xs text-gray-500 mt-1 xs:mt-1.5">
+                    Minimum 8 characters, one special character, one number
+                  </p>
+                )}
               </div>
 
               {/* Confirm Password */}
@@ -632,17 +767,12 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                   <input
                     type={showConfirmPassword ? "text" : "password"}
                     value={formData.confirmpassword}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        confirmpassword: e.target.value,
-                      })
-                    }
+                    onChange={(e) => handleFieldChange("confirmpassword", e.target.value)}
                     disabled={!isEditing}
-                    placeholder={
-                      isEditing ? "Enter Confirm new password" : "••••••••••"
-                    }
-                    className="w-full pl-9 xs:pl-10 sm:pl-12 pr-10 xs:pr-12 py-2 xs:py-2.5 sm:py-3 border border-[#D3D6D1] text-xs xs:text-sm sm:text-[16px] text-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] disabled:bg-[#F1F2F0] disabled:text-[#41463B]"
+                    placeholder={isEditing ? "Enter Confirm new password" : "••••••••••"}
+                    className={`w-full pl-9 xs:pl-10 sm:pl-12 pr-10 xs:pr-12 py-2 xs:py-2.5 sm:py-3 border text-xs xs:text-sm sm:text-[16px] text-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] disabled:bg-[#F1F2F0] disabled:text-[#41463B] ${
+                      fieldErrors.confirmpassword ? "border-red-500" : "border-[#D3D6D1]"
+                    }`}
                   />
                   {isEditing && (
                     <button
@@ -650,7 +780,7 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                       onClick={() => setShowConfirmPassword((s) => !s)}
                       className="absolute right-3 xs:right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                     >
-                      {showConfirmPassword ? (
+                      {!showConfirmPassword ? (
                         <svg
                           className="w-4 h-4 xs:w-5 xs:h-5"
                           fill="none"
@@ -688,6 +818,9 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                     </button>
                   )}
                 </div>
+                {fieldErrors.confirmpassword && (
+                  <p className="text-red-500 text-xs mt-1">{fieldErrors.confirmpassword}</p>
+                )}
               </div>
             </div>
 
@@ -704,12 +837,11 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                       newpassword: "",
                       confirmpassword: "",
                     });
-                    // Reset avatar preview
+                    setFieldErrors({});
                     if (previewUrl) {
                       URL.revokeObjectURL(previewUrl);
                       setPreviewUrl(null);
                     }
-                    setMessage(null);
                   }}
                   disabled={loading || avatarLoading}
                   className="px-4 py-2 text-[12px] md:text-sm text-gray-600 font-semibold rounded-3xl hover:bg-gray-50 transition-colors disabled:opacity-50"

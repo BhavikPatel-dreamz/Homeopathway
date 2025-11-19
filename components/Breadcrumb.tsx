@@ -19,7 +19,7 @@ export default function Breadcrumb({ items, className = "" }: BreadcrumbProps) {
     <div className={`bg-[#F5F1E8] ${className}`}>
       <div className="max-w-7xl mx-auto px-6 py-3">
         <div className="flex items-center gap-2 text-sm text-gray-600">
-          {items.map((item, index) => (
+          {items?.map((item, index) => (
             <React.Fragment key={index}>
               {index > 0 && <span>/</span>}
               {item.href && !item.isActive ? (

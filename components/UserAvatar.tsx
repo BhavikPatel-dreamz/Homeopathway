@@ -12,16 +12,84 @@ interface UserAvatarProps {
   className?: string;
 }
 
+const USER_CACHE_KEY = "user_profile_cache";
+const CACHE_EXPIRY_MS = 5 * 60 * 1000; // 5 minutes
+
+interface CachedUserData {
+  user: User;
+  profile: UserProfile;
+  timestamp: number;
+}
+
 export default function UserAvatar({ className = "" }: UserAvatarProps) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [showDropdown, setShowDropdown] = useState(false);
 
+  // Helper function to check if cache is valid
+  const isCacheValid = (timestamp: number): boolean => {
+    return Date.now() - timestamp < CACHE_EXPIRY_MS;
+  };
+
+  // Helper function to get cached data
+  const getCachedData = (): CachedUserData | null => {
+    try {
+      const cached = localStorage.getItem(USER_CACHE_KEY);
+      if (cached) {
+        const data: CachedUserData = JSON.parse(cached);
+        if (isCacheValid(data.timestamp)) {
+          return data;
+        } else {
+          // Cache expired, remove it
+          localStorage.removeItem(USER_CACHE_KEY);
+        }
+      }
+    } catch (error) {
+      console.error("Error reading cache:", error);
+      localStorage.removeItem(USER_CACHE_KEY);
+    }
+    return null;
+  };
+
+  // Helper function to set cached data
+  const setCachedData = (user: User, profile: UserProfile): void => {
+    try {
+      const cacheData: CachedUserData = {
+        user,
+        profile,
+        timestamp: Date.now(),
+      };
+      localStorage.setItem(USER_CACHE_KEY, JSON.stringify(cacheData));
+    } catch (error) {
+      console.error("Error setting cache:", error);
+    }
+  };
+
+  // Helper function to clear cached data
+  const clearCachedData = (): void => {
+    try {
+      localStorage.removeItem(USER_CACHE_KEY);
+    } catch (error) {
+      console.error("Error clearing cache:", error);
+    }
+  };
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        // Get current user
+        // First, check localStorage for cached data
+        const cachedData = getCachedData();
+        
+        if (cachedData) {
+          // Use cached data
+          setUser(cachedData.user);
+          setProfile(cachedData.profile);
+          setLoading(false);
+          return;
+        }
+
+        // If no valid cache, fetch from Supabase
         const {
           data: { user },
         } = await supabase.auth.getUser();
@@ -38,10 +106,16 @@ export default function UserAvatar({ className = "" }: UserAvatarProps) {
 
           if (profileData && !error) {
             setProfile(profileData);
+            // Cache the data
+            setCachedData(user, profileData);
           }
+        } else {
+          // No user logged in, clear cache
+          clearCachedData();
         }
       } catch (error) {
         console.error("Error fetching user:", error);
+        clearCachedData();
       } finally {
         setLoading(false);
       }
@@ -59,6 +133,7 @@ export default function UserAvatar({ className = "" }: UserAvatarProps) {
       } else if (event === "SIGNED_OUT") {
         setUser(null);
         setProfile(null);
+        clearCachedData();
       }
     });
 
