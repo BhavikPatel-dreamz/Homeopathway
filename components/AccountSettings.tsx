@@ -206,50 +206,29 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
       const preview = URL.createObjectURL(file);
       setPreviewUrl(preview);
 
-      // Create a FormData object to send the file
-      const formData = new FormData();
-      formData.append("file", file);
-
-      // Upload to the new API endpoint
-      const response = await fetch("/api/avatar/upload", {
-        method: "POST",
-        body: formData,
+      // Convert image to base64 directly
+      const reader = new FileReader();
+      
+      const base64Image = await new Promise<string>((resolve, reject) => {
+        reader.onload = (e) => {
+          const result = e.target?.result as string;
+          resolve(result);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
       });
 
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(data.error || "Failed to upload avatar.");
-      }
-
-      const newAvatarUrl = data.path;
-
-      // Update user profile with the new avatar URL
+      // Update user profile with the base64 image directly
       const { error: updateError } = await supabase
         .from("profiles")
-        .update({ profile_img: newAvatarUrl })
+        .update({ profile_img: base64Image })
         .eq("id", user.id);
 
       if (updateError) {
-        // If the DB update fails, try to remove the uploaded file
-        await fetch("/api/avatar/remove", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ path: newAvatarUrl }),
-        });
         throw updateError;
       }
 
-      // If there was an old avatar, remove it
-      if (avatarUrl) {
-        await fetch("/api/avatar/remove", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ path: avatarUrl }),
-        });
-      }
-
-      setAvatarUrl(newAvatarUrl);
+      setAvatarUrl(base64Image);
       
       // Update cache after avatar change
       await updateCache();
@@ -283,27 +262,16 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
 
     setAvatarLoading(true);
     try {
-      const response = await fetch("/api/avatar/remove", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ path: avatarUrl }),
-      });
-
-      const data = await response.json();
-
-      if (!data.success && data.error) {
-        throw new Error(data.error);
-      }
-
+      // Simply update the database to remove the avatar
       const { error: updateError } = await supabase
         .from("profiles")
         .update({ profile_img: null })
         .eq("id", user.id);
-
+  
       if (updateError) {
         throw updateError;
       }
-
+  
       setAvatarUrl("");
       setPreviewUrl(null);
       
@@ -597,7 +565,6 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                 <p className="text-red-500 text-xs mt-1">{fieldErrors.full_name}</p>
               )}
             </div>
-
             {/* Email */}
             <div>
               <label className="block text-[14px] xs:text-sm font-medium text-[#41463B] mb-1.5 xs:mb-2">
