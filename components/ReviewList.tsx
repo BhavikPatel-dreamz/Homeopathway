@@ -123,6 +123,8 @@ export default function ReviewListPage({
     rating: [],
     dosage: [],
     form: [],
+    dateRange: "all",
+    userName: "",
   });
 
   const [activeFilters, setActiveFilters] = useState<{
@@ -144,7 +146,6 @@ export default function ReviewListPage({
 
   const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  const [isAdvancedFilterOpen, setIsAdvancedFilterOpen] = useState(false);
 
   const [totalReviews, setTotalReviews] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -176,7 +177,7 @@ export default function ReviewListPage({
       });
 
       let allReviews = reviewsData || [];
-      
+
       // Apply advanced filters
       allReviews = allReviews.filter((review) => {
         // Filter by dosage/potency tags
@@ -343,10 +344,7 @@ export default function ReviewListPage({
 
   return (
     <div>
-      <section
-        id="Reviews"
-        className="bg-white rounded-2xl md:p-4 sm:py-8 "
-      >
+      <section id="Reviews" className="bg-white rounded-2xl md:p-4 sm:py-8 ">
         <div className="grid grid-cols-1 lg:grid-cols-3 md:gap-6 sm:gap-10">
           {/* Left Panel – Ratings Summary */}
           <aside className="col-span-1 mb-6 lg:mb-0">
@@ -446,111 +444,29 @@ export default function ReviewListPage({
                 {/* Filter Button */}
                 <div className="relative" ref={filterDropdownRef}>
                   {/* Filter Button INSIDE Input */}
+                  {/* Filter Button */}
                   <button
-                    onClick={() =>
-                      setIsAdvancedFilterOpen(!isAdvancedFilterOpen)
-                    }
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 px-3 py-3 bg-[#6C7463] hover:bg-[#5A6B5D] 
-      text-white rounded-md transition-colors flex items-center gap-1"
-                    ref={filterDropdownRef}
-                  >
+                    onClick={() => setIsFilterModalOpen(true)}
+                   className="absolute right-2.5 top-1/2 -translate-y-1/2 px-3 py-3 bg-[#6C7463] hover:bg-[#5A6B5D] 
+      text-white rounded-md transition-colors flex items-center gap-1"                  >
                     <SlidersHorizontal className="w-4 h-4" />
 
-                    {/* Show badge inside button */}
-                    {getActiveFilterCount() > 0 && (
+                    {/* Show badge */}
+                    {filters.rating.length +
+                      filters.dosage.length +
+                      filters.form.length +
+                      (filters.dateRange !== "all" ? 1 : 0) +
+                      (filters.userName ? 1 : 0) >
+                      0 && (
                       <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                        {getActiveFilterCount()}
+                        {filters.rating.length +
+                          filters.dosage.length +
+                          filters.form.length +
+                          (filters.dateRange !== "all" ? 1 : 0) +
+                          (filters.userName ? 1 : 0)}
                       </span>
                     )}
                   </button>
-
-                  {/* Advanced Filter Dropdown */}
-                  {isAdvancedFilterOpen && (
-                    <div className="absolute right-0 top-full mt-2 w-80 bg-white border border-gray-300 rounded-lg shadow-lg z-20 p-4">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="font-semibold text-gray-800">Filters</h3>
-                        {getActiveFilterCount() > 0 && (
-                          <button
-                            onClick={clearAllAdvancedFilters}
-                            className="text-xs text-red-600 hover:text-red-700 font-medium"
-                          >
-                            Clear All
-                          </button>
-                        )}
-                      </div>
-
-                      {/* Dosage/Potency Tags */}
-                      <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Dosage/Potency
-                        </label>
-                        <div className="flex flex-wrap gap-2">
-                          {filterOptions.potencies.map((potency) => (
-                            <button
-                              key={potency}
-                              onClick={() =>
-                                setActiveFilters((prev) => ({
-                                  ...prev,
-                                  dosage: prev.dosage.includes(potency)
-                                    ? prev.dosage.filter((d) => d !== potency)
-                                    : [...prev.dosage, potency],
-                                }))
-                              }
-                              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                                activeFilters.dosage.includes(potency)
-                                  ? "bg-[#6C7463] text-white"
-                                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                              }`}
-                            >
-                              {potency}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Date Range */}
-                      <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Time Period
-                        </label>
-                        <select
-                          value={activeFilters.dateRange}
-                          onChange={(e) =>
-                            setActiveFilters((prev) => ({
-                              ...prev,
-                              dateRange: e.target.value,
-                            }))
-                          }
-                          className="w-full px-3 py-2 border border-gray-300  text-black rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#6C7463]"
-                        >
-                          <option value="all">All Time</option>
-                          <option value="today">Today</option>
-                          <option value="week">Past Week</option>
-                          <option value="month">Past Month</option>
-                          <option value="year">Past Year</option>
-                        </select>
-                      </div>
-
-                      {/* User Name */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Reviewer Name
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="Filter by name..."
-                          value={activeFilters.userName}
-                          onChange={(e) =>
-                            setActiveFilters((prev) => ({
-                              ...prev,
-                              userName: e.target.value,
-                            }))
-                          }
-                          className="w-full px-3 py-2 text-black border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#6C7463]"
-                        />
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
 
@@ -727,13 +643,15 @@ export default function ReviewListPage({
         </div>
 
         {/* Filter Modal */}
+        {/* Filter Modal */}
         <ReviewFilterModal
           isOpen={isFilterModalOpen}
           onClose={() => setIsFilterModalOpen(false)}
           onApply={(appliedFilters) => setFilters(appliedFilters)}
-          totalResults={reviews.length}
+          totalResults={totalReviews}
           dosageOptions={filterOptions.potencies}
           formOptions={filterOptions.forms}
+          currentFilters={filters}
         />
       </section>
 

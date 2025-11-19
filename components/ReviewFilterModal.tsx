@@ -1,10 +1,12 @@
-"use client";
-import { useState } from 'react';
+import React from 'react';
+import { X, Star } from 'lucide-react';
 
 export interface ReviewFilters {
   rating: number[];
   dosage: string[];
   form: string[];
+  dateRange: string;
+  userName: string;
 }
 
 interface ReviewFilterModalProps {
@@ -14,153 +16,280 @@ interface ReviewFilterModalProps {
   totalResults: number;
   dosageOptions: string[];
   formOptions: string[];
+  currentFilters: ReviewFilters;
 }
 
-export default function ReviewFilterModal({ isOpen, onClose, onApply, totalResults, dosageOptions = [], formOptions = [] }: ReviewFilterModalProps) {
-  const [filters, setFilters] = useState<ReviewFilters>({
-    rating: [],
-    dosage: [],
-    form: [],
-  });
+export default function ReviewFilterModal({
+  isOpen,
+  onClose,
+  onApply,
+  totalResults,
+  dosageOptions,
+  formOptions,
+  currentFilters,
+}: ReviewFilterModalProps) {
+  const [localFilters, setLocalFilters] = React.useState<ReviewFilters>(currentFilters);
 
-  // In a real scenario, you would fetch these from your database
-  // and pass them as props to this component. This is now correctly
-  // handled by destructuring `dosageOptions` and `formOptions` from props.
-  // Default values are provided in case the props are not passed.
+  React.useEffect(() => {
+    if (isOpen) {
+      setLocalFilters(currentFilters);
+    }
+  }, [isOpen, currentFilters]);
 
   if (!isOpen) return null;
 
-  const handleRatingChange = (rating: number) => {
-    setFilters(prev => ({
+  const toggleRating = (rating: number) => {
+    setLocalFilters((prev) => ({
       ...prev,
       rating: prev.rating.includes(rating)
-        ? prev.rating.filter(r => r !== rating)
-        : [...prev.rating, rating]
+        ? prev.rating.filter((r) => r !== rating)
+        : [...prev.rating, rating],
     }));
   };
 
-  const handleDosageChange = (dosage: string) => {
-    setFilters(prev => ({
+  const toggleDosage = (dosage: string) => {
+    setLocalFilters((prev) => ({
       ...prev,
       dosage: prev.dosage.includes(dosage)
-        ? prev.dosage.filter(d => d !== dosage)
-        : [...prev.dosage, dosage]
+        ? prev.dosage.filter((d) => d !== dosage)
+        : [...prev.dosage, dosage],
     }));
   };
 
-  const handleFormChange = (form: string) => {
-    setFilters(prev => ({
+  const toggleForm = (form: string) => {
+    setLocalFilters((prev) => ({
       ...prev,
       form: prev.form.includes(form)
-        ? prev.form.filter(f => f !== form)
-        : [...prev.form, form]
+        ? prev.form.filter((f) => f !== form)
+        : [...prev.form, form],
     }));
   };
 
   const clearAll = () => {
-    setFilters({
+    setLocalFilters({
       rating: [],
       dosage: [],
       form: [],
+      dateRange: 'all',
+      userName: '',
     });
   };
 
   const handleApply = () => {
-    onApply(filters);
+    onApply(localFilters);
     onClose();
   };
 
+  const renderStars = (count: number) => {
+    return (
+      <div className="flex gap-0.5">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Star
+            key={star}
+            className={`w-4 h-4 ${
+              star <= count
+                ? 'fill-yellow-400 text-yellow-400'
+                : 'fill-none text-gray-300 stroke-2'
+            }`}
+          />
+        ))}
+      </div>
+    );
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl w-full max-w-md shadow-xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 bg-opacity-50 p-4">
+      <div className="bg-white rounded-lg w-full max-w-md max-h-[50vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h3 className="text-xl font-semibold text-gray-900">Filters</h3>
+        <div className="flex items-center justify-between p-6 border-b">
+          <h2 className="text-xl font-semibold text-gray-900">Filters</h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
+            className="text-gray-400 hover:text-gray-600 transition"
           >
-            ✕
+            <X className="w-6 h-6" />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="p-6 max-h-[60vh] overflow-y-auto space-y-6">
-          {/* Rating Filter */}
-          <div>
-            <h4 className="text-sm font-semibold text-gray-900 mb-3">Rating</h4>
-            <div className="space-y-2">
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto p-6">
+          {/* Rating Section */}
+          <div className="mb-6">
+            <h3 className="text-base font-semibold text-gray-900 mb-3">
+              Rating
+            </h3>
+            <div className="space-y-2.5">
               {[5, 4, 3, 2, 1].map((rating) => (
-                <label key={rating} className="flex items-center gap-3 cursor-pointer group">
-                  <input
-                    type="checkbox"
-                    checked={filters.rating.includes(rating)}
-                    onChange={() => handleRatingChange(rating)}
-                    className="w-4 h-4 text-[#6B7B5E] border-gray-300 rounded focus:ring-[#6B7B5E]"
-                  />
-                  <div className="flex items-center gap-1 text-yellow-400">
-                    {[...Array(rating)].map((_, i) => (
-                      <span key={i}>★</span>
-                    ))}
-                    {[...Array(5 - rating)].map((_, i) => (
-                      <span key={i} className="text-gray-300">☆</span>
-                    ))}
+                <label
+                  key={rating}
+                  className="flex items-center gap-3 cursor-pointer group"
+                >
+                  <div className="relative flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={localFilters.rating.includes(rating)}
+                      onChange={() => toggleRating(rating)}
+                      className="w-5 h-5 border-2 border-gray-300 rounded cursor-pointer appearance-none
+                        checked:bg-[#6C7463] checked:border-[#6C7463]
+                        focus:ring-2 focus:ring-[#6C7463] focus:ring-offset-2 transition"
+                    />
+                    {localFilters.rating.includes(rating) && (
+                      <svg
+                        className="w-3 h-3 text-white absolute left-1 pointer-events-none"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="3"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path d="M5 13l4 4L19 7"></path>
+                      </svg>
+                    )}
                   </div>
+                  {renderStars(rating)}
                 </label>
               ))}
             </div>
           </div>
 
-          {/* Dosage Filter */}
-          <div>
-            <h4 className="text-sm font-semibold text-gray-900 mb-3">Dosage</h4>
-            <div className="space-y-2">
+          {/* Dosage Section */}
+          <div className="mb-6">
+            <h3 className="text-base font-semibold text-gray-900 mb-3">
+              Dosage
+            </h3>
+            <div className="space-y-2.5">
               {dosageOptions.map((dosage) => (
-                <label key={dosage} className="flex items-center gap-3 cursor-pointer group">
-                  <input
-                    type="checkbox"
-                    checked={filters.dosage.includes(dosage)}
-                    onChange={() => handleDosageChange(dosage)}
-                    className="w-4 h-4 text-[#6B7B5E] border-gray-300 rounded focus:ring-[#6B7B5E]"
-                  />
-                  <span className="text-gray-700">{dosage}</span>
+                <label
+                  key={dosage}
+                  className="flex items-center gap-3 cursor-pointer group"
+                >
+                  <div className="relative flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={localFilters.dosage.includes(dosage)}
+                      onChange={() => toggleDosage(dosage)}
+                      className="w-5 h-5 border-2 border-gray-300 rounded cursor-pointer appearance-none
+                        checked:bg-[#6C7463] checked:border-[#6C7463]
+                        focus:ring-2 focus:ring-[#6C7463] focus:ring-offset-2 transition"
+                    />
+                    {localFilters.dosage.includes(dosage) && (
+                      <svg
+                        className="w-3 h-3 text-white absolute left-1 pointer-events-none"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="3"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path d="M5 13l4 4L19 7"></path>
+                      </svg>
+                    )}
+                  </div>
+                  <span className="text-gray-700 font-medium text-[15px]">{dosage}</span>
                 </label>
               ))}
             </div>
           </div>
 
-          {/* Form Filter */}
-          <div>
-            <h4 className="text-sm font-semibold text-gray-900 mb-3">Form</h4>
-            <div className="space-y-2">
+          {/* Form Section */}
+          <div className="mb-6">
+            <h3 className="text-base font-semibold text-gray-900 mb-3">Form</h3>
+            <div className="space-y-2.5">
               {formOptions.map((form) => (
-                <label key={form} className="flex items-center gap-3 cursor-pointer group">
-                  <input
-                    type="checkbox"
-                    checked={filters.form.includes(form)}
-                    onChange={() => handleFormChange(form)}
-                    className="w-4 h-4 text-[#6B7B5E] border-gray-300 rounded focus:ring-[#6B7B5E]"
-                  />
-                  <span className="text-gray-700">{form}</span>
+                <label
+                  key={form}
+                  className="flex items-center gap-3 cursor-pointer group"
+                >
+                  <div className="relative flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={localFilters.form.includes(form)}
+                      onChange={() => toggleForm(form)}
+                      className="w-5 h-5 border-2 border-gray-300 rounded cursor-pointer appearance-none
+                        checked:bg-[#6C7463] checked:border-[#6C7463]
+                        focus:ring-2 focus:ring-[#6C7463] focus:ring-offset-2 transition"
+                    />
+                    {localFilters.form.includes(form) && (
+                      <svg
+                        className="w-3 h-3 text-white absolute left-1 pointer-events-none"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="3"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path d="M5 13l4 4L19 7"></path>
+                      </svg>
+                    )}
+                  </div>
+                  <span className="text-gray-700 font-medium text-[15px]">{form}</span>
                 </label>
               ))}
             </div>
+          </div>
+
+          {/* Time Period Section */}
+          <div className="mb-6">
+            <label className="block text-base font-semibold text-gray-900 mb-3">
+              Time Period
+            </label>
+            <select
+              value={localFilters.dateRange}
+              onChange={(e) =>
+                setLocalFilters((prev) => ({
+                  ...prev,
+                  dateRange: e.target.value,
+                }))
+              }
+              className="w-full px-3 py-2.5 border-2 border-gray-300 text-gray-700 rounded-md text-sm 
+                focus:outline-none focus:ring-2 focus:ring-[#6C7463] focus:border-[#6C7463] transition"
+            >
+              <option value="all">All Time</option>
+              <option value="today">Today</option>
+              <option value="week">Past Week</option>
+              <option value="month">Past Month</option>
+              <option value="year">Past Year</option>
+            </select>
+          </div>
+
+          {/* Reviewer Name Section */}
+          <div>
+            <label className="block text-base font-semibold text-gray-900 mb-3">
+              Reviewer Name
+            </label>
+            <input
+              type="text"
+              placeholder="Filter by name..."
+              value={localFilters.userName}
+              onChange={(e) =>
+                setLocalFilters((prev) => ({
+                  ...prev,
+                  userName: e.target.value,
+                }))
+              }
+              className="w-full px-3 py-2.5 text-gray-700 border-2 border-gray-300 rounded-md text-sm 
+                focus:outline-none focus:ring-2 focus:ring-[#6C7463] focus:border-[#6C7463] transition
+                placeholder:text-gray-400"
+            />
           </div>
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-200 flex gap-3">
+        <div className="flex items-center justify-between p-6 border-t bg-white">
           <button
             onClick={clearAll}
-            className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+            className="text-gray-700 font-medium hover:text-gray-900 transition text-[15px]"
           >
             Clear all
           </button>
           <button
             onClick={handleApply}
-            className="flex-1 px-6 py-3 bg-[#6B7B5E] text-white rounded-lg font-medium hover:bg-[#5A6A4D] transition-colors"
+            className="bg-[#6C7463] hover:bg-[#5A6B5D] text-white px-8 py-2.5 rounded-lg font-medium transition text-[15px]"
           >
-            Show {totalResults} results
+            Show {totalResults.toLocaleString()} results
           </button>
         </div>
       </div>
