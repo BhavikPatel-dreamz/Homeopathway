@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Montserrat } from "next/font/google";
 import "./globals.css";
-import ConditionalLayout from "@/components/ConditionalLayout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,7 +15,7 @@ const geistMono = Geist_Mono({
 const montserrat = Montserrat({
   subsets: ["latin"],
   variable: "--font-montserrat",
-  weight: ["400", "500", "600", "700"], // add or remove weights as needed
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -24,7 +23,8 @@ export const metadata: Metadata = {
     default: "Homeopathway - Natural Homeopathic Remedies & Wellness Solutions",
     template: "%s | Homeopathway"
   },
-  description: "Discover effective homeopathic remedies for common ailments. Browse our comprehensive database of natural treatments, read user reviews, and find the right homeopathic solution for your health needs.",
+  description:
+    "Discover effective homeopathic remedies for common ailments. Browse our comprehensive database of natural treatments, read user reviews, and find the right homeopathic solution for your health needs.",
   keywords: [
     "homeopathy",
     "homeopathic remedies",
@@ -45,7 +45,9 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+  ),
   alternates: {
     canonical: "/",
   },
@@ -54,7 +56,8 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "/",
     title: "Homeopathway - Natural Homeopathic Remedies & Wellness Solutions",
-    description: "Discover effective homeopathic remedies for common ailments. Browse our comprehensive database of natural treatments and find the right solution for your health needs.",
+    description:
+      "Discover effective homeopathic remedies for common ailments. Browse our database to find the right solution.",
     siteName: "Homeopathway",
     images: [
       {
@@ -68,7 +71,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Homeopathway - Natural Homeopathic Remedies & Wellness Solutions",
-    description: "Discover effective homeopathic remedies for common ailments. Browse our comprehensive database of natural treatments.",
+    description:
+      "Discover effective homeopathic remedies for common ailments. Browse our comprehensive database of natural treatments.",
     images: ["/og-image.jpg"],
     creator: "@homeopathway",
   },
@@ -78,9 +82,9 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
   verification: {
@@ -90,8 +94,7 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
 };
 
-
-// ✅ Proper viewport setup for all devices
+// Viewport config
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -103,21 +106,14 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <head>
-        {/* Mobile app meta tags */}
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Homeopathway" />
-        <meta name="msapplication-TileColor" content="#10b981" />
-        <link rel="mask-icon" href="/favicon.svg" color="#10b981" />
-      </head>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable}`}>
       <body className="antialiased bg-white text-gray-900">
         {children}
       </body>
     </html>
   );
 }
+
 
 // export default function RootLayout({
 //   children,

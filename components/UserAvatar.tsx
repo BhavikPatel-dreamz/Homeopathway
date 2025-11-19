@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { UserProfile } from '@/types/supabase';
-import { supabase } from '@/lib/supabaseClient';
-import { User } from '@supabase/supabase-js';
-import UserDropdown from './UserDropdown';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useState, useEffect } from "react";
+import { UserProfile } from "@/types/supabase";
+import { supabase } from "@/lib/supabaseClient";
+import { User } from "@supabase/supabase-js";
+import UserDropdown from "./UserDropdown";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 interface UserAvatarProps {
   className?: string;
@@ -17,30 +17,31 @@ export default function UserAvatar({ className = "" }: UserAvatarProps) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [showDropdown, setShowDropdown] = useState(false);
-  const pathname = usePathname();
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
         // Get current user
-        const { data: { user } } = await supabase.auth.getUser();
-        
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
         if (user) {
           setUser(user);
-          
+
           // Fetch profile data
           const { data: profileData, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', user.id)
+            .from("profiles")
+            .select("*")
+            .eq("id", user.id)
             .single();
-          
+
           if (profileData && !error) {
             setProfile(profileData);
           }
         }
       } catch (error) {
-        console.error('Error fetching user:', error);
+        console.error("Error fetching user:", error);
       } finally {
         setLoading(false);
       }
@@ -49,11 +50,13 @@ export default function UserAvatar({ className = "" }: UserAvatarProps) {
     fetchUser();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" && session?.user) {
         setUser(session.user);
         fetchUser();
-      } else if (event === 'SIGNED_OUT') {
+      } else if (event === "SIGNED_OUT") {
         setUser(null);
         setProfile(null);
       }
@@ -62,19 +65,19 @@ export default function UserAvatar({ className = "" }: UserAvatarProps) {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Show loading skeleton while checking authentication
   if (loading) {
     return (
-      <div className={`animate-pulse bg-gray-300 rounded-full ${className} w-10 h-10`}>
+      <div className={`animate-pulse bg-gray-300 rounded-full ${className}`}>
       </div>
     );
   }
 
-  // Guest user - show login button
   if (!user || !profile) {
-    const isHome = pathname === '/';
-    const borderColor = isHome ? '#fff' : '#20231E';
-    const textColor = isHome ? '#fff' : '#20231E';
+    // Guest user - show a generic icon
+    const pathname = usePathname();
+    const isHome = pathname === "/";
+    const borderColor = isHome ? "#fff" : "#20231E";
+    const textColor = isHome ? "#fff" : "#20231E";
 
     return (
       <div className="relative">
@@ -86,8 +89,8 @@ export default function UserAvatar({ className = "" }: UserAvatarProps) {
             Login
           </button>
         </Link>
-        <UserDropdown 
-          isOpen={showDropdown} 
+        <UserDropdown
+          isOpen={showDropdown}
           onClose={() => setShowDropdown(false)}
           user={user}
           profile={profile}
@@ -96,36 +99,53 @@ export default function UserAvatar({ className = "" }: UserAvatarProps) {
     );
   }
 
-  // Logged in user - show initials avatar
-  const firstInitial = profile.first_name?.charAt(0)?.toUpperCase() || '';
-  const lastInitial = profile.last_name?.charAt(0)?.toUpperCase() || '';
-  const initials = firstInitial + lastInitial || profile.email?.charAt(0)?.toUpperCase() || 'U';
+  // Logged in user - show initials
+  const firstInitial = profile.first_name?.charAt(0)?.toUpperCase() || "";
+  const lastInitial = profile.last_name?.charAt(0)?.toUpperCase() || "";
+  const initials =
+    firstInitial + lastInitial ||
+    profile.email?.charAt(0)?.toUpperCase() ||
+    "U";
 
   // Generate a consistent color based on user ID
   const colors = [
-    'bg-red-500',
-    'bg-blue-500', 
-    'bg-green-500',
-    'bg-yellow-500',
-    'bg-purple-500',
-    'bg-pink-500',
-    'bg-indigo-500',
-    'bg-gray-500'
+    "bg-red-500",
+    "bg-blue-500",
+    "bg-green-500",
+    "bg-yellow-500",
+    "bg-purple-500",
+    "bg-pink-500",
+    "bg-indigo-500",
+    "bg-gray-500",
   ];
-  
+
   const colorIndex = user.id.charCodeAt(0) % colors.length;
   const bgColor = colors[colorIndex];
 
   return (
     <div className="relative">
-      <div 
-        className={`${bgColor} rounded-full flex items-center justify-center text-white font-semibold cursor-pointer ${className}`}
+      <div
         onClick={() => setShowDropdown(!showDropdown)}
+        className={`w-10 h-10 rounded-full flex items-center justify-center overflow-hidden cursor-pointer ${className}`}
+        style={{
+          backgroundColor: !profile.profile_img
+            ? bgColor.replace("bg-", "")
+            : undefined,
+        }}
       >
-        <span>{initials}</span>
+        {profile.profile_img ? (
+          <img
+            src={profile.profile_img}
+            alt={`${profile.first_name || "User"}'s avatar`}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <span className="text-white font-semibold text-sm">{initials}</span>
+        )}
       </div>
-      <UserDropdown 
-        isOpen={showDropdown} 
+
+      <UserDropdown
+        isOpen={showDropdown}
         onClose={() => setShowDropdown(false)}
         user={user}
         profile={profile}

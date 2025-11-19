@@ -52,6 +52,7 @@ export interface UserProfile {
   role: 'user' | 'admin';
   created_at: string;
   updated_at: string;
+  profile_img?: string;
 }
 
 // Review Types
