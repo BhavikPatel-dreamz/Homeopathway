@@ -17,6 +17,7 @@ interface ReviewFilterModalProps {
   dosageOptions: string[];
   formOptions: string[];
   currentFilters: ReviewFilters;
+  allReviews?: any[];
 }
 
 export default function ReviewFilterModal({
@@ -27,14 +28,83 @@ export default function ReviewFilterModal({
   dosageOptions,
   formOptions,
   currentFilters,
-}: any) {
+  allReviews = [],
+}: ReviewFilterModalProps) {
   const [localFilters, setLocalFilters] = React.useState<ReviewFilters>(currentFilters);
+  const [filteredCount, setFilteredCount] = React.useState(totalResults);
+
+  console.log("allReviews",allReviews);
+  
 
   React.useEffect(() => {
     if (isOpen) {
       setLocalFilters(currentFilters);
     }
   }, [isOpen, currentFilters]);
+
+  // Calculate filtered count whenever localFilters change
+  React.useEffect(() => {
+    if (!allReviews.length) {
+      setFilteredCount(totalResults);
+      return;
+    }
+
+    let filtered = allReviews.filter((review: any) => {
+      // Filter by rating
+      if (localFilters.rating.length > 0 && !localFilters.rating.includes(review.star_count)) {
+        return false;
+      }
+
+      // Filter by dosage
+      if (localFilters.dosage.length > 0) {
+        const hasMatchingDosage = localFilters.dosage.some(
+          (d) => review.dosage === d || review.potency === d
+        );
+        if (!hasMatchingDosage) return false;
+      }
+
+      // Filter by form
+      if (localFilters.form.length > 0 && !localFilters.form.includes(review.form)) {
+        return false;
+      }
+
+      // Filter by date range
+      if (localFilters.dateRange !== 'all') {
+        const reviewDate = new Date(review.created_at);
+        const now = new Date();
+        const daysDiff = Math.floor((now.getTime() - reviewDate.getTime()) / (1000 * 60 * 60 * 24));
+
+        switch (localFilters.dateRange) {
+          case 'today':
+            if (daysDiff > 0) return false;
+            break;
+          case 'week':
+            if (daysDiff > 7) return false;
+            break;
+          case 'month':
+            if (daysDiff > 30) return false;
+            break;
+          case 'year':
+            if (daysDiff > 365) return false;
+            break;
+        }
+      }
+
+      // Filter by user name
+      if (localFilters.userName.trim()) {
+        const userName = review.profiles?.first_name || review.profiles?.last_name
+          ? `${review.profiles?.first_name || ''} ${review.profiles?.last_name || ''}`.toLowerCase()
+          : 'anonymous';
+        if (!userName.includes(localFilters.userName.toLowerCase())) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+
+    setFilteredCount(filtered.length);
+  }, [localFilters, allReviews, totalResults]);
 
   if (!isOpen) return null;
 
@@ -171,7 +241,7 @@ export default function ReviewFilterModal({
               Dosage
             </h3>
             <div className="space-y-2.5">
-              {dosageOptions.map((dosage:any) => (
+              {dosageOptions.map((dosage: any) => (
                 <label
                   key={dosage}
                   className="flex items-center gap-3 cursor-pointer group"
@@ -209,7 +279,7 @@ export default function ReviewFilterModal({
           <div className="mb-6">
             <h3 className="text-base font-semibold text-gray-900 mb-3">Form</h3>
             <div className="space-y-2.5">
-              {formOptions.map((form:any) => (
+              {formOptions.map((form: any) => (
                 <label
                   key={form}
                   className="flex items-center gap-3 cursor-pointer group"
@@ -301,7 +371,7 @@ export default function ReviewFilterModal({
             onClick={handleApply}
             className="bg-[#6C7463] hover:bg-[#5A6B5D] text-white px-8 py-2.5 rounded-lg font-medium transition text-[15px]"
           >
-            Show {totalResults.toLocaleString()} results
+            Show {filteredCount.toLocaleString()} results
           </button>
         </div>
       </div>

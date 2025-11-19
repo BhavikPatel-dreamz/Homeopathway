@@ -157,6 +157,8 @@ export default function ReviewListPage({
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isPageLoading, setIsPageLoading] = useState(false);
 
+  const [allReviesList,setAllReviewsList] = useState([])
+
   // ---------------------------
   // Fetch Reviews + Stats
   // ---------------------------
@@ -177,6 +179,8 @@ export default function ReviewListPage({
       });
 
       let allReviews = reviewsData || [];
+
+      setAllReviewsList(reviewsData)
 
       // Apply advanced filters
       allReviews = allReviews.filter((review) => {
@@ -631,6 +635,7 @@ export default function ReviewListPage({
           dosageOptions={filterOptions.potencies}
           formOptions={filterOptions.forms}
           currentFilters={filters}
+           allReviews={allReviesList} 
         />
       </section>
 
