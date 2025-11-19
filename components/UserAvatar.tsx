@@ -215,7 +215,9 @@ export default function UserAvatar({ className = "" }: UserAvatarProps) {
             className="w-full h-full object-cover"
           />
         ) : (
+          <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-400">
           <span className="text-white font-semibold text-sm">{initials}</span>
+          </div>
         )}
       </div>
 

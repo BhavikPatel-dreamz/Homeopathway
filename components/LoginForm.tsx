@@ -10,80 +10,92 @@ export default function LoginForm() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   async function handleEmailLogin(e: React.FormEvent) {
     e.preventDefault();
-    setMessage(null);
+    setError(null);
+    setSuccess(null);
     setLoading(true);
     
     try {
       console.log('🔐 Attempting login...');
-      const { data, error } = await signInWithEmail({ email, password });
+      const { data, error: signInError } = await signInWithEmail({ email, password });
       
-      if (error) {
-        console.error('❌ Login error:', error);
+      if (signInError) {
+        console.error('❌ Login error:', signInError);
         setLoading(false);
-        setMessage(error.message || 'Failed to sign in');
+        
+        // User-friendly error messages
+        if (signInError.message.includes('Invalid login credentials')) {
+          setError('Incorrect email or password. Please try again.');
+        } else if (signInError.message.includes('Email not confirmed')) {
+          setError('Please verify your email address before logging in.');
+        } else if (signInError.message.includes('User not found')) {
+          setError('No account found with this email address.');
+        } else {
+          setError(signInError.message || 'Failed to sign in. Please try again.');
+        }
         return;
       }
 
       console.log('✅ Login successful, user:', data?.user?.email);
       // Get user profile to check role
       if (data?.user) {
-        console.log('🔍 Fetching user profile...',);
+        console.log('🔍 Fetching user profile...');
         const { profile, error: profileError } = await getUserProfile(data.user.id);
-        
         
         if (profileError) {
           console.error('❌ Profile fetch error:', profileError);
           setLoading(false);
-          setMessage(`Profile error: ${profileError.message}`);
+          setError(`Profile error: ${profileError.message}`);
           return;
         }
         
         if (!profile) {
           console.error('⚠️ Profile still not found after auto-create attempt');
           setLoading(false);
-          setMessage('Unable to create profile. Please check database permissions.');
+          setError('Unable to create profile. Please contact support.');
           return;
         }
         
-        // Success! Redirect based on role
-        if (profile?.role === 'admin') {
-          // Redirect admin to dashboard
-          console.log('👑 Redirecting admin to dashboard');
-          router.push('/admin');
-        } else {
-          // Redirect regular user to home page
-          console.log('👤 Redirecting user to home');
-          router.push('/');
-        }
+        // Success! Set success message briefly before redirect
+        setSuccess('Login successful! Redirecting...');
+        
+        // Redirect based on role
+        setTimeout(() => {
+          if (profile?.role === 'admin') {
+            console.log('👑 Redirecting admin to dashboard');
+            router.push('/admin');
+          } else {
+            console.log('👤 Redirecting user to home');
+            router.push('/');
+          }
+        }, 500);
       } else {
-        console.warn('⚠️ No user data returned');
         setLoading(false);
-        setMessage('Signed in successfully');
+        setError('Sign in failed. Please try again.');
       }
     } catch (err) {
       setLoading(false);
-      setMessage('An error occurred during sign in');
-      console.error('💥 Login error:', err);
+      setError('An unexpected error occurred. Please try again.');
     }
   }
 
   async function handleGoogle() {
-    setMessage(null);
+    setError(null);
+    setSuccess(null);
     setLoading(true);
-    const { data, error } = await signInWithGoogle();
+    const { data, error: googleError } = await signInWithGoogle();
     
-    if (error) {
+    if (googleError) {
       setLoading(false);
-      setMessage(error.message || 'Failed to sign in with Google');
+      setError(googleError.message || 'Failed to sign in with Google. Please try again.');
       return;
     }
 
     // Note: Google OAuth redirect is handled by Supabase
-    // You'll need to set up a callback page to handle role-based redirect
     setLoading(false);
   }
 
@@ -94,17 +106,47 @@ export default function LoginForm() {
         <div className="flex justify-center mb-6">
           <div className="w-25 h-22">
             <Link href="/" className='cursor-pointer'>
-            <img src="/login-logo.svg" alt="" />
+              <img src="/login-logo.svg" alt="" />
             </Link>
           </div>
         </div>
 
         {/* Heading */}
         <h1 className="text-3xl font-serif text-center mb-2 text-[#0B0C0A]">Welcome Back!</h1>
-        <p className="text-[#41463B] text-center text-[16px] font-[500]  mb-6">
+        <p className="text-[#41463B] text-center text-[16px] font-[500] mb-6">
           Glad to see you again.<br />
           Login to your account below.
         </p>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+            <svg className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+            </svg>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-red-800">{error}</p>
+            </div>
+            <button 
+              onClick={() => setError(null)}
+              className="text-red-400 hover:text-red-600 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </button>
+          </div>
+        )}
+
+        {/* Success Message */}
+        {success && (
+          <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3">
+            <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+            <p className="text-sm font-medium text-green-800">{success}</p>
+          </div>
+        )}
 
         {/* Form */}
         <form onSubmit={handleEmailLogin} className="space-y-4">
@@ -118,14 +160,14 @@ export default function LoginForm() {
                 <img src="/email.svg" alt="" />
               </span>
               <input
-                  type="email"
-                 value={email}
+                type="email"
+                value={email}
                 onChange={(e) => setEmail(e.target.value)}
-               placeholder="Enter your email"
-               className="w-full pl-9 pr-4 py-2.5 placeholder-[#41463B] font-[500] placeholder:font-[400] text-[16px] text-[#41463B] bg-[#F1F2F0] hover:bg-[#D3D6D1] focus:bg-[#ffffff] border border-[#D3D6D1] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#6C7463] focus:border-transparent transition-all duration-500"
-               required
-               autoFocus
-             />
+                placeholder="Enter your email"
+                className="w-full pl-9 pr-4 py-2.5 placeholder-[#41463B] font-[500] placeholder:font-[400] text-[16px] text-[#41463B] bg-[#F1F2F0] hover:bg-[#D3D6D1] focus:bg-[#ffffff] border border-[#D3D6D1] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#6C7463] focus:border-transparent transition-all duration-500"
+                required
+                autoFocus
+              />
             </div>
           </div>
 
@@ -149,13 +191,13 @@ export default function LoginForm() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cusror-pointer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
               >
-                  {showPassword ? (
-                    <img src="/eye-line.svg" alt="" />
-                  ) : (
-                    <img src="/eye-close.svg" alt="" />
-                  )}
+                {showPassword ? (
+                  <img src="/eye-line.svg" alt="" />
+                ) : (
+                  <img src="/eye-close.svg" alt="" />
+                )}
               </button>
             </div>
           </div>
@@ -171,17 +213,10 @@ export default function LoginForm() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#6C7463] text-white py-3 font-[600] rounded-full  hover:bg-[#565D4F] transition-colors  cursor-pointer transition-all duration-500"
+            className="w-full bg-[#6C7463] text-white py-3 font-[600] rounded-full hover:bg-[#565D4F] transition-colors cursor-pointer transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Signing in...' : 'Login'}
           </button>
-
-          {/* Error/Success Message */}
-          {message && (
-            <p className={`text-sm text-center ${message.includes('success') ? 'text-green-600' : 'text-red-600'}`}>
-              {message}
-            </p>
-          )}
 
           {/* Signup Link */}
           <p className="text-center text-sm text-[#83857D] font-[500] mb-6">
@@ -191,22 +226,12 @@ export default function LoginForm() {
             </Link>
           </p>
 
-          {/* Divider */}
-          {/* <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">or</span>
-            </div>
-          </div> */}
-
           {/* Google Login Button */}
           <button
             type="button"
             onClick={handleGoogle}
             disabled={loading}
-            className="w-full bg-[#F1F2F0] border border-[#D3D6D1] text-[16px] text-[#41463B] py-2.5 rounded-[8px] font-medium hover:bg-[#D3D6D1] transition-colors  flex items-center cursor-pointer justify-center gap-2 transition-all duration-500"
+            className="w-full bg-[#F1F2F0] border border-[#D3D6D1] text-[16px] text-[#41463B] py-2.5 rounded-[8px] font-medium hover:bg-[#D3D6D1] transition-colors flex items-center cursor-pointer justify-center gap-2 transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
