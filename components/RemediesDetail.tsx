@@ -331,7 +331,7 @@ const relatedRef = useRef<HTMLDivElement>(null!);
 
         {/* Origin Section */}
 
-        <section className=" bg-white rounded-[8px] p-4 sm:p-6">
+        <section className={`bg-white rounded-lg p-4 sm:p-6  ${activeTab == "Reviews" ? "mb-10" : ""}`}>
 
           <p className="text-lg sm:text-xl md:text-[20px] text-[#0B0C0A] font-semibold mb-4">
             Origin
@@ -358,7 +358,7 @@ const relatedRef = useRef<HTMLDivElement>(null!);
         </section>
 
         {/* Reviews Section */}
-        <div ref={reviewsRef} className=" bg-white rounded-lg p-4 sm:py-6">
+        <div ref={reviewsRef} className={`bg-white rounded-lg p-4 sm:py-6 ${activeTab == "Related Remedies" ? "mb-15 md:mb-0" : ""}`}>
           <ReviewListPage
             remedy={remedy}
             ailmentContext={
@@ -375,7 +375,7 @@ const relatedRef = useRef<HTMLDivElement>(null!);
 
         {/* Related Remedies Section */}
         <section ref={relatedRef}>
-          <h3 className="text-2xl sm:text-3xl font-serif text-gray-800 mb-4 sm:mb-6 font-normal">
+          <h3 className="text-2xl sm:text-3xl font-serif text-gray-800 mb-4 mt-2 md:mt-10 sm:mb-6 font-normal">
             Related Remedies
           </h3>
 
