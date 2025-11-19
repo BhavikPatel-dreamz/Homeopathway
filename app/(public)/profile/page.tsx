@@ -61,6 +61,7 @@ export default async function ProfilePage() {
         email: user?.email || '',
         first_name: profile?.first_name || '',
         last_name: profile?.last_name || '',
+        profile_img:profile?.profile_img || ""
       }}
     />
   );
