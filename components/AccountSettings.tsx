@@ -126,7 +126,7 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
 
       setAvatarUrl(newAvatarUrl);
       setMessage({ type: "success", text: "Avatar updated successfully!" });
-    } catch (error) {
+    } catch (error:any) {
       console.error("Avatar upload error:", error);
       setMessage({
         type: "error",
@@ -188,7 +188,7 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
       setAvatarUrl("");
       setPreviewUrl(null);
       setMessage({ type: "success", text: "Avatar removed successfully!" });
-    } catch (error) {
+    } catch (error:any) {
       console.error("Avatar removal error:", error);
       setMessage({
         type: "error",

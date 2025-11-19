@@ -302,7 +302,7 @@ export default function ReviewListPage({
         filterDropdownRef.current &&
         !filterDropdownRef.current.contains(event.target as Node)
       ) {
-        setIsAdvancedFilterOpen(false);
+        setIsFilterModalOpen(false);
       }
     };
 
@@ -314,21 +314,6 @@ export default function ReviewListPage({
 
   const refreshReviews = () => fetchReviews(false);
 
-  const getActiveFilterCount = () => {
-    let count = 0;
-    if (activeFilters.dosage.length > 0) count += activeFilters.dosage.length;
-    if (activeFilters.dateRange !== "all") count += 1;
-    if (activeFilters.userName.trim()) count += 1;
-    return count;
-  };
-
-  const clearAllAdvancedFilters = () => {
-    setActiveFilters({
-      dosage: [],
-      dateRange: "all",
-      userName: "",
-    });
-  };
 
   const sortOptions = [
     { label: "Most Recent", value: "newest" },
@@ -647,7 +632,7 @@ export default function ReviewListPage({
         <ReviewFilterModal
           isOpen={isFilterModalOpen}
           onClose={() => setIsFilterModalOpen(false)}
-          onApply={(appliedFilters) => setFilters(appliedFilters)}
+          onApply={(appliedFilters: ReviewFilters) => setFilters(appliedFilters)}
           totalResults={totalReviews}
           dosageOptions={filterOptions.potencies}
           formOptions={filterOptions.forms}

@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
       limit,
       totalPages: Math.ceil((count || 0) / limit)
     });
-  } catch (error) {
+  } catch (error:any) {
     console.error('API error:', error);
     return NextResponse.json({ 
       error: 'Internal server error',

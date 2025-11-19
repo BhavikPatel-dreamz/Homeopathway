@@ -27,7 +27,7 @@ export default function ReviewFilterModal({
   dosageOptions,
   formOptions,
   currentFilters,
-}: ReviewFilterModalProps) {
+}: any) {
   const [localFilters, setLocalFilters] = React.useState<ReviewFilters>(currentFilters);
 
   React.useEffect(() => {
@@ -159,7 +159,7 @@ export default function ReviewFilterModal({
               Dosage
             </h3>
             <div className="space-y-2.5">
-              {dosageOptions.map((dosage) => (
+              {dosageOptions.map((dosage:any) => (
                 <label
                   key={dosage}
                   className="flex items-center gap-3 cursor-pointer group"
@@ -197,7 +197,7 @@ export default function ReviewFilterModal({
           <div className="mb-6">
             <h3 className="text-base font-semibold text-gray-900 mb-3">Form</h3>
             <div className="space-y-2.5">
-              {formOptions.map((form) => (
+              {formOptions.map((form:any) => (
                 <label
                   key={form}
                   className="flex items-center gap-3 cursor-pointer group"

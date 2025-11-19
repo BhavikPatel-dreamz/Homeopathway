@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
   try {
     await unlink(fullPath);
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (error:any) {
     console.error("Failed to delete file:", error);
     // It's possible the file doesn't exist, which isn't a critical server error
     if (error.code === 'ENOENT') {
