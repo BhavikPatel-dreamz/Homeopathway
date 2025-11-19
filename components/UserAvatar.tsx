@@ -17,6 +17,7 @@ export default function UserAvatar({ className = "" }: UserAvatarProps) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [showDropdown, setShowDropdown] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -61,41 +62,41 @@ export default function UserAvatar({ className = "" }: UserAvatarProps) {
     return () => subscription.unsubscribe();
   }, []);
 
-  // if (loading) {
-  //   return (
-  //     <div className={`animate-pulse bg-gray-300 rounded-full ${className}`}>
-  //     </div>
-  //   );
-  // }
-
-  if (!user || !profile) {
-    // Guest user - show a generic icon
-   const pathname = usePathname();
-   const isHome = pathname === '/';
-   const borderColor = isHome ? '#fff' : '#20231E';
-   const textColor = isHome ? '#fff' : '#20231E';
-
-return (
-  <div className="relative">
-    <Link href="/login">
-      <button
-        className={`text-montserrat px-4 py-[5px] border rounded-full transition-colors font-semibold text-[16px] leading-[24px] cursor-pointer transition-all duration-500 hover:bg-gray-300 hover:text-white hover:border-black`}
-        style={{ borderColor, color: textColor }}
-      >
-        Login
-      </button>
-    </Link>
-    <UserDropdown 
-      isOpen={showDropdown} 
-      onClose={() => setShowDropdown(false)}
-      user={user}
-      profile={profile}
-    />
-  </div>
-);
+  // Show loading skeleton while checking authentication
+  if (loading) {
+    return (
+      <div className={`animate-pulse bg-gray-300 rounded-full ${className} w-10 h-10`}>
+      </div>
+    );
   }
 
-  // Logged in user - show initials
+  // Guest user - show login button
+  if (!user || !profile) {
+    const isHome = pathname === '/';
+    const borderColor = isHome ? '#fff' : '#20231E';
+    const textColor = isHome ? '#fff' : '#20231E';
+
+    return (
+      <div className="relative">
+        <Link href="/login">
+          <button
+            className={`text-montserrat px-4 py-[5px] border rounded-full transition-colors font-semibold text-[16px] leading-[24px] cursor-pointer transition-all duration-500 hover:bg-gray-300 hover:text-white hover:border-black`}
+            style={{ borderColor, color: textColor }}
+          >
+            Login
+          </button>
+        </Link>
+        <UserDropdown 
+          isOpen={showDropdown} 
+          onClose={() => setShowDropdown(false)}
+          user={user}
+          profile={profile}
+        />
+      </div>
+    );
+  }
+
+  // Logged in user - show initials avatar
   const firstInitial = profile.first_name?.charAt(0)?.toUpperCase() || '';
   const lastInitial = profile.last_name?.charAt(0)?.toUpperCase() || '';
   const initials = firstInitial + lastInitial || profile.email?.charAt(0)?.toUpperCase() || 'U';
@@ -118,7 +119,7 @@ return (
   return (
     <div className="relative">
       <div 
-        className={`${bgColor} rounded-full flex items-center justify-center text-white font-semibold ${className}`}
+        className={`${bgColor} rounded-full flex items-center justify-center text-white font-semibold cursor-pointer ${className}`}
         onClick={() => setShowDropdown(!showDropdown)}
       >
         <span>{initials}</span>

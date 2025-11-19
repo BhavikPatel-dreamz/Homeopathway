@@ -19,7 +19,7 @@ export default async function AdminDashboardLayout({
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-3xl">🔒</span>
           </div>
-          <h2 className="text-2xl font-serif mb-2">Access Denied</h2>
+          <h2 className="text-2xl font-serif mb-2 text-black">Access Denied</h2>
           <p className="text-gray-600 mb-6">You must be signed in to view this page.</p>
           <Link href="/login">
             <button className="px-6 py-3 bg-[#6B7B5E] text-white rounded-lg font-medium hover:bg-[#5A6A4D] transition-colors">

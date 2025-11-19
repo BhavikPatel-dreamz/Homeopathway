@@ -14,7 +14,7 @@ export default async function ReviewsPage() {
   const userId = user?.id;
 
   if (!userId || !(await isAdmin(userId))) {
-    return <div>Access Denied</div>;
+    return <div className='text-black'>Access Denied</div>;
   }
 
   // Fetch initial reviews (just first page) and total count
