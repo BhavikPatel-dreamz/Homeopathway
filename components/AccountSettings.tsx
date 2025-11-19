@@ -20,6 +20,8 @@ interface AccountSettingsProps {
   };
 }
 
+const USER_CACHE_KEY = "user_profile_cache";
+
 export default function AccountSettings({ user }: AccountSettingsProps) {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
@@ -59,6 +61,34 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
     confirmpassword: "",
   });
 
+  // Helper function to update localStorage cache
+  const updateCache = async () => {
+    try {
+      const {
+        data: { user: authUser },
+      } = await supabase.auth.getUser();
+
+      if (authUser) {
+        const { data: profileData, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", authUser.id)
+          .single();
+
+        if (profileData && !error) {
+          const cacheData = {
+            user: authUser,
+            profile: profileData,
+            timestamp: Date.now(),
+          };
+          localStorage.setItem(USER_CACHE_KEY, JSON.stringify(cacheData));
+        }
+      }
+    } catch (error) {
+      console.error("Error updating cache:", error);
+    }
+  };
+
   // Auto-hide toast after 5 seconds
   useEffect(() => {
     if (toast) {
@@ -86,6 +116,9 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
         }
         break;
       case "newpassword":
+        if ((formData.password || formData.confirmpassword) && !value) {
+          return "New password is required";
+        }
         if (value) {
           if (value.length < 8) {
             return "Password must be at least 8 characters";
@@ -99,7 +132,10 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
         }
         break;
       case "confirmpassword":
-        if (formData.newpassword && value !== formData.newpassword) {
+        if (formData.newpassword && !value) {
+          return "Please confirm your new password";
+        }
+        if (value && formData.newpassword && value !== formData.newpassword) {
           return "Passwords do not match";
         }
         break;
@@ -214,6 +250,10 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
       }
 
       setAvatarUrl(newAvatarUrl);
+      
+      // Update cache after avatar change
+      await updateCache();
+      
       showToast("success", "Avatar updated successfully!");
     } catch (error: any) {
       console.error("Avatar upload error:", error);
@@ -266,6 +306,10 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
 
       setAvatarUrl("");
       setPreviewUrl(null);
+      
+      // Update cache after avatar removal
+      await updateCache();
+      
       showToast("success", "Avatar removed successfully!");
     } catch (error: any) {
       console.error("Avatar removal error:", error);
@@ -311,6 +355,9 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
       }));
       setFieldErrors({});
 
+      // Update cache after profile save
+      await updateCache();
+
       setTimeout(() => {
         router.refresh();
       }, 1500);
@@ -329,9 +376,14 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) console.error("Logout error:", error);
+      
+      // Clear cache on logout
+      localStorage.removeItem(USER_CACHE_KEY);
+      
       router.push("/login");
     } catch (err) {
       console.error("Logout error:", err);
+      localStorage.removeItem(USER_CACHE_KEY);
       router.push("/login");
     }
   };
