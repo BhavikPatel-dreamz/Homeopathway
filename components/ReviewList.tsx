@@ -157,7 +157,7 @@ export default function ReviewListPage({
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isPageLoading, setIsPageLoading] = useState(false);
 
-  const [allReviesList,setAllReviewsList] = useState([])
+  const [allReviesList,setAllReviewsList] = useState<any>([])
 
   // ---------------------------
   // Fetch Reviews + Stats

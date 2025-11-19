@@ -29,7 +29,7 @@ export default function ReviewFilterModal({
   formOptions,
   currentFilters,
   allReviews = [],
-}: ReviewFilterModalProps) {
+}: any) {
   const [localFilters, setLocalFilters] = React.useState<ReviewFilters>(currentFilters);
   const [filteredCount, setFilteredCount] = React.useState(totalResults);
 
