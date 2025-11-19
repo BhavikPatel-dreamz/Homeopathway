@@ -80,6 +80,12 @@ export default function ReviewFilterModal({
     onClose();
   };
 
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   const renderStars = (count: number) => {
     return (
       <div className="flex gap-0.5">
@@ -98,8 +104,14 @@ export default function ReviewFilterModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 bg-opacity-50 p-4">
-      <div className="bg-white rounded-lg w-full max-w-md max-h-[50vh] overflow-hidden flex flex-col">
+    <div
+      className="fixed inset-0 z-9999 flex items-center justify-center bg-black/50 p-4"
+      onClick={handleBackdropClick}
+    >
+      <div
+        className="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-xl font-semibold text-gray-900">Filters</h2>
