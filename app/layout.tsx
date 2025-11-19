@@ -51,6 +51,18 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+
+  // --------------------------
+  //     FAVICON CONFIG
+  // --------------------------
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/icon.png", sizes: "192x192", type: "image/png" },
+    ],
+  },
+  // --------------------------
+
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -94,7 +106,6 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
 };
 
-// Viewport config
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -106,7 +117,10 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable}`}>
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable}`}
+    >
       <body className="antialiased bg-white text-gray-900">
         {children}
       </body>

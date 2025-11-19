@@ -50,7 +50,7 @@ export default function PopularAilmentsServer({
           {!searchQuery.trim() && (
             <Link href="/ailments">
               <div className="bg-[#4B544A] text-white rounded-xl p-4 flex items-center justify-center hover:bg-[#2B2E28] transition-colors cursor-pointer h-full transition-all duration-500">
-                <span className="font-[600] text-white text-[16px]">View All Ailments</span>
+                <span className="font-[600] text-white text-[14px] md:text-[16px]">View All Ailments</span>
               </div>
             </Link>
           )}

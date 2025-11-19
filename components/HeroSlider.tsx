@@ -42,7 +42,7 @@ const CustomSlider = ({ slides }: { slides: string[] }) => {
         {slides.map((slide, index) => (
           <div 
             key={index} 
-            className="relative min-h-[400px] sm:min-h-[460px] md:min-h-[500px] w-full flex-shrink-0"
+            className="relative min-h-[500px] sm:min-h-[460px] md:min-h-[500px] w-full flex-shrink-0"
           >
             {/* Background Image */}
             <div className="absolute top-0 left-0 w-full h-full">
@@ -250,10 +250,10 @@ export default function HeroSlider() {
                   />
                 </div>
                 <div className="text-white lg:text-left text-center">
-                  <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-[40px] mb-3 md:mb-4 leading-tight font-semibold">
+                  <h1 className="text-3xl sm:text-2xl md:text-3xl lg:text-[40px] mb-3 md:mb-4 leading-tight font-semibold">
                     Your Path to Healing
                   </h1>
-                  <h6 className="text-sm sm:text-base md:text-lg lg:text-[24px] font-normal">
+                  <h6 className="text-2xl sm:text-base md:text-lg lg:text-[24px] font-normal">
                     Find trusted homeopathic solutions for your health concerns, backed by
                     community reviews and expert guidance.
                   </h6>
