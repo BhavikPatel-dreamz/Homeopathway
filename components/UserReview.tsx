@@ -68,34 +68,6 @@ const mockUserProfile = {
   memberSince: "October 2025"
 };
 
-// const renderStars = (rating: number) => {
-//   return (
-//     <div className="flex items-center gap-0.5">
-//       {[1, 2, 3, 4, 5].map((star) => (
-//         <svg
-//           key={star}
-//           width="16"
-//           height="16"
-//           viewBox="0 0 16 16"
-//           fill="none"
-//           xmlns="http://www.w3.org/2000/svg"
-//         >
-//           <path
-//             d="M8 1.5L10.163 5.88L15 6.607L11.5 10.012L12.326 14.835L8 12.565L3.674 14.835L4.5 10.012L1 6.607L5.837 5.88L8 1.5Z"
-//             fill={star <= Math.floor(rating) ? "#FFA500" : star === Math.ceil(rating) && rating % 1 >= 0.5 ? "#FFA500" : "none"}
-//             fillOpacity={star === Math.ceil(rating) && rating % 1 >= 0.5 ? "0.5" : "1"}
-//             stroke="#FFA500"
-//             strokeWidth="1"
-//             strokeLinecap="round"
-//             strokeLinejoin="round"
-//           />
-//         </svg>
-//       ))}
-//       <span className="ml-1.5 text-sm font-medium text-gray-700">{rating}</span>
-//     </div>
-//   );
-// };
-
 const renderStars = (rating: number) => {
   const fullStars = Math.floor(rating);
   const hasHalfStar = rating % 1 >= 0.5;
