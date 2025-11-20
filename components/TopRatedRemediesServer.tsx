@@ -55,8 +55,6 @@ export default function TopRatedRemediesServer({
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {remediesWithStats.map((remedy, index) => (
-            
-          
             <Link
               key={remedy.id || index}
               href={`/remedies/${remedy.slug || remedy.id}`}

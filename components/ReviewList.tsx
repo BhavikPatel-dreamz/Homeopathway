@@ -407,7 +407,7 @@ export default function ReviewListPage({
 
           {/* Right Panel – Reviews List */}
           <div className="col-span-2">
-            <div className="flex flex-col sm:flex-row flex-wrap items-start gap-2 sm:gap-3 mb-4 sm:mb-6">
+            <div className="flex flex-col sm:flex-row flex-wrap items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
               {/* Search Input with Filter Button */}
               <div className="relative w-full sm:flex-1 sm:mr-6 flex gap-2">
                 <div className="relative flex-1">
@@ -452,16 +452,16 @@ export default function ReviewListPage({
               </div>
 
               {/* Sort By */}
-              <div className="flex items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0 justify-end">
-                <span className="font-semibold text-[#2B2E28] text-[16px] whitespace-nowrap sm:pl-3">
+              <div className="flex items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0 justify-center ">
+                <span className="font-semibold text-[#2B2E28] text-[14px]  whitespace-nowrap ">
                   Sort by:
                 </span>
 
                 <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="appearance-none flex items-center justify-between gap-1 min-w-[133px] sm:min-w-[148px]
-               sm:pl-1 pr-10 py-2 text-[16px] sm:text-base text-[#20231E] font-medium focus:outline-none"
+                    className="appearance-none min-w-fit 
+               sm:pl-1 pr-10 py-2 text-[14px]  text-[#20231E] font-medium focus:outline-none"
                   >
                     {sortOptions.find((opt) => opt.value === sortBy)?.label}
                   </button>
@@ -481,8 +481,7 @@ export default function ReviewListPage({
                             setSortBy(opt.value as typeof sortBy);
                             setIsDropdownOpen(false);
                           }}
-                          className={`px-2 w-full py-2 text-xs text-start sm:text-base cursor-pointer 
-                      hover:bg-blue-200 hover:text-blue-700 transition-colors
+                          className={`px-2 w-full py-2 text-xs text-start  cursor-pointer hover:bg-blue-200 hover:text-blue-700 transition-colors
                       ${
                         sortBy === opt.value
                           ? "bg-blue-200 text-blue-700 font-medium"

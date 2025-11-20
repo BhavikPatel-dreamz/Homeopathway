@@ -100,39 +100,38 @@ export default function TopRemedies({
 
   return (
     <div className="">
-      <div className="flex flex-row justify-between sm:flex-row sm:items-center sm:justify-between mb-6">
+      <div className="flex justify-between items-center sm:items-center mb-6 gap-4">
+        {/* Left Section */}
         <div className="flex items-center gap-3">
-          <img
-            src="/top-remedies.svg"
-            alt=""
-            className="w-10 h-10 sm:w-10 sm:h-10 lg:w-12 lg:h-12"
-          />
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-normal max-w-[100px] md:max-w-[300px] text-[#0B0C0A] leading-tight">
+          <img src="/top-remedies.svg" alt="Top Remedies" className="w-8 sm:w-10 lg:w-12" />
+
+          <h2 className="text-xl sm:text-3xl lg:text-4xl font-normal max-w-[100px] md:max-w-[300px] text-[#0B0C0A] leading-tight">
             Top Remedies
           </h2>
         </div>
 
-        {/* Sort Dropdown */}
-        <div className="flex flex-row items-center gap-2 sm:ml-auto">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
+        {/* Right Section - Sort Dropdown */}
+        <div className="flex items-center justify-end sm:ml-auto">
+          <div className=" w-[130px] flex flex-col sm:flex-row sm:min-w-[190px] sm:gap-1 relative">
             <label
               htmlFor="sort-remedies"
-              className="font-semibold text-[#2B2E28] text-xs sm:text-sm whitespace-nowrap"
+              className="block font-semibold text-[#2B2E28] text-xs sm:text-sm mb-1"
             >
-              Sort by:
+              Sort by :
             </label>
 
-            <div ref={dropdownRef} className="relative w-full sm:w-auto">
+            <div ref={dropdownRef} className="">
+              {/* Button */}
               <button
                 id="sort-remedies"
                 onClick={() => setIsOpen((prev) => !prev)}
-                className="flex items-center justify-start gap-1 text-sm sm:text-base text-[#20231E] focus:outline-none w-full sm:w-[148px]"
+                className="flex items-center justify-between gap-1 text-sm text-[#20231E] transition"
               >
                 <span className="truncate">{sortBy}</span>
+
                 <svg
-                  className={`h-4 w-4 transition-transform duration-200 ${
-                    isOpen ? "rotate-180" : "rotate-0"
-                  }`}
+                  className={`h-4 w-4 transition-transform duration-200 ${isOpen ? "rotate-180" : "rotate-0"
+                    }`}
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
                   fill="currentColor"
@@ -141,18 +140,18 @@ export default function TopRemedies({
                 </svg>
               </button>
 
+              {/* Dropdown List */}
               {isOpen && (
-                <ul className="absolute z-10 mt-1 top-full left-0 w-full bg-white border border-gray-300 rounded-md shadow-lg">
+                <ul className="absolute z-20 mt-1 left-0 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-auto">
                   {["Overall Rating", "Most Reviewed", "Alphabetical"].map(
                     (option) => (
                       <li
                         key={option}
                         onClick={() => handleSelect(option)}
-                        className={`px-2 py-2 text-sm sm:text-base cursor-pointer hover:bg-blue-100 hover:text-blue-700 transition-colors ${
-                          sortBy === option
+                        className={`px-3 py-2 text-sm cursor-pointer hover:bg-blue-100 hover:text-blue-700 transition-colors ${sortBy === option
                             ? "bg-blue-100 text-blue-700 font-medium"
                             : "text-gray-700"
-                        }`}
+                          }`}
                       >
                         {option}
                       </li>
@@ -164,6 +163,7 @@ export default function TopRemedies({
           </div>
         </div>
       </div>
+
 
       {/* Remedies List */}
       <div className="space-y-2.5 mb-[10px]">
@@ -177,7 +177,7 @@ export default function TopRemedies({
             key={remedy.slug}
           >
             <div className="bg-white rounded-xl p-4 sm:p-6 hover:shadow-lg transition-all duration-300 cursor-pointer border border-transparent hover:border-gray-200 mb-[10px]">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
                 {/* Icon */}
                 <div className="w-12 h-12 sm:w-16 sm:h-16 bg-[#F9F7F2] rounded-full flex items-center justify-center text-3xl sm:text-4xl flex-shrink-0">
                   {remedy.icon}
@@ -193,7 +193,7 @@ export default function TopRemedies({
                         {remedy.indication}
                       </p>
                     </div>
-                  
+
                     <div className="sm:block text-right text-3xl sm:text-4xl lg:text-5xl font-serif text-kingred text-[#7D5C4E]">
                       #{index + 1}
                     </div>

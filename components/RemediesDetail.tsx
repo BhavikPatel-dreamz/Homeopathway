@@ -74,7 +74,8 @@ export default function RemediesDetailPage({
   ailmentContext,
   review,
 }: RemediesDetailPageProps) {
-  const [activeTab, setActiveTab] = useState("Overview");
+  // activeTab is initialized to "Overview", fixing the initial tab issue.
+  const [activeTab, setActiveTab] = useState("Overview"); 
 
     const overviewRef = useRef<HTMLDivElement>(null!);
    const originRef = useRef<HTMLDivElement>(null!);
@@ -136,47 +137,50 @@ const relatedRef = useRef<HTMLDivElement>(null!);
   useEffect(() => {
     let ticking = false;
 
-    const sectionList: { ref: React.RefObject<HTMLDivElement>; tab: string }[] = [
+    const sectionList = [
       { ref: overviewRef, tab: "Overview" },
       { ref: originRef, tab: "Origin" },
       { ref: reviewsRef, tab: "Reviews" },
       { ref: relatedRef, tab: "Related Remedies" },
     ];
 
+    const detectActiveTab = () => {
+      const tabsBottom = getTabsBottom();
+      let closestTab = "Overview";
+      let minDistance = Infinity;
+
+      sectionList.forEach((s) => {
+        const el = s.ref.current;
+        if (!el) return;
+
+        const rect = el.getBoundingClientRect();
+        const distance = Math.abs(rect.top - tabsBottom);
+
+        // ⭐ UNCOMMENTED: This logic must run to change the active tab on scroll
+        if (distance < minDistance) { 
+          minDistance = distance;
+          closestTab = s.tab;
+        }
+      });
+
+      setActiveTab(closestTab); 
+    };
+
     const onScroll = () => {
       if (ticking) return;
       ticking = true;
-      window.requestAnimationFrame(() => {
-        const tabsBottom = getTabsBottom(); // viewport y where section should align
-        let closestTab = activeTab;
-        let minDistance = Number.POSITIVE_INFINITY;
-
-        sectionList.forEach((s) => {
-          const el = s.ref.current;
-          if (!el) return;
-          const rect = el.getBoundingClientRect();
-          // compute distance from section top to tabsBottom
-          const distance = Math.abs(rect.top - tabsBottom);
-
-          // Prefer sections that are at or above the tabsBottom (so they "arrive" under the tabs)
-          // But also allow slightly below — distance measure handles it.
-          if (distance < minDistance) {
-            minDistance = distance;
-            closestTab = s.tab;
-          }
-        });
-
-        // only update when it actually changes (avoid re-renders)
-        if (closestTab !== activeTab) {
-          setActiveTab(closestTab);
-        }
-
+      requestAnimationFrame(() => {
+        detectActiveTab();
         ticking = false;
       });
     };
-
-    // trigger once on mount to set right tab (in case user navigated with anchor)
-    onScroll();
+    
+    // ⭐ NEW FIX FOR INITIAL SCROLL POSITION (Browser Scroll Restoration)
+    // Force scroll to top (0, 0) immediately after mount
+    if (typeof window !== 'undefined' && window.pageYOffset !== 0) {
+        window.scrollTo(0, 0);
+    }
+    // ⭐ END NEW FIX
 
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
@@ -185,8 +189,7 @@ const relatedRef = useRef<HTMLDivElement>(null!);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab]);
+  }, []);
 
   const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
@@ -429,4 +432,3 @@ const relatedRef = useRef<HTMLDivElement>(null!);
     </div>
   );
 }
-
