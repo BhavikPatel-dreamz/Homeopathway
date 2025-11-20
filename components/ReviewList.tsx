@@ -130,10 +130,12 @@ export default function ReviewListPage({
   const [activeFilters, setActiveFilters] = useState<{
     dosage: string[];
     dateRange: string;
+    form: string[];
     userName: string;
   }>({
     dosage: [],
     dateRange: "all",
+    form: [],
     userName: "",
   });
 
@@ -157,7 +159,7 @@ export default function ReviewListPage({
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isPageLoading, setIsPageLoading] = useState(false);
 
-  const [allReviesList,setAllReviewsList] = useState<any>([])
+  const [allReviesList, setAllReviewsList] = useState<any>([]);
 
   // ---------------------------
   // Fetch Reviews + Stats
@@ -180,7 +182,7 @@ export default function ReviewListPage({
 
       let allReviews = reviewsData || [];
 
-      setAllReviewsList(reviewsData)
+      setAllReviewsList(reviewsData);
 
       // Apply advanced filters
       allReviews = allReviews.filter((review) => {
@@ -262,6 +264,16 @@ export default function ReviewListPage({
   useEffect(() => {
     fetchReviews(false);
   }, [remedy.id]);
+
+  // Sync activeFilters with filters
+  useEffect(() => {
+    setActiveFilters({
+      dosage: filters.dosage,
+      dateRange: filters.dateRange,
+      form: filters.form,
+      userName: filters.userName,
+    });
+  }, [filters]);
 
   useEffect(() => {
     // When filters, sort, or search change, silently update without spinner
@@ -623,7 +635,6 @@ export default function ReviewListPage({
         </div>
 
         {/* Filter Modal */}
-        {/* Filter Modal */}
         <ReviewFilterModal
           isOpen={isFilterModalOpen}
           onClose={() => setIsFilterModalOpen(false)}
@@ -634,7 +645,7 @@ export default function ReviewListPage({
           dosageOptions={filterOptions.potencies}
           formOptions={filterOptions.forms}
           currentFilters={filters}
-           allReviews={allReviesList} 
+          allReviews={allReviesList}
         />
       </section>
 
