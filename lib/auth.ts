@@ -91,8 +91,6 @@ export async function getUserProfile(userId?: string) {
     return { profile: null, error: null };
   }
 
-  console.log('🔍 Querying profile for userId:', userId);
-
   // Try to get profile - using single() instead of maybeSingle() for better error handling
   const { data, error } = await supabase
     .from('profiles')
