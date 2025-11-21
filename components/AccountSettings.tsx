@@ -90,14 +90,14 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
   };
 
   // Auto-hide toast after 5 seconds
-  // useEffect(() => {
-  //   if (toast) {
-  //     const timer = setTimeout(() => {
-  //       setToast(null);
-  //     }, 5000);
-  //     return () => clearTimeout(timer);
-  //   }
-  // }, [toast]);
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => {
+        setToast(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   const showToast = (type: "success" | "error", text: string) => {
     setToast({ type, text });
