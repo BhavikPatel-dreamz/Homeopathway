@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, Star } from 'lucide-react';
+import Image from 'next/image';
 
 export interface ReviewFilters {
   rating: number[];
@@ -159,25 +160,33 @@ export default function ReviewFilterModal({
     }
   };
 
-  const renderStars = (count: number) => {
+  const renderStars = (rating: number) => {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+  
     return (
-      <div className="flex gap-0.5">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <Star
-            key={star}
-            className={`w-4 h-4 ${
-              star <= count
-                ? 'fill-yellow-400 text-yellow-400'
-                : 'fill-none text-gray-300 stroke-2'
-            }`}
-          />
+      <div className="flex text-yellow-400 gap-1">
+        {[...Array(fullStars)].map((_, i) => (
+          <span key={`full-${i}`}>
+            <Image src="/star.svg" alt="Star" width={16} height={16} />
+          </span>
+        ))}
+        {hasHalfStar && (
+          <span key="half">
+            <Image src="/star-half-fill.svg" alt="Half Star" width={16} height={16} />
+          </span>
+        )}
+        {[...Array(5 - Math.ceil(rating))].map((_, i) => (
+          <span key={`empty-${i}`}>
+            <Image src="/star-line.svg" alt="Empty Star" width={16} height={16} />
+          </span>
         ))}
       </div>
     );
   };
 
   return (
-    <div
+   <div
       className="fixed inset-0 z-9999 flex items-center justify-center bg-black/50 p-4"
       onClick={handleBackdropClick}
     >
@@ -186,18 +195,19 @@ export default function ReviewFilterModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 ">
-          <h2 className="text-xl font-bold text-gray-900">Filters</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition"
-          >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
+        
+        <div className="relative p-6">
+       <button
+         onClick={onClose}
+       className="absolute top-6 right-2 text-[#83857D] transition"
+    >
+    <X className="w-8 h-8" />
+  </button>
+</div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto px-6 pt-0 mt-3">
+          <h2 className="text-[28px] mb-5 font-normal text-[#0B0C0A]">Filters</h2>
           {/* Rating Section */}
           <div className="mb-6">
             <p className="text-base font-semibold text-gray-900 mb-3">
