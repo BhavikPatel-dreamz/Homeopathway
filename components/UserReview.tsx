@@ -90,7 +90,7 @@ export default function UserReviewListPage({ user }: any ) {
                 </div>
                <div className="relative">
                  <p className="font-semibold text-base text-xl text-[#2B2E28]">{userProfile.name}</p>
-                 <p className="text-sm text-[#2B2E28]">@{userProfile.name}</p>
+                 <p className="text-sm text-[#2B2E28] pr-5">@{userProfile.name}</p>
                  <img
                    src="/edit-box-line.svg"
                    className="absolute right-[1] mt-4 top-1/2 -translate-y-1/2 w-4 h-4 cursor-pointer z-10"
@@ -126,12 +126,10 @@ export default function UserReviewListPage({ user }: any ) {
 
             {/* Right Panel - Reviews */}
            <div className="w-full lg:w-[824px] p-4 sm:p-6 bg-white rounded-2xl shadow-sm flex flex-col">
-  <p className="text-md text-gray-900 mb-4">Reviews</p>
-
-<div className="flex-1 overflow-y-auto space-y-4 max-h-[70vh] lg:max-h-[780px] my-scrollbar pr-4">
-
-    {reviews.map((review: any) => {
-      const tags = [review.dosage, review.potency].filter(Boolean);
+           <p className="text-base text-black mb-4">Reviews</p>
+        <div className="flex-1 overflow-y-auto space-y-4 max-h-[70vh] lg:max-h-[780px] my-scrollbar pr-4">
+         {reviews.map((review: any) => {
+        const tags = [review.dosage, review.potency].filter(Boolean);
 
       return (
         <div
