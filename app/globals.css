@@ -33,7 +33,17 @@ body {
   scroll-behavior: smooth;
   overscroll-behavior: none;
 }
-
+ .my-scrollbar::-webkit-scrollbar {
+    width: 10px;
+}
+.my-scrollbar::-webkit-scrollbar-track {
+    background: rgba(108, 116, 99, 0.2);
+    border-radius: 10px;
+}
+.my-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(108, 116, 99, 0.7); 
+    border-radius: 10px;
+}
 /* ✅ Prevent iOS bounce effect (optional) */
 body {
   position: relative;

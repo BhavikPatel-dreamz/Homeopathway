@@ -63,6 +63,7 @@ export interface Review {
   // Related data when joined
   remedies?: Remedy;
   profiles?: {
+    id:string
     first_name: string;
     last_name: string;
     email: string;

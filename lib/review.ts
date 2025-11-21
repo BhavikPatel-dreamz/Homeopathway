@@ -222,6 +222,7 @@ export async function getReviews({
           r.profiles.first_name.toLowerCase().includes(q)) ||
           (r.profiles.last_name &&
             r.profiles.last_name.toLowerCase().includes(q)));
+             (r.profiles.id.includes(q));
       return matchNotes || matchProfile;
     });
   }

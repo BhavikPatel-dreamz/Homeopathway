@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Search, Loader2, ChevronDown, SlidersHorizontal } from "lucide-react";
 import Image from "next/image";
 import {
@@ -17,6 +17,8 @@ import { Remedy, Review as ReviewType } from "@/types";
 // ---------------------------
 // Type Definitions
 // ---------------------------
+
+
 interface ReviewListPageProps {
   remedy: Remedy & {
     id: string;
@@ -315,6 +317,17 @@ export default function ReviewListPage({
     { label: "Lowest Rated", value: "lowest_rated" },
   ];
 
+  function createUserSlug(review: any) {
+  const first = review.profiles?.first_name || "";
+  const lastInitial = review.profiles?.last_name?.[0] || "";
+
+  if (!first && !lastInitial) return "anonymous";
+
+  return `${first}-${lastInitial}`
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, ""); // clean slug
+}
+
   // ---------------------------
   // Render
   // ---------------------------
@@ -333,8 +346,9 @@ export default function ReviewListPage({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
+  
   return (
+    
     <div>
       <section id="Reviews" className="bg-white rounded-2xl md:p-4 sm:py-8 ">
         <div className="grid grid-cols-1 lg:grid-cols-3 md:gap-6 sm:gap-10">
@@ -542,10 +556,12 @@ export default function ReviewListPage({
                         }.`
                       : "Anonymous";
                   const tags = [review.dosage, review.potency].filter(Boolean);
+                   const userId = review.profiles?.id;
                   return (
                     <div
                       key={review.id}
-                      className="border-b border-[#B5B6B1]/50 w-full p-4 sm:p-6"
+                      onClick={() => router.push(`/user/${userId}`)}
+                      className="border-b border-[#B5B6B1]/50 w-full p-4 sm:p-6 cursor-pointer" 
                     >
                       <div className="flex flex-col sm:flex-row items-start justify-between mb-2 sm:mb-3 gap-2 sm:gap-0">
                         <div className="flex items-start gap-2 sm:gap-3">

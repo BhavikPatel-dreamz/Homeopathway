@@ -62,10 +62,13 @@ export default function ReviewFilterModal({
         );
         if (!hasMatchingDosage) return false;
       }
-
+      console.log("review.form",localFilters);
       // Filter by form
-      if (localFilters.form.length > 0 && !localFilters.form.includes(review.form)) {
-        return false;
+      if (localFilters.form.length > 0 ) {
+        const hasMatchingForm = localFilters.dosage.some(
+          (f) => review.dosage === f
+        );
+        if (!hasMatchingForm) return false;
       }
 
       // Filter by date range
@@ -311,30 +314,6 @@ export default function ReviewFilterModal({
                 </label>
               ))}
             </div>
-          </div>
-
-          {/* Time Period Section */}
-          <div className="mb-6">
-            <label className="block text-base font-semibold text-gray-900 mb-3">
-              Time Period
-            </label>
-            <select
-              value={localFilters.dateRange}
-              onChange={(e) =>
-                setLocalFilters((prev) => ({
-                  ...prev,
-                  dateRange: e.target.value,
-                }))
-              }
-              className="w-full px-3 py-2.5 border-2 border-gray-300 text-gray-700 rounded-md text-sm 
-                focus:outline-none focus:ring-2 focus:ring-[#6C7463] focus:border-[#6C7463] transition"
-            >
-              <option value="all">All Time</option>
-              <option value="today">Today</option>
-              <option value="week">Past Week</option>
-              <option value="month">Past Month</option>
-              <option value="year">Past Year</option>
-            </select>
           </div>
 
           {/* Reviewer Name Section */}
