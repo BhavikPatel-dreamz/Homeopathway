@@ -103,8 +103,9 @@ export default function ReviewFilterModal({
         }
       }
 
-      return true;
-    });
+  return true;
+});
+
 
     setFilteredCount(filtered.length);
   }, [localFilters, allReviews, totalResults]);
@@ -186,8 +187,8 @@ export default function ReviewFilterModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-xl font-semibold text-gray-900">Filters</h2>
+        <div className="flex items-center justify-between p-6 ">
+          <h2 className="text-xl font-bold text-gray-900">Filters</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition"
@@ -200,9 +201,9 @@ export default function ReviewFilterModal({
         <div className="flex-1 overflow-y-auto p-6">
           {/* Rating Section */}
           <div className="mb-6">
-            <h3 className="text-base font-semibold text-gray-900 mb-3">
+            <p className="text-base font-semibold text-gray-900 mb-3">
               Rating
-            </h3>
+            </p>
             <div className="space-y-2.5">
               {[5, 4, 3, 2, 1].map((rating) => (
                 <label
@@ -240,9 +241,9 @@ export default function ReviewFilterModal({
 
           {/* Dosage Section */}
           <div className="mb-6">
-            <h3 className="text-base font-semibold text-gray-900 mb-3">
+            <p className="text-base font-semibold text-gray-900 mb-3">
               Dosage
-            </h3>
+            </p>
             <div className="space-y-2.5">
               {dosageOptions.map((dosage: any) => (
                 <label
@@ -280,7 +281,7 @@ export default function ReviewFilterModal({
 
           {/* Form Section */}
           <div className="mb-6">
-            <h3 className="text-base font-semibold text-gray-900 mb-3">Form</h3>
+            <p className="text-base font-semibold text-gray-900 mb-3">Form</p>
             <div className="space-y-2.5">
               {formOptions.map((form: any) => (
                 <label
@@ -339,20 +340,24 @@ export default function ReviewFilterModal({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-6 border-t bg-white">
-          <button
-            onClick={clearAll}
-            className="text-gray-700 font-medium hover:text-gray-900 transition text-[15px]"
-          >
-            Clear all
-          </button>
-          <button
-            onClick={handleApply}
-            className="bg-[#6C7463] hover:bg-[#5A6B5D] text-white px-8 py-2.5 rounded-lg font-medium transition text-[15px]"
-          >
-            Show {filteredCount.toLocaleString()} results
-          </button>
-        </div>
+        <div className="flex items-center justify-end gap-3 p-6">
+
+  <button
+    onClick={clearAll}
+    className="text-gray-700 font-medium hover:text-gray-900 transition text-[15px]"
+  >
+    Clear all
+  </button>
+
+  <button
+    onClick={handleApply}
+    className="bg-[#6C7463] hover:bg-[#5A6B5D] text-white px-6 py-2.5 rounded-full font-medium transition text-[15px]"
+  >
+    Show {filteredCount.toLocaleString()} results
+  </button>
+
+</div>
+
       </div>
     </div>
   );
