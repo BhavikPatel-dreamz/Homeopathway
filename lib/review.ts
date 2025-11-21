@@ -122,8 +122,10 @@ export async function addReview({
  * @param {number} [params.limit=10] - The maximum number of reviews to return.
  * @param {number[]} [params.starCount] - Star ratings to filter by (e.g., [4, 5]).
  * @param {string[]} [params.potency] - Potencies to filter by (e.g., ["30C", "200C"]).
+ *  * @param {string[]} [params.dosage] 
  * @param {string} [params.searchQuery] - Search query to filter notes, potency, or dosage.
  * @param {boolean} [params.experiencedSideEffects] - Filter by side effects.
+ * 
  * @returns {Promise<{ data: Review[] | null; error: Error | null }>} Reviews with associated profiles.
  */
 
@@ -137,6 +139,7 @@ export async function getReviews({
   potency,
   searchQuery,
   experiencedSideEffects,
+  dosage
 }: {
   remedyId?: string;
   ailmentId?: string | null;
@@ -145,6 +148,7 @@ export async function getReviews({
   starCount?: number[];
   potency?: string[];
   searchQuery?: string;
+  dosage?:string[];
   experiencedSideEffects?: boolean;
 }): Promise<{ data: Review[] | null; error: Error | null }> {
   let query = supabase.from('reviews').select('*').limit(limit);
@@ -164,6 +168,7 @@ export async function getReviews({
   // ADDITIONAL FILTERS
   if (starCount?.length) query = query.in('star_count', starCount);
   if (potency?.length) query = query.in('potency', potency);
+  if (dosage?.length) query = query.in('dosage', dosage);
   if (experiencedSideEffects !== undefined)
     query = query.eq('experienced_side_effects', experiencedSideEffects);
 
@@ -257,6 +262,7 @@ export async function getReviewFilterOptions(remedyId: string): Promise<{
     }
 
     const potencies = [...new Set(data.map(r => r.potency).filter(Boolean) as string[])].sort();
+
     
     // This is a guess. The 'form' might be part of 'dosage' or another column.
     // For now, I'll extract from dosage. A dedicated 'form' column is better.

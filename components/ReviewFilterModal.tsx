@@ -33,8 +33,6 @@ export default function ReviewFilterModal({
   const [localFilters, setLocalFilters] = React.useState<ReviewFilters>(currentFilters);
   const [filteredCount, setFilteredCount] = React.useState(totalResults);
 
-  console.log("allReviews",allReviews);
-  
 
   React.useEffect(() => {
     if (isOpen) {
@@ -42,7 +40,6 @@ export default function ReviewFilterModal({
     }
   }, [isOpen, currentFilters]);
 
-  // Calculate filtered count whenever localFilters change
   React.useEffect(() => {
     if (!allReviews.length) {
       setFilteredCount(totalResults);
@@ -62,12 +59,13 @@ export default function ReviewFilterModal({
         );
         if (!hasMatchingDosage) return false;
       }
-      console.log("review.form",localFilters);
+
       // Filter by form
       if (localFilters.form.length > 0 ) {
-        const hasMatchingForm = localFilters.dosage.some(
+        const hasMatchingForm = localFilters.form.some(
           (f) => review.dosage === f
         );
+
         if (!hasMatchingForm) return false;
       }
 
@@ -107,6 +105,7 @@ export default function ReviewFilterModal({
     });
 
     setFilteredCount(filtered.length);
+  
   }, [localFilters, allReviews, totalResults]);
 
   if (!isOpen) return null;

@@ -180,6 +180,7 @@ export default function ReviewListPage({
         starCount: filters.rating,
         searchQuery,
         potency: filters.dosage,
+        dosage: filters.form
       });
 
       let allReviews = reviewsData || [];
