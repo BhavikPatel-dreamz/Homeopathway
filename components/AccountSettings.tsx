@@ -90,14 +90,14 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
   };
 
   // Auto-hide toast after 5 seconds
-  useEffect(() => {
-    if (toast) {
-      const timer = setTimeout(() => {
-        setToast(null);
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [toast]);
+  // useEffect(() => {
+  //   if (toast) {
+  //     const timer = setTimeout(() => {
+  //       setToast(null);
+  //     }, 5000);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [toast]);
 
   const showToast = (type: "success" | "error", text: string) => {
     setToast({ type, text });
@@ -360,9 +360,12 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
     <div className="min-h-screen bg-[#F5F1E8]">
       {/* Toast Notification */}
       {toast && (
-        <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2">
+        <div className="fixed top-4 left-1/2 -translate-x-1/2
+sm:left-auto sm:right-4 sm:translate-x-0
+z-50 animate-in slide-in-from-top-2
+">
           <div
-            className={`min-w-[300px] max-w-md p-4 rounded-lg shadow-lg flex items-start gap-3 ${
+            className={`min-w-[300px]  max-w-md p-4 rounded-lg shadow-lg flex items-start gap-3 ${
               toast.type === "success"
                 ? "bg-green-50 text-green-800 border border-green-200"
                 : "bg-red-50 text-red-800 border border-red-200"
