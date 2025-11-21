@@ -161,7 +161,7 @@ export default function ReviewListPage({
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isPageLoading, setIsPageLoading] = useState(false);
 
-  const [allReviesList, setAllReviewsList] = useState<any>([]);
+  const [allReviesList, setAllReviewsList] = useState<any>([])
 
   // ---------------------------
   // Fetch Reviews + Stats
@@ -224,8 +224,7 @@ export default function ReviewListPage({
         if (activeFilters.userName.trim()) {
           const userName =
             review.profiles?.first_name || review.profiles?.last_name
-              ? `${review.profiles?.first_name || ""} ${
-                  review.profiles?.last_name || ""
+              ? `${review.profiles?.first_name || ""} ${review.profiles?.last_name || ""
                 }`.toLowerCase()
               : "anonymous";
           if (!userName.includes(activeFilters.userName.toLowerCase())) {
@@ -382,8 +381,8 @@ export default function ReviewListPage({
                     const percentage =
                       reviewStats.total_reviews > 0
                         ? (reviewStats.rating_distribution[star] /
-                            reviewStats.total_reviews) *
-                          100
+                          reviewStats.total_reviews) *
+                        100
                         : 0;
                     const isActive = filters.rating.includes(star);
 
@@ -465,59 +464,56 @@ export default function ReviewListPage({
                       (filters.dateRange !== "all" ? 1 : 0) +
                       (filters.userName ? 1 : 0) >
                       0 && (
-                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                        {filters.rating.length +
-                          filters.dosage.length +
-                          filters.form.length +
-                          (filters.dateRange !== "all" ? 1 : 0) +
-                          (filters.userName ? 1 : 0)}
-                      </span>
-                    )}
+                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                          {filters.rating.length +
+                            filters.dosage.length +
+                            filters.form.length +
+                            (filters.dateRange !== "all" ? 1 : 0) +
+                            (filters.userName ? 1 : 0)}
+                        </span>
+                      )}
                   </button>
                 </div>
               </div>
 
               {/* Sort By */}
-              <div className="flex items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0 justify-center ">
-                <span className="font-semibold text-[#2B2E28] text-[14px]  whitespace-nowrap ">
-                  Sort by:
-                </span>
+              <div className=" ">
 
-                <div className="relative" ref={dropdownRef}>
+                <div className="flex items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0 justify-center relative" ref={dropdownRef}>
+                  <span className="font-semibold text-[#2B2E28] text-[14px]  whitespace-nowrap ">
+                    Sort by:
+                  </span>
                   <button
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="appearance-none min-w-fit 
-               sm:pl-1 pr-10 py-2 text-[14px]  text-[#20231E] font-medium focus:outline-none"
+                    className="appearance-none
+               sm:pl-1 pr-10 py-2 text-[14px] min-w-[130px] text-[#20231E] font-medium focus:outline-none"
                   >
                     {sortOptions.find((opt) => opt.value === sortBy)?.label}
-                  </button>
-
-                  <ChevronDown
-                    className={`absolute right-4 sm:right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 
+                    <ChevronDown
+                      className={`absolute right-4 sm:right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 
                 pointer-events-none transition-transform duration-200
                 ${isDropdownOpen ? "rotate-180" : ""}`}
-                  />
+                    />
+                  </button>
+
 
                   {isDropdownOpen && (
-                    <div className="absolute z-10 top-full w-full bg-white border border-gray-300 rounded-md shadow-lg">
-                      {sortOptions.map((opt) => (
+                    <div className="absolute z-10 top-full left-0  bg-white border border-gray-300 rounded-md shadow-lg">
+                      {sortOptions.map((opt: any) => (
                         <button
                           key={opt.value}
                           onClick={() => {
-                            setSortBy(opt.value as typeof sortBy);
+                            setSortBy(opt.value);
                             setIsDropdownOpen(false);
                           }}
-                          className={`px-2 w-full py-2 text-xs text-start  cursor-pointer hover:bg-blue-200 hover:text-blue-700 transition-colors
-                      ${
-                        sortBy === opt.value
-                          ? "bg-blue-200 text-blue-700 font-medium"
-                          : "text-gray-700"
-                      }`}
+                          className={`px-3 py-2 w-full text-sm text-start hover:bg-blue-200 hover:text-blue-700 transition
+                     ${sortBy === opt.value ? "bg-blue-200 text-blue-700 font-medium" : "text-gray-700"}`}
                         >
                           {opt.label}
                         </button>
                       ))}
                     </div>
+
                   )}
                 </div>
               </div>
@@ -551,9 +547,8 @@ export default function ReviewListPage({
                 {reviews.map((review) => {
                   const userName =
                     review.profiles?.first_name || review.profiles?.last_name
-                      ? `${review.profiles?.first_name || ""} ${
-                          review.profiles?.last_name?.[0] || ""
-                        }.`
+                      ? `${review.profiles?.first_name || ""} ${review.profiles?.last_name?.[0] || ""
+                      }.`
                       : "Anonymous";
                   const tags = [review.dosage, review.potency].filter(Boolean);
                    const userId = review.profiles?.id;
@@ -627,11 +622,10 @@ export default function ReviewListPage({
                         <button
                           key={page}
                           onClick={() => handlePageChange(page)}
-                          className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full text-xs sm:text-sm font-semibold ${
-                            currentPage === page
-                              ? "bg-[#6C7463] text-white"
-                              : "bg-[#F5F3ED] border border-gray-300 text-gray-700 hover:bg-gray-50"
-                          }`}
+                          className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full text-xs sm:text-sm font-semibold ${currentPage === page
+                            ? "bg-[#6C7463] text-white"
+                            : "bg-[#F5F3ED] border border-gray-300 text-gray-700 hover:bg-gray-50"
+                            }`}
                         >
                           {page}
                         </button>

@@ -115,7 +115,7 @@ export default function TopRemedies({
           <div className=" w-[130px] flex flex-col sm:flex-row sm:min-w-[190px] sm:gap-1 relative">
             <label
               htmlFor="sort-remedies"
-              className="block font-semibold text-[#2B2E28] text-xs sm:text-sm mb-1"
+              className="block font-semibold text-[#2B2E28] text-xs sm:text-sm mb-1 "
             >
               Sort by :
             </label>
