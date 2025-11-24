@@ -2,15 +2,14 @@ import Breadcrumb from "@/components/Breadcrumb";
 import UserReviewListPage from "@/components/UserReview";
 import { supabase } from "@/lib/supabaseClient";
 
-export default async function UserProfilePage({ params }: { params: { id: string } }) {
-  const { id } =await params;
-  console.log(id,"111111")
-
+export default async function UserProfilePage({ params }: { params: { slug: string } }) {
+  const { slug } =await params;
+ 
   // Fetch user with their reviews
   const { data: user, error } = await supabase
     .from("profiles")
     .select("*")
-    .eq("id", id)
+    .eq("user_name", slug)
     .single();
 
  const { data: reviews, error: reviewsError } = await supabase
@@ -20,7 +19,7 @@ export default async function UserProfilePage({ params }: { params: { id: string
       remedies(id, name, slug, scientific_name),
       ailments(id, name, slug)
     `)
-    .eq("user_id", id)
+    .eq("user_id", user.id)
     .order('created_at', { ascending: false });
 
 // Combine the data

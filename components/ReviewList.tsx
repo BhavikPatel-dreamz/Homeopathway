@@ -552,11 +552,12 @@ export default function ReviewListPage({
                       }.`
                       : "Anonymous";
                   const tags = [review.dosage, review.potency].filter(Boolean);
-                   const userId = review.profiles?.id;
+                   const user_name = review.profiles?.user_name;
+                   console.log(user_name,'5555')
                   return (
                     <div
                       key={review.id}
-                      onClick={() => router.push(`/user/${userId}`)}
+                      onClick={() => router.push(`/user/${user_name}`)}
                       className="border-b border-[#B5B6B1]/50 w-full p-4 sm:p-6 cursor-pointer" 
                     >
                       <div className="flex flex-col sm:flex-row items-start justify-between mb-2 sm:mb-3 gap-2 sm:gap-0">

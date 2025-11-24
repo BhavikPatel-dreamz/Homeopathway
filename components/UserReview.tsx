@@ -63,11 +63,11 @@ const formatMemberSince = (dateString: string) => {
 
 export default function UserReviewListPage({ user }: any ) {
   const [reviews] = useState(user?.reviews || []);
-  console.log(reviews,)
+ 
   const userProfile = {
     initial: user?.first_name?.[0] || "",
     name: `${user?.first_name || ""} ${user?.last_name || ""}`,
-    username: user?.username || "",
+    username: user?.user_name || "",
     email:user?.email,
     followers: user?.followers || 10,
     following: user?.following || 15,

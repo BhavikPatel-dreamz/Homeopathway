@@ -22,6 +22,10 @@ export async function signUpWithEmail({ email, password, firstName, lastName }: 
   // Assumes you have a `profiles` table with columns: id (uuid same as auth user id), email, first_name, last_name, role
   try {
     const user = data.user;
+    const userName = [firstName, lastName]
+  .filter(Boolean)
+  .join('-')
+  .toLowerCase();
     if (user) {
       const { error: profileError } = await supabase
         .from('profiles')
@@ -30,7 +34,8 @@ export async function signUpWithEmail({ email, password, firstName, lastName }: 
           email: user.email,
           first_name: firstName ?? null, 
           last_name: lastName ?? null, 
-          role: 'user' 
+          role: 'user' ,
+          user_name:userName
         });
       
       if (profileError) {

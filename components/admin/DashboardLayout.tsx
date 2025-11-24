@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import Image from 'next/image';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -24,15 +25,22 @@ export default function DashboardLayout({ children, userName }: DashboardLayoutP
     }
   };
 
-  const navigation = [
-    { name: 'Overview', href: '/admin', icon: '📊' },
-    { name: 'Ailments', href: '/admin/ailments', icon: '💊' },
-    { name: 'Remedies', href: '/admin/remedies', icon: '🧪' },
-    { name: 'Users', href: '/admin/users', icon: '👥' },
-    { name: 'Reviews', href: '/admin/reviews', icon: '⭐' },
-    // { name: 'Analytics', href: '/admin/analytics', icon: '📈' },
-    // { name: 'Settings', href: '/admin/settings', icon: '⚙️' },
-  ];
+
+   const navigation = [
+  { name: 'Overview', href: '/admin', icon: '📊' },
+  { 
+    name: 'Ailments', 
+    href: '/admin/ailments', 
+    icon: '' 
+  },
+  { 
+    name: 'Remedies', 
+    href: '/admin/remedies', 
+    icon: '' 
+  },
+  { name: 'Users', href: '/admin/users', icon: '👥' },
+  { name: 'Reviews', href: '/admin/reviews', icon: '⭐' },
+];
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -40,26 +48,18 @@ export default function DashboardLayout({ children, userName }: DashboardLayoutP
       <aside
         className={`${
           isSidebarOpen ? 'w-64' : 'w-20'
-        } bg-[#2C3E3E] text-white transition-all duration-300 flex flex-col fixed h-full z-30`}
+        } bg-[#4B544A] text-white transition-all duration-300 flex flex-col fixed h-full z-30`}
       >
         {/* Logo */}
         <div className="p-6 border-b border-white/10">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg viewBox="0 0 100 100" className="w-6 h-6">
-                <path
-                  d="M50 10 L50 50 M30 30 L50 50 L70 30 M20 50 L50 50 L80 50 M30 70 L50 50 L70 70"
-                  stroke="white"
-                  strokeWidth="2"
-                  fill="none"
-                />
-                <circle cx="50" cy="50" r="3" fill="white" />
-              </svg>
+              <img src="/favicon.svg" alt="" />
             </div>
             {isSidebarOpen && (
               <div>
                 <h1 className="text-lg font-semibold">Homeopathway</h1>
-                <p className="text-xs text-gray-400">Admin Panel</p>
+                <p className="text-xs text-white">Admin Panel</p>
               </div>
             )}
           </div>
@@ -78,7 +78,16 @@ export default function DashboardLayout({ children, userName }: DashboardLayoutP
                       : 'text-gray-300 hover:bg-white/5 hover:text-white'
                   }`}
                 >
-                  <span className="text-xl flex-shrink-0">{item.icon}</span>
+                {item.icon=='' ? (
+             <Image 
+                  src={item.name =='Ailments'? '/ailments-icon.svg':'/top-remedies.svg'} 
+                  alt={`${item.name} icon`} 
+                  width={21} 
+                  height={21}
+              />
+           ) : (
+              <span>{item.icon}</span>
+             )}
                   {isSidebarOpen && (
                     <span className={isActive ? "font-semibold" : "font-medium"}>
                       {item.name}
@@ -98,8 +107,8 @@ export default function DashboardLayout({ children, userName }: DashboardLayoutP
             </div>
             {isSidebarOpen && (
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{userName || 'Admin'}</p>
-                <p className="text-xs text-gray-400">Administrator</p>
+                <p className="text-sm font-medium truncate text-white">{userName || 'Admin'}</p>
+                <p className="text-xs text-white">Administrator</p>
               </div>
             )}
           </div>
@@ -119,7 +128,7 @@ export default function DashboardLayout({ children, userName }: DashboardLayoutP
         {/* Toggle Button */}
         <button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="absolute -right-3 top-20 w-6 h-6 bg-[#2C3E3E] border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-[#3C4E4E] transition-colors"
+          className="absolute -right-3 top-20 w-6 h-6 bg-[#4B544A] border border-white/20 rounded-full flex items-center justify-center text-white  transition-colors"
         >
           <span className="text-xs">{isSidebarOpen ? '←' : '→'}</span>
         </button>
