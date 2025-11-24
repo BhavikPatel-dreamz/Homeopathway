@@ -48,7 +48,7 @@ export default function DashboardLayout({ children, userName }: DashboardLayoutP
       <aside
         className={`${
           isSidebarOpen ? 'w-64' : 'w-20'
-        } bg-[#4B544A] text-white transition-all duration-300 flex flex-col fixed h-full z-30`}
+        } bg-[#2B2E28] text-white transition-all duration-300 flex flex-col fixed h-full z-30`}
       >
         {/* Logo */}
         <div className="p-6 border-b border-white/10">
@@ -130,7 +130,7 @@ export default function DashboardLayout({ children, userName }: DashboardLayoutP
         {/* Toggle Button */}
         <button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="absolute -right-3 top-20 w-6 h-6 bg-[#4B544A] border border-white/20 rounded-full flex items-center justify-center text-white  transition-colors"
+          className="absolute -right-3 top-20 w-6 h-6 bg-[#2B2E28] border border-white/20 rounded-full flex items-center justify-center text-white  transition-colors"
         >
           <span className="text-xs">{isSidebarOpen ? '←' : '→'}</span>
         </button>
