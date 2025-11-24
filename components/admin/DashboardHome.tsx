@@ -20,7 +20,7 @@ export default function DashboardHome({
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between mb-3">
             <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
-              <span className="text-2xl">💊</span>
+              <img src="/top-remedies.svg" alt="" />
             </div>
             <span className="text-xs text-gray-500">Total</span>
           </div>
@@ -31,7 +31,7 @@ export default function DashboardHome({
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between mb-3">
             <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
-              <span className="text-2xl">🤒</span>
+              <img src="/ailments-icon.svg" alt="" />
             </div>
             <span className="text-xs text-gray-500">Categories</span>
           </div>
@@ -68,7 +68,7 @@ export default function DashboardHome({
           href="/admin/ailments/add"
           className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
         >
-          <div className="text-3xl mb-3">🤒</div>
+           <img className="text-3xl mb-3" src="/ailments-icon.svg" alt="" />
           <h3 className="text-lg font-semibold mb-1">Add Ailment</h3>
           <p className="text-sm text-blue-100">Create a new ailment category</p>
         </Link>
@@ -77,7 +77,7 @@ export default function DashboardHome({
           href="/admin/remedies/add"
           className="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
         >
-          <div className="text-3xl mb-3">💊</div>
+          <img className="text-3xl mb-3" src="/top-remedies.svg" alt="" />
           <h3 className="text-lg font-semibold mb-1">Add Remedy</h3>
           <p className="text-sm text-green-100">Add a new homeopathic remedy</p>
         </Link>

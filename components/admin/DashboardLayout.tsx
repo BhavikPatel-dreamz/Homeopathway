@@ -52,7 +52,8 @@ export default function DashboardLayout({ children, userName }: DashboardLayoutP
       >
         {/* Logo */}
         <div className="p-6 border-b border-white/10">
-          <div className="flex items-center gap-3">
+        <Link href="/admin">
+          <div className="flex items-center gap-3 cursor-pointer">
             <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
               <img src="/favicon.svg" alt="" />
             </div>
@@ -63,6 +64,7 @@ export default function DashboardLayout({ children, userName }: DashboardLayoutP
               </div>
             )}
           </div>
+          </Link>
         </div>
 
         {/* Navigation */}
