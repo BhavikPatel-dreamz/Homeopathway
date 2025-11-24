@@ -454,7 +454,7 @@ export default function ReviewListPage({
                   <button
                     onClick={() => setIsFilterModalOpen(true)}
                     className="absolute right-2.5 top-1/2 -translate-y-1/2 px-3 py-3 bg-[#6C7463] hover:bg-[#5A6B5D] 
-      text-white rounded-md transition-colors flex items-center gap-1"
+      text-white rounded-md transition-colors flex items-center gap-1 cursor-pointer"
                   >
                     <SlidersHorizontal className="w-4 h-4" />
 

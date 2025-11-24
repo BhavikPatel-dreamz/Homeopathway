@@ -353,14 +353,14 @@ export default function ReviewFilterModal({
 
   <button
     onClick={clearAll}
-    className="text-gray-700 font-medium hover:text-gray-900 transition text-[15px]"
+    className="text-gray-700 font-medium hover:text-gray-900 transition text-[15px] cursor-pointer"
   >
     Clear all
   </button>
 
   <button
     onClick={handleApply}
-    className="bg-[#6C7463] hover:bg-[#5A6B5D] text-white px-6 py-2.5 rounded-full font-medium transition text-[15px]"
+    className="bg-[#6C7463] hover:bg-[#5A6B5D] text-white px-6 py-2.5 rounded-full font-medium transition text-[15px]  cursor-pointer"
   >
     Show {filteredCount.toLocaleString()} results
   </button>
