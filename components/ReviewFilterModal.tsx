@@ -342,7 +342,7 @@ export default function ReviewFilterModal({
                 }))
               }
               className="w-full px-3 py-2.5 text-gray-700 border-2 border-gray-300 rounded-md text-sm 
-                focus:outline-none focus:ring-2 focus:ring-[#6C7463] focus:border-[#6C7463] transition
+                focus:outline-none  focus:ring-[#6C7463] focus:border-[#6C7463] transition
                 placeholder:text-gray-400"
             />
           </div>
