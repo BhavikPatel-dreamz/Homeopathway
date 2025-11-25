@@ -62,7 +62,7 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
       if (filterOptions.sideEffects) params.append('sideEffects', filterOptions.sideEffects);
       if (filterOptions.dateRange) params.append('dateRange', filterOptions.dateRange);
       params.append('page', filterOptions.page.toString());
-      params.append('limit', '1');
+      params.append('limit', '10');
 
       const response = await fetch(`/api/admin/reviews/search?${params.toString()}`);
       
@@ -460,7 +460,7 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
                     <button
                       onClick={() => setFilters(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
                       disabled={filters.page === 1 || loading}
-                      className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Previous
                     </button>
@@ -518,36 +518,13 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
                           </button>
                         );
                       }
-                      
-                      // Add last page and ellipsis if needed
-                      if (endPage < totalPages) {
-                        if (endPage < totalPages - 1) {
-                          pages.push(
-                            <span key="ellipsis2" className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">
-                              ...
-                            </span>
-                          );
-                        }
-                        
-                        pages.push(
-                          <button
-                            key={totalPages}
-                            onClick={() => setFilters(prev => ({ ...prev, page: totalPages }))}
-                            disabled={loading}
-                            className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:cursor-not-allowed disabled:opacity-50"
-                          >
-                            {totalPages}
-                          </button>
-                        );
-                      }
-                      
                       return pages;
                     })()}
                     
                     <button
                       onClick={() => setFilters(prev => ({ ...prev, page: Math.min(totalPages, prev.page + 1) }))}
                       disabled={filters.page === totalPages || loading}
-                      className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Next
                     </button>

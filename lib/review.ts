@@ -196,7 +196,7 @@ export async function getReviews({
   const userIds = reviews.map(r => r.user_id).filter(Boolean);
   const { data: profiles, error: profileError } = await supabase
     .from('profiles')
-    .select('id, first_name, last_name, email,user_name')
+    .select('id, first_name, last_name, email,user_name,profile_img')
     .in('id', userIds);
 
   if (profileError) {
@@ -229,6 +229,7 @@ export async function getReviews({
             r.profiles.last_name.toLowerCase().includes(q)));
              (r.profiles.id.includes(q));
               (r.profiles.user_name.includes(q));
+              (r.profiles.profile_img.includes(q));
       return matchNotes || matchProfile;
     });
   }

@@ -210,7 +210,7 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="e.g., Arnica Montana, Belladonna"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                  className="w-full px-4 py-2 border text-gray-400 border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                 />
               </div>
 
@@ -227,7 +227,7 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
                   value={formData.slug}
                   onChange={handleSlugChange}
                   placeholder="e.g., arnica-montana, belladonna"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                  className="w-full px-4 py-2 border text-gray-400 border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                 />
                 <p className="text-sm text-gray-500 mt-1">Auto-generated from remedy name, but can be edited</p>
               </div>
@@ -244,7 +244,7 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
                   value={formData.scientific_name}
                   onChange={handleChange}
                   placeholder="e.g., Arnica montana"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                  className="w-full px-4 py-2 border text-gray-400 border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                 />
               </div>
 
@@ -260,7 +260,7 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
                   value={formData.common_name}
                   onChange={handleChange}
                   placeholder="e.g., Mountain Arnica, Deadly Nightshade"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                  className="w-full px-4 py-2 border text-gray-400 border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                 />
               </div>
 
@@ -277,7 +277,7 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
                   onChange={handleChange}
                   rows={4}
                   placeholder="Describe the remedy, its uses, and characteristics..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 resize-none"
+                  className="w-full px-4 py-2 text-gray-400 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 resize-none"
                 />
               </div>
 
@@ -368,7 +368,7 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
                     onChange={handleChange}
                     placeholder="Type or paste emoji here"
                     maxLength={2}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-2xl text-center"
+                    className="w-full px-3 py-2 text-gray-400 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-2xl text-center"
                   />
                 </div>
 
@@ -389,7 +389,7 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
                   value={formData.image_url}
                   onChange={handleChange}
                   placeholder="https://example.com/remedy-image.jpg"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                  className="w-full px-4 py-2 text-gray-400 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                 />
                 <p className="text-sm text-gray-500 mt-1">
                   Optional: Add a URL to an image of the remedy plant/substance
@@ -430,7 +430,7 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
                   value={formData.key_symptoms}
                   onChange={handleChange}
                   placeholder="Bruising, Muscle soreness, Trauma, Shock"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                  className="w-full px-4 py-2 text-gray-400 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                 />
                 <p className="text-sm text-gray-500 mt-1">Separate symptoms with commas</p>
               </div>
@@ -447,7 +447,7 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
                   value={formData.constitutional_type}
                   onChange={handleChange}
                   placeholder="e.g., Nervous, Robust, Phlegmatic"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                  className="w-full px-4 py-2 text-gray-400 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                 />
               </div>
 
@@ -464,7 +464,7 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
                   value={formData.dosage_forms}
                   onChange={handleChange}
                   placeholder="30C, 200C, 6C, 1M"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                  className="w-full px-4 py-2 text-gray-400 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                 />
                 <p className="text-sm text-gray-500 mt-1">Separate potencies with commas</p>
               </div>
@@ -486,7 +486,7 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
                 onChange={handleChange}
                 rows={3}
                 placeholder="List any contraindications, warnings, or special precautions..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 resize-none"
+                className="w-full px-4 py-2 text-gray-400 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 resize-none"
               />
             </div>
           </div>

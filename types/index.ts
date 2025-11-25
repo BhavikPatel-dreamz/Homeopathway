@@ -68,6 +68,7 @@ export interface Review {
     last_name: string;
     email: string;
     user_name?:string;
+    profile_img?:string;
   };
   // Legacy support for old structure
   remedy?: Remedy;

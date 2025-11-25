@@ -63,7 +63,6 @@ const formatMemberSince = (dateString: string) => {
 
 export default function UserReviewListPage({ user }: any ) {
   const [reviews] = useState(user?.reviews || []);
- 
   const userProfile = {
     initial: user?.first_name?.[0] || "",
     name: `${user?.first_name || ""} ${user?.last_name || ""}`,
@@ -72,6 +71,7 @@ export default function UserReviewListPage({ user }: any ) {
     followers: user?.followers || 10,
     following: user?.following || 15,
     location: user?.location || "N/A",
+    profileImg: user?.profile_img || "",
     memberSince: formatMemberSince(user?.created_at || ""),
   };
   
@@ -85,12 +85,20 @@ export default function UserReviewListPage({ user }: any ) {
             <div className="w-full lg:w-[400px] lg:h-[216px] p-6 bg-white rounded-2xl shadow-sm">
               {/* Avatar */}
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-full bg-[#4B544A] text-white flex items-center justify-center text-xl font-semibold">
-                  {userProfile.initial.charAt(0).toUpperCase()}
-                </div>
+               <div className="w-10 h-10 rounded-full bg-[#4B544A] text-white flex items-center justify-center text-xl font-semibold overflow-hidden">
+              {userProfile.profileImg ? (
+                <img 
+                   src={userProfile.profileImg} 
+                   alt={userProfile.initial}
+                   className="w-full h-full object-cover"
+                 />
+             ) : (
+              userProfile.initial.charAt(0).toUpperCase()
+             )}
+            </div>
                <div className="relative">
                  <p className="font-semibold text-base text-xl text-[#2B2E28]">{userProfile.name}</p>
-                 <p className="text-sm text-[#2B2E28] pr-5">@{userProfile.name}</p>
+                 <p className="text-sm text-[#2B2E28] pr-5">@{userProfile.username}</p>
                  <img
                    src="/edit-box-line.svg"
                    className="absolute right-[1] mt-4 top-1/2 -translate-y-1/2 w-4 h-4 cursor-pointer z-10"
@@ -139,10 +147,17 @@ export default function UserReviewListPage({ user }: any ) {
           {/* Header */}
           <div className="flex justify-between items-start mb-3">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#4B544A] text-white flex items-center justify-center text-base font-semibold">
-                {userProfile.initial.charAt(0).toUpperCase()}
+               <div className="w-10 h-10 rounded-full bg-[#4B544A] text-white flex items-center justify-center text-xl font-semibold overflow-hidden">
+              {userProfile.profileImg ? (
+                <img 
+                   src={userProfile.profileImg} 
+                   alt={userProfile.initial}
+                   className="w-full h-full object-cover"
+                 />
+             ) : (
+              userProfile.initial.charAt(0).toUpperCase()
+             )}
               </div>
-
               <div>
                 <p className="font-semibold text-gray-900 text-[15px]">
                   {userProfile.name}

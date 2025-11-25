@@ -23,7 +23,7 @@ export default async function ReviewsPage() {
       .from('reviews')
       .select('*')
       .order('created_at', { ascending: false })
-      .limit(1),
+      .limit(10),
     supabase
       .from('reviews')
       .select('id', { count: 'exact', head: true })

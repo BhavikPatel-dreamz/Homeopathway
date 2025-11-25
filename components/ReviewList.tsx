@@ -317,16 +317,6 @@ export default function ReviewListPage({
     { label: "Lowest Rated", value: "lowest_rated" },
   ];
 
-  function createUserSlug(review: any) {
-  const first = review.profiles?.first_name || "";
-  const lastInitial = review.profiles?.last_name?.[0] || "";
-
-  if (!first && !lastInitial) return "anonymous";
-
-  return `${first}-${lastInitial}`
-    .toLowerCase()
-    .replace(/[^a-z0-9-]/g, ""); // clean slug
-}
 
   // ---------------------------
   // Render
@@ -553,7 +543,7 @@ export default function ReviewListPage({
                       : "Anonymous";
                   const tags = [review.dosage, review.potency].filter(Boolean);
                    const user_name = review.profiles?.user_name;
-                   console.log(user_name,'5555')
+                   const profile_image = review.profiles?.profile_img;
                   return (
                     <div
                       key={review.id}
@@ -562,9 +552,20 @@ export default function ReviewListPage({
                     >
                       <div className="flex flex-col sm:flex-row items-start justify-between mb-2 sm:mb-3 gap-2 sm:gap-0">
                         <div className="flex items-start gap-2 sm:gap-3">
-                          <div className="flex items-center justify-center w-11 h-11 sm:w-10 sm:h-10 rounded-full bg-[#4B544A] text-white font-semibold text-lg sm:text-base shadow-sm">
-                            {userName?.charAt(0).toUpperCase()}
-                          </div>
+                          {/* <div className="flex items-center justify-center w-11 h-11 sm:w-10 sm:h-10 rounded-full bg-[#4B544A] text-white font-semibold text-lg sm:text-base shadow-sm">
+                            {userName?.charAt(0).toUpperCase() || profile_image}
+                          </div> */}
+                          <div className="flex items-center justify-center w-11 h-11 sm:w-10 sm:h-10 rounded-full bg-[#4B544A] text-white font-semibold text-lg sm:text-base shadow-sm overflow-hidden">
+                       {profile_image ? (
+                          <img 
+                            src={profile_image} 
+                            alt={userName}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                            userName?.charAt(0).toUpperCase()
+                         )}
+</div>
 
                           <div>
                             <p className="font-semibold text-gray-800 text-[16px] sm:text-base">
