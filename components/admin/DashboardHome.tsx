@@ -57,8 +57,8 @@ export default function DashboardHome({
             </div>
             <span className="text-xs text-gray-500">Average</span>
           </div>
-          <div className="text-2xl font-bold text-gray-900">{averageRating.toFixed(1)}</div>
-          <div className="text-sm text-gray-600">Rating</div>
+          <div className="text-2xl font-bold text-gray-900">{averageRating}</div>
+          <div className="text-sm text-gray-600">Total Reviews</div>
         </div>
       </div>
 
