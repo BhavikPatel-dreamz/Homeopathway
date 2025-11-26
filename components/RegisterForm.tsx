@@ -301,7 +301,7 @@ export default function RegisterForm() {
 
       {/* ------------------- STEP 2: USERNAME FORM ------------------- */}
 {step === "username" && (
-  <div className="bg-white w-full max-w-md rounded-xl py-10 px-6 sm:px-10 shadow-md w-[382px] h-[372px] sm:w-[448px]">
+  <div className="bg-white w-full max-w-md rounded-xl py-10 px-6 sm:px-10 shadow-md w-[382px] h-[372px] sm:w-[448px] sm:h-[410px]">
 
     {/* Logo */}
     <div className="mb-4">
