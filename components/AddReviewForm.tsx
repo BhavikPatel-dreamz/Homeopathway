@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { X } from 'lucide-react';
 import { getCurrentUser } from '@/lib/auth';
+import Image from 'next/image';
 
 interface AddReviewFormProps {
   onClose: () => void;
@@ -194,12 +195,12 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
         {/* Content */}
         <div className="p-5 pt-8 sm:p-10 sm:pt-12">
           {/* Header */}
-          <div className="mb-6 sm:mb-10 pr-8">
-            <h2 className="text-lg sm:text-2xl font-serif text-gray-900 leading-tight">
+          <div className="mb-2 pr-8">
+            <h2 className="text-lg sm:text-[28px] font-medium text-[#0B0C0A] leading-tight">
               Your experience with
             </h2>
-            <h3 className="text-lg sm:text-2xl font-serif text-gray-900 leading-tight break-words">
-              <span className="font-semibold">{formData.remedy}</span> for {formData.condition}
+            <h3 className="text-lg sm:text-[28px] font-medium text-[#0B0C0A] leading-tight break-words">
+              <span className="font-medium">{formData.remedy}</span> for {formData.condition}
             </h3>
           </div>
 
@@ -212,28 +213,22 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
 
           {/* Step 1: Rating */}
           {step === 1 && (
-            <div className="space-y-6 sm:space-y-8">
+            <div className="space-y-3 sm:space-y-4">
               <p className="text-gray-800 text-sm sm:text-base">How do you rate the remedy?</p>
               <div className="flex gap-2 sm:gap-3 justify-start">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    onClick={() => handleRating(star)}
-                    className="focus:outline-none transition-all hover:scale-110"
-                  >
-                    <svg
-                      width="44"
-                      height="44"
-                      viewBox="0 0 24 24"
-                      fill={star <= formData.rating ? "#F59E0B" : "none"}
-                      stroke={star <= formData.rating ? "#F59E0B" : "#D1D5DB"}
-                      strokeWidth="1.5"
-                      className="transition-all sm:w-14 sm:h-14"
-                    >
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                    </svg>
-                  </button>
-                ))}
+               {[1, 2, 3, 4, 5].map((star) => (
+  <button
+    key={star}
+    onClick={() => handleRating(star)}
+    className="focus:outline-none transition-all hover:scale-110"
+  >
+    {star <= formData.rating ? (
+      <Image src="/star.svg" alt="Filled Star" width={44} height={44} />
+    ) : (
+      <Image src="/star-line.svg" alt="Empty Star" width={44} height={44} />
+    )}
+  </button>
+))}
               </div>
             </div>
           )}
@@ -413,7 +408,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
               <div
                 key={idx}  
                 className={`h-2 flex-1 rounded-xl transition-all ${
-                  idx < step ? 'bg-[#4B544A]' : 'bg-gray-200'
+                  idx < step ? 'bg-[#4B544A]' : 'bg-[#4B544A1A]'
                 }`}
               />
             ))}
@@ -424,7 +419,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
         {step > 1 && (
           <button
             onClick={handleBack}
-            className="px-5 py-2.5 sm:px-8 sm:py-3 rounded-full hover:bg-gray-50 transition-all font-medium text-gray-700 text-sm sm:text-base"
+            className="px-5 py-2.5 h-[44px] w-[80px]  sm:px-8 sm:py-3 rounded-full  transition-all font-medium text-gray-700 text-sm sm:text-base"
           >
             Back
           </button>
@@ -440,9 +435,9 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
             (step === 4 && !formData.duration) ||
             (step === 5 && !formData.effectiveness)
           }
-          className="px-5 py-2 sm:px-8 text-[#4B544A] rounded-full bg-[#4B544A] text-white disabled:bg-[#F1F2F0] disabled:text-[#2B2E28] disabled:cursor-not-allowed transition-all font-medium text-sm sm:text-base"
+          className="px-5 py-2.5 h-[44px] w-[138px] sm:px-8 text-[#4B544A] rounded-full bg-[#4B544A] text-white disabled:bg-[#F1F2F0] disabled:text-[#2B2E28] disabled:cursor-not-allowed transition-all font-medium text-sm sm:text-base"
         >
-          {loading ? "Submitting..." : step === totalSteps ? "Done" : "Next"}
+          {loading ? "Submitting.." : step === totalSteps ? "Done" : "Next"}
         </button>
       </div>
 

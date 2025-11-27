@@ -589,7 +589,7 @@ export default function ReviewListPage({
                           {tags.map((tag, i) => (
                             <span
                               key={i}
-                              className="text-[12px] leading-5 font-medium sm:text-xs px-2 py-2 rounded-md text-[#2B2E28] border"
+                              className="text-[12px] leading-5 font-medium sm:text-xs px-2 py-2 rounded-md text-[#2B2E28] border border-[#B5B6B1]"
                             >
                               {tag}
                             </span>

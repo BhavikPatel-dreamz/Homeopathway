@@ -259,10 +259,9 @@ const relatedRef = useRef<HTMLDivElement>(null!);
                 {remedy.description}
               </p>
               <div className="text-[14px] leading-3.5  flex items-center gap-2 mb-4 sm:mb-6 flex-wrap">
-                {renderStars(review?.average_rating || remedy.average_rating)}
+                {renderStars(remedy.average_rating)}
                 <span className="text-[#41463B] text-xs sm:text-sm">
-                  {(review?.average_rating || remedy.average_rating).toFixed(1)} (
-                  {(review?.total_reviews || remedy.review_count).toLocaleString()} reviews)
+                  {remedy.average_rating.toFixed(1)} ({remedy.review_count} {remedy.review_count === 1 ? "review" : "reviews"})
                 </span>
               </div>
 
@@ -316,7 +315,7 @@ const relatedRef = useRef<HTMLDivElement>(null!);
               </li>
             </ul>
 
-            <div className="mt-4 sm:mt-6">
+            {/* <div className="mt-4 sm:mt-6">
               <p className="text-md sm:text-base text-[#0B0C0A] mb-2 font-semibold">
                 Common Potencies
               </p>
@@ -327,7 +326,39 @@ const relatedRef = useRef<HTMLDivElement>(null!);
                     .join(", ")}
                 </div>
               </div>
-            </div>
+            </div> */}
+     <div className="mt-4 sm:mt-6">
+  <p className="text-md sm:text-base text-[#0B0C0A] mb-2 font-semibold">
+    Common Potencies
+  </p>
+
+  {/* Mobile 320px View */}
+  <div className="flex flex-col gap-1 sm:hidden font-medium text-[#2B2E28] text-xs">
+    {(remedy.dosage_forms || []).map((item, index) => (
+      <div
+        key={index}
+        className="flex justify-between w-full  pb-1"
+      >
+        <span>
+          {item.replace(/^'+|'+$/g, "").replace(/^"+|"+$/g, "")}
+        </span>
+        <span className="font-semibold">common</span>
+      </div>
+    ))}
+  </div>
+
+  {/* Desktop View */}
+  <div className="hidden sm:flex justify-between flex-wrap font-medium text-[#2B2E28] text-xs sm:text-sm">
+    <div>
+      {(remedy.dosage_forms || [])
+        .map((item) =>
+          item.replace(/^'+|'+$/g, "").replace(/^"+|"+$/g, "")
+        )
+        .join("   ")}
+    </div>
+  </div>
+</div>
+
           </aside>
        
         </section>
@@ -400,7 +431,7 @@ const relatedRef = useRef<HTMLDivElement>(null!);
                       {renderStars(item.average_rating || 0)}
                       <span className="ml-1">{(item.average_rating || 0).toFixed(1)}</span>
                       <span className="text-gray-500">
-                        ({(item.review_count || 0).toLocaleString()} reviews)
+                        ({item.review_count} {item.review_count === 1 ? "review" : "reviews"})
                       </span>
                     </div>
 

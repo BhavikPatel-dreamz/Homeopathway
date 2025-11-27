@@ -210,7 +210,7 @@ export default function ReviewFilterModal({
           <h2 className="text-[28px] mb-5 font-normal text-[#0B0C0A]">Filters</h2>
           {/* Rating Section */}
           <div className="mb-6">
-            <p className="text-base font-semibold text-gray-900 mb-3">
+            <p className="text-base font-semibold text-[#0B0C0A] mb-3">
               Rating
             </p>
             <div className="space-y-2.5">
@@ -224,9 +224,9 @@ export default function ReviewFilterModal({
                       type="checkbox"
                       checked={localFilters.rating.includes(rating)}
                       onChange={() => toggleRating(rating)}
-                      className="w-5 h-5 border-2 border-gray-300 rounded cursor-pointer appearance-none
-                        checked:bg-[#6C7463] checked:border-[#6C7463]
-                        focus:ring-2 focus:ring-[#6C7463] focus:ring-offset-2 transition"
+                      className="w-5 h-5 border-2 border-[#B5B6B1] rounded cursor-pointer appearance-none
+                        checked:bg-[#83857D] checked:border-[#83857D]
+                        focus:ring-2 focus:ring-[#83857D] focus:ring-offset-2 transition"
                     />
                     {localFilters.rating.includes(rating) && (
                       <svg
@@ -250,7 +250,7 @@ export default function ReviewFilterModal({
 
           {/* Dosage Section */}
           <div className="mb-6">
-            <p className="text-base font-semibold text-gray-900 mb-3">
+            <p className="text-base font-semibold text-[#0B0C0A] mb-3">
               Dosage
             </p>
             <div className="space-y-2.5">
@@ -264,9 +264,9 @@ export default function ReviewFilterModal({
                       type="checkbox"
                       checked={localFilters.dosage.includes(dosage)}
                       onChange={() => toggleDosage(dosage)}
-                      className="w-5 h-5 border-2 border-gray-300 rounded cursor-pointer appearance-none
-                        checked:bg-[#6C7463] checked:border-[#6C7463]
-                        focus:ring-2 focus:ring-[#6C7463] focus:ring-offset-2 transition"
+                      className="w-5 h-5 border-2 border-[#B5B6B1] rounded cursor-pointer appearance-none
+                        checked:bg-[#83857D] checked:border-[#83857D]
+                        focus:ring-2 focus:ring-[#83857D] focus:ring-offset-2 transition"
                     />
                     {localFilters.dosage.includes(dosage) && (
                       <svg
@@ -282,7 +282,7 @@ export default function ReviewFilterModal({
                       </svg>
                     )}
                   </div>
-                  <span className="text-gray-700 font-medium text-[15px]">{dosage}</span>
+                  <span className="text-[#41463B] font-medium text-[15px]">{dosage}</span>
                 </label>
               ))}
             </div>
@@ -290,7 +290,7 @@ export default function ReviewFilterModal({
 
           {/* Form Section */}
           <div className="mb-6">
-            <p className="text-base font-semibold text-gray-900 mb-3">Form</p>
+            <p className="text-base font-semibold text-[#0B0C0A] mb-3">Form</p>
             <div className="space-y-2.5">
               {formOptions.map((form: any) => (
                 <label
@@ -302,9 +302,9 @@ export default function ReviewFilterModal({
                       type="checkbox"
                       checked={localFilters.form.includes(form)}
                       onChange={() => toggleForm(form)}
-                      className="w-5 h-5 border-2 border-gray-300 rounded cursor-pointer appearance-none
-                        checked:bg-[#6C7463] checked:border-[#6C7463]
-                        focus:ring-2 focus:ring-[#6C7463] focus:ring-offset-2 transition"
+                      className="w-5 h-5 border-2 border-[#B5B6B1] rounded cursor-pointer appearance-none
+                        checked:bg-[#83857D] checked:border-[#83857D]
+                        focus:ring-2 focus:ring-[#83857D] focus:ring-offset-2 transition"
                     />
                     {localFilters.form.includes(form) && (
                       <svg
@@ -320,7 +320,14 @@ export default function ReviewFilterModal({
                       </svg>
                     )}
                   </div>
-                  <span className="text-gray-700 font-medium text-[15px]">{form}</span>
+                  {/* <span className="text-[#41463B] font-medium text-[15px]">{form}</span> */}
+                  <span
+  className={`font-medium text-[15px] transition ${
+    localFilters.form.includes(form) ? "text-[#0B0C0A]" : "text-[#41463B]"
+  }`}
+>
+  {form}
+</span>
                 </label>
               ))}
             </div>
@@ -328,7 +335,7 @@ export default function ReviewFilterModal({
 
           {/* Reviewer Name Section */}
           <div>
-            <label className="block text-base font-semibold text-gray-900 mb-3">
+            <label className="block text-base font-semibold text-[#0B0C0A] mb-3">
               Reviewer Name
             </label>
             <input
@@ -341,9 +348,9 @@ export default function ReviewFilterModal({
                   userName: e.target.value,
                 }))
               }
-              className="w-full px-3 py-2.5 text-gray-700 border-2 border-gray-300 rounded-md text-sm 
+              className="w-full px-3 py-2.5 text-[#0B0C0A] border-2 border-[#B5B6B1] rounded-md text-sm 
                 focus:outline-none  focus:ring-[#6C7463] focus:border-[#6C7463] transition
-                placeholder:text-gray-400"
+                placeholder:text-black"
             />
           </div>
         </div>
@@ -353,7 +360,7 @@ export default function ReviewFilterModal({
 
   <button
     onClick={clearAll}
-    className="text-gray-700 font-medium hover:text-gray-900 transition text-[15px] cursor-pointer"
+    className="text-[#2B2E28] font-medium  transition text-[15px] cursor-pointer"
   >
     Clear all
   </button>
