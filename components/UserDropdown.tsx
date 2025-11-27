@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { UserProfile } from '@/types/supabase';
 import { User } from '@supabase/supabase-js';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface UserDropdownProps {
   isOpen: boolean;
@@ -32,9 +33,12 @@ export default function UserDropdown({ isOpen, onClose, user, profile }: UserDro
     };
   }, [isOpen, onClose]);
 
+  const router = useRouter();
+
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     onClose();
+    router.push('/login');
   };
 
   if (!isOpen) return null;

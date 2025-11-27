@@ -206,7 +206,7 @@ export default function TopRemedies({
                         ? remedy.rating.toFixed(1)
                         : "N/A"}{" "}
                       ({remedy.reviewCount}{" "}
-                      {remedy.reviewCount === 1 ? "review" : "reviews"})
+                      {remedy.reviewCount === 1 ? "review" : "reviews"} for {ailmentSlug}) 
                     </span>
                   </div>
                   {/* Description */}

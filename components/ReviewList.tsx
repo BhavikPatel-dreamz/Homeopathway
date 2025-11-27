@@ -565,25 +565,24 @@ export default function ReviewListPage({
                         ) : (
                             userName?.charAt(0).toUpperCase()
                          )}
-</div>
+                     </div>
 
                           <div>
-                            <p className="font-semibold text-gray-800 text-[16px] sm:text-base">
+                            <p className="font-semibold text-[#0B0C0A] text-[16px] sm:text-base">
                               {userName}
                             </p>
                             <div className="flex items-center gap-1">
                               {renderStars(review.star_count)}
-                              <span className="ml-1 text-[16px] text-gray-600">
+                              <span className="ml-1 text-[16px] text-[#20231E]">
                                 {review.star_count.toFixed(1)}
                               </span>
                             </div>
                           </div>
                         </div>
-                        <p className="text-[14px] leading-[22px] text-[#83857D]">
+                       <p className="text-[14px] leading-[22px] text-[#83857D]">
                           {formatTimeAgo(review.created_at)}
                         </p>
                       </div>
-
                       {tags.length > 0 && (
                         <div className="flex flex-wrap gap-1 sm:gap-2 mb-2 sm:mb-3">
                           {tags.map((tag, i) => (
