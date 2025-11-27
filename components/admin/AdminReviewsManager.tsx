@@ -609,7 +609,7 @@ function ReviewRow({
             <textarea
               value={editData.notes}
               onChange={(e) => setEditData(prev => ({ ...prev, notes: e.target.value }))}
-              className="mt-2 w-full px-2 py-1 text-sm border border-gray-300 rounded resize-none"
+              className="mt-2 w-full px-2 py-1 text-sm border border-gray-300 rounded resize-none text-gray-500"
               rows={2}
               placeholder="Review notes..."
             />
@@ -634,7 +634,7 @@ function ReviewRow({
               <select
                 value={editData.star_count}
                 onChange={(e) => setEditData(prev => ({ ...prev, star_count: parseInt(e.target.value) }))}
-                className="text-sm border border-gray-300 rounded px-2 py-1"
+                className="text-sm border border-gray-300 rounded px-2 py-1 text-gray-700"
               >
                 {[1, 2, 3, 4, 5].map(rating => (
                   <option key={rating} value={rating}>{rating} Stars</option>
@@ -643,7 +643,7 @@ function ReviewRow({
               <select
                 value={editData.effectiveness}
                 onChange={(e) => setEditData(prev => ({ ...prev, effectiveness: parseInt(e.target.value) }))}
-                className="text-sm border border-gray-300 rounded px-2 py-1 ml-2"
+                className="text-sm border border-gray-300 rounded px-2 py-1 ml-2 text-gray-700"
               >
                 {[1, 2, 3, 4, 5].map(eff => (
                   <option key={eff} value={eff}>Eff: {eff}/5</option>
@@ -671,23 +671,23 @@ function ReviewRow({
               placeholder="Potency"
               value={editData.potency}
               onChange={(e) => setEditData(prev => ({ ...prev, potency: e.target.value }))}
-              className="w-full text-sm border border-gray-300 rounded px-2 py-1"
+              className="w-full text-sm border border-gray-300 rounded px-2 py-1 text-gray-700"
             />
             <input
               type="text"
               placeholder="Dosage"
               value={editData.dosage}
               onChange={(e) => setEditData(prev => ({ ...prev, dosage: e.target.value }))}
-              className="w-full text-sm border border-gray-300 rounded px-2 py-1"
+              className="w-full text-sm border border-gray-300 rounded px-2 py-1 text-gray-700"
             />
             <input
               type="text"
               placeholder="Duration"
               value={editData.duration_used}
               onChange={(e) => setEditData(prev => ({ ...prev, duration_used: e.target.value }))}
-              className="w-full text-sm border border-gray-300 rounded px-2 py-1"
+              className="w-full text-sm border border-gray-300 rounded px-2 py-1 text-gray-700"
             />
-            <label className="flex items-center text-sm">
+            <label className="flex items-center text-sm text-gray-700">
               <input
                 type="checkbox"
                 checked={editData.experienced_side_effects}

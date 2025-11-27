@@ -461,10 +461,10 @@ z-50 animate-in slide-in-from-top-2
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                      <span className="text-gray-400 text-xl">
-                        {user.first_name.charAt(0)}
-                        {user.last_name.charAt(0)}
+                    <div className="w-full h-full bg-gray-400 flex items-center justify-center">
+                      <span className="text-gray-100 text-xl font-semibold">
+                        {user.first_name.charAt(0).toUpperCase()}
+                        {user.last_name.charAt(0).toUpperCase()}
                       </span>
                     </div>
                   )}

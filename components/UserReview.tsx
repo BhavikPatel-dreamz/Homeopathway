@@ -38,7 +38,7 @@ const formatTimeAgo = (dateString: string) => {
     [2592000, "month"],
     [86400, "day"],
     [3600, "hour"],
-    [60, "minute"],
+    [60, "min"],
   ];
 
   for (const [secondsInUnit, label] of intervals) {
