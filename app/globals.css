@@ -145,3 +145,8 @@ select option{
     width: 40px;
   }
 }
+@media only screen and (max-width:320px) {
+    .custom-320 {
+      flex-direction: column;
+    }
+  }

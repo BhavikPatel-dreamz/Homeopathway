@@ -550,7 +550,7 @@ export default function ReviewListPage({
                       onClick={() => router.push(`/user/${user_name}`)}
                       className="border-b border-[#B5B6B1]/50 w-full p-4 sm:p-6 cursor-pointer" 
                     >
-                      <div className="flex flex-col sm:flex-row items-start justify-between mb-2 sm:mb-3 gap-2 sm:gap-0">
+                      <div className="flex custom-320 flex-row items-start justify-between mb-2 sm:mb-3 gap-2 sm:gap-0">
                         <div className="flex items-start gap-2 sm:gap-3">
                           {/* <div className="flex items-center justify-center w-11 h-11 sm:w-10 sm:h-10 rounded-full bg-[#4B544A] text-white font-semibold text-lg sm:text-base shadow-sm">
                             {userName?.charAt(0).toUpperCase() || profile_image}
@@ -616,10 +616,6 @@ export default function ReviewListPage({
                       <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 rotate-90" />
                     </button>
                     {Array.from({ length: totalPages }, (_, i) => i + 1)
-                      .slice(
-                        Math.max(0, currentPage - 2),
-                        Math.min(totalPages, currentPage + 1)
-                      )
                       .map((page) => (
                         <button
                           key={page}

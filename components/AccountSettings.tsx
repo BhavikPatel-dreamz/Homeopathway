@@ -501,7 +501,7 @@ z-50 animate-in slide-in-from-top-2
                     {(avatarUrl || previewUrl) && (
                       <button
                         onClick={handleRemoveAvatar}
-                        className="px-4 py-2 flex items-center justify-center gap-1 text-[12px] md:text-sm text-red-600 bg-[#FCEBEC] font-semibold rounded-3xl hover:bg-red-50 transition-colors disabled:opacity-50"
+                        className="px-4 py-2 flex items-center justify-center gap-1 text-[12px] md:text-sm text-[#B62E31] bg-[#FCEBEC] font-semibold rounded-3xl hover:bg-red-50 transition-colors disabled:opacity-50"
                         disabled={avatarLoading}
                       >
                         <svg
@@ -536,7 +536,7 @@ z-50 animate-in slide-in-from-top-2
           <div className="space-y-6">
             {/* Full Name */}
             <div>
-              <label className="block text-[14px] xs:text-sm font-medium text-[#41463B] mb-1.5 xs:mb-2">
+              <label className="block text-[14px] xs:text-sm font-medium text-[#20231E] mb-1.5 xs:mb-2">
                 Full Name
               </label>
               <div className="relative">
@@ -570,7 +570,7 @@ z-50 animate-in slide-in-from-top-2
             </div>
             {/* Email */}
             <div>
-              <label className="block text-[14px] xs:text-sm font-medium text-[#41463B] mb-1.5 xs:mb-2">
+              <label className="block text-[14px] xs:text-sm font-medium text-[#20231E] mb-1.5 xs:mb-2">
                 Email Address
               </label>
               <div className="relative">
@@ -594,7 +594,7 @@ z-50 animate-in slide-in-from-top-2
                   className="w-full pl-9 xs:pl-10 sm:pl-12 pr-3 xs:pr-4 py-2 xs:py-2.5 border border-[#D3D6D1] text-xs xs:text-sm sm:text-[16px] rounded-lg bg-[#F1F2F0] text-[#41463B] cursor-not-allowed"
                 />
               </div>
-              <p className="text-[10px] xs:text-xs text-gray-500 mt-1 xs:mt-1.5">
+              <p className="text-[10px] xs:text-xs text-[#83857D] mt-1 xs:mt-1.5">
                 Email address cannot be changed.
               </p>
             </div>
@@ -606,7 +606,7 @@ z-50 animate-in slide-in-from-top-2
 
               {/* Current Password */}
               <div className="mb-3 xs:mb-4">
-                <label className="block text-[14px] xs:text-sm font-medium text-[#41463B] mb-1.5 xs:mb-2">
+                <label className="block text-[14px] xs:text-sm font-medium text-[#20231E] mb-1.5 xs:mb-2">
                   Current Password
                 </label>
                 <div className="relative">
@@ -685,7 +685,7 @@ z-50 animate-in slide-in-from-top-2
 
               {/* New Password */}
               <div className="mb-3 xs:mb-4">
-                <label className="block text-[14px] xs:text-sm font-medium text-[#41463B] mb-1.5 xs:mb-2">
+                <label className="block text-[14px] xs:text-sm font-medium text-[#20231E] mb-1.5 xs:mb-2">
                   New Password
                 </label>
                 <div className="relative">
@@ -761,7 +761,7 @@ z-50 animate-in slide-in-from-top-2
                   <p className="text-red-500 text-xs mt-1">{fieldErrors.newpassword}</p>
                 )}
                 {!fieldErrors.newpassword && (
-                  <p className="text-[9px] xs:text-[10px] sm:text-xs text-gray-500 mt-1 xs:mt-1.5">
+                  <p className="text-[9px] xs:text-[10px] sm:text-xs text-[#41463B] mt-1 xs:mt-1.5">
                     Minimum 8 characters, one special character, one number
                   </p>
                 )}
@@ -769,7 +769,7 @@ z-50 animate-in slide-in-from-top-2
 
               {/* Confirm Password */}
               <div>
-                <label className="block text-[14px] xs:text-sm font-medium text-[#41463B] mb-1.5 xs:mb-2">
+                <label className="block text-[14px] xs:text-sm font-medium text-[#20231E] mb-1.5 xs:mb-2">
                   Confirm Password
                 </label>
                 <div className="relative">

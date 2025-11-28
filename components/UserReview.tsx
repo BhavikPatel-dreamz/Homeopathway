@@ -145,7 +145,7 @@ export default function UserReviewListPage({ user }: any ) {
           className="border-b border-[#D9D9D6] last:border-none pb-6"
         >
           {/* Header */}
-          <div className="flex justify-between items-start mb-3">
+          <div className="flex justify-between items-start mb-3 custom-320">
             <div className="flex items-start gap-3">
                <div className="w-10 h-10 rounded-full bg-[#4B544A] text-white flex items-center justify-center text-xl font-semibold overflow-hidden">
               {userProfile.profileImg ? (

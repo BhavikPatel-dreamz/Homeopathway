@@ -157,7 +157,7 @@ export default function RemedyListPage({
                     <p className="text-sm text-gray-600 line-clamp-2">{remedy.description}</p>
                   </div>
                   <p className="text-sm text-gray-500 mt-3 flex items-center gap-2">
-                    <span className="flex items-center gap-1 text-yellow-400">
+                    <span className="flex items-center gap-1 text-[#E69E29]">
                       <Image src="/star.svg" alt="Star" width={16} height={16} />
                       <span>{(remedy.rating ?? remedy.average_rating)?.toFixed(1)}</span>
                     </span>

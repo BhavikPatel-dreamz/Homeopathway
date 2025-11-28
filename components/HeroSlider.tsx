@@ -311,7 +311,7 @@ export default function HeroSlider() {
                   {/* Ailments Section */}
                   {filteredAilments.length > 0 && (
                     <div className="border-b border-gray-100">
-                      <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
+                      <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-[#0B0C0A] uppercase tracking-wide flex items-center gap-2">
                         <img
                           className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]"
                           src="/ailments-icon.svg"
@@ -327,10 +327,10 @@ export default function HeroSlider() {
                         >
                           <span className="text-2xl">{ailment.icon}</span>
                           <div className="flex-1">
-                            <div className="font-medium text-gray-900 group-hover:text-[#2C3E3E]">
+                            <div className="font-medium text-[#2C3E3E] group-hover:text-[#0B0C0A]">
                               {ailment.name}
                             </div>
-                            <div className="text-sm text-gray-500">
+                            <div className="text-sm text-gray-500 hover:text-gray-700">
                               🔬 {ailment.remedies_count} remedies available
                             </div>
                           </div>
@@ -360,10 +360,10 @@ export default function HeroSlider() {
                             {remedy.icon}
                           </div>
                           <div className="flex-1">
-                            <div className="font-medium text-gray-900 group-hover:text-[#2C3E3E]">
+                            <div className="font-medium text-[#2C3E3E] group-hover:text-[#0B0C0A]">
                               {remedy.name}
                             </div>
-                            <div className="text-sm text-gray-500 break-words whitespace-pre-wrap line-clamp-3">
+                            <div className="text-sm text-gray-500 hover:text-gray-700 break-words whitespace-pre-wrap line-clamp-3">
                             {remedy.description}
                            </div>
                           </div>
