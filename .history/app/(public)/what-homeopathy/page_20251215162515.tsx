@@ -6,7 +6,11 @@ import HomeopathyCard from '@/components/HomeopathyCard' // Import the new card 
 
 export default function HomeopathyPage() {
   return (
+
+    // Use a background color consistent with the image's body background
     <div className="min-h-screen bg-[#F5F1E8]">
+
+
       {/* Breadcrumb */}
       <Breadcrumb
         items={[
@@ -17,6 +21,7 @@ export default function HomeopathyPage() {
 
       {/* Main Content Card */}
       <HomeopathyCard />
+
       {/* Footer */}
       <Footer />
     </div>

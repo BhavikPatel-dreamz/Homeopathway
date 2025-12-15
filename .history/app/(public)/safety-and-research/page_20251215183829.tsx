@@ -13,6 +13,9 @@ export default function Page() {
         ]}
       />
 
+      {/* ❌ REMOVED BIG HERO TITLE */}
+      {/* ❌ REMOVED EXTRA “Safety & Research” */}
+
       {/* MAIN CONTENT */}
       <main className="px-4 py-10">
         <SafetyContent />

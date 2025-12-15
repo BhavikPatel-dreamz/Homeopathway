@@ -17,6 +17,7 @@ export default function HomeopathyPage() {
 
       {/* Main Content Card */}
       <HomeopathyCard />
+
       {/* Footer */}
       <Footer />
     </div>
