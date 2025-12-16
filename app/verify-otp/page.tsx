@@ -1,0 +1,59 @@
+'use client'
+
+import { useState } from 'react'
+import { supabase } from '@/lib/supabase'
+import AuthCard from '@/components/AuthCard'
+import { useSearchParams, useRouter } from 'next/navigation'
+
+export default function VerifyOtpPage() {
+  const email = useSearchParams().get('email')!
+  const [otp, setOtp] = useState('')
+  const router = useRouter()
+
+  async function verify() {
+    if (otp.length !== 6) {
+      alert('Please enter the 6-digit code')
+      return
+    }
+
+    const { error } = await supabase.auth.verifyOtp({
+      email,
+      token: otp,
+      type: 'email', // DO NOT CHANGE (as requested)
+    })
+
+    if (error) {
+      alert(error.message)
+      return
+    }
+
+    router.push('/reset-password')
+  }
+
+  return (
+    <AuthCard
+      title="Verify Code"
+      subtitle={`Enter the 6-digit code sent to ${email}`}
+    >
+      <input
+        maxLength={6}
+        inputMode="numeric"
+        placeholder="••••••"
+        className="
+          w-full border rounded-md px-3 py-2 mb-4
+          text-center tracking-widest text-lg
+          text-[#0B0C0A]
+        "
+        value={otp}
+        onChange={(e) => setOtp(e.target.value)}
+      />
+
+      <button
+        onClick={verify}
+        className="w-full bg-[#6B705C] text-white py-2 rounded-full"
+      >
+        Verify
+      </button>
+    </AuthCard>
+  )
+}
