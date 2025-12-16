@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import AuthCard from '@/components/AuthCard'
 import { useSearchParams, useRouter } from 'next/navigation'
@@ -8,18 +8,22 @@ import { useSearchParams, useRouter } from 'next/navigation'
 export default function VerifyOtpClient() {
   const params = useSearchParams()
   const email = params.get('email') || ''
-  const [otp, setOtp] = useState('')
   const router = useRouter()
 
+  const [otp, setOtp] = useState<string[]>(Array(6).fill(''))
+  const inputsRef = useRef<(HTMLInputElement | null)[]>([])
+
   async function verify() {
-    if (otp.length !== 6) {
+    const token = otp.join('')
+
+    if (token.length !== 6) {
       alert('Please enter the 6-digit code')
       return
     }
 
     const { error } = await supabase.auth.verifyOtp({
       email,
-      token: otp,
+      token,
       type: 'email', // ✅ unchanged
     })
 
@@ -31,27 +35,55 @@ export default function VerifyOtpClient() {
     router.push('/reset-password')
   }
 
+  function handleChange(value: string, index: number) {
+    if (!/^\d?$/.test(value)) return
+
+    const updated = [...otp]
+    updated[index] = value
+    setOtp(updated)
+
+    if (value && index < 5) {
+      inputsRef.current[index + 1]?.focus()
+    }
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>, index: number) {
+    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+      inputsRef.current[index - 1]?.focus()
+    }
+  }
+
   return (
     <AuthCard
       title="Verify Code"
-      subtitle={`Enter the 6-digit code sent to ${email}`}
+      subtitle={`We sent a code to ${email}`}
     >
-      <input
-        maxLength={6}
-        inputMode="numeric"
-        placeholder="••••••"
-        className="
-          w-full h-[44px]
-          border border-[#0B0C0A]
-          rounded-md
-          text-center
-          tracking-[8px]
-          text-[18px]
-          text-[#0B0C0A]
-        "
-        value={otp}
-        onChange={(e) => setOtp(e.target.value)}
-      />
+      {/* OTP INPUTS */}
+      <div className="flex justify-center gap-2">
+        {otp.map((digit, index) => (
+          <input
+            key={index}
+            ref={(el) => {
+              inputsRef.current[index] = el
+            }}
+            value={digit}
+            onChange={(e) => handleChange(e.target.value, index)}
+            onKeyDown={(e) => handleKeyDown(e, index)}
+            maxLength={1}
+            inputMode="numeric"
+            className="
+        w-[40px] h-[44px]
+        border border-[#0B0C0A]
+        rounded-md
+        text-center
+        text-[16px]
+        text-[#0B0C0A]
+        focus:outline-none
+      "
+          />
+        ))}
+      </div>
+
 
       <button
         onClick={verify}
@@ -61,10 +93,18 @@ export default function VerifyOtpClient() {
           text-white
           rounded-full
           text-[14px]
+          font-medium
         "
       >
-        Verify
+        Continue
       </button>
+
+      <p className="text-[12px] text-[#6B6F63]">
+        Didn’t receive the email?{' '}
+        <span className="underline cursor-pointer">
+          Click to resend
+        </span>
+      </p>
     </AuthCard>
   )
 }
