@@ -19,30 +19,33 @@ export default function Footer() {
             </div>
           </div>
         </div>
-
-        <div  className="col-span-12 md:col-span-3 lg:col-span-3">
-          <p className="text-[#fff] text-[16px] font-[600] mb-5 ">About</p>
-          <ul className="space-y-4 text-sm text-gray-300">
-            <li><a href="/what-homeopathy" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">What is Homeopathy?</a></li>
-            <li><a href="/how-it-works" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">How it Works</a></li>
-            <li><a href="/safety-and-research" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">Safety & Research</a></li>
-            <li><a href="/getting-started" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">Getting Started</a></li>
-          </ul>
-        </div>
-
+        
         <div className="col-span-12 md:col-span-3 lg:col-span-2">
-        <p className="text-[#fff] text-[16px] font-[600] mb-5 ">Support</p>
+        {/* <p className="text-[#fff] text-[16px] font-[600] mb-5 ">Support</p>
           <ul className="space-y-4 text-sm text-gray-300">
             <li><a href="/contact-us" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">Contact Us</a></li>
             <li><a href="/help-center" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">Help Center</a></li>
             <li><a href="/safety-guidelines" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">Safety Guidelines</a></li>
             <li><a href="/faq" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">FAQ</a></li>
+          </ul> */}
+        </div>
+        
+        <div  className="col-span-12 md:col-span-3 lg:col-span-3 lg:col-start-11">
+          <p className="text-[#fff] text-[16px] font-[600] mb-5 ">About</p>
+          <ul className="space-y-4 text-sm text-gray-300">
+            <li><a href="/what-homeopathy" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">What is HomeoPathway?</a></li>
+            <li><a href="/safety-and-research" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">Safety & Research</a></li>
+            <li><a href="/getting-started" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">Getting Started</a></li>
+            <li><a href="/faq" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">FAQ</a></li>
+            <li><a href="/contact-us" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">Contact Us</a></li>
           </ul>
         </div>
+
+       
       </div>
 
       <div className="border-t border-[#A7ACA1] mt-5 pt-5 flex flex-col md:flex-row justify-between flex-col-reverse items-start lg:items-center gap-4">
-        <p className="text-[12px] text-[#D3D6D1] font-[500]">© 2025 Homeopathway. All Rights Reserved.</p>
+        <p className="text-[12px] text-[#D3D6D1] font-[500]">© 2025 HomeoPathway. All Rights Reserved.</p>
         <div className="flex items-center gap-4">
           <div className="text-[#D3D6D1] font-[500]">Follow Us</div>
           <a href="https://www.facebook.com" target="_blank" className="w-6 h-6">
