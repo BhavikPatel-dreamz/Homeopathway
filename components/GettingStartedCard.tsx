@@ -15,7 +15,7 @@ export default function GettingStartedCard() {
             "
           >
             {/* TITLE */}
-            <h1 className="font-sans text-[40px] leading-[48px] font-normal text-[#0B0C0A] mb-4">
+            <h1 className="font-sans md:text-[40px] text-[36px] md:leading-[44px] leading-48px font-normal text-[#0B0C0A] mb-4">
               Getting Started
             </h1>
 

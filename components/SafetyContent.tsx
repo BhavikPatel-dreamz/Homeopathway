@@ -26,7 +26,7 @@ export default function SafetyContent() {
         <div className="bg-white rounded-[8px] border-0 md:p-6 p-4">
           
             {/* PAGE TITLE */}
-            <h1 className="font-sans text-[40px] leading-[48px] font-normal text-[#0B0C0A] mb-4">
+            <h1 className="font-sans md:text-[40px] text-[36px] md:leading-[44px] leading-48px font-normal text-[#0B0C0A] mb-4">
               Safety and Research
             </h1>
 

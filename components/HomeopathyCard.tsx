@@ -13,7 +13,7 @@ const SUB_HEADING_STYLE =
 
 // Main titles
 const MAIN_TITLE_STYLE =
-  "font-sans text-[40px] font-normal text-[#0B0C0A]";
+  "font-sans md:text-[40px] text-[36px] md:leading-[44px] leading-48px font-normal text-[#0B0C0A]";
 
 // Reusable content block
 const ContentBlock = ({
@@ -107,7 +107,7 @@ export default function HomeopathyPage() {
           </div>
 
           {/* FOOTER */}
-          <div className="mt-4">
+          <div className="mt-5">
             <h2 className={`${MAIN_TITLE_STYLE} mb-2`}>
               Why HomeoPathway Exists?
             </h2>
