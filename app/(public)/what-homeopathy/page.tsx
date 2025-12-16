@@ -1,7 +1,6 @@
 // app/page.js
 import React from 'react'
 import Breadcrumb from '@/components/Breadcrumb'
-import Footer from '@/components/Footer' // Import Footer if it's not already globally included
 import HomeopathyCard from '@/components/HomeopathyCard' // Import the new card component
 
 export default function HomeopathyPage() {
@@ -17,8 +16,6 @@ export default function HomeopathyPage() {
 
       {/* Main Content Card */}
       <HomeopathyCard />
-      {/* Footer */}
-      <Footer />
     </div>
   )
 }

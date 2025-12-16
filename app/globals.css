@@ -44,6 +44,9 @@ body {
     background: rgba(108, 116, 99, 0.7); 
     border-radius: 10px;
 }
+.font-family-montserrat {
+    font-family: 'Montserrat', sans-serif;
+}
 /* ✅ Prevent iOS bounce effect (optional) */
 body {
   position: relative;
@@ -140,6 +143,7 @@ select option{
   flex-direction: column;
   justify-content: space-between;
 }
+
 @media only screen and (max-width:767px) {
   .home-slider .slick-dots li button{
     width: 40px;
