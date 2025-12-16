@@ -34,29 +34,11 @@ export default function FAQCard() {
 
   return (
     <section
-      className="
-        flex justify-center
-        bg-[#F5F1E8]
-        px-[16px] pt-[8px] pb-[24px]
-        md:px-[96px] md:pt-[12px] md:pb-[40px]
-      "
-    >
-      <div
-        className="
-          bg-white border border-[#EDECE7] rounded-[16px]
-          w-full max-w-[368px] p-[16px]
-          md:max-w-[1248px] md:p-[24px]
-        "
-      >
-        <div
-          className="
-            w-full
-            md:w-[1200px] md:mx-auto
-            flex flex-col gap-[24px]
-          "
-        >
+      className="bg-[#F5F1E8] pt-3 pb-[40px] bg-[#F5F1E8]">
+      <div className="max-w-[1268px] mx-auto px-4" >
+        <div className="bg-white rounded-[8px] border-0 md:p-6 p-4">
           {/* TITLE */}
-          <h1 className="font-serif text-[#0B0C0A] text-[28px] leading-[32px] md:text-[32px] md:leading-[36px]">
+          <h1 className="font-sans text-[40px] leading-[48px] font-normal text-[#0B0C0A] mb-4">
             FAQ
           </h1>
 
