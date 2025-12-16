@@ -25,7 +25,6 @@ export default function ForgotPasswordPage() {
       return
     }
 
-    // ✅ IMPORTANT FIX: GO TO OTP PAGE
     router.push(`/verify-otp?email=${email}`)
   }
 
@@ -37,7 +36,15 @@ export default function ForgotPasswordPage() {
       <input
         type="email"
         placeholder="Enter your email"
-        className="w-full border rounded-md px-3 py-2 mb-4 text-[#0B0C0A]"
+        className="
+          w-full h-[40px]
+          border border-[#E6E4DC]
+          rounded-md
+          px-3
+          text-[14px]
+          text-[#0B0C0A]
+          placeholder:text-[#9B9F94]
+        "
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
@@ -45,13 +52,21 @@ export default function ForgotPasswordPage() {
       <button
         onClick={handleSubmit}
         disabled={loading}
-        className="w-full bg-[#6B705C] text-white py-2 rounded-full mb-4"
+        className="
+          w-full h-[40px]
+          bg-[#6B705C]
+          text-white
+          rounded-full
+          text-[14px]
+          font-medium
+          disabled:opacity-60
+        "
       >
-        Send OTP
+        Continue
       </button>
 
-      <p className="text-xs text-[#6B6F63]">
-        Remembered your password?{' '}
+      <p className="text-[12px] text-[#6B6F63]">
+        Did you remember the password?{' '}
         <Link href="/login" className="underline">
           Login
         </Link>

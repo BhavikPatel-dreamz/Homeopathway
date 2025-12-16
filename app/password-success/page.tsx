@@ -9,7 +9,14 @@ export default function SuccessPage() {
     >
       <Link
         href="/login"
-        className="block w-full bg-[#6B705C] text-white py-2 rounded-full text-center"
+        className="
+          w-full h-[40px]
+          bg-[#6B705C]
+          text-white
+          rounded-full
+          flex items-center justify-center
+          text-[14px]
+        "
       >
         Back to Login
       </Link>
