@@ -6,7 +6,7 @@ export default function AuthCard({
   children,
 }: {
   title: string
-  subtitle?: string
+  subtitle?: React.ReactNode
   children: React.ReactNode
 }) {
   return (
@@ -14,11 +14,11 @@ export default function AuthCard({
       <div
         className="
           bg-white
-          w-full max-w-[360px]
-          rounded-[16px]
-          px-6 py-8
+          w-full max-w-[448px]
+          rounded-[12px]
+          sm:px-[40px] sm:py-[50px]
+          px-[16px] py-[30px]
           text-center
-          shadow-sm
         "
       >
         {/* LOGO */}
@@ -30,19 +30,19 @@ export default function AuthCard({
 
 
         {/* TITLE */}
-        <h1 className="font-serif text-[22px] leading-[28px] text-[#0B0C0A] mb-2">
+        <h1 className="font-serif text-[32px] leading-[40px] font-normal text-[#0B0C0A] mb-2">
           {title}
         </h1>
 
         {/* SUBTITLE */}
         {subtitle && (
-          <p className="text-[14px] leading-[20px] text-[#6B6F63] mb-6">
+          <p className="text-[16px] leading-6 text-[#41463B] mb-5 font-medium sm:max-w-[368px] max-w-full mx-auto">
             {subtitle}
           </p>
         )}
 
         {/* CONTENT */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col">
           {children}
         </div>
       </div>

@@ -55,11 +55,15 @@ export default function VerifyOtpClient() {
 
   return (
     <AuthCard
-      title="Verify Code"
-      subtitle={`We sent a code to ${email}`}
+      title="Forgot Password"
+      subtitle={
+      <span>
+        We sent a code to <span className="font-bold wrap-break-word">{email}</span>
+      </span>
+    }
     >
       {/* OTP INPUTS */}
-      <div className="flex justify-center gap-2">
+      <div className="flex justify-center gap-[10px]">
         {otp.map((digit, index) => (
           <input
             key={index}
@@ -72,13 +76,16 @@ export default function VerifyOtpClient() {
             maxLength={1}
             inputMode="numeric"
             className="
-        w-[40px] h-[44px]
-        border border-[#0B0C0A]
+            font-serif
+            font-regular
+        w-[44px] h-[44px]
+        border border-[#B5B6B1]
         rounded-md
         text-center
-        text-[16px]
+        text-[20px]
         text-[#0B0C0A]
         focus:outline-none
+        focus:border-[#6B705C] focus:border-2
       "
           />
         ))}
@@ -88,20 +95,27 @@ export default function VerifyOtpClient() {
       <button
         onClick={verify}
         className="
-          w-full h-[40px]
+          w-full h-[44px]
           bg-[#6B705C]
           text-white
           rounded-full
-          text-[14px]
-          font-medium
+          text-[16px]
+          font-semibold
+          disabled:opacity-60
+          hover:bg-[#5A5E4F]
+          cursor-pointer
+          mt-5
+          max-w-[318px]
+          mx-auto
+          transition: background-color 0.3s ease-in-out
         "
       >
         Continue
       </button>
 
-      <p className="text-[12px] text-[#6B6F63]">
+      <p className="text-[14px] leading-[22px] text-[#83857D] font-medium mt-3">
         Didn’t receive the email?{' '}
-        <span className="underline cursor-pointer">
+        <span className="underline text-[#4B544A] font-semibold hover:text-[#6B705C] cursor-pointer">
           Click to resend
         </span>
       </p>
