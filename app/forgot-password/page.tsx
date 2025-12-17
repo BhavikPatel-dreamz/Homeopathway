@@ -12,6 +12,7 @@ export default function ForgotPasswordPage() {
   const router = useRouter()
 
   async function handleSubmit() {
+    if (!email) return alert("Please enter your email")
     setLoading(true)
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -25,6 +26,9 @@ export default function ForgotPasswordPage() {
       return
     }
 
+    // We pass the email to verify-otp and set a flag in sessionStorage 
+    // to prove the user started the flow.
+    sessionStorage.setItem('passwordResetFlow', 'otp_pending')
     router.push(`/verify-otp?email=${email}`)
   }
 
@@ -38,19 +42,7 @@ export default function ForgotPasswordPage() {
         <input
           type="email"
           placeholder="Enter your email"
-          className="
-            w-full h-[44px]
-            border 
-            border-[#D3D6D1]
-            rounded-md
-            pr-3
-            pl-10
-            text-[16px]
-            text-[#41463B]
-            bg-[#F1F2F0]
-            font-normal
-            placeholder:text-[#41463B]
-          "
+          className="w-full h-[44px] border border-[#D3D6D1] rounded-md pr-3 pl-10 text-[16px] text-[#41463B] bg-[#F1F2F0] font-normal placeholder:text-[#41463B]"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
@@ -63,18 +55,7 @@ export default function ForgotPasswordPage() {
       <button
         onClick={handleSubmit}
         disabled={loading}
-        className="
-          w-full h-[44px]
-          bg-[#6B705C]
-          text-white
-          rounded-full
-          text-[16px]
-          font-semibold
-          disabled:opacity-60
-          hover:bg-[#5A5E4F]
-          cursor-pointer
-          transition: background-color 0.3s ease-in-out
-        "
+        className="w-full h-[44px] bg-[#6B705C] text-white rounded-full text-[16px] font-semibold disabled:opacity-60 hover:bg-[#5A5E4F] cursor-pointer transition: background-color 0.3s ease-in-out"
       >
         Continue
       </button>

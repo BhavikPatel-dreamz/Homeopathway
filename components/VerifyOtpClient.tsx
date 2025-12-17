@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import AuthCard from '@/components/AuthCard'
 import { useSearchParams, useRouter } from 'next/navigation'
@@ -13,6 +13,14 @@ export default function VerifyOtpClient() {
   const [otp, setOtp] = useState<string[]>(Array(6).fill(''))
   const inputsRef = useRef<(HTMLInputElement | null)[]>([])
 
+  // REDIRECT PROTECTION
+  useEffect(() => {
+    const flow = sessionStorage.getItem('passwordResetFlow')
+    if (!email || flow !== 'otp_pending') {
+      router.push('/forgot-password')
+    }
+  }, [email, router])
+
   async function verify() {
     const token = otp.join('')
 
@@ -24,7 +32,7 @@ export default function VerifyOtpClient() {
     const { error } = await supabase.auth.verifyOtp({
       email,
       token,
-      type: 'email', // ✅ unchanged
+      type: 'recovery', // Note: Changed to 'recovery' as standard for forgot password flows
     })
 
     if (error) {
@@ -32,16 +40,15 @@ export default function VerifyOtpClient() {
       return
     }
 
+    sessionStorage.setItem('passwordResetFlow', 'reset_pending')
     router.push('/reset-password')
   }
 
   function handleChange(value: string, index: number) {
     if (!/^\d?$/.test(value)) return
-
     const updated = [...otp]
     updated[index] = value
     setOtp(updated)
-
     if (value && index < 5) {
       inputsRef.current[index + 1]?.focus()
     }
@@ -57,58 +64,29 @@ export default function VerifyOtpClient() {
     <AuthCard
       title="Forgot Password"
       subtitle={
-      <span>
-        We sent a code to <span className="font-bold wrap-break-word">{email}</span>
-      </span>
-    }
+        <span>
+          We sent a code to <span className="font-bold wrap-break-word">{email}</span>
+        </span>
+      }
     >
-      {/* OTP INPUTS */}
       <div className="flex justify-center gap-[10px]">
         {otp.map((digit, index) => (
           <input
             key={index}
-            ref={(el) => {
-              inputsRef.current[index] = el
-            }}
+            ref={(el) => { inputsRef.current[index] = el }}
             value={digit}
             onChange={(e) => handleChange(e.target.value, index)}
             onKeyDown={(e) => handleKeyDown(e, index)}
             maxLength={1}
             inputMode="numeric"
-            className="
-            font-serif
-            font-regular
-        w-[44px] h-[44px]
-        border border-[#B5B6B1]
-        rounded-md
-        text-center
-        text-[20px]
-        text-[#0B0C0A]
-        focus:outline-none
-        focus:border-[#6B705C] focus:border-2
-      "
+            className="font-serif font-regular w-[44px] h-[44px] border border-[#B5B6B1] rounded-md text-center text-[20px] text-[#0B0C0A] focus:outline-none focus:border-[#6B705C] focus:border-2"
           />
         ))}
       </div>
 
-
       <button
         onClick={verify}
-        className="
-          w-full h-[44px]
-          bg-[#6B705C]
-          text-white
-          rounded-full
-          text-[16px]
-          font-semibold
-          disabled:opacity-60
-          hover:bg-[#5A5E4F]
-          cursor-pointer
-          mt-5
-          max-w-[318px]
-          mx-auto
-          transition: background-color 0.3s ease-in-out
-        "
+        className="w-full h-[44px] bg-[#6B705C] text-white rounded-full text-[16px] font-semibold hover:bg-[#5A5E4F] cursor-pointer mt-5 max-w-[318px] mx-auto transition: background-color 0.3s ease-in-out"
       >
         Continue
       </button>
