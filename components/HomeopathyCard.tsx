@@ -9,11 +9,11 @@ const BODY_TEXT =
 
 // Sub-headings
 const SUB_HEADING_STYLE =
-  "font-montserrat text-xl font-semibold leading-7 text-[#0B0C0A]";
+  "font-family-montserrat text-xl font-semibold leading-7 text-[#0B0C0A]";
 
 // Main titles
 const MAIN_TITLE_STYLE =
-  "font-sans text-[40px] font-normal text-[#0B0C0A]";
+  "font-sans md:text-[40px] text-[36px] md:leading-[44px] leading-48px font-normal text-[#0B0C0A]";
 
 // Reusable content block
 const ContentBlock = ({
@@ -31,9 +31,9 @@ const ContentBlock = ({
 
 export default function HomeopathyPage() {
   return (
-    <section className="bg-[#F5F1E8] py-16">
+    <section className="bg-[#F5F1E8] pt-3 pb-[40px] bg-[#F5F1E8]">
       <div className="max-w-[1268px] mx-auto px-4">
-        <div className="bg-white rounded-[16px] border border-[#EDECE7] p-6">
+        <div className="bg-white rounded-[8px] border-0 md:p-6 p-4">
 
           {/* TITLE */}
           <h1 className={`${MAIN_TITLE_STYLE} mb-4`}>
@@ -54,18 +54,13 @@ export default function HomeopathyPage() {
 
           {/* SECTION 1 — IMAGE FIXED 586×336 */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-            <div className="space-y-6 order-2 lg:order-1">
+            <div className="space-y-6">
               <ContentBlock title="A historical foundation">
-                In the late 1700s, Hahnemann noticed that taking certain substances in
-                large amounts produced specific symptoms. When these same substances
-                were given in extremely small, highly diluted forms, many individuals
-                reported relief from similar symptoms.
+                In the late 1700s, Hahnemann noticed that taking certain substances in large amounts produced specific symptoms. When these same substances were given in extremely small, highly diluted forms, many individuals reported relief from similar symptoms. This observation became the guiding principle behind homeopathy.
               </ContentBlock>
 
               <ContentBlock title="Based on natural sources">
-                Homeopathic remedies come from plant materials such as Arnica,
-                Belladonna, and Chamomilla, minerals like Natrum Muriaticum and
-                Sulphur, and various organic substances.
+                Homeopathic remedies come from plant materials such as Arnica, Belladonna, and Chamomilla, minerals like Natrum Muriaticum and Sulphur, and various organic substances. These materials are prepared in a precise and structured way so they are gentle, accessible, and easy to use.
               </ContentBlock>
             </div>
 
@@ -80,10 +75,9 @@ export default function HomeopathyPage() {
           </div>
 
           {/* POTENTIZATION */}
-          <div className="mt-6 max-w-[586px]">
+          <div className="mt-6">
             <ContentBlock title="Potentization">
-              Although remedies become highly diluted, homeopathic theory holds that
-              this process enhances the energetic properties of the original substance.
+              Although remedies become highly diluted, homeopathic theory holds that this process enhances the energetic properties of the original substance, allowing the remedy to work effectively.
             </ContentBlock>
           </div>
 
@@ -101,17 +95,11 @@ export default function HomeopathyPage() {
               {/* TEXT */}
               <div className="space-y-6">
                 <ContentBlock title="Used worldwide">
-                  Homeopathy is practiced in many parts of the world, including Europe,
-                  South Asia, South America, and the United States. Some people use it
-                  for common everyday concerns, while others take a more classical
-                  approach and integrate it with conventional care.
+                  Homeopathy is practiced in many parts of the world, including Europe, South Asia, South America, and the United States. Some people use it for common everyday concerns, while others take a more classical approachand integrate it with conventional care.
                 </ContentBlock>
 
                 <ContentBlock title="Non toxic and gentle">
-                  Because remedies are highly diluted, they are typically safe for a
-                  wide range of users, including children and older adults. However,
-                  individuals should use their own judgement and consult appropriate
-                  care when needed.
+                  Because remedies are highly diluted, they are typically safe for a wide range of users, including children and older adults. However, individuals should use their own judgement and consult appropriate care when needed.
                 </ContentBlock>
               </div>
 
@@ -119,15 +107,12 @@ export default function HomeopathyPage() {
           </div>
 
           {/* FOOTER */}
-          <div className="mt-10">
-            <h2 className={`${MAIN_TITLE_STYLE} mb-4`}>
+          <div className="mt-5">
+            <h2 className={`${MAIN_TITLE_STYLE} mb-2`}>
               Why HomeoPathway Exists?
             </h2>
             <p className={BODY_TEXT}>
-              Homeopathy can feel overwhelming because there are many remedies and
-              detailed symptom patterns. HomeoPathway helps by organizing real user
-              experiences, remedy insights, and community reported outcomes in one
-              place.
+              Homeopathy can feel overwhelming because there are many remedies and detailed symptom patterns. HomeoPathway helps by organizing real user experiences, remedy insights, and community reported outcomes in one place, making it easier for people to learn from others and explore what has worked for different symptoms.
             </p>
           </div>
 

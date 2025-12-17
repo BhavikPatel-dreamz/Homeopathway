@@ -3,93 +3,70 @@ import React from "react";
 export default function GettingStartedCard() {
   return (
     /* PAGE WRAPPER (handles all spacing & centering) */
-    <section
-      className="
-        flex justify-center
-        bg-[#F5F1E8]
-        px-[16px] pt-[8px] pb-[24px]
-        md:px-[96px] md:pt-[12px] md:pb-[40px]
-      "
-    >
-      {/* CARD */}
-      <div
-        className="
-          bg-white border border-[#EDECE7] rounded-[16px]
-          w-full max-w-[368px] p-[16px]
-          md:max-w-[1248px] md:p-[24px]
-        "
-      >
-        {/* INNER CONTENT */}
-        <div
-          className="
-            flex flex-col gap-[24px]
-            w-full
-            md:w-[1200px] md:mx-auto
-          "
-        >
-          {/* TITLE */}
-          <h1
+    <section className="bg-[#F5F1E8] pt-3 pb-[40px] bg-[#F5F1E8]">
+      <div className="max-w-[1268px] mx-auto px-4">
+        {/* CARD */}
+        <div className="bg-white rounded-[8px] border-0 md:p-6 p-4">
+          {/* INNER CONTENT */}
+          <div
             className="
-              font-serif font-normal text-[#0B0C0A]
-              text-[28px] leading-[32px]
-              md:text-[32px] md:leading-[36px]
+              flex flex-col
+              w-full
             "
           >
-            Getting Started
-          </h1>
+            {/* TITLE */}
+            <h1 className="font-sans md:text-[40px] text-[36px] md:leading-[44px] leading-48px font-normal text-[#0B0C0A] mb-4">
+              Getting Started
+            </h1>
 
-          {/* SUBTITLE */}
-          <p className="text-[#41463B] font-medium text-[16px] leading-[24px]">
-            If you are new to homeopathy, here are simple steps to help you begin.
-          </p>
-
-          {/* STEPS */}
-          <div className="flex flex-col gap-[16px] text-[#41463B] text-[16px] leading-[24px] font-medium">
-            <p>
-              <span className="font-semibold text-[#0B0C0A]">
-                1. Search for an Ailment
-              </span>
-              <br />
-              Use HomeoPathway’s search feature to find ailments you are interested
-              in and explore which remedies people have tried for those concerns.
+            {/* SUBTITLE */}
+            <p className="text-[#41463B] font-medium text-[16px] leading-[24px] mb-4">
+              If you are new to homeopathy, here are simple steps to help you begin.
             </p>
 
-            <p>
-              <span className="font-semibold text-[#0B0C0A]">
-                2. Review Community Insights
-              </span>
-              <br />
-              Look at remedy effectiveness scores, user reviews, and notes about
-              dosage or timing shared by others.
-            </p>
+            {/* STEPS */}
+            <div className="flex flex-col text-[#41463B] text-[16px] leading-[24px] font-medium">
+              <p className="mb-5">
+                <h3 className="font-semibold text-[#0B0C0A] font-family-montserrat text-[20px] leading-[28px] mb-3">
+                  1. Search for an Ailment
+                </h3>
+                Use HomeoPathway’s search feature to find ailments you are interested
+                in and explore which remedies people have tried for those concerns.
+              </p>
 
-            <p>
-              <span className="font-semibold text-[#0B0C0A]">
-                3. Start With Common Remedies
-              </span>
-              <br />
-              Many beginners experiment with well known remedies such as Arnica,
-              Nux Vomica, Aconite, or Chamomilla.
-            </p>
+              <p className="mb-5">
+                <h3 className="font-semibold text-[#0B0C0A] font-family-montserrat text-[20px] leading-[28px] mb-3">
+                  2. Review Community Insights
+                </h3>
+                Look at remedy effectiveness scores, user reviews, and notes about
+                dosage or timing shared by others.
+              </p>
 
-            <p>
-              <span className="font-semibold text-[#0B0C0A]">
-                4. Keep It Low Risk
-              </span>
-              <br />
-              Try homeopathy for mild or everyday concerns first. Always seek
-              medical care for urgent or serious issues.
-            </p>
+              <p className="mb-5">
+                <h3 className="font-semibold text-[#0B0C0A] font-family-montserrat text-[20px] leading-[28px] mb-3">
+                  3. Start With Common Remedies
+                </h3>
+                Many beginners experiment with well known remedies such as Arnica,
+                Nux Vomica, Aconite, or Chamomilla.
+              </p>
 
-            <p>
-              <span className="font-semibold text-[#0B0C0A]">
-                5. Track Your Experience
-              </span>
-              <br />
-              Make notes about what you tried, how often you took it, and how your
-              symptoms changed. This can help you refine what works for you and
-              contribute back to the community later.
-            </p>
+              <p className="mb-5">
+                <h3 className="font-semibold text-[#0B0C0A] font-family-montserrat text-[20px] leading-[28px] mb-3">
+                  4. Keep It Low Risk
+                </h3>
+                Try homeopathy for mild or everyday concerns first. Always seek
+                medical care for urgent or serious issues.
+              </p>
+
+              <p>
+                <h3 className="font-semibold text-[#0B0C0A] font-family-montserrat text-[20px] leading-[28px] mb-3">
+                  5. Track Your Experience
+                </h3>
+                Make notes about what you tried, how often you took it, and how your
+                symptoms changed. This can help you refine what works for you and
+                contribute back to the community later.
+              </p>
+            </div>
           </div>
         </div>
       </div>

@@ -4,7 +4,7 @@ import React from 'react'
 
 export default function Page() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#F5F1E8] ">
       <Breadcrumb
         items={[
           { label: 'Home', href: '/' },

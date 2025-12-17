@@ -17,15 +17,15 @@ export default function FAQItem({
   return (
     <div
       className={`
-        border-b border-[#D9D7D0]
-        ${isOpen ? 'bg-[#F7F4EC] rounded-[8px] p-4' : 'py-4'}
+        border-b border-[#D9D7D0] last:border-b-0 cursor-pointer
+        ${isOpen ? 'bg-[#F7F4EC] rounded-[8px] p-4 mt-5 border-b-0' : 'py-4'}
         transition-all duration-300
       `}
     >
       {/* QUESTION */}
       <button
         onClick={onClick}
-        className="w-full flex items-center justify-between text-left"
+        className="w-full flex items-center justify-between text-left cursor-pointer"
       >
         <span className="text-[#0B0C0A] font-semibold text-[16px] leading-[24px]">
           Q: {question}

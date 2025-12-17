@@ -13,11 +13,8 @@ export default function Page() {
         ]}
       />
 
-      {/* MAIN CONTENT */}
-      <main className="px-4 py-10">
+      {/* MAIN CONTENT */}      
         <SafetyContent />
-      </main>
-
     </div>
   );
 }
