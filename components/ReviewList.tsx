@@ -10,7 +10,8 @@ import {
   getReviewStats,
 } from "@/lib/review";
 import { getCurrentUser } from "@/lib/auth";
-import ReviewFilterModal, { ReviewFilters } from "./ReviewFilterModal";
+import ReviewFilterModal from "./ReviewFilterModal";
+import { ReviewFilters } from "@/types";
 import AddReviewForm from "./AddReviewForm";
 import { Remedy, Review as ReviewType } from "@/types";
 
@@ -123,6 +124,7 @@ const renderStars = (rating: number) => {
     </div>
   );
 };
+type SortBy = "newest" | "oldest" | "highest_rated" | "lowest_rated";
 
 // ---------------------------
 // Main Component
@@ -168,10 +170,9 @@ export default function ReviewListPage({
     userName: "",
   });
 
+  
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<
-    "newest" | "oldest" | "highest_rated" | "lowest_rated"
-  >("newest");
+  const [sortBy, setSortBy] = useState<SortBy>("newest");
   const dropdownRef = useRef<HTMLDivElement>(null);
   const filterDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -186,7 +187,8 @@ export default function ReviewListPage({
 
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isPageLoading, setIsPageLoading] = useState(false);
-  const [allReviesList, setAllReviewsList] = useState<any>([]);
+  const [allReviesList, setAllReviewsList] = useState<ReviewType[]>([]);
+  
 
   // ---------------------------
   // Fetch Reviews + Stats
@@ -209,7 +211,7 @@ export default function ReviewListPage({
       });
 
       let allReviews = reviewsData || [];
-      setAllReviewsList(reviewsData);
+      setAllReviewsList(reviewsData ?? []);
 
       allReviews = allReviews.filter((review) => {
         if (activeFilters.dosage.length > 0) {
@@ -318,12 +320,12 @@ export default function ReviewListPage({
 
   const refreshReviews = () => fetchReviews(false);
 
-  const sortOptions = [
-    { label: "Most Recent", value: "newest" },
-    { label: "Oldest", value: "oldest" },
-    { label: "Highest Rated", value: "highest_rated" },
-    { label: "Lowest Rated", value: "lowest_rated" },
-  ];
+  const sortOptions: { label: string; value: SortBy }[] = [
+  { label: "Most Recent", value: "newest" },
+  { label: "Oldest", value: "oldest" },
+  { label: "Highest Rated", value: "highest_rated" },
+  { label: "Lowest Rated", value: "lowest_rated" },
+];
 
   if (!remedy) return <div>Loading remedy details...</div>;
 
@@ -415,7 +417,7 @@ export default function ReviewListPage({
 
                 {isDropdownOpen && (
                   <div className="absolute z-10 top-full left-0 bg-white border border-gray-300 rounded-md shadow-lg">
-                    {sortOptions.map((opt: any) => (
+                    {sortOptions.map((opt) => (
                       <button
                         key={opt.value}
                         onClick={() => { setSortBy(opt.value); setIsDropdownOpen(false); }}

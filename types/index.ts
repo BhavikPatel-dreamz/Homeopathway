@@ -104,3 +104,11 @@ export interface RemedyOption {
   name: string;
   icon?: string;
 }
+
+export interface ReviewFilters {
+  rating: number[];
+  dosage: string[];
+  form: string[];
+  dateRange: 'all' | 'today' | 'week' | 'month' | 'year';
+  userName: string;
+}

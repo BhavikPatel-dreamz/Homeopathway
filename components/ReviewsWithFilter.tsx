@@ -1,7 +1,7 @@
 "use client";
 import { useState } from 'react';
 import ReviewFilterModal from './ReviewFilterModal';
-import {Review} from '@/types'
+import { Review, ReviewFilters } from '@/types'
 
 // interface Review {
 //   id: string;
@@ -29,43 +29,55 @@ export default function ReviewsWithFilter({
 }: ReviewsWithFilterProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filteredReviews, setFilteredReviews] = useState(initialReviews);
-  const [activeFilters, setActiveFilters] = useState<any>({
+  const [activeFilters, setActiveFilters] = useState<ReviewFilters>({
     rating: [],
     dosage: [],
     form: [],
+    dateRange: 'all',
+    userName: '',
   });
 
 
-  const applyFilters = (filters: any) => {
+
+
+  const applyFilters = (filters: ReviewFilters) => {
     setActiveFilters(filters);
-    
-    let filtered = initialReviews;
 
-    // Filter by rating
-    if (filters.rating.length > 0) {
-      filtered = filtered.filter(review => filters.rating.includes(review.rating));
-    }
+    const filtered = initialReviews.filter((review) => {
+      // Rating (uses star_count from Review)
+      if (
+        filters.rating.length > 0 &&
+        !filters.rating.includes(review.star_count)
+      ) {
+        return false;
+      }
 
-    // Filter by dosage
-    if (filters.dosage.length > 0) {
-      filtered = filtered.filter(review => 
-        review.dosage && filters.dosage.includes(review.dosage)
-      );
-    }
+      // Dosage
+      if (
+        filters.dosage.length > 0 &&
+        (!review.dosage || !filters.dosage.includes(review.dosage))
+      ) {
+        return false;
+      }
 
-    // Filter by form
-    if (filters.form.length > 0) {
-      filtered = filtered.filter(review => 
-        review.form && filters.form.includes(review.form)
-      );
-    }
+      // Form
+      if (
+        filters.form.length > 0 &&
+        (!review.form || !filters.form.includes(review.form))
+      ) {
+        return false;
+      }
+
+      return true;
+    });
 
     setFilteredReviews(filtered);
   };
 
-  const hasActiveFilters = 
-    activeFilters.rating.length > 0 || 
-    activeFilters.dosage.length > 0 || 
+
+  const hasActiveFilters =
+    activeFilters.rating.length > 0 ||
+    activeFilters.dosage.length > 0 ||
     activeFilters.form.length > 0;
 
   return (
@@ -163,7 +175,14 @@ export default function ReviewsWithFilter({
             ))}
             <button
               onClick={() => {
-                setActiveFilters({ rating: [], dosage: [], form: [] });
+                setActiveFilters({
+                  rating: [],
+                  dosage: [],
+                  form: [],
+                  dateRange: 'all',
+                  userName: '',
+                });
+
                 setFilteredReviews(initialReviews);
               }}
               className="text-sm text-red-600 hover:underline"
@@ -226,7 +245,13 @@ export default function ReviewsWithFilter({
         isOpen={isFilterOpen}
         onClose={() => setIsFilterOpen(false)}
         onApply={applyFilters}
-        totalResults={filteredReviews.length} dosageOptions={[]} formOptions={[]}      />
+        totalResults={filteredReviews.length}
+        dosageOptions={[]}
+        formOptions={[]}
+        currentFilters={activeFilters}
+        allReviews={initialReviews}
+      />
+
     </>
   );
 }

@@ -1,14 +1,8 @@
 import React from 'react';
 import { X, Star } from 'lucide-react';
 import Image from 'next/image';
+import { Review, ReviewFilters } from '@/types';
 
-export interface ReviewFilters {
-  rating: number[];
-  dosage: string[];
-  form: string[];
-  dateRange: string;
-  userName: string;
-}
 
 interface ReviewFilterModalProps {
   isOpen: boolean;
@@ -18,8 +12,9 @@ interface ReviewFilterModalProps {
   dosageOptions: string[];
   formOptions: string[];
   currentFilters: ReviewFilters;
-  allReviews?: any[];
+  allReviews?: Review[];
 }
+
 
 export default function ReviewFilterModal({
   isOpen,
@@ -30,7 +25,7 @@ export default function ReviewFilterModal({
   formOptions,
   currentFilters,
   allReviews = [],
-}: any) {
+}: ReviewFilterModalProps) {
   const [localFilters, setLocalFilters] = React.useState<ReviewFilters>(currentFilters);
   const [filteredCount, setFilteredCount] = React.useState(totalResults);
 
@@ -47,7 +42,7 @@ export default function ReviewFilterModal({
       return;
     }
 
-    let filtered = allReviews.filter((review: any) => {
+    const filtered = allReviews.filter((review) => {
       // Filter by rating
       if (localFilters.rating.length > 0 && !localFilters.rating.includes(review.star_count)) {
         return false;
@@ -254,7 +249,7 @@ export default function ReviewFilterModal({
               Dosage
             </p>
             <div className="space-y-2.5">
-              {dosageOptions.map((dosage: any) => (
+              {dosageOptions.map((dosage) => (
                 <label
                   key={dosage}
                   className="flex items-center gap-3 cursor-pointer group"
@@ -292,7 +287,7 @@ export default function ReviewFilterModal({
           <div className="mb-6">
             <p className="text-base font-semibold text-[#0B0C0A] mb-3">Form</p>
             <div className="space-y-2.5">
-              {formOptions.map((form: any) => (
+              {formOptions.map((form) => (
                 <label
                   key={form}
                   className="flex items-center gap-3 cursor-pointer group"

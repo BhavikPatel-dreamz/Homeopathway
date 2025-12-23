@@ -11,8 +11,6 @@ interface RemedyListPageProps {
   totalPages: number;
 }
 
-
-
 const ITEMS_PER_PAGE = 12;
 
 export default function RemedyListPage({
@@ -64,27 +62,21 @@ export default function RemedyListPage({
     const showEllipsis = totalPages > 7;
 
     if (!showEllipsis) {
-      // Show all pages if 7 or fewer
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
       }
     } else {
-      // Show first, last, current, and nearby pages with ellipsis
       if (currentPage <= 3) {
-        // Near the start
         pages.push(1, 2, 3, 4, '...', totalPages);
       } else if (currentPage >= totalPages - 2) {
-        // Near the end
         pages.push(1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
       } else {
-        // In the middle
         pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
       }
     }
 
     return pages;
   };
-
 
   return (
     <div className="min-h-screen bg-[#F5F1E8]">
@@ -104,27 +96,27 @@ export default function RemedyListPage({
        <div className="bg-white rounded-2xl p-6 shadow-sm">
           {/* Header */}
           <div className="mb-8">
-     <div className="flex items-center gap-3 mb-2">
-       <Image
-        className="w-[40px] h-[40px] sm:w-[50px] sm:h-[50px] lg:w-[60px] lg:h-[60px]"
-        src="/top-remedies.svg"
-        alt="Top Remedies Icon"
-        width={60}
-        height={60}
-      />
-      <h1 className="text-4xl font-serif text-gray-900">
-         All Remedies
-     </h1>
-  </div>
-  <p className="text-gray-600 mt-2">
-      Browse through our comprehensive collection of homeopathic remedies.
-    </p>
-</div>
+            <div className="flex items-center gap-3 mb-2">
+              <Image
+                className="w-[40px] h-[40px] sm:w-[50px] sm:h-[50px] lg:w-[60px] lg:h-[60px]"
+                src="/top-remedies.svg"
+                alt="Top Remedies Icon"
+                width={60}
+                height={60}
+              />
+              <h1 className="text-4xl font-serif text-gray-900">
+                All Remedies
+              </h1>
+            </div>
+            <p className="text-gray-600 mt-2">
+              Browse through our comprehensive collection of homeopathic remedies.
+            </p>
+          </div>
 
           {/* Search Results Info */}
           {searchQuery && (
             <div className="mb-6 text-gray-600">
-              Found {filteredRemedies.length} remedy{filteredRemedies.length !== 1 ? 's' : ''} matching "{searchQuery}"
+              Found {filteredRemedies.length} remedy{filteredRemedies.length !== 1 ? 's' : ''} matching &quot;{searchQuery}&quot;
               {filteredRemedies.length > ITEMS_PER_PAGE && (
                 <span className="ml-2">
                   (Showing {startIndex + 1}-{Math.min(endIndex, filteredRemedies.length)})
@@ -143,7 +135,6 @@ export default function RemedyListPage({
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {paginatedRemedies.length > 0 ? (
               paginatedRemedies.map((remedy) => {
-                // Log the remedy object to inspect its properties
                 return (
                 <Link href={`/remedies/${remedy.slug}`} key={remedy.slug}>
                   <div
@@ -156,7 +147,7 @@ export default function RemedyListPage({
                     </h4>
                     <p className="text-sm text-gray-600 line-clamp-2">{remedy.description}</p>
                   </div>
-                  <p className="text-sm text-gray-500 mt-3 flex items-center gap-2">
+                  <div className="text-sm text-gray-500 mt-3 flex items-center gap-2">
                     <span className="flex items-center gap-1 text-[#E69E29]">
                       <Image src="/star.svg" alt="Star" width={16} height={16} />
                       <span>{(remedy.rating ?? remedy.average_rating)?.toFixed(1)}</span>
@@ -166,7 +157,7 @@ export default function RemedyListPage({
                          {remedy.reviewCount ?? remedy.review_count}{" "}
                          {(remedy.reviewCount ?? remedy.review_count) === 1 ? "review" : "reviews"}
                    </span>
-                  </p>
+                  </div>
                   </div>
                 </Link>
                 );
@@ -232,7 +223,6 @@ export default function RemedyListPage({
           )}
         </div>
       </main>
-
     </div>
   );
 }

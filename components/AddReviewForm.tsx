@@ -20,7 +20,7 @@ interface AddReviewFormProps {
 
 export default function AddReviewForm({ onClose, remedyId, remedyName, condition = 'your condition', ailmentId }: AddReviewFormProps) {
   const router = useRouter();
- const [selectedRemedies, setSelectedRemedies] = useState<RemedyOption[]>([]);
+  const [selectedRemedies, setSelectedRemedies] = useState<RemedyOption[]>([]);
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -134,12 +134,13 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
   };
 
   const handleNext = () => {
-    if (step < totalSteps) {
-      setStep(step + 1);
-    } else {
+    if (step === totalSteps - 1) {
       submitReview();
+    } else {
+      setStep((prev) => prev + 1);
     }
   };
+
 
   const handleBack = () => {
     if (step > 0) {
@@ -270,8 +271,8 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                     onClick={() => handlePotencyType(type)}
                     className={`px-2 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all font-medium text-xs sm:text-base ${formData.potencyType === type
 
-                        ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A]'
-                        : 'border-[#B5B6B1] hover:border-gray-400 text-[#B5B6B1]'
+                      ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A]'
+                      : 'border-[#B5B6B1] hover:border-gray-400 text-[#B5B6B1]'
                       }`}
 
                   >
@@ -290,8 +291,8 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                     key={pot}
                     onClick={() => handlePotency(pot)}
                     className={`px-2 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all font-medium text-xs sm:text-base ${formData.potency === pot
-                        ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A]'
-                        : 'border-[#B5B6B1] hover:border-gray-400 text-[#B5B6B1]'
+                      ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A]'
+                      : 'border-[#B5B6B1] hover:border-gray-400 text-[#B5B6B1]'
                       }`}
                   >
                     {pot}
@@ -324,8 +325,8 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                     key={dose}
                     onClick={() => handleDosage(dose)}
                     className={`px-3 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all text-left font-medium text-xs sm:text-base ${formData.dosage === dose
-                        ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A]'
-                        : 'border-[#B5B6B1] hover:border-gray-400 text-[#B5B6B1]'
+                      ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A]'
+                      : 'border-[#B5B6B1] hover:border-gray-400 text-[#B5B6B1]'
                       }`}
                   >
                     {dose}
@@ -358,8 +359,8 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                     key={dur}
                     onClick={() => handleDuration(dur)}
                     className={`px-3 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all font-medium text-xs sm:text-base ${formData.duration === dur
-                        ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A]'
-                        : 'border-[#B5B6B1] hover:border-gray-400 text-[#B5B6B1]'
+                      ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A]'
+                      : 'border-[#B5B6B1] hover:border-gray-400 text-[#B5B6B1]'
                       }`}
                   >
                     {dur}
@@ -390,8 +391,8 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                     key={eff}
                     onClick={() => handleEffectiveness(eff)}
                     className={`w-full px-3 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all text-left font-medium text-xs sm:text-base ${formData.effectiveness === eff
-                        ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A]'
-                        : 'border-[#B5B6B1] hover:border-gray-400 text-[#B5B6B1]'
+                      ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A]'
+                      : 'border-[#B5B6B1] hover:border-gray-400 text-[#B5B6B1]'
                       }`}
                   >
                     {eff}
@@ -455,7 +456,11 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
               }
               className="px-5 py-2.5 h-[44px] min-w-[138px] rounded-full bg-[#4B544A] text-white disabled:bg-[#F1F2F0] disabled:text-[#2B2E28] disabled:cursor-not-allowed transition-all font-medium text-sm sm:text-base"
             >
-              {loading ? "Submitting.." : step === totalSteps ? "Done" : "Next"}
+              {loading
+                ? "Submitting..."
+                : step === totalSteps - 1
+                  ? "Done"
+                  : "Next"}
             </button>
           </div>
 
