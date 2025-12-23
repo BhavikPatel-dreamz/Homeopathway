@@ -18,7 +18,8 @@ export async function POST(request: NextRequest) {
       duration_used,
       effectiveness,
       notes,
-      experienced_side_effects
+      experienced_side_effects,
+      secondary_remedy_ids, 
     } = body;
 
     // Validate required fields
@@ -71,7 +72,9 @@ export async function POST(request: NextRequest) {
       effectiveness: effectiveness ? parseInt(effectiveness) : undefined,
       notes: notes || undefined,
       experiencedSideEffects: experienced_side_effects === 'Yes' || experienced_side_effects === true,
+      secondaryRemedyIds: secondary_remedy_ids || [], 
       supabaseClient: supabase, // Pass the server-side client
+      
     });
 
     if (error) {

@@ -5,6 +5,10 @@ import { useRouter } from 'next/navigation';
 import { X } from 'lucide-react';
 import { getCurrentUser } from '@/lib/auth';
 import Image from 'next/image';
+import RemedyMultiSelect from './RemedyMultiSelect';
+import type { RemedyOption } from "@/types";
+
+
 
 interface AddReviewFormProps {
   onClose: () => void;
@@ -16,7 +20,8 @@ interface AddReviewFormProps {
 
 export default function AddReviewForm({ onClose, remedyId, remedyName, condition = 'your condition', ailmentId }: AddReviewFormProps) {
   const router = useRouter();
-  const [step, setStep] = useState(1);
+ const [selectedRemedies, setSelectedRemedies] = useState<RemedyOption[]>([]);
+  const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -34,7 +39,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
     notes: ''
   });
 
-  const totalSteps = 6;
+  const totalSteps = 7;
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -61,14 +66,14 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
     // Save original body overflow style
     const originalOverflow = document.body.style.overflow;
     const originalPaddingRight = document.body.style.paddingRight;
-    
+
     // Get scrollbar width to prevent layout shift
     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-    
+
     // Lock body scroll
     document.body.style.overflow = 'hidden';
     document.body.style.paddingRight = `${scrollbarWidth}px`;
-    
+
     // Restore original styles on cleanup
     return () => {
       document.body.style.overflow = originalOverflow;
@@ -90,15 +95,16 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
         remedy_id: remedyId,
         ailment_id: ailmentId,
         star_count: formData.rating,
+        secondary_remedy_ids: selectedRemedies.map(r => r.id),
         potency: formData.potencyType && formData.potency ? `${formData.potencyType} ${formData.potency}` : null,
         dosage: formData.dosage,
         duration_used: formData.duration,
         effectiveness: formData.effectiveness === 'Completely resolved symptoms' ? 5 :
-                      formData.effectiveness === 'Significantly improved' ? 4 :
-                      formData.effectiveness === 'Moderately improved' ? 3 :
-                      formData.effectiveness === 'Slightly improved' ? 2 :
-                      formData.effectiveness === 'No change' ? 1 :
-                      formData.effectiveness === 'Symptoms worsened' ? 0 : null,
+          formData.effectiveness === 'Significantly improved' ? 4 :
+            formData.effectiveness === 'Moderately improved' ? 3 :
+              formData.effectiveness === 'Slightly improved' ? 2 :
+                formData.effectiveness === 'No change' ? 1 :
+                  formData.effectiveness === 'Symptoms worsened' ? 0 : null,
         notes: formData.notes,
         experienced_side_effects: formData.sideEffects
       };
@@ -117,7 +123,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
       }
 
       const result = await response.json();
-       setShowSuccess(true);
+      setShowSuccess(true);
       // onClose();
     } catch (err) {
       console.error('Error submitting review:', err);
@@ -136,7 +142,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
   };
 
   const handleBack = () => {
-    if (step > 1) {
+    if (step > 0) {
       setStep(step - 1);
     }
   };
@@ -211,24 +217,41 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
             </div>
           )}
 
+          {/* Step 0: Combination Remedies */}
+          {step === 0 && (
+            <div className="space-y-4">
+              <p className="text-[#41463B] text-sm sm:text-base">
+                Used in combination with (optional)
+              </p>
+
+              <RemedyMultiSelect
+                primaryRemedyId={remedyId}
+                primaryRemedyName={remedyName}
+                selected={selectedRemedies}
+                onChange={setSelectedRemedies}
+              />
+            </div>
+          )}
+
+
           {/* Step 1: Rating */}
           {step === 1 && (
             <div className="space-y-3 sm:space-y-4">
               <p className="text-gray-800 text-sm sm:text-base">How do you rate the remedy?</p>
               <div className="flex gap-2 sm:gap-3 justify-start">
-               {[1, 2, 3, 4, 5].map((star) => (
-  <button
-    key={star}
-    onClick={() => handleRating(star)}
-    className="focus:outline-none transition-all hover:scale-110"
-  >
-    {star <= formData.rating ? (
-      <Image src="/star.svg" alt="Filled Star" width={44} height={44} />
-    ) : (
-      <Image src="/star-line.svg" alt="Empty Star" width={44} height={44} />
-    )}
-  </button>
-))}
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    onClick={() => handleRating(star)}
+                    className="focus:outline-none transition-all hover:scale-110"
+                  >
+                    {star <= formData.rating ? (
+                      <Image src="/star.svg" alt="Filled Star" width={44} height={44} />
+                    ) : (
+                      <Image src="/star-line.svg" alt="Empty Star" width={44} height={44} />
+                    )}
+                  </button>
+                ))}
               </div>
             </div>
           )}
@@ -237,21 +260,20 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
           {step === 2 && (
             <div className="space-y-4 sm:space-y-6">
               <p className="text-[#41463B] text-sm sm:text-base">What was the potency?</p>
-              
+
               {/* Potency Type */}
               <div className="grid grid-cols-3 gap-2 sm:gap-3">
                 {['Pellet', 'Tincture', 'Ointment'].map((type) => (
                   <button
                     key={type}
-                    
+
                     onClick={() => handlePotencyType(type)}
-                    className={`px-2 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all font-medium text-xs sm:text-base ${
-                      formData.potencyType === type
-                      
+                    className={`px-2 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all font-medium text-xs sm:text-base ${formData.potencyType === type
+
                         ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A]'
                         : 'border-[#B5B6B1] hover:border-gray-400 text-[#B5B6B1]'
-                    }`}
-                    
+                      }`}
+
                   >
                     {type}
                     {formData.potencyType === type && (
@@ -267,11 +289,10 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                   <button
                     key={pot}
                     onClick={() => handlePotency(pot)}
-                    className={`px-2 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all font-medium text-xs sm:text-base ${
-                      formData.potency === pot
-                       ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A]'
+                    className={`px-2 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all font-medium text-xs sm:text-base ${formData.potency === pot
+                        ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A]'
                         : 'border-[#B5B6B1] hover:border-gray-400 text-[#B5B6B1]'
-                    }`}
+                      }`}
                   >
                     {pot}
                     {formData.potency === pot && (
@@ -287,7 +308,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
           {step === 3 && (
             <div className="space-y-4 sm:space-y-6">
               <p className="text-[#41463B] text-sm sm:text-base">What was the dosage?</p>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                 {[
                   'One-time dose',
@@ -302,11 +323,10 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                   <button
                     key={dose}
                     onClick={() => handleDosage(dose)}
-                    className={`px-3 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all text-left font-medium text-xs sm:text-base ${
-                      formData.dosage === dose
-                       ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A]'
+                    className={`px-3 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all text-left font-medium text-xs sm:text-base ${formData.dosage === dose
+                        ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A]'
                         : 'border-[#B5B6B1] hover:border-gray-400 text-[#B5B6B1]'
-                    }`}
+                      }`}
                   >
                     {dose}
                     {formData.dosage === dose && (
@@ -337,11 +357,10 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                   <button
                     key={dur}
                     onClick={() => handleDuration(dur)}
-                    className={`px-3 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all font-medium text-xs sm:text-base ${
-                      formData.duration === dur
+                    className={`px-3 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all font-medium text-xs sm:text-base ${formData.duration === dur
                         ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A]'
                         : 'border-[#B5B6B1] hover:border-gray-400 text-[#B5B6B1]'
-                    }`}
+                      }`}
                   >
                     {dur}
                     {formData.duration === dur && (
@@ -357,7 +376,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
           {step === 5 && (
             <div className="space-y-4 sm:space-y-6">
               <p className="text-[#41463B] text-sm sm:text-base">How effective was it?</p>
-              
+
               <div className="space-y-2 sm:space-y-3">
                 {[
                   'Completely resolved symptoms',
@@ -370,11 +389,10 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                   <button
                     key={eff}
                     onClick={() => handleEffectiveness(eff)}
-                    className={`w-full px-3 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all text-left font-medium text-xs sm:text-base ${
-                      formData.effectiveness === eff
+                    className={`w-full px-3 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all text-left font-medium text-xs sm:text-base ${formData.effectiveness === eff
                         ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A]'
                         : 'border-[#B5B6B1] hover:border-gray-400 text-[#B5B6B1]'
-                    }`}
+                      }`}
                   >
                     {eff}
                     {formData.effectiveness === eff && (
@@ -390,7 +408,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
           {step === 6 && (
             <div className="space-y-4 sm:space-y-6">
               <p className="text-[#41463B] text-sm sm:text-base">Share details of your situation, what you did, and the outcome.</p>
-              
+
               <textarea
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
@@ -406,71 +424,71 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
           <div className="flex gap-1 sm:gap-1.5 mt-6 sm:mt-10 mb-6 sm:mb-8">
             {Array.from({ length: totalSteps }).map((_, idx) => (
               <div
-                key={idx}  
-                className={`h-2 flex-1 rounded-xl transition-all ${
-                  idx < step ? 'bg-[#4B544A]' : 'bg-[#4B544A1A]'
-                }`}
+                key={idx}
+                className={`h-2 flex-1 rounded-xl transition-all ${idx < step ? 'bg-[#4B544A]' : 'bg-[#4B544A1A]'
+                  }`}
               />
             ))}
           </div>
 
           {/* Navigation Buttons */}
-        <div className="flex gap-2 sm:gap-3 justify-end">
-        {step > 1 && (
-          <button
-            onClick={handleBack}
-            className="px-5 py-2.5 h-[44px] w-[80px]  sm:px-8 sm:py-3 rounded-full  transition-all font-medium text-gray-700 text-sm sm:text-base"
-          >
-            Back
-          </button>
-        )}
+          <div className="flex gap-2 sm:gap-3 justify-end items-center">
+            {/* UPDATED: Changed condition from step > 1 to step > 0 to allow back from step 1 */}
+            {step > 0 && (
+              <button
+                onClick={handleBack}
+                className="px-5 py-2.5 h-[44px] min-w-[80px] sm:px-8 transition-all font-medium text-gray-700 text-sm sm:text-base"
+              >
+                Back
+              </button>
+            )}
 
-        <button
-          onClick={handleNext}
-          disabled={
-            loading ||
-            (step === 1 && formData.rating === 0) ||
-            (step === 2 && !formData.potency) ||
-            (step === 3 && !formData.dosage) ||
-            (step === 4 && !formData.duration) ||
-            (step === 5 && !formData.effectiveness)
-          }
-          className="px-5 py-2.5 h-[44px] w-[138px] sm:px-8 text-[#4B544A] rounded-full bg-[#4B544A] text-white disabled:bg-[#F1F2F0] disabled:text-[#2B2E28] disabled:cursor-not-allowed transition-all font-medium text-sm sm:text-base"
-        >
-          {loading ? "Submitting.." : step === totalSteps ? "Done" : "Next"}
-        </button>
-      </div>
-
-      {/* ---- Success Modal ---- */}
-      {showSuccess && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-[99999]">
-          <div className="bg-white w-[368px] h-[312] sm:w-[495px] sm:h-[328px] rounded-2xl shadow-2xl w-full max-w-md relative text-center p-10 animate-fadeIn scale-100">
             <button
-              onClick={onClose}
-              className="absolute top-4 right-4 text-[#41463B] hover:[#41463B]"
+              onClick={handleNext}
+              disabled={
+                loading ||
+                (step === 1 && formData.rating === 0) ||
+                (step === 2 && !formData.potency) ||
+                (step === 3 && !formData.dosage) ||
+                (step === 4 && !formData.duration) ||
+                (step === 5 && !formData.effectiveness)
+              }
+              className="px-5 py-2.5 h-[44px] min-w-[138px] rounded-full bg-[#4B544A] text-white disabled:bg-[#F1F2F0] disabled:text-[#2B2E28] disabled:cursor-not-allowed transition-all font-medium text-sm sm:text-base"
             >
-              <X size={24} />
+              {loading ? "Submitting.." : step === totalSteps ? "Done" : "Next"}
             </button>
-
-            <div className="flex flex-col items-center space-y-3">
-              <img
-                src="/login-logo.svg"
-                alt="icon"
-                className="sm:w-30 sm:h-30 w-20 h-20 mx-auto"
-              />
-
-              <h2 className="text-[22px] sm:text-[32px] font-medium text-gray-900">
-                Thanks for Sharing!
-              </h2>
-
-              <p className="text-[#41463B] text-[16px] sm:text-[15px] leading-relaxed">
-                Review your post below. If everything looks good, submit it to
-                share with your community.
-              </p>
-            </div>
           </div>
-        </div>
-      )}
+
+          {/* ---- Success Modal ---- */}
+          {showSuccess && (
+            <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-[99999]">
+              <div className="bg-white w-[368px] h-[312] sm:w-[495px] sm:h-[328px] rounded-2xl shadow-2xl w-full max-w-md relative text-center p-10 animate-fadeIn scale-100">
+                <button
+                  onClick={onClose}
+                  className="absolute top-4 right-4 text-[#41463B] hover:[#41463B]"
+                >
+                  <X size={24} />
+                </button>
+
+                <div className="flex flex-col items-center space-y-3">
+                  <img
+                    src="/login-logo.svg"
+                    alt="icon"
+                    className="sm:w-30 sm:h-30 w-20 h-20 mx-auto"
+                  />
+
+                  <h2 className="text-[22px] sm:text-[32px] font-medium text-gray-900">
+                    Thanks for Sharing!
+                  </h2>
+
+                  <p className="text-[#41463B] text-[16px] sm:text-[15px] leading-relaxed">
+                    Review your post below. If everything looks good, submit it to
+                    share with your community.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

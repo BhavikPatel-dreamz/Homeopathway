@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient';
-import type { Review } from '../types';
+import type { Review , Remedy } from '../types';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 /**
@@ -29,6 +29,7 @@ export async function addReview({
   effectiveness,
   notes,
   experiencedSideEffects = false,
+  secondaryRemedyIds = [],
   supabaseClient,
 }: {
   remedyId: string;
@@ -41,6 +42,7 @@ export async function addReview({
   effectiveness?: number;
   notes?: string;
   experiencedSideEffects?: boolean;
+  secondaryRemedyIds?: string[]; 
   supabaseClient?: SupabaseClient;
 }): Promise<{ data: Review | null; error: Error | null; }> {
   // Use provided client or fall back to default browser client
@@ -66,6 +68,7 @@ export async function addReview({
       effectiveness: effectiveness || null,
       notes: notes || null,
       experienced_side_effects: experiencedSideEffects,
+      secondary_remedy_ids: secondaryRemedyIds,
     })
     .select()
     .single();
@@ -139,7 +142,7 @@ export async function getReviews({
   potency,
   searchQuery,
   experiencedSideEffects,
-  dosage
+  dosage,
 }: {
   remedyId?: string;
   ailmentId?: string | null;
@@ -148,31 +151,32 @@ export async function getReviews({
   starCount?: number[];
   potency?: string[];
   searchQuery?: string;
-  dosage?:string[];
+  dosage?: string[];
   experiencedSideEffects?: boolean;
 }): Promise<{ data: Review[] | null; error: Error | null }> {
-  let query = supabase.from('reviews').select('*').limit(limit);
 
-  // REMEDY FILTER
+  /* ----------------------------------------
+     1️⃣ FETCH REVIEWS
+  ---------------------------------------- */
+  let query = supabase
+    .from('reviews')
+    .select('*')
+    .limit(limit);
+
   if (remedyId) query = query.eq('remedy_id', remedyId);
 
-  // AILMENT FILTER
-  if (remedyId && ailmentId !== undefined) {
-    if (ailmentId === null) query = query.is('ailment_id', null);
-    else query = query.eq('ailment_id', ailmentId);
-  } else if (!remedyId && ailmentId !== undefined) {
-    if (ailmentId === null) query = query.is('ailment_id', null);
-    else query = query.eq('ailment_id', ailmentId);
+  if (ailmentId !== undefined) {
+    ailmentId === null
+      ? (query = query.is('ailment_id', null))
+      : (query = query.eq('ailment_id', ailmentId));
   }
 
-  // ADDITIONAL FILTERS
   if (starCount?.length) query = query.in('star_count', starCount);
   if (potency?.length) query = query.in('potency', potency);
   if (dosage?.length) query = query.in('dosage', dosage);
   if (experiencedSideEffects !== undefined)
     query = query.eq('experienced_side_effects', experiencedSideEffects);
 
-  // SORTING
   switch (sortBy) {
     case 'oldest':
       query = query.order('created_at', { ascending: true });
@@ -185,57 +189,79 @@ export async function getReviews({
       break;
     default:
       query = query.order('created_at', { ascending: false });
-      break;
   }
 
   const { data: reviews, error } = await query;
   if (error) return { data: null, error };
   if (!reviews?.length) return { data: [], error: null };
 
-  // FETCH PROFILES
-  const userIds = reviews.map(r => r.user_id).filter(Boolean);
-  const { data: profiles, error: profileError } = await supabase
+  /* ----------------------------------------
+     2️⃣ FETCH PROFILES
+  ---------------------------------------- */
+  const userIds = [...new Set(reviews.map(r => r.user_id).filter(Boolean))];
+
+  const { data: profiles } = await supabase
     .from('profiles')
-    .select('id, first_name, last_name, email,user_name,profile_img')
+    .select('id, first_name, last_name, user_name, profile_img')
     .in('id', userIds);
 
-  if (profileError) {
-    console.warn('Could not fetch profiles:', profileError);
-    return {
-      data: reviews.map(r => ({ ...r, profiles: null })),
-      error: null,
-    };
-  }
+  /* ----------------------------------------
+   3️⃣ FETCH SECONDARY REMEDIES (✅ FIXED)
+---------------------------------------- */
 
-  // Merge profiles
-  let reviewsWithProfiles = reviews.map(r => ({
-    ...r,
-    profiles: profiles?.find(p => p.id === r.user_id) || null,
+type SecondaryRemedy = {
+  id: string;
+  name: string;
+};
+
+const allSecondaryIds = [
+  ...new Set(reviews.flatMap((r) => r.secondary_remedy_ids || [])),
+];
+
+const remediesMap: Record<string, SecondaryRemedy> = {};
+
+if (allSecondaryIds.length) {
+  const { data: remedies } = await supabase
+    .from('remedies')
+    .select('id, name')
+    .in('id', allSecondaryIds);
+
+  remedies?.forEach((r) => {
+    remediesMap[r.id] = {
+      id: r.id,
+      name: r.name,
+    };
+  });
+}
+  /* ----------------------------------------
+     4️⃣ MERGE EVERYTHING
+  ---------------------------------------- */
+  let enrichedReviews = reviews.map(review => ({
+    ...review,
+    profiles: profiles?.find(p => p.id === review.user_id) || null,
+    secondary_remedies: (review.secondary_remedy_ids || [])
+  .map((id: string) => remediesMap[id])
+  .filter(Boolean),
   }));
 
-  // LOCAL SEARCH FILTER (no join)
-  if (searchQuery && searchQuery.trim() !== '') {
-    const q = searchQuery.trim().toLowerCase();
-    reviewsWithProfiles = reviewsWithProfiles.filter(r => {
-      const matchNotes =
-        r.notes?.toLowerCase().includes(q) ||
-        r.potency?.toLowerCase().includes(q) ||
-        r.dosage?.toLowerCase().includes(q);
-      const matchProfile =
-        r.profiles &&
-        ((r.profiles.first_name &&
-          r.profiles.first_name.toLowerCase().includes(q)) ||
-          (r.profiles.last_name &&
-            r.profiles.last_name.toLowerCase().includes(q)));
-             (r.profiles.id.includes(q));
-              (r.profiles.user_name.includes(q));
-              (r.profiles.profile_img.includes(q));
-      return matchNotes || matchProfile;
-    });
+  /* ----------------------------------------
+     5️⃣ LOCAL SEARCH
+  ---------------------------------------- */
+  if (searchQuery?.trim()) {
+    const q = searchQuery.toLowerCase();
+    enrichedReviews = enrichedReviews.filter(r =>
+      r.notes?.toLowerCase().includes(q) ||
+      r.potency?.toLowerCase().includes(q) ||
+      r.dosage?.toLowerCase().includes(q) ||
+      r.profiles?.first_name?.toLowerCase().includes(q) ||
+      r.profiles?.last_name?.toLowerCase().includes(q) ||
+      r.profiles?.user_name?.toLowerCase().includes(q)
+    );
   }
 
-  return { data: reviewsWithProfiles, error: null };
+  return { data: enrichedReviews, error: null };
 }
+
 
 /**
  * Fetches unique filter options (like potency and form) for reviews of a specific remedy.
