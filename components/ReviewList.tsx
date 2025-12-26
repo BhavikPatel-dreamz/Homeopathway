@@ -583,7 +583,7 @@ export default function ReviewListPage({
                         </div>
                       )}
 
-                      {review.notes && <p className="text-[#0B0C0A] text-[14px] leading-5">{review.notes}</p>}
+                      {review.notes && <p className="text-[#0B0C0A] text-[14px] leading-5 font-medium sm:text-sm">{review.notes}</p>}
                     </div>
                   );
                 })}
