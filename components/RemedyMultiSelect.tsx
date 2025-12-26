@@ -78,16 +78,16 @@ export default function RemedyMultiSelect({
   return (
     <div className="space-y-4">
       {/* PRIMARY REMEDY */}
-      <p className="text-[14px] text-[#4B544A]">
+      {/* <p className="font-montserrat font-medium text-[16px] leading-[24px] text-[#41463B]">
         Your Primary Remedy:{" "}
-        <span className="font-medium text-[#0B0C0A]">
+        <span className="font-montserrat font-medium text-[16px] leading-[24px] text-[#41463B]">
           {primaryRemedyName}
         </span>
-      </p>
+      </p> */}
 
       {/* SEARCH INPUT (WITH ICON) */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9A9A96]" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#9A9A96]" />
 
         <input
           ref={inputRef}
@@ -101,11 +101,12 @@ export default function RemedyMultiSelect({
           className="
             w-full
             h-[44px]
-            rounded-[10px]
-            border border-[#E6E6E3]
+            rounded-[8px]
+            border-2 border-[#F8F6F2]
             pl-10 pr-4
             text-[14px]
-            text-[#0B0C0A]
+            text-[#41463B]
+            font-medium
             placeholder:text-[#9A9A96]
             focus:outline-none
             focus:border-[#6C7463]
@@ -115,7 +116,24 @@ export default function RemedyMultiSelect({
 
       {/* DROPDOWN (ONLY WHILE SEARCHING) */}
       {query && (
-        <div className="border border-[#E6E6E3] rounded-[10px] bg-white max-h-[180px] overflow-y-auto px-1 py-1 shadow-sm">
+      <div
+        className="
+          border border-[#E6E6E3]
+          rounded-[10px]
+          bg-white
+          shadow-[0px_0px_12px_-4px_rgba(26,26,26,0.16)]
+          overflow-hidden
+        "
+      >
+        {/* Scrollable area */}
+        <div
+          className="
+            max-h-[72px]
+            overflow-y-auto
+            pl-1 pr-4 py-1
+            scrollbar
+          "
+        >
           {loading && (
             <p className="text-sm text-center py-3 text-[#8E8E8A]">
               Loading remedies…
@@ -136,7 +154,7 @@ export default function RemedyMultiSelect({
               className={`
                 w-full
                 flex items-center gap-3
-                px-3 py-2
+                px-2 py-1
                 rounded-[8px]
                 text-left
                 transition
@@ -147,14 +165,19 @@ export default function RemedyMultiSelect({
                 }
               `}
             >
-              <span className="text-[16px]">{r.icon || "🌿"}</span>
-              <span className="flex-1 text-[14px] text-[#0B0C0A]">
+              <span className="w-[24px] h-[24px] bg-[#F9F7F2] rounded-[45px] flex items-center justify-center text-[16px]">
+                {r.icon || "🌿"}
+              </span>
+
+              <span className="flex-1 font-medium text-[16px] leading-[24px] text-[#0B0C0A]">
                 {r.name}
               </span>
             </button>
           ))}
         </div>
-      )}
+      </div>
+    )}
+
 
       {/* SELECTED CHIPS (MATCH IMAGE) */}
       {selected.length > 0 && (
@@ -164,12 +187,13 @@ export default function RemedyMultiSelect({
               key={r.id}
               className="
                 flex items-center gap-1
-                px-3 py-1
+                px-3 py-1.5
                 rounded-[6px]
                 bg-[#F1F2F0]
-                text-[13px]
-                text-[#0B0C0A]
-              "
+                font-medium
+                text-[14px]
+                leading-[22px]
+                text-[#41463B] "
             >
               {r.name}
               <button
@@ -177,7 +201,7 @@ export default function RemedyMultiSelect({
                 onClick={() =>
                   onChange(selected.filter((s) => s.id !== r.id))
                 }
-                className="text-[#8E8E8A] hover:text-[#0B0C0A]"
+                className="text-[#8E8E8A] hover:text-[#0B0C0A] text-xl"
               >
                 ×
               </button>

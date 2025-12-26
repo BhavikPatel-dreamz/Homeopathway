@@ -174,7 +174,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
 
   if (isAuthenticated === null) {
     return (
-      <div className="fixed inset-0 bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 z-[9999]">
+      <div className="fixed inset-0 bg-[rgba(0,0,0,0.6)] backdrop-blur-[5.5px] flex items-center justify-center p-3 sm:p-4 z-[9999]">
         <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-lg relative">
           <div className="p-6 sm:p-10 pt-8 sm:pt-12">
             <div className="text-center">
@@ -188,7 +188,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
   }
 
   return (
-    <div className="fixed inset-0 bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 z-[9999]">
+    <div className="fixed inset-0 bg-[rgba(0,0,0,0.6)] backdrop-blur-[5.5px] flex items-center justify-center p-3 sm:p-4 z-[9999]">
       <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-lg relative max-h-[95vh] overflow-y-auto">
         {/* Close Button */}
         <button
@@ -200,13 +200,13 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
         </button>
 
         {/* Content */}
-        <div className="p-5 pt-8 sm:p-10 sm:pt-12">
+        <div className="py-5 px-4 pt-8 sm:p-10 sm:pt-12">
           {/* Header */}
           <div className="mb-2 pr-8">
-            <h2 className="text-lg sm:text-[28px] font-medium text-[#0B0C0A] leading-tight">
+            <h2 className="font-kingred font-normal text-[22px] sm:text-[26px] lg:text-[32px] leading-[30px] sm:leading-[34px] lg:leading-[40px] text-[#0B0C0A] break-words">
               Your experience with
             </h2>
-            <h3 className="text-lg sm:text-[28px] font-medium text-[#0B0C0A] leading-tight break-words">
+            <h3 className=" font-kingred font-normal text-[24px] sm:text-[28px] lg:text-[32px] leading-[32px] sm:leading-[36px] lg:leading-[40px] text-[#0B0C0A] break-words ">
               <span className="font-medium">{formData.remedy}</span> for {formData.condition}
             </h3>
           </div>
@@ -220,19 +220,31 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
 
           {/* Step 0: Combination Remedies */}
           {step === 0 && (
-            <div className="space-y-4">
-              <p className="text-[#41463B] text-sm sm:text-base">
-                Used in combination with (optional)
-              </p>
+          <div className="space-y-2">
+         
+            {/* Line 1 */}
+            <p className="font-montserrat font-medium text-[20px] leading-[28px] text-[#4B544A]">
+              Your Primary Remedy:{" "}
+              <span className="font-montserrat font-medium text-[16px] leading-[24px] text-[#41463B] mb-3">{remedyName}</span>
+            
+            </p>
+            
+            {/* Line 2 */}
+            <p className="font-montserrat font-medium text-[16px] leading-[24px] text-[#41463B]">
+              Used in combination with{" "}
+              <span className="font-montserrat font-normal text-[12px] leading-[20px] text-[#41463B]">
+                (optional)
+              </span>
+            </p>
 
-              <RemedyMultiSelect
-                primaryRemedyId={remedyId}
-                primaryRemedyName={remedyName}
-                selected={selectedRemedies}
-                onChange={setSelectedRemedies}
-              />
-            </div>
-          )}
+            <RemedyMultiSelect
+              primaryRemedyId={remedyId}
+              primaryRemedyName={remedyName}
+              selected={selectedRemedies}
+              onChange={setSelectedRemedies}
+            />
+          </div>
+        )}
 
 
           {/* Step 1: Rating */}
@@ -260,7 +272,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
           {/* Step 2: Potency */}
           {step === 2 && (
             <div className="space-y-4 sm:space-y-6">
-              <p className="text-[#41463B] text-sm sm:text-base">What was the potency?</p>
+              <p className="text-[#41463B] font-medium text-sm sm:text-base">What was the potency?</p>
 
               {/* Potency Type */}
               <div className="grid grid-cols-3 gap-2 sm:gap-3">
@@ -269,35 +281,46 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                     key={type}
 
                     onClick={() => handlePotencyType(type)}
-                    className={`px-2 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all font-medium text-xs sm:text-base ${formData.potencyType === type
+                    className={`px-2 py-2 sm:px-4 sm:py-2 rounded-[8px] transition-all font-medium text-xs sm:text-base flex items-center justify-center flex-nowrap ${formData.potencyType === type
 
-                      ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A]'
-                      : 'border-[#B5B6B1] hover:border-gray-400 text-[#B5B6B1]'
+                      ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A] border-2 '
+                      : 'border-[#B5B6B1] hover:border-gray-400 text-[#83857D] border'
                       }`}
 
                   >
                     {type}
                     {formData.potencyType === type && (
-                      <span className="ml-1 sm:ml-2">✓</span>
+                      <span className="ml-1 sm:ml-2">
+                        <svg width="15" height="11" viewBox="0 0 15 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M5.30333 7.66083L12.9633 0L14.1425 1.17833L5.30333 10.0175L0 4.71417L1.17833 3.53583L5.30333 7.66083Z" fill="#0B0C0A"/>
+                        </svg>
+                      </span>
                     )}
                   </button>
                 ))}
               </div>
 
+              {/* Textarea */}
+              <textarea placeholder="Free text…" className=" w-full min-h-[120px] px-4 py-3 rounded-[10px] border-2 border-[#6C7463] bg-white font-montserrat font-medium text-[16px] leading-[22px] text-[#0B0C0A] placeholder:text-[#9A9A96] resize-none focus:outline-none focus:ring-0 " />
+
               {/* Potency Level */}
-              <div className="grid grid-cols-4 gap-2 sm:gap-3">
+              <div className="flex flex-wrap gap-2 sm:gap-3">
                 {['6C', '6X', '12C', '30C', '200C', '1M', '10M', 'CM'].map((pot) => (
                   <button
                     key={pot}
                     onClick={() => handlePotency(pot)}
-                    className={`px-2 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all font-medium text-xs sm:text-base ${formData.potency === pot
-                      ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A]'
-                      : 'border-[#B5B6B1] hover:border-gray-400 text-[#B5B6B1]'
+                    className={`px-2 py-2 sm:px-4 sm:py-2 rounded-[8px] transition-all font-medium text-xs sm:text-base flex items-center justify-center flex-nowrap ${formData.potency === pot
+                      ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A] border-2'
+                      : 'border-[#B5B6B1] hover:border-gray-400 text-[#83857D] border'
                       }`}
                   >
                     {pot}
                     {formData.potency === pot && (
-                      <span className="ml-1 sm:ml-2">✓</span>
+                      <span className="ml-1 sm:ml-2">
+                        <svg width="15" height="11" viewBox="0 0 15 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M5.30333 7.66083L12.9633 0L14.1425 1.17833L5.30333 10.0175L0 4.71417L1.17833 3.53583L5.30333 7.66083Z" fill="#0B0C0A"/>
+                        </svg>
+                      </span>
                     )}
                   </button>
                 ))}
@@ -308,9 +331,9 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
           {/* Step 3: Dosage */}
           {step === 3 && (
             <div className="space-y-4 sm:space-y-6">
-              <p className="text-[#41463B] text-sm sm:text-base">What was the dosage?</p>
+              <p className="text-[#41463B] font-medium text-sm sm:text-base">What was the dosage?</p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+              <div className="flex flex-wrap gap-2 sm:gap-3">
                 {[
                   'One-time dose',
                   'Once daily',
@@ -324,14 +347,18 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                   <button
                     key={dose}
                     onClick={() => handleDosage(dose)}
-                    className={`px-3 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all text-left font-medium text-xs sm:text-base ${formData.dosage === dose
-                      ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A]'
-                      : 'border-[#B5B6B1] hover:border-gray-400 text-[#B5B6B1]'
+                    className={`px-2 py-2 sm:px-4 sm:py-2 rounded-[8px] transition-all font-medium text-xs sm:text-base flex items-center flex-nowrap ${formData.dosage === dose
+                      ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A] border-2'
+                      : 'border-[#B5B6B1] hover:border-gray-400 text-[#83857D] border'
                       }`}
                   >
-                    {dose}
+                   <span> {dose}</span>
                     {formData.dosage === dose && (
-                      <span className="ml-2">✓</span>
+                      <span className="ml-2">
+                        <svg width="15" height="11" viewBox="0 0 15 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M5.30333 7.66083L12.9633 0L14.1425 1.17833L5.30333 10.0175L0 4.71417L1.17833 3.53583L5.30333 7.66083Z" fill="#0B0C0A"/>
+                        </svg>
+                      </span>
                     )}
                   </button>
                 ))}
@@ -342,9 +369,9 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
           {/* Step 4: Duration */}
           {step === 4 && (
             <div className="space-y-4 sm:space-y-6">
-              <p className="text-[#41463B] text-sm sm:text-base">How long did you use it?</p>
+              <p className="text-[#41463B] font-medium text-sm sm:text-base">How long did you use it?</p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-1 gap-2 sm:gap-3">
                 {[
                   '1 day',
                   '2-3 days',
@@ -358,14 +385,18 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                   <button
                     key={dur}
                     onClick={() => handleDuration(dur)}
-                    className={`px-3 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all font-medium text-xs sm:text-base ${formData.duration === dur
-                      ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A]'
-                      : 'border-[#B5B6B1] hover:border-gray-400 text-[#B5B6B1]'
+                    className={`px-2 py-2 sm:px-4 sm:py-2 rounded-[8px] transition-all font-medium text-xs sm:text-base flex items-center justify-center flex-nowrap ${formData.duration === dur
+                      ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A] border-2'
+                      : 'border-[#B5B6B1] hover:border-gray-400 text-[#83857D] border'
                       }`}
                   >
                     {dur}
                     {formData.duration === dur && (
-                      <span className="ml-2">✓</span>
+                      <span className="ml-2">
+                        <svg width="15" height="11" viewBox="0 0 15 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M5.30333 7.66083L12.9633 0L14.1425 1.17833L5.30333 10.0175L0 4.71417L1.17833 3.53583L5.30333 7.66083Z" fill="#0B0C0A"/>
+                        </svg>
+                      </span>
                     )}
                   </button>
                 ))}
@@ -376,7 +407,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
           {/* Step 5: Effectiveness */}
           {step === 5 && (
             <div className="space-y-4 sm:space-y-6">
-              <p className="text-[#41463B] text-sm sm:text-base">How effective was it?</p>
+              <p className="text-[#41463B] font-medium text-sm sm:text-base">How effective was it?</p>
 
               <div className="space-y-2 sm:space-y-3">
                 {[
@@ -390,14 +421,18 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                   <button
                     key={eff}
                     onClick={() => handleEffectiveness(eff)}
-                    className={`w-full px-3 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all text-left font-medium text-xs sm:text-base ${formData.effectiveness === eff
-                      ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A]'
-                      : 'border-[#B5B6B1] hover:border-gray-400 text-[#B5B6B1]'
+                    className={`w-full px-2 py-2 sm:px-4 sm:py-2 rounded-[8px] transition-all font-medium text-xs sm:text-base flex items-center justify-center flex-nowrap ${formData.effectiveness === eff
+                      ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A] border-2'
+                      : 'border-[#B5B6B1] hover:border-gray-400 text-[#83857D] border'
                       }`}
                   >
                     {eff}
                     {formData.effectiveness === eff && (
-                      <span className="float-right">✓</span>
+                      <span className="float-right ml-2">
+                        <svg width="15" height="11" viewBox="0 0 15 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M5.30333 7.66083L12.9633 0L14.1425 1.17833L5.30333 10.0175L0 4.71417L1.17833 3.53583L5.30333 7.66083Z" fill="#0B0C0A"/>
+                        </svg>
+                      </span>
                     )}
                   </button>
                 ))}
@@ -408,13 +443,13 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
           {/* Step 6: Additional Notes */}
           {step === 6 && (
             <div className="space-y-4 sm:space-y-6">
-              <p className="text-[#41463B] text-sm sm:text-base">Share details of your situation, what you did, and the outcome.</p>
+              <p className="text-[#41463B] font-medium text-sm sm:text-base">Share details of your situation, what you did, and the outcome.</p>
 
               <textarea
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 placeholder="Type your message..."
-                className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-[#B5B6B1] rounded-lg sm:rounded-xl focus:border-[#6C7463] focus:outline-none resize-none text-black text-sm sm:text-base"
+                className="w-full sm:h-[328px] h-[200px] px-3 py-2 sm:px-4 sm:py-2 border-2 border-[#6C7463] rounded-lg sm:rounded-xl focus:border-[#6C7463] focus:outline-none resize-none text-black text-sm sm:text-base font-medium placeholder:text-[#9A9A96]"
                 rows={5}
                 autoFocus
               />
@@ -426,8 +461,9 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
             {Array.from({ length: totalSteps }).map((_, idx) => (
               <div
                 key={idx}
-                className={`h-2 flex-1 rounded-xl transition-all ${idx < step ? 'bg-[#4B544A]' : 'bg-[#4B544A1A]'
-                  }`}
+                className={`h-2 flex-1 rounded-xl transition-all ${
+                  idx <= step ? 'bg-[#4B544A]' : 'bg-[#4B544A1A]'
+                }`}
               />
             ))}
           </div>
@@ -438,7 +474,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
             {step > 0 && (
               <button
                 onClick={handleBack}
-                className="px-5 py-2.5 h-[44px] min-w-[80px] sm:px-8 transition-all font-medium text-gray-700 text-sm sm:text-base"
+                className="px-5 py-2.5 h-[44px] min-w-[80px] sm:px-8 transition-all font-semibold text-[#2B2E28] text-sm sm:text-base hover:bg-[#F1F2F0] rounded-full cursor-pointer"
               >
                 Back
               </button>
@@ -454,7 +490,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                 (step === 4 && !formData.duration) ||
                 (step === 5 && !formData.effectiveness)
               }
-              className="px-5 py-2.5 h-[44px] min-w-[138px] rounded-full bg-[#4B544A] text-white disabled:bg-[#F1F2F0] disabled:text-[#2B2E28] disabled:cursor-not-allowed transition-all font-medium text-sm sm:text-base"
+              className="px-5 py-2.5 h-[44px] min-w-[138px] rounded-full bg-[#6C7463] text-white disabled:bg-[#F1F2F0] disabled:text-[#2B2E28] disabled:cursor-not-allowed transition-all font-semibold text-sm sm:text-base cursor-pointer hover:bg-[#4B544A]"
             >
               {loading
                 ? "Submitting..."
@@ -482,7 +518,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                     className="sm:w-30 sm:h-30 w-20 h-20 mx-auto"
                   />
 
-                  <h2 className="text-[22px] sm:text-[32px] font-medium text-gray-900">
+                  <h2 className="text-[22px] sm:text-[32px] font-medium text-gray-900 mb-0">
                     Thanks for Sharing!
                   </h2>
 
