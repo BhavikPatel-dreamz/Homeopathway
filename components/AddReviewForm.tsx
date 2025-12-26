@@ -26,6 +26,9 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
   const [error, setError] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [remedyPotencies, setRemedyPotencies] = useState<Record<string, string>>({
+    [remedyId]: ''
+  });
   const [formData, setFormData] = useState({
     remedy: remedyName,
     condition: condition,
@@ -40,6 +43,11 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
   });
 
   const totalSteps = 7;
+
+  const allRemedies = [
+    { id: remedyId, name: remedyName },
+    ...selectedRemedies
+  ];
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -96,7 +104,8 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
         ailment_id: ailmentId,
         star_count: formData.rating,
         secondary_remedy_ids: selectedRemedies.map(r => r.id),
-        potency: formData.potencyType && formData.potency ? `${formData.potencyType} ${formData.potency}` : null,
+        // Combines the global type with the primary remedy potency
+        potency: formData.potencyType && remedyPotencies[remedyId] ? `${formData.potencyType} ${remedyPotencies[remedyId]}` : null,
         dosage: formData.dosage,
         duration_used: formData.duration,
         effectiveness: formData.effectiveness === 'Completely resolved symptoms' ? 5 :
@@ -106,7 +115,9 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                 formData.effectiveness === 'No change' ? 1 :
                   formData.effectiveness === 'Symptoms worsened' ? 0 : null,
         notes: formData.notes,
-        experienced_side_effects: formData.sideEffects
+        experienced_side_effects: formData.sideEffects,
+        // NEW: Sending detailed potency map if your API supports it
+        all_potencies: remedyPotencies
       };
 
       const response = await fetch('/api/reviews', {
@@ -160,6 +171,10 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
     setFormData({ ...formData, potency });
   };
 
+  const handleSpecificPotency = (id: string, pot: string) => {
+    setRemedyPotencies(prev => ({ ...prev, [id]: pot }));
+  };
+
   const handleDosage = (dosage: string) => {
     setFormData({ ...formData, dosage });
   };
@@ -174,7 +189,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
 
   if (isAuthenticated === null) {
     return (
-      <div className="fixed inset-0 bg-[rgba(0,0,0,0.6)] backdrop-blur-[5.5px] flex items-center justify-center p-3 sm:p-4 z-[9999]">
+      <div className="fixed inset-0 bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 z-[9999]">
         <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-lg relative">
           <div className="p-6 sm:p-10 pt-8 sm:pt-12">
             <div className="text-center">
@@ -220,31 +235,31 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
 
           {/* Step 0: Combination Remedies */}
           {step === 0 && (
-          <div className="space-y-2">
-         
-            {/* Line 1 */}
-            <p className="font-montserrat font-medium text-[20px] leading-[28px] text-[#4B544A]">
-              Your Primary Remedy:{" "}
-              <span className="font-montserrat font-medium text-[16px] leading-[24px] text-[#41463B] mb-3">{remedyName}</span>
-            
-            </p>
-            
-            {/* Line 2 */}
-            <p className="font-montserrat font-medium text-[16px] leading-[24px] text-[#41463B]">
-              Used in combination with{" "}
-              <span className="font-montserrat font-normal text-[12px] leading-[20px] text-[#41463B]">
-                (optional)
-              </span>
-            </p>
+            <div className="space-y-2">
 
-            <RemedyMultiSelect
-              primaryRemedyId={remedyId}
-              primaryRemedyName={remedyName}
-              selected={selectedRemedies}
-              onChange={setSelectedRemedies}
-            />
-          </div>
-        )}
+              {/* Line 1 */}
+              <p className="font-montserrat font-medium text-[20px] leading-[28px] text-[#4B544A]">
+                Your Primary Remedy:{" "}
+                <span className="font-montserrat font-medium text-[16px] leading-[24px] text-[#41463B] mb-3">{remedyName}</span>
+
+              </p>
+
+              {/* Line 2 */}
+              <p className="font-montserrat font-medium text-[16px] leading-[24px] text-[#41463B]">
+                Used in combination with{" "}
+                <span className="font-montserrat font-normal text-[12px] leading-[20px] text-[#41463B]">
+                  (optional)
+                </span>
+              </p>
+
+              <RemedyMultiSelect
+                primaryRemedyId={remedyId}
+                primaryRemedyName={remedyName}
+                selected={selectedRemedies}
+                onChange={setSelectedRemedies}
+              />
+            </div>
+          )}
 
 
           {/* Step 1: Rating */}
@@ -269,60 +284,74 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
             </div>
           )}
 
-          {/* Step 2: Potency */}
+          {/* Step 2: Potency - Multi-Remedy Support */}
           {step === 2 && (
-            <div className="space-y-4 sm:space-y-6">
-              <p className="text-[#41463B] font-medium text-sm sm:text-base">What was the potency?</p>
+            <div className="flex flex-col gap-[40px]">
+              {/* Global Selector Area: Type and Notes */}
+              <div className="flex flex-col gap-[16px]">
+                <p className="text-[#41463B] text-base font-medium">What was the potency?</p>
 
-              {/* Potency Type */}
-              <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                {['Pellet', 'Tincture', 'Ointment'].map((type) => (
-                  <button
-                    key={type}
+                {/* Potency Type (Pellet, Liquid, Ointment) */}
+                <div className="flex gap-2">
+                  {['Pellet', 'Liquid', 'Ointment'].map((type) => (
+                    <button
+                      key={type}
+                      onClick={() => handlePotencyType(type)}
+                      className={`px-4 py-2 rounded-lg border transition-all font-medium text-sm flex items-center justify-center ${formData.potencyType === type
+                          ? 'border-[#0B0C0A] text-[#0B0C0A] border-2'
+                          : 'border-[#B5B6B1] text-[#B5B6B1] border'
+                        }`}
+                    >
+                      {type}
+                      {formData.potencyType === type && (
+                        <span className="ml-2">
+                          <svg width="15" height="11" viewBox="0 0 15 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5.30333 7.66083L12.9633 0L14.1425 1.17833L5.30333 10.0175L0 4.71417L1.17833 3.53583L5.30333 7.66083Z" fill="currentColor" />
+                          </svg>
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
 
-                    onClick={() => handlePotencyType(type)}
-                    className={`px-2 py-2 sm:px-4 sm:py-2 rounded-[8px] transition-all font-medium text-xs sm:text-base flex items-center justify-center flex-nowrap ${formData.potencyType === type
-
-                      ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A] border-2 '
-                      : 'border-[#B5B6B1] hover:border-gray-400 text-[#83857D] border'
-                      }`}
-
-                  >
-                    {type}
-                    {formData.potencyType === type && (
-                      <span className="ml-1 sm:ml-2">
-                        <svg width="15" height="11" viewBox="0 0 15 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M5.30333 7.66083L12.9633 0L14.1425 1.17833L5.30333 10.0175L0 4.71417L1.17833 3.53583L5.30333 7.66083Z" fill="#0B0C0A"/>
-                        </svg>
-                      </span>
-                    )}
-                  </button>
-                ))}
+                {/* Textarea for Notes */}
+                <textarea
+                  placeholder="Free text...."
+                  className="w-full p-4 border border-[#B5B6B1] rounded-xl text-[#0B0C0A] text-sm focus:outline-none focus:border-[#0B0C0A] min-h-[120px] placeholder:text-[#B5B6B1] resize-none"
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                />
               </div>
 
-              {/* Textarea */}
-              <textarea placeholder="Free text…" className=" w-full min-h-[120px] px-4 py-3 rounded-[10px] border-2 border-[#6C7463] bg-white font-montserrat font-medium text-[16px] leading-[22px] text-[#0B0C0A] placeholder:text-[#9A9A96] resize-none focus:outline-none focus:ring-0 " />
+              {/* Individual Remedies Potency Selection */}
+              <div className="flex flex-col gap-[24px]">
+                {allRemedies.map((rem) => (
+                  <div key={rem.id} className="flex flex-col gap-[12px]">
+                    <p className="text-sm font-semibold text-[#0B0C0A]">{rem.name}:</p>
 
-              {/* Potency Level */}
-              <div className="flex flex-wrap gap-2 sm:gap-3">
-                {['6C', '6X', '12C', '30C', '200C', '1M', '10M', 'CM'].map((pot) => (
-                  <button
-                    key={pot}
-                    onClick={() => handlePotency(pot)}
-                    className={`px-2 py-2 sm:px-4 sm:py-2 rounded-[8px] transition-all font-medium text-xs sm:text-base flex items-center justify-center flex-nowrap ${formData.potency === pot
-                      ? 'border-[#6C7463] bg-gray-50 text-[#0B0C0A] border-2'
-                      : 'border-[#B5B6B1] hover:border-gray-400 text-[#83857D] border'
-                      }`}
-                  >
-                    {pot}
-                    {formData.potency === pot && (
-                      <span className="ml-1 sm:ml-2">
-                        <svg width="15" height="11" viewBox="0 0 15 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M5.30333 7.66083L12.9633 0L14.1425 1.17833L5.30333 10.0175L0 4.71417L1.17833 3.53583L5.30333 7.66083Z" fill="#0B0C0A"/>
-                        </svg>
-                      </span>
-                    )}
-                  </button>
+                    {/* Grid for Potency Levels (6 above, 2 below logic via flex-wrap) */}
+                    <div className="flex flex-wrap gap-[8px]" style={{ maxWidth: '459px' }}>
+                      {['6C', '6X', '12C', '30C', '200C', '1M', '10M', 'CM'].map((pot) => (
+                        <button
+                          key={pot}
+                          onClick={() => handleSpecificPotency(rem.id, pot)}
+                          className={`flex items-center justify-center px-[12px] py-[8px] rounded-lg border transition-all text-[14px] font-medium min-w-[65px] ${remedyPotencies[rem.id] === pot
+                              ? 'border-[#0B0C0A] text-[#0B0C0A] border-2 bg-gray-50'
+                              : 'border-[#D1D1CB] text-[#B5B6B1] border'
+                            }`}
+                        >
+                          {pot}
+                          {remedyPotencies[rem.id] === pot && (
+                            <span className="ml-1.5">
+                              <svg width="12" height="9" viewBox="0 0 15 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5.30333 7.66083L12.9633 0L14.1425 1.17833L5.30333 10.0175L0 4.71417L1.17833 3.53583L5.30333 7.66083Z" fill="currentColor" />
+                              </svg>
+                            </span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
@@ -352,11 +381,11 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                       : 'border-[#B5B6B1] hover:border-gray-400 text-[#83857D] border'
                       }`}
                   >
-                   <span> {dose}</span>
+                    <span> {dose}</span>
                     {formData.dosage === dose && (
                       <span className="ml-2">
                         <svg width="15" height="11" viewBox="0 0 15 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M5.30333 7.66083L12.9633 0L14.1425 1.17833L5.30333 10.0175L0 4.71417L1.17833 3.53583L5.30333 7.66083Z" fill="#0B0C0A"/>
+                          <path d="M5.30333 7.66083L12.9633 0L14.1425 1.17833L5.30333 10.0175L0 4.71417L1.17833 3.53583L5.30333 7.66083Z" fill="#0B0C0A" />
                         </svg>
                       </span>
                     )}
@@ -394,7 +423,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                     {formData.duration === dur && (
                       <span className="ml-2">
                         <svg width="15" height="11" viewBox="0 0 15 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M5.30333 7.66083L12.9633 0L14.1425 1.17833L5.30333 10.0175L0 4.71417L1.17833 3.53583L5.30333 7.66083Z" fill="#0B0C0A"/>
+                          <path d="M5.30333 7.66083L12.9633 0L14.1425 1.17833L5.30333 10.0175L0 4.71417L1.17833 3.53583L5.30333 7.66083Z" fill="#0B0C0A" />
                         </svg>
                       </span>
                     )}
@@ -430,7 +459,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                     {formData.effectiveness === eff && (
                       <span className="float-right ml-2">
                         <svg width="15" height="11" viewBox="0 0 15 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M5.30333 7.66083L12.9633 0L14.1425 1.17833L5.30333 10.0175L0 4.71417L1.17833 3.53583L5.30333 7.66083Z" fill="#0B0C0A"/>
+                          <path d="M5.30333 7.66083L12.9633 0L14.1425 1.17833L5.30333 10.0175L0 4.71417L1.17833 3.53583L5.30333 7.66083Z" fill="#0B0C0A" />
                         </svg>
                       </span>
                     )}
@@ -461,9 +490,8 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
             {Array.from({ length: totalSteps }).map((_, idx) => (
               <div
                 key={idx}
-                className={`h-2 flex-1 rounded-xl transition-all ${
-                  idx <= step ? 'bg-[#4B544A]' : 'bg-[#4B544A1A]'
-                }`}
+                className={`h-2 flex-1 rounded-xl transition-all ${idx <= step ? 'bg-[#4B544A]' : 'bg-[#4B544A1A]'
+                  }`}
               />
             ))}
           </div>
@@ -485,7 +513,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
               disabled={
                 loading ||
                 (step === 1 && formData.rating === 0) ||
-                (step === 2 && !formData.potency) ||
+                (step === 2 && (!formData.potencyType || !remedyPotencies[remedyId])) ||
                 (step === 3 && !formData.dosage) ||
                 (step === 4 && !formData.duration) ||
                 (step === 5 && !formData.effectiveness)
