@@ -10,14 +10,14 @@ import {
   getReviewStats,
 } from "@/lib/review";
 import { getCurrentUser } from "@/lib/auth";
-import ReviewFilterModal, { ReviewFilters } from "./ReviewFilterModal";
+import ReviewFilterModal from "./ReviewFilterModal";
+import { ReviewFilters } from "@/types";
 import AddReviewForm from "./AddReviewForm";
 import { Remedy, Review as ReviewType } from "@/types";
 
 // ---------------------------
 // Type Definitions
 // ---------------------------
-
 
 interface ReviewListPageProps {
   remedy: Remedy & {
@@ -61,6 +61,30 @@ const formatTimeAgo = (dateString: string) => {
   return "Just now";
 };
 
+/**
+ * Splits strings like "Pellet 6C" into ["Pellet", "6C"]
+ * while keeping "Once daily" as a single tag.
+ */
+const processUsageTags = (tags: (string | null | undefined)[]) => {
+  const processed: string[] = [];
+
+  tags.forEach((tag) => {
+    if (!tag) return;
+
+    const parts = tag.split(/\s+/);
+    const potencyRegex = /^\d+(C|X|CK|LM)$/i;
+    const isPelletOrPotency = parts.some(p => p.toLowerCase() === "pellet" || potencyRegex.test(p));
+
+    if (isPelletOrPotency && parts.length > 1) {
+      processed.push(...parts);
+    } else {
+      processed.push(tag);
+    }
+  });
+
+  return Array.from(new Set(processed));
+};
+
 // ---------------------------
 // Star Renderer
 // ---------------------------
@@ -100,6 +124,7 @@ const renderStars = (rating: number) => {
     </div>
   );
 };
+type SortBy = "newest" | "oldest" | "highest_rated" | "lowest_rated";
 
 // ---------------------------
 // Main Component
@@ -109,10 +134,15 @@ export default function ReviewListPage({
   ailmentContext,
 }: ReviewListPageProps) {
   const router = useRouter();
-
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   // States
   const [reviews, setReviews] = useState<ReviewType[]>([]);
-  const [reviewStats, setReviewStats] = useState<any>(null);
+  const [reviewStats, setReviewStats] = useState<{
+    average_rating: number;
+    total_reviews: number;
+    rating_distribution: Record<number, number>;
+  } | null>(null);
   const [filterOptions, setFilterOptions] = useState<{
     potencies: string[];
     forms: string[];
@@ -141,10 +171,9 @@ export default function ReviewListPage({
     userName: "",
   });
 
+  
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<
-    "newest" | "oldest" | "highest_rated" | "lowest_rated"
-  >("newest");
+  const [sortBy, setSortBy] = useState<SortBy>("newest");
   const dropdownRef = useRef<HTMLDivElement>(null);
   const filterDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -157,11 +186,10 @@ export default function ReviewListPage({
   const [reviewsPerPage] = useState(15);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // 👇 Loading states
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isPageLoading, setIsPageLoading] = useState(false);
-
-  const [allReviesList, setAllReviewsList] = useState<any>([])
+  const [allReviesList, setAllReviewsList] = useState<ReviewType[]>([]);
+  
 
   // ---------------------------
   // Fetch Reviews + Stats
@@ -184,12 +212,9 @@ export default function ReviewListPage({
       });
 
       let allReviews = reviewsData || [];
+      setAllReviewsList(reviewsData ?? []);
 
-      setAllReviewsList(reviewsData);
-
-      // Apply advanced filters
       allReviews = allReviews.filter((review) => {
-        // Filter by dosage/potency tags
         if (activeFilters.dosage.length > 0) {
           const hasMatchingTag = activeFilters.dosage.some(
             (tag) => review.dosage === tag || review.potency === tag
@@ -197,7 +222,6 @@ export default function ReviewListPage({
           if (!hasMatchingTag) return false;
         }
 
-        // Filter by date range
         if (activeFilters.dateRange !== "all") {
           const reviewDate = new Date(review.created_at);
           const now = new Date();
@@ -206,31 +230,16 @@ export default function ReviewListPage({
           );
 
           switch (activeFilters.dateRange) {
-            case "today":
-              if (daysDiff > 0) return false;
-              break;
-            case "week":
-              if (daysDiff > 7) return false;
-              break;
-            case "month":
-              if (daysDiff > 30) return false;
-              break;
-            case "year":
-              if (daysDiff > 365) return false;
-              break;
+            case "today": if (daysDiff > 0) return false; break;
+            case "week": if (daysDiff > 7) return false; break;
+            case "month": if (daysDiff > 30) return false; break;
+            case "year": if (daysDiff > 365) return false; break;
           }
         }
 
-        // Filter by user name
         if (activeFilters.userName.trim()) {
-          const userName =
-            review.profiles?.first_name || review.profiles?.last_name
-              ? `${review.profiles?.first_name || ""} ${review.profiles?.last_name || ""
-                }`.toLowerCase()
-              : "anonymous";
-          if (!userName.includes(activeFilters.userName.toLowerCase())) {
-            return false;
-          }
+          const name = `${review.profiles?.first_name || ""} ${review.profiles?.last_name || ""}`.toLowerCase();
+          if (!name.includes(activeFilters.userName.toLowerCase())) return false;
         }
 
         return true;
@@ -240,12 +249,9 @@ export default function ReviewListPage({
       const endIndex = startIndex + reviewsPerPage;
       setReviews(allReviews.slice(startIndex, endIndex));
 
-      const { data: statsData } = await getReviewStats(
-        remedy.id,
-        ailmentContext?.id
-      );
+      const { data: statsData } = await getReviewStats(remedy.id, ailmentContext?.id);
       if (statsData) {
-        setReviewStats({ ...statsData, star_count: statsData.average_rating });
+        setReviewStats(statsData);
         setTotalReviews(allReviews.length);
         setTotalPages(Math.ceil(allReviews.length / reviewsPerPage));
       }
@@ -267,7 +273,6 @@ export default function ReviewListPage({
     fetchReviews(false);
   }, [remedy.id]);
 
-  // Sync activeFilters with filters
   useEffect(() => {
     setActiveFilters({
       dosage: filters.dosage,
@@ -278,17 +283,25 @@ export default function ReviewListPage({
   }, [filters]);
 
   useEffect(() => {
-    // When filters, sort, or search change, silently update without spinner
     fetchReviews(false);
     setCurrentPage(1);
   }, [filters, sortBy, searchQuery, activeFilters]);
 
   useEffect(() => {
-    // When only page changes → show pagination loading
     if (currentPage > 1 || totalReviews > reviewsPerPage) {
       fetchReviews(true);
     }
   }, [currentPage]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // ---------------------------
   // Handlers
@@ -302,110 +315,52 @@ export default function ReviewListPage({
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
-      document
-        .getElementById("Reviews")
-        ?.scrollIntoView({ behavior: "smooth" });
+      document.getElementById("Reviews")?.scrollIntoView({ behavior: "smooth" });
     }
   };
 
   const refreshReviews = () => fetchReviews(false);
 
-  const sortOptions = [
-    { label: "Most Recent", value: "newest" },
-    { label: "Oldest", value: "oldest" },
-    { label: "Highest Rated", value: "highest_rated" },
-    { label: "Lowest Rated", value: "lowest_rated" },
-  ];
+  const sortOptions: { label: string; value: SortBy }[] = [
+  { label: "Most Recent", value: "newest" },
+  { label: "Oldest", value: "oldest" },
+  { label: "Highest Rated", value: "highest_rated" },
+  { label: "Lowest Rated", value: "lowest_rated" },
+];
 
-
-  // ---------------------------
-  // Render
-  // ---------------------------
   if (!remedy) return <div>Loading remedy details...</div>;
 
-  // Close dropdown if click happens outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-  
   return (
-    
     <div>
       <section id="Reviews" className="bg-white rounded-2xl md:p-4 sm:py-8 ">
         <div className="grid grid-cols-1 lg:grid-cols-3 md:gap-6 sm:gap-10">
           {/* Left Panel – Ratings Summary */}
           <aside className="col-span-1 mb-6 lg:mb-0">
             <div className="flex flex-col text-left md:p-3 sm:p-6">
-              <p className="text-base sm:text-[20px] text-[#0B0C0A] font-semibold mb-2">
-                Reviews
-              </p>
+              <p className="text-base sm:text-[20px] text-[#0B0C0A] font-semibold mb-2">Reviews</p>
               <div className="flex items-center gap-2 sm:gap-3">
-                <Image
-                  src="/star.svg"
-                  alt="Star"
-                  width={36}
-                  height={36}
-                  className="sm:w-12 sm:h-12"
-                />
-                <h2 className="text-2xl sm:text-4xl font-bold text-gray-800 mt-2 sm:mt-3">
+                <Image src="/star.svg" alt="Star" width={36} height={36} className="sm:w-12 sm:h-12" />
+                <h2 className="text-4xl sm:text-4xl lg:text-[32px] xl:text-[40px] font-bold text-gray-800 mt-2 sm:mt-3">
                   {reviewStats ? reviewStats.average_rating.toFixed(1) : "0.0"}
                 </h2>
               </div>
-              <p className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6">
-                Based on {reviewStats?.total_reviews ?? 0}{" "}
-                {(reviewStats?.total_reviews ?? 0) === 1 ? "review" : "reviews"}
-              </p>
+              {/* <p className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6">
+                Based on {reviewStats?.total_reviews ?? 0} {(reviewStats?.total_reviews ?? 0) === 1 ? "review" : "reviews"}
+              </p> */}
 
-              {/* Rating Filters */}
-              <div className="w-full flex flex-col gap-2.5  mb-4 sm:mb-6">
-                {reviewStats &&
-                  [5, 4, 3, 2, 1].map((star) => {
-                    const percentage =
-                      reviewStats.total_reviews > 0
-                        ? (reviewStats.rating_distribution[star] /
-                          reviewStats.total_reviews) *
-                        100
-                        : 0;
+              <div className="mt-3 ml-[-8px] w-full flex flex-col gap-2.5  mb-4 sm:mb-6">
+                {reviewStats && [5, 4, 3, 2, 1].map((star) => {
+                    const percentage = reviewStats.total_reviews > 0 ? (reviewStats.rating_distribution[star] / reviewStats.total_reviews) * 100 : 0;
                     const isActive = filters.rating.includes(star);
-
                     return (
                       <button
                         key={star}
-                        onClick={() =>
-                          setFilters((prev) => ({
-                            ...prev,
-                            rating: prev.rating.includes(star) ? [] : [star],
-                          }))
-                        }
-                        className={`flex items-center gap-2 text-sm sm:text-sm w-full rounded-md  hover:bg-[#6C74631A]
-    px-3 py-2 transition
-    ${isActive ? "bg-[#6C74631A]" : "border-[#6C74631A]/10 "}
-  `}
-                      >
-                        <Image
-                          src="/star.svg"
-                          alt={`${star} Star`}
-                          width={15}
-                          height={15}
-                          className="sm:w-4 sm:h-4"
-                        />
-                        <span className="w-3 text-gray-700 font-medium">
-                          {star}
-                        </span>
+                        onClick={() => setFilters((prev) => ({ ...prev, rating: prev.rating.includes(star) ? [] : [star] }))}
+                        className={`flex items-center text-sm sm:text-sm w-full rounded-md  hover:bg-[#6C74631A] px-3 py-2 transition ${isActive ? "bg-[#6C74631A]" : "border-[#6C74631A]/10 "} `} >
+                        <Image src="/star.svg" alt={`${star} Star`} width={15} height={15} className="sm:w-4 sm:h-4 mr-1" />
+                        <span className="w-3 text-gray-700 font-medium mr-5">{star}</span>
                         <div className="flex-1 h-2 bg-[#4B544A]/20 rounded-xl overflow-hidden">
-                          <div
-                            className={`h-full transition-all duration-300 rounded-xl ${"bg-[#6C7463]"}`}
-                            style={{ width: `${percentage}%` }}
-                          />
+                          <div className="h-full transition-all duration-300 rounded-xl bg-[#6C7463]" style={{ width: `${percentage}%` }} />
                         </div>
                       </button>
                     );
@@ -414,7 +369,7 @@ export default function ReviewListPage({
 
               <button
                 onClick={handleReviewButtonClick}
-                className="bg-[#6C7463] hover:bg-[#5A6B5D] text-white px-3 py-2 sm:px-5 rounded-full text-xs sm:text-sm font-medium transition w-full sm:w-auto"
+                className="bg-[#6C7463] hover:bg-[#5A6B5D] text-white px-3 py-2.5 sm:px-5 rounded-full sm:text-base font-semibold transition w-full sm:max-w-[246px] h-[44px] mx-auto cursor-pointer"
               >
                 Review Remedy
               </button>
@@ -424,14 +379,12 @@ export default function ReviewListPage({
           {/* Right Panel – Reviews List */}
           <div className="col-span-2">
             <div className="flex flex-col sm:flex-row flex-wrap items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-              {/* Search Input with Filter Button */}
               <div className="relative w-full sm:flex-1 sm:mr-6 flex gap-2">
                 <div className="relative flex-1">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Search className="absolute left-4 sm:left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     placeholder="Search reviews..."
-                    className="w-full pl-11 pr-4 py-3 border border-[#B5B6B1] rounded-md text-xs sm:text-sm text-gray-600
-                   focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent"
+                    className="w-full h-[40px] pl-11 pr-4 py-3 sm:h-[48px] border border-[#B5B6B1] rounded-[8px] sm:text-base text-[#41463B] focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent placeholder:text-[#41463B] placeholder:font-medium font-family-montserrat"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
@@ -439,28 +392,16 @@ export default function ReviewListPage({
 
                 {/* Filter Button */}
                 <div className="relative" ref={filterDropdownRef}>
+                  
                   {/* Filter Button INSIDE Input */}
-                  {/* Filter Button */}
                   <button
                     onClick={() => setIsFilterModalOpen(true)}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 px-3 py-3 bg-[#6C7463] hover:bg-[#5A6B5D] 
-      text-white rounded-md transition-colors flex items-center gap-1 cursor-pointer"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 px-2 py-2 sm:w-[44px] w-[40px] sm:h-[44px] h-[36px] bg-[#6C7463] hover:bg-[#5A6B5D]text-white rounded-[8px] transition-colors flex items-center justify-center cursor-pointer border border-[1px] border-[#B5B6B1] outline-none"
                   >
-                    <SlidersHorizontal className="w-4 h-4" />
-
-                    {/* Show badge */}
-                    {filters.rating.length +
-                      filters.dosage.length +
-                      filters.form.length +
-                      (filters.dateRange !== "all" ? 1 : 0) +
-                      (filters.userName ? 1 : 0) >
-                      0 && (
+                    <SlidersHorizontal className="w-[22px] h-[18px]" />
+                    {filters.rating.length + filters.dosage.length + filters.form.length + (filters.dateRange !== "all" ? 1 : 0) + (filters.userName ? 1 : 0) > 0 && (
                         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                          {filters.rating.length +
-                            filters.dosage.length +
-                            filters.form.length +
-                            (filters.dateRange !== "all" ? 1 : 0) +
-                            (filters.userName ? 1 : 0)}
+                          {filters.rating.length + filters.dosage.length + filters.form.length + (filters.dateRange !== "all" ? 1 : 0) + (filters.userName ? 1 : 0)}
                         </span>
                       )}
                   </button>
@@ -468,45 +409,28 @@ export default function ReviewListPage({
               </div>
 
               {/* Sort By */}
-              <div className=" ">
+              <div className="flex items-center justify-end gap-2 w-full sm:w-auto mt-2 sm:mt-0 justify-center relative" ref={dropdownRef}>
+                <span className="sm:font-semibold font-regular text-[#2B2E28] text-base leading-[24px]  whitespace-nowrap text-montserrat">Sort by:</span>
+                <button
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="appearance-none sm:pl-1 pr-5 py-2 text-base leading-[24px] min-w-[130px] text-[#20231E] font-medium focus:outline-none" >
+                  {sortOptions.find((opt) => opt.value === sortBy)?.label}
+                  <ChevronDown className={`absolute right-0 sm:right-0 top-1/2 -translate-y-1/2 w-4 h-4 text-[#20231E] pointer-events-none transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`} />
+                </button>
 
-                <div className="flex items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0 justify-center relative" ref={dropdownRef}>
-                  <span className="font-semibold text-[#2B2E28] text-[14px]  whitespace-nowrap ">
-                    Sort by:
-                  </span>
-                  <button
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="appearance-none
-               sm:pl-1 pr-10 py-2 text-[14px] min-w-[130px] text-[#20231E] font-medium focus:outline-none"
-                  >
-                    {sortOptions.find((opt) => opt.value === sortBy)?.label}
-                    <ChevronDown
-                      className={`absolute right-4 sm:right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 
-                pointer-events-none transition-transform duration-200
-                ${isDropdownOpen ? "rotate-180" : ""}`}
-                    />
-                  </button>
-
-
-                  {isDropdownOpen && (
-                    <div className="absolute z-10 top-full left-0  bg-white border border-gray-300 rounded-md shadow-lg">
-                      {sortOptions.map((opt: any) => (
-                        <button
-                          key={opt.value}
-                          onClick={() => {
-                            setSortBy(opt.value);
-                            setIsDropdownOpen(false);
-                          }}
-                          className={`px-3 py-2 w-full text-sm text-start hover:bg-blue-200 hover:text-blue-700 transition
-                     ${sortBy === opt.value ? "bg-blue-200 text-blue-700 font-medium" : "text-gray-700"}`}
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
-                    </div>
-
-                  )}
-                </div>
+                {isDropdownOpen && (
+                  <div className="absolute z-10 top-full left-0  bg-white border border-gray-300 rounded-md shadow-lg">
+                    {sortOptions.map((opt) => (
+                      <button
+                        key={opt.value}
+                        onClick={() => { setSortBy(opt.value); setIsDropdownOpen(false); }}
+                        className={`px-3 py-2 w-full text-sm text-start hover:bg-[#6c74631f] font-medium hover:text-[#6C7463] transition ${sortBy === opt.value ? "bg-[#6c74631f] text-[#6C7463] font-semibold" : "text-gray-700"}`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -519,76 +443,139 @@ export default function ReviewListPage({
             ) : reviews.length === 0 ? (
               <div className="text-center py-6 sm:py-10 text-gray-500">
                 <p className="font-medium">No reviews yet.</p>
-                <p className="text-xs sm:text-sm">
-                  Be the first to review this remedy!
-                </p>
+                <p className="text-xs sm:text-sm">Be the first to review this remedy!</p>
               </div>
             ) : (
               <>
-                {/* Lazy Loading Spinner — only for pagination */}
                 {isPageLoading && (
                   <div className="flex justify-center items-center py-3">
                     <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />
-                    <span className="ml-2 text-gray-500 text-sm">
-                      Loading more...
-                    </span>
+                    <span className="ml-2 text-gray-500 text-sm">Loading more...</span>
                   </div>
                 )}
 
                 {reviews.map((review) => {
-                  const userName =
-                    review.profiles?.first_name || review.profiles?.last_name
-                      ? `${review.profiles?.first_name || ""} ${review.profiles?.last_name?.[0] || ""
-                      }.`
+                  const userName = review.profiles?.first_name || review.profiles?.last_name
+                      ? `${review.profiles?.first_name || ""} ${review.profiles?.last_name?.[0] || ""}.`
                       : "Anonymous";
-                  const tags = [review.dosage, review.potency].filter(Boolean);
-                   const user_name = review.profiles?.user_name;
-                   const profile_image = review.profiles?.profile_img;
+
+                  const user_name = review.profiles?.user_name;
+                  const profile_image = review.profiles?.profile_img;
+                  const secondaryRemedies = review.secondary_remedies || [];
+
+                  const usageTags = processUsageTags([
+                    review.dosage,
+                    review.potency,
+                    review.potency_2,
+                    review.duration_used
+                  ]);
+
                   return (
                     <div
                       key={review.id}
                       onClick={() => router.push(`/user/${user_name}`)}
-                      className="border-b border-[#B5B6B1]/50 w-full p-4 sm:p-6 cursor-pointer" 
+                      className="border-b border-[#B5B6B1]/50 w-full py-4 sm:py-6 cursor-pointer sm:last:border-b-0 mobile-hide-last-two"
                     >
                       <div className="flex custom-320 flex-row items-start justify-between mb-2 sm:mb-3 gap-2 sm:gap-0">
                         <div className="flex items-start gap-2 sm:gap-3">
-                          {/* <div className="flex items-center justify-center w-11 h-11 sm:w-10 sm:h-10 rounded-full bg-[#4B544A] text-white font-semibold text-lg sm:text-base shadow-sm">
-                            {userName?.charAt(0).toUpperCase() || profile_image}
-                          </div> */}
-                          <div className="flex items-center justify-center w-11 h-11 sm:w-10 sm:h-10 rounded-full bg-[#4B544A] text-white font-semibold text-lg sm:text-base shadow-sm overflow-hidden">
-                       {profile_image ? (
-                          <img 
-                            src={profile_image} 
-                            alt={userName}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                            userName?.charAt(0).toUpperCase()
-                         )}
-                     </div>
-
+                          <div className="flex items-center justify-center w-11 h-11 sm:w-[44px] sm:h-[44px] rounded-full bg-[#4B544A] text-white font-semibold text-lg sm:text-base shadow-sm overflow-hidden">
+                            {profile_image ? (
+                              <img src={profile_image} alt={userName} className="w-full h-full object-cover" />
+                            ) : (
+                              userName.charAt(0).toUpperCase()
+                            )}
+                          </div>
                           <div>
-                            <p className="font-semibold text-[#0B0C0A] text-[16px] sm:text-base">
-                              {userName}
-                            </p>
+                            <p className="font-semibold text-[#0B0C0A] hover:underline text-[16px] sm:text-base">{userName}</p>
                             <div className="flex items-center gap-1">
                               {renderStars(review.star_count)}
-                              <span className="ml-1 text-[16px] text-[#20231E]">
-                                {review.star_count.toFixed(1)}
-                              </span>
+                              <span className="ml-1 text-[16px] text-[#20231E] font-medium">{review.star_count.toFixed(1)}</span>
                             </div>
                           </div>
                         </div>
-                       <p className="text-[14px] leading-[22px] text-[#83857D]">
-                          {formatTimeAgo(review.created_at)}
-                        </p>
+                        
+                        {/* <p className="text-[14px] text-[#83857D]">{formatTimeAgo(review.created_at)}</p> */}
+
+                        <div
+                          ref={menuRef}
+                          className="relative flex items-center gap-2"
+                          onClick={(e) => e.stopPropagation()} // prevent navigation
+                        >
+                          <p className="text-[14px] leading-[22px] font-medium text-[#83857D]">
+                            {formatTimeAgo(review.created_at)}
+                          </p>
+
+                          {/* 3-dot button */}
+                          <button
+                            onClick={() =>
+                              setOpenMenuId(openMenuId === review.id ? null : review.id)
+                            }
+                            className="p-1 rounded-full hover:bg-gray-100"
+                          >
+                            <span className="text-lg leading-none">
+                              <svg width="4" height="18" viewBox="0 0 4 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M2 0C0.9 0 0 0.9 0 2C0 3.1 0.9 4 2 4C3.1 4 4 3.1 4 2C4 0.9 3.1 0 2 0ZM2 14C0.9 14 0 14.9 0 16C0 17.1 0.9 18 2 18C3.1 18 4 17.1 4 16C4 14.9 3.1 14 2 14ZM2 7C0.9 7 0 7.9 0 9C0 10.1 0.9 11 2 11C3.1 11 4 10.1 4 9C4 7.9 3.1 7 2 7Z" fill="#41463B"/>
+                              </svg>
+                            </span>
+                          </button>
+
+                          {/* Dropdown */}
+                          {openMenuId === review.id && (
+                            <div className="absolute right-0 top-7 w-44 bg-white rounded-lg shadow-lg border border-gray-200 z-20 py-2">
+                              <button
+                                onClick={() => {
+                                  setOpenMenuId(null);
+                                  console.log("Edit", user_name);
+                                }}
+                                className="w-full px-4 py-2 flex items-center gap-3 text-sm text-[#20231E] hover:bg-gray-100 font-semibold"
+                              >
+                                <span className="w-[16px] h-[16px]">
+                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M11.1713 2.00039L9.838 3.33372H3.33333V12.6671H12.6667V6.16239L14 4.82906V13.3337C14 13.5105 13.9298 13.6801 13.8047 13.8051C13.6797 13.9302 13.5101 14.0004 13.3333 14.0004H2.66667C2.48986 14.0004 2.32029 13.9302 2.19526 13.8051C2.07024 13.6801 2 13.5105 2 13.3337V2.66706C2 2.49025 2.07024 2.32068 2.19526 2.19565C2.32029 2.07063 2.48986 2.00039 2.66667 2.00039H11.1713V2.00039ZM13.6567 1.40039L14.6 2.34439L8.472 8.47239L7.53067 8.47439L7.52933 7.52972L13.6567 1.40039V1.40039Z" fill="#20231E"/>
+                                  </svg>
+                                </span> 
+                                Edit
+                              </button>
+
+                              <button
+                                onClick={() => {
+                                  setOpenMenuId(null);
+                                  console.log("Delete", review.id);
+                                }}
+                                className="w-full px-4 py-2 flex items-center gap-3 text-sm text-[#20231E] hover:bg-gray-100 font-semibold"
+                              >
+                                <span className="w-[16px] h-[16px]">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M11.333 3.99967H14.6663V5.33301H13.333V13.9997C13.333 14.1765 13.2628 14.3461 13.1377 14.4711C13.0127 14.5961 12.8432 14.6663 12.6663 14.6663H3.33301C3.1562 14.6663 2.98663 14.5961 2.8616 14.4711C2.73658 14.3461 2.66634 14.1765 2.66634 13.9997V5.33301H1.33301V3.99967H4.66634V1.99967C4.66634 1.82286 4.73658 1.65329 4.8616 1.52827C4.98663 1.40325 5.1562 1.33301 5.33301 1.33301H10.6663C10.8432 1.33301 11.0127 1.40325 11.1377 1.52827C11.2628 1.65329 11.333 1.82286 11.333 1.99967V3.99967ZM11.9997 5.33301H3.99967V13.333H11.9997V5.33301ZM5.99967 7.33301H7.33301V11.333H5.99967V7.33301ZM8.66634 7.33301H9.99967V11.333H8.66634V7.33301ZM5.99967 2.66634V3.99967H9.99967V2.66634H5.99967Z" fill="#20231E"/>
+                                  </svg>
+                                </span> 
+                                Delete
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      {tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1 sm:gap-2 mb-2 sm:mb-3">
-                          {tags.map((tag, i) => (
+
+                      {/* UPDATED: Single grey container with increased spacing between bracketed remedies */}
+                      {secondaryRemedies.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-2 mb-3">
+                          <div className="text-[12px] px-3 py-1 rounded-[4px] bg-[#F1F2F0] text-[#41463B] font-medium border border-transparent tracking-wide">
+                            {secondaryRemedies.map((r, index) => (
+                              <span key={r.name} className="mr-[10px] sm:mb-0 mb-2">
+                                [{r.name}]
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Pill Containers - Usage details like "Pellet", "6C" */}
+                      {usageTags.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {usageTags.map((tag, i) => (
                             <span
-                              key={i}
-                              className="text-[12px] leading-5 font-medium sm:text-xs px-2 py-2 rounded-md text-[#2B2E28] border border-[#B5B6B1]"
+                              key={`${tag}-${i}`}
+                              className="text-[12px] font-medium px-3 py-1 rounded-md text-[#2B2E28] border border-[#B5B6B1] bg-white"
                             >
                               {tag}
                             </span>
@@ -596,42 +583,33 @@ export default function ReviewListPage({
                         </div>
                       )}
 
-                      {review.notes && (
-                        <p className="text-[#0B0C0A] text-[14px] leading-5 sm:text-sm ">
-                          {review.notes}
-                        </p>
-                      )}
+                      {review.notes && <p className="text-[#0B0C0A] text-[14px] leading-5 font-medium sm:text-sm">{review.notes}</p>}
                     </div>
                   );
                 })}
 
-                {/* Pagination */}
                 {totalReviews > reviewsPerPage && (
                   <div className="flex items-center justify-center gap-1 sm:gap-2 mt-6 sm:mt-8">
                     <button
                       onClick={() => handlePageChange(currentPage - 1)}
                       disabled={currentPage === 1}
-                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-[#F5F3ED] border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-[#F5F3ED] border border-gray-300 text-gray-700 disabled:opacity-50"
                     >
                       <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 rotate-90" />
                     </button>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1)
-                      .map((page) => (
-                        <button
-                          key={page}
-                          onClick={() => handlePageChange(page)}
-                          className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full text-xs sm:text-sm font-semibold ${currentPage === page
-                            ? "bg-[#6C7463] text-white"
-                            : "bg-[#F5F3ED] border border-gray-300 text-gray-700 hover:bg-gray-50"
-                            }`}
-                        >
-                          {page}
-                        </button>
-                      ))}
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <button
+                        key={page}
+                        onClick={() => handlePageChange(page)}
+                        className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full text-xs sm:text-sm font-semibold ${currentPage === page ? "bg-[#6C7463] text-white" : "bg-[#F5F3ED] border border-gray-300 text-gray-700 hover:bg-gray-50"}`}
+                      >
+                        {page}
+                      </button>
+                    ))}
                     <button
                       onClick={() => handlePageChange(currentPage + 1)}
                       disabled={currentPage === totalPages}
-                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-[#F5F3ED] border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-[#F5F3ED] border border-gray-300 text-gray-700 disabled:opacity-50"
                     >
                       <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 -rotate-90" />
                     </button>
@@ -642,13 +620,10 @@ export default function ReviewListPage({
           </div>
         </div>
 
-        {/* Filter Modal */}
         <ReviewFilterModal
           isOpen={isFilterModalOpen}
           onClose={() => setIsFilterModalOpen(false)}
-          onApply={(appliedFilters: ReviewFilters) =>
-            setFilters(appliedFilters)
-          }
+          onApply={(appliedFilters: ReviewFilters) => setFilters(appliedFilters)}
           totalResults={totalReviews}
           dosageOptions={filterOptions.potencies}
           formOptions={filterOptions.forms}
@@ -657,13 +632,9 @@ export default function ReviewListPage({
         />
       </section>
 
-      {/* Add Review Modal */}
       {isReviewFormOpen && (
         <AddReviewForm
-          onClose={() => {
-            setIsReviewFormOpen(false);
-            refreshReviews();
-          }}
+          onClose={() => { setIsReviewFormOpen(false); refreshReviews(); }}
           remedyId={remedy.id}
           remedyName={remedy.name}
           condition={ailmentContext?.name || "your condition"}

@@ -62,6 +62,12 @@ export interface Review {
   updated_at: string;
   // Related data when joined
   remedies?: Remedy;
+
+  secondary_remedies?: {
+    id: string;
+    name: string;
+  }[];
+
   profiles?: {
     id:string
     first_name: string;
@@ -91,4 +97,18 @@ export interface User {
   last_name: string;
   role: string;
   created_at: string;
+}
+
+export interface RemedyOption {
+  id: string;
+  name: string;
+  icon?: string;
+}
+
+export interface ReviewFilters {
+  rating: number[];
+  dosage: string[];
+  form: string[];
+  dateRange: 'all' | 'today' | 'week' | 'month' | 'year';
+  userName: string;
 }

@@ -408,46 +408,61 @@ const relatedRef = useRef<HTMLDivElement>(null!);
         </div>
 
         {/* Related Remedies Section */}
-        <section ref={relatedRef}>
-          <h3 className="text-2xl sm:text-3xl font-serif text-gray-800 mb-4 mt-2 md:mt-10 sm:mb-6 font-normal">
+        <section ref={relatedRef} className="sm:mb-0 mb-6">
+          <h3 className="text-4xl sm:text-4xl lg:text-[32px] xl:text-[40px] font-serif text-[#0B0C0A] mb-4 mt-2 md:mt-10 sm:mb-6 wrap-break-word font-normal">
             Related Remedies
           </h3>
 
           {filteredRelatedRemedies && filteredRelatedRemedies.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-7">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredRelatedRemedies.map((item) => (
                 <Link href={`/remedies/${item.slug}`} key={item.id}>
-                  <div className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow p-4 sm:p-5 flex flex-col gap-3 h-full cursor-pointer">
-                    {/* Header */}
-                    <div className="flex items-center gap-3">
-                      <span className="w-13 h-13 p-3 bg-[#F9F7F2] rounded-full flex items-center justify-center text-3xl flex-shrink-0 mr-3">{item.icon || "💊"}</span>
-                      <h4 className="font-semibold text-gray-800 text-base sm:text-lg break-words">
+                  <div className="bg-white rounded-[8px] hover:shadow-md transition-shadow pt-4 pr-2 pb-4 pl-4 flex items-start gap-4 h-full cursor-pointer">
+                    
+                    {/* Icon */}
+                    <div className="w-15 h-15 bg-[#F9F7F2] rounded-full flex items-center justify-center text-3xl flex-shrink-0">
+                      {item.icon || "💊"}
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex flex-col gap-1 min-w-0">
+                      
+                      {/* Title */}
+                      <h4 className="font-semibold text-[20px] leading-[28px] text-[#0B0C0A] truncate font-family-montserrat">
                         {item.name}
                       </h4>
-                    </div>
 
-                    {/* Rating */}
-                    <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-700 flex-wrap">
-                      {renderStars(item.average_rating || 0)}
-                      <span className="ml-1">{(item.average_rating || 0).toFixed(1)}</span>
-                      <span className="text-gray-500">
-                        ({item.review_count} {item.review_count === 1 ? "review" : "reviews"})
+
+                      {/* Rating */}
+                      <div className="flex items-center gap-1 mb-1 text-sm text-gray-700">
+                        {renderStars(item.average_rating || 0)}
+                        <span className="ml-1 font-medium">
+                          {(item.average_rating || 0).toFixed(1)}
+                        </span>
+                       <span className="font-montserrat font-medium text-[14px] leading-[22px] text-[#41463B]">
+                        ({item.review_count}{" "}
+                        {item.review_count === 1 ? "review" : "reviews"})
                       </span>
+                      </div>
+
+                      {/* Description */}
+                      <p className="font-montserrat font-medium text-[12px] leading-[20px] text-[#2B2E28] line-clamp-2">
+                        {item.description}
+                      </p>
                     </div>
 
-                    {/* Description */}
-                    <p className="text-xs sm:text-sm text-gray-600 leading-relaxed line-clamp-2">
-                      {item.description}
-                    </p>
                   </div>
                 </Link>
               ))}
             </div>
           ) : (
             <div className="text-center py-8 bg-gray-50 rounded-lg">
-              <p className="text-gray-500 text-sm sm:text-base">No related remedies found.</p>
+              <p className="text-gray-500 text-sm sm:text-base">
+                No related remedies found.
+              </p>
             </div>
           )}
+
         </section>
       </main>
 

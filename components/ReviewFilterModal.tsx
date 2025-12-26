@@ -1,14 +1,8 @@
 import React from 'react';
 import { X, Star } from 'lucide-react';
 import Image from 'next/image';
+import { Review, ReviewFilters } from '@/types';
 
-export interface ReviewFilters {
-  rating: number[];
-  dosage: string[];
-  form: string[];
-  dateRange: string;
-  userName: string;
-}
 
 interface ReviewFilterModalProps {
   isOpen: boolean;
@@ -18,8 +12,9 @@ interface ReviewFilterModalProps {
   dosageOptions: string[];
   formOptions: string[];
   currentFilters: ReviewFilters;
-  allReviews?: any[];
+  allReviews?: Review[];
 }
+
 
 export default function ReviewFilterModal({
   isOpen,
@@ -30,7 +25,7 @@ export default function ReviewFilterModal({
   formOptions,
   currentFilters,
   allReviews = [],
-}: any) {
+}: ReviewFilterModalProps) {
   const [localFilters, setLocalFilters] = React.useState<ReviewFilters>(currentFilters);
   const [filteredCount, setFilteredCount] = React.useState(totalResults);
 
@@ -47,7 +42,7 @@ export default function ReviewFilterModal({
       return;
     }
 
-    let filtered = allReviews.filter((review: any) => {
+    const filtered = allReviews.filter((review) => {
       // Filter by rating
       if (localFilters.rating.length > 0 && !localFilters.rating.includes(review.star_count)) {
         return false;
@@ -199,7 +194,7 @@ export default function ReviewFilterModal({
         <div className="relative p-6">
        <button
          onClick={onClose}
-       className="absolute top-6 right-2 text-[#83857D] transition"
+       className="absolute top-5 right-5 text-[#83857D] transition"
     >
     <X className="w-8 h-8" />
   </button>
@@ -207,10 +202,10 @@ export default function ReviewFilterModal({
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto px-6 pt-0 mt-3">
-          <h2 className="text-[28px] mb-5 font-normal text-[#0B0C0A]">Filters</h2>
+          <h2 className="text-[28px] sm:text-[32px] mb-5 font-normal text-[#0B0C0A]">Filters</h2>
           {/* Rating Section */}
           <div className="mb-6">
-            <p className="text-base font-semibold text-[#0B0C0A] mb-3">
+            <p className="text-[20px] font-medium text-[#0B0C0A] mb-3">
               Rating
             </p>
             <div className="space-y-2.5">
@@ -224,13 +219,13 @@ export default function ReviewFilterModal({
                       type="checkbox"
                       checked={localFilters.rating.includes(rating)}
                       onChange={() => toggleRating(rating)}
-                      className="w-5 h-5 border-2 border-[#B5B6B1] rounded cursor-pointer appearance-none
+                      className="w-[15px] h-[15px] border-2 border-[#B5B6B1] cursor-pointer appearance-none
                         checked:bg-[#83857D] checked:border-[#83857D]
                         focus:ring-2 focus:ring-[#83857D] focus:ring-offset-2 transition"
                     />
                     {localFilters.rating.includes(rating) && (
                       <svg
-                        className="w-3 h-3 text-white absolute left-1 pointer-events-none"
+                        className="w-3 h-3 text-white absolute left-0.5 pointer-events-none"
                         fill="none"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -250,11 +245,11 @@ export default function ReviewFilterModal({
 
           {/* Dosage Section */}
           <div className="mb-6">
-            <p className="text-base font-semibold text-[#0B0C0A] mb-3">
+            <p className="text-[20px] font-medium text-[#0B0C0A] mb-3">
               Dosage
             </p>
             <div className="space-y-2.5">
-              {dosageOptions.map((dosage: any) => (
+              {dosageOptions.map((dosage) => (
                 <label
                   key={dosage}
                   className="flex items-center gap-3 cursor-pointer group"
@@ -264,13 +259,13 @@ export default function ReviewFilterModal({
                       type="checkbox"
                       checked={localFilters.dosage.includes(dosage)}
                       onChange={() => toggleDosage(dosage)}
-                      className="w-5 h-5 border-2 border-[#B5B6B1] rounded cursor-pointer appearance-none
+                      className="w-[15px] h-[15px] border-2 border-[#B5B6B1] cursor-pointer appearance-none
                         checked:bg-[#83857D] checked:border-[#83857D]
                         focus:ring-2 focus:ring-[#83857D] focus:ring-offset-2 transition"
                     />
                     {localFilters.dosage.includes(dosage) && (
                       <svg
-                        className="w-3 h-3 text-white absolute left-1 pointer-events-none"
+                        className="w-3 h-3 text-white absolute left-0.5 pointer-events-none"
                         fill="none"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -290,9 +285,9 @@ export default function ReviewFilterModal({
 
           {/* Form Section */}
           <div className="mb-6">
-            <p className="text-base font-semibold text-[#0B0C0A] mb-3">Form</p>
+            <p className="text-[20px] font-medium text-[#0B0C0A] mb-3">Form</p>
             <div className="space-y-2.5">
-              {formOptions.map((form: any) => (
+              {formOptions.map((form) => (
                 <label
                   key={form}
                   className="flex items-center gap-3 cursor-pointer group"
@@ -302,13 +297,13 @@ export default function ReviewFilterModal({
                       type="checkbox"
                       checked={localFilters.form.includes(form)}
                       onChange={() => toggleForm(form)}
-                      className="w-5 h-5 border-2 border-[#B5B6B1] rounded cursor-pointer appearance-none
+                      className="w-[15px] h-[15px] border-2 border-[#B5B6B1] cursor-pointer appearance-none
                         checked:bg-[#83857D] checked:border-[#83857D]
                         focus:ring-2 focus:ring-[#83857D] focus:ring-offset-2 transition"
                     />
                     {localFilters.form.includes(form) && (
                       <svg
-                        className="w-3 h-3 text-white absolute left-1 pointer-events-none"
+                        className="w-3 h-3 text-white absolute left-0.5 pointer-events-none"
                         fill="none"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -335,7 +330,7 @@ export default function ReviewFilterModal({
 
           {/* Reviewer Name Section */}
           <div>
-            <label className="block text-base font-semibold text-[#0B0C0A] mb-3">
+            <label className="text-[20px] font-medium text-[#0B0C0A] mb-3 block">
               Reviewer Name
             </label>
             <input
@@ -349,7 +344,7 @@ export default function ReviewFilterModal({
                 }))
               }
               className="w-full px-3 py-2.5 text-[#0B0C0A] border-2 border-[#B5B6B1] rounded-md text-sm 
-                focus:outline-none  focus:ring-[#6C7463] focus:border-[#6C7463] transition
+                focus:outline-none  focus:ring-[#6C7463] focus:border-[#6C7463] transition font-medium
                 placeholder:text-black"
             />
           </div>
@@ -360,14 +355,14 @@ export default function ReviewFilterModal({
 
   <button
     onClick={clearAll}
-    className="text-[#2B2E28] font-medium  transition text-[14px] sm:text-[15px] cursor-pointer"
+    className="text-[#2B2E28] font-semibold transition text-[14px] sm:text-[15px] cursor-pointer rounded-full px-4 py-1.5 sm:py-2.5 hover:bg-[#F1F2F0]"
   >
     Clear all
   </button>
 
   <button
     onClick={handleApply}
-    className="bg-[#6C7463] hover:bg-[#5A6B5D] text-white px-6 py-1.5 sm:py-2.5 rounded-full font-medium transition text-[14px] sm:text-[15px]  cursor-pointer"
+    className="bg-[#6C7463] hover:bg-[#5A6B5D] text-white px-6 py-1.5 sm:py-2.5 rounded-full font-semibold transition text-[14px] sm:text-[15px]  cursor-pointer"
   >
     Show {filteredCount.toLocaleString()} results
   </button>
