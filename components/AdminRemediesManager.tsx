@@ -42,7 +42,7 @@ export default function AdminRemediesManager() {
 
       // Apply search filter
       if (searchTerm) {
-        query = query.or(`name.ilike.%${searchTerm}%,scientific_name.ilike.%${searchTerm}%`);
+        query = query.or(`name.ilike.%${searchTerm}%`);
       }
 
       const { data, error, count } = await query;
@@ -122,11 +122,10 @@ export default function AdminRemediesManager() {
       {/* Success/Error Message */}
       {message && (
         <div
-          className={`p-4 rounded-lg ${
-            message.type === 'success'
-              ? 'bg-green-50 text-green-800 border border-green-200'
-              : 'bg-red-50 text-red-800 border border-red-200'
-          }`}
+          className={`p-4 rounded-lg ${message.type === 'success'
+            ? 'bg-green-50 text-green-800 border border-green-200'
+            : 'bg-red-50 text-red-800 border border-red-200'
+            }`}
         >
           {message.text}
         </div>
@@ -174,9 +173,6 @@ export default function AdminRemediesManager() {
                   Remedy Name
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Scientific Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Rating
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -193,9 +189,9 @@ export default function AdminRemediesManager() {
                   <td className="px-6 py-4">
                     <div className="w-10 h-10 flex items-center justify-center">
                       {remedy.image_url ? (
-                        <Image 
-                          src={remedy.image_url} 
-                          alt={remedy.name} 
+                        <Image
+                          src={remedy.image_url}
+                          alt={remedy.name}
                           width={40}
                           height={40}
                           className="w-10 h-10 object-cover rounded-lg border border-gray-200"
@@ -216,16 +212,12 @@ export default function AdminRemediesManager() {
                     <div className="font-medium text-gray-900">{remedy.name}</div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-sm text-gray-600 italic">{remedy.scientific_name}</div>
-                  </td>
-                  <td className="px-6 py-4">
                     <div className="flex items-center">
-                      <span className="text-yellow-500 mr-1">★</span>
-                      <span className="text-sm font-medium text-gray-500">{remedy.average_rating.toFixed(1)}</span>
+                      <span className="text-sm font-medium text-gray-500 block w-[50px] text-center">{remedy.average_rating.toFixed(1)}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-sm text-gray-600">{remedy.review_count} reviews</span>
+                    <span className="text-sm text-gray-600 block w-[50px] text-center">{remedy.review_count}</span>
                   </td>
                   <td className="px-6 py-4 text-right space-x-2">
                     <Link
@@ -235,7 +227,7 @@ export default function AdminRemediesManager() {
                       Edit
                     </Link>
                     <button
-                     onClick={() => handleDelete(remedy.id!)}
+                      onClick={() => handleDelete(remedy.id!)}
                       disabled={loading}
                       className="text-red-600 hover:text-red-800 font-medium text-sm disabled:opacity-50"
                     >

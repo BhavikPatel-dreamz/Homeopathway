@@ -5,7 +5,7 @@ import { Metadata } from 'next';
 import { Ailment, Remedy } from '@/types';
 
 export const metadata: Metadata = {
-  title: "Search Results - Homeopathway",
+  title: "Search Results - HomeoPathway",
   description: "Search results for homeopathic remedies and ailments",
 };
 
@@ -52,7 +52,7 @@ async function SearchPageContent({ searchParams }: { searchParams: Promise<{ q?:
   }
 
   return (
-    <SearchResults 
+    <SearchResults
       ailments={ailments}
       remedies={remedies}
       searchQuery={query}

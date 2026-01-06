@@ -20,8 +20,8 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   title: {
-    default: "Homeopathway - Natural Homeopathic Remedies & Wellness Solutions",
-    template: "%s | Homeopathway"
+    default: "HomeoPathway - Natural Homeopathic Remedies & Wellness Solutions",
+    template: "%s | HomeoPathway"
   },
   description:
     "Discover effective homeopathic remedies for common ailments. Browse our comprehensive database of natural treatments, read user reviews, and find the right homeopathic solution for your health needs.",
@@ -37,9 +37,9 @@ export const metadata: Metadata = {
     "homeopathic medicine",
     "natural healing"
   ],
-  authors: [{ name: "Homeopathway Team" }],
-  creator: "Homeopathway",
-  publisher: "Homeopathway",
+  authors: [{ name: "HomeoPathway Team" }],
+  creator: "HomeoPathway",
+  publisher: "HomeoPathway",
   formatDetection: {
     email: false,
     address: false,
@@ -67,22 +67,22 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "/",
-    title: "Homeopathway - Natural Homeopathic Remedies & Wellness Solutions",
+    title: "HomeoPathway - Natural Homeopathic Remedies & Wellness Solutions",
     description:
       "Discover effective homeopathic remedies for common ailments. Browse our database to find the right solution.",
-    siteName: "Homeopathway",
+    siteName: "HomeoPathway",
     images: [
       {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Homeopathway - Natural Homeopathic Remedies",
+        alt: "HomeoPathway - Natural Homeopathic Remedies",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Homeopathway - Natural Homeopathic Remedies & Wellness Solutions",
+    title: "HomeoPathway - Natural Homeopathic Remedies & Wellness Solutions",
     description:
       "Discover effective homeopathic remedies for common ailments. Browse our comprehensive database of natural treatments.",
     images: ["/og-image.jpg"],
@@ -141,7 +141,7 @@ export default function RootLayout({
 //         <meta name="msapplication-TileColor" content="#10b981" />
 //         <meta name="apple-mobile-web-app-capable" content="yes" />
 //         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-//         <meta name="apple-mobile-web-app-title" content="Homeopathway" />
+//         <meta name="apple-mobile-web-app-title" content="HomeoPathway" />
 //          <meta
 //           name="viewport"
 //           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"

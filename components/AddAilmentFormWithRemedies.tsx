@@ -22,7 +22,6 @@ export default function AddAilmentForm() {
     name: '',
     icon: '',
     description: '',
-    personalizedApproach: '',
   });
 
   // Generate slug when name changes
@@ -50,34 +49,28 @@ export default function AddAilmentForm() {
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    
+
     console.log('=== ADD AILMENT SUBMISSION STARTED ===');
-    
+
     // Validate required fields
     if (!formData.name.trim()) {
       setError('Ailment name is required');
       setActiveTab('basic'); // Switch to basic tab to show the error
-     
-      return;
-    }
-    
-    if (!formData.icon.trim()) {
-      setError('Icon is required');
-      setActiveTab('basic');
-     
-      return;
-    }
-    
-    if (!formData.description.trim()) {
-      setError('Description is required');
-      setActiveTab('basic');
- 
+
       return;
     }
 
-    if (!formData.personalizedApproach.trim()) {
-      setError('Personalized approach is required');
+    if (!formData.icon.trim()) {
+      setError('Icon is required');
       setActiveTab('basic');
+
+      return;
+    }
+
+    if (!formData.description.trim()) {
+      setError('Description is required');
+      setActiveTab('basic');
+
       return;
     }
 
@@ -86,14 +79,14 @@ export default function AddAilmentForm() {
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (!user) {
         throw new Error('You must be logged in to add an ailment');
       }
-      
+
       // Generate final unique slug
       const finalSlug = await createUniqueSlugFromName(formData.name);
-      
+
       // Check if ailment with this name already exists
       console.log('Checking for existing ailment...');
       const { data: existingAilment, error: checkError } = await supabase
@@ -101,18 +94,18 @@ export default function AddAilmentForm() {
         .select('id, name')
         .eq('name', formData.name)
         .single();
-      
+
       if (checkError && checkError.code !== 'PGRST116') {
         // PGRST116 is "not found" which is what we want
         console.error('Error checking for existing ailment:', checkError);
         throw new Error('Failed to verify ailment uniqueness. Please try again.');
       }
-      
+
       if (existingAilment) {
         throw new Error(`An ailment named "${formData.name}" already exists. Please choose a different name.`);
       }
-    
-      
+
+
       const { data: ailmentData, error: insertError } = await supabase
         .from('ailments')
         .insert([
@@ -121,7 +114,6 @@ export default function AddAilmentForm() {
             slug: finalSlug,
             icon: formData.icon,
             description: formData.description,
-            personalized_approach: formData.personalizedApproach,
             created_by: user?.id,
           },
         ])
@@ -138,7 +130,7 @@ export default function AddAilmentForm() {
           description: formData.description,
           created_by: user?.id,
         });
-        
+
         // Provide more specific error messages
         if (insertError.code === '23505') {
           // Unique constraint violation
@@ -177,7 +169,7 @@ export default function AddAilmentForm() {
           console.error('Error creating remedy relations:', relationsError);
           throw relationsError;
         }
-        
+
         console.log('Remedy relations created successfully');
 
         // Update the remedies_count in the ailments table
@@ -197,7 +189,7 @@ export default function AddAilmentForm() {
       }
 
       console.log('=== ADD AILMENT SUBMISSION COMPLETED ===');
-      
+
       // Success - redirect back to ailments page
       router.push('/admin/ailments');
     } catch (err: unknown) {
@@ -220,7 +212,7 @@ export default function AddAilmentForm() {
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
       <div>
-        <Link 
+        <Link
           href="/admin/ailments"
           className="text-teal-600 hover:text-teal-700 flex items-center gap-2 mb-4"
         >
@@ -244,22 +236,20 @@ export default function AddAilmentForm() {
             <button
               type="button"
               onClick={() => setActiveTab('basic')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'basic'
-                  ? 'border-teal-500 text-teal-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'basic'
+                ? 'border-teal-500 text-teal-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
             >
               Basic Information
             </button>
             <button
               type="button"
               onClick={() => setActiveTab('remedies')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'remedies'
-                  ? 'border-teal-500 text-teal-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'remedies'
+                ? 'border-teal-500 text-teal-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
             >
               Related Remedies {selectedRemedyRelations.length > 0 && `(${selectedRemedyRelations.length})`}
             </button>
@@ -310,7 +300,7 @@ export default function AddAilmentForm() {
                 <label htmlFor="icon" className="block text-sm font-medium text-gray-700 mb-2">
                   Icon (Emoji) *
                 </label>
-                
+
                 {/* Current Selection Display */}
                 <div className="mb-3">
                   <div className="flex items-center gap-3 p-3 border border-gray-300 rounded-lg bg-gray-50">
@@ -348,7 +338,7 @@ export default function AddAilmentForm() {
                       {showEmojiPicker ? 'Hide' : 'Show'} Emoji Options
                     </button>
                   </div>
-                  
+
                   {showEmojiPicker && (
                     <div className="grid grid-cols-10 gap-2 max-h-48 overflow-y-auto">
                       {healthEmojis.map((emoji, index) => (
@@ -359,11 +349,10 @@ export default function AddAilmentForm() {
                             setFormData({ ...formData, icon: emoji });
                             setShowEmojiPicker(false);
                           }}
-                          className={`p-2 text-2xl rounded-lg border transition-all hover:bg-teal-50 hover:border-teal-300 ${
-                            formData.icon === emoji
-                              ? 'bg-teal-100 border-teal-500 ring-2 ring-teal-200'
-                              : 'bg-gray-50 border-gray-200 hover:shadow-sm'
-                          }`}
+                          className={`p-2 text-2xl rounded-lg border transition-all hover:bg-teal-50 hover:border-teal-300 ${formData.icon === emoji
+                            ? 'bg-teal-100 border-teal-500 ring-2 ring-teal-200'
+                            : 'bg-gray-50 border-gray-200 hover:shadow-sm'
+                            }`}
                           title={`Select ${emoji}`}
                         >
                           {emoji}
@@ -371,7 +360,7 @@ export default function AddAilmentForm() {
                       ))}
                     </div>
                   )}
-                  
+
                   {!showEmojiPicker && (
                     <div className="text-sm text-gray-500">
                       Click &ldquo;Show Emoji Options&rdquo; to browse available emojis
@@ -418,22 +407,7 @@ export default function AddAilmentForm() {
                 />
               </div>
 
-              {/* Personalized Approach Field */}
-              <div>
-                <label htmlFor="personalizedApproach" className="block text-sm font-medium text-gray-700 mb-2">
-                  Personalized Approach *
-                </label>
-                <textarea
-                  id="personalizedApproach"
-                  name="personalizedApproach"
-                  required
-                  value={formData.personalizedApproach}
-                  onChange={handleChange}
-                  rows={4}
-                  placeholder="Describe the personalized approach and treatment recommendations for this ailment..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 resize-none"
-                />
-              </div>
+
             </div>
           )}
 
@@ -461,9 +435,6 @@ export default function AddAilmentForm() {
                   <span className={formData.description ? 'text-green-600' : 'text-red-600'}>
                     Description: {formData.description ? '✓' : '✗'}
                   </span>
-                  <span className={formData.personalizedApproach ? 'text-green-600' : 'text-red-600'}>
-                    Approach: {formData.personalizedApproach ? '✓' : '✗'}
-                  </span>
                   <span className="text-blue-600">
                     Remedies: {selectedRemedyRelations.length}
                   </span>
@@ -471,7 +442,7 @@ export default function AddAilmentForm() {
               </div>
             </div>
           </div>
-          
+
           <div className="flex gap-4">
             <button
               type="button"
@@ -505,11 +476,6 @@ export default function AddAilmentForm() {
                 <p className="text-sm text-gray-600 mt-1">
                   {formData.description || 'Description will appear here...'}
                 </p>
-                {formData.personalizedApproach && (
-                  <p className="text-sm text-gray-600 mt-1 italic">
-                    <strong>Approach:</strong> {formData.personalizedApproach}
-                  </p>
-                )}
                 <p className="text-xs text-gray-500 mt-2">
                   {selectedRemedyRelations.length} remedies selected
                 </p>

@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     "muscle soreness treatment"
   ],
   openGraph: {
-    title: "Homeopathway - Find Natural Homeopathic Remedies",
+    title: "HomeoPathway - Find Natural Homeopathic Remedies",
     description: "Discover effective homeopathic treatments for common ailments. Browse remedies, read reviews, and find natural solutions for your health needs.",
     url: "/",
     images: [
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
         url: "/og-home.jpg",
         width: 1200,
         height: 630,
-        alt: "Homeopathway Homepage - Natural Remedies Database",
+        alt: "HomeoPathway Homepage - Natural Remedies Database",
       },
     ],
   },
@@ -67,45 +67,45 @@ export default async function Home() {
   const ailments = ailmentsData && ailmentsData.length > 0 ? ailmentsData : dummyAilments;
 
   const dummyTopRemedies = [
-    { 
-      name: "Nux Vomica", 
-      average_rating: 5, 
+    {
+      name: "Nux Vomica",
+      average_rating: 5,
       review_count: 234,
       rating: 5,
       reviewCount: 234,
       description: "Best for nausea and acidity, especially after...",
       indication: "Digestive issues"
     },
-    { 
-      name: "Belladonna", 
-      average_rating: 5, 
+    {
+      name: "Belladonna",
+      average_rating: 5,
       review_count: 324,
       rating: 5,
       reviewCount: 324,
       description: "Best for sudden, intense, throbbing pain that...",
       indication: "Fever and pain"
     },
-    { 
-      name: "Bryonia Alba", 
-      average_rating: 5, 
+    {
+      name: "Bryonia Alba",
+      average_rating: 5,
       review_count: 324,
       rating: 5,
       reviewCount: 324,
       description: "Best for dry coughs that worsen with movement.",
       indication: "Cough"
     },
-    { 
-      name: "Coffea Cruda", 
-      average_rating: 5, 
+    {
+      name: "Coffea Cruda",
+      average_rating: 5,
       review_count: 143,
       rating: 5,
       reviewCount: 143,
       description: "Best for sleeplessness due to an overactive...",
       indication: "Insomnia"
     },
-    { 
-      name: "Gelsemium Sempervirens", 
-      average_rating: 4, 
+    {
+      name: "Gelsemium Sempervirens",
+      average_rating: 4,
       review_count: 247,
       rating: 4,
       reviewCount: 247,
@@ -125,19 +125,19 @@ export default async function Home() {
     console.error("Error fetching top remedies:", remediesError);
   }
 
-  const topRemedies = remediesData && remediesData.length > 0 
+  const topRemedies = remediesData && remediesData.length > 0
     ? remediesData.map(remedy => ({
-        ...remedy,
-        rating: remedy.average_rating,
-        reviewCount: remedy.review_count,
-        indication: "General" // Default value since indication field doesn't exist in DB
-      }))
+      ...remedy,
+      rating: remedy.average_rating,
+      reviewCount: remedy.review_count,
+      indication: "General" // Default value since indication field doesn't exist in DB
+    }))
     : dummyTopRemedies;
 
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "Homeopathway",
+    "name": "HomeoPathway",
     "description": "Comprehensive database of homeopathic remedies and natural treatments",
     "url": process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
     "potentialAction": {
@@ -150,21 +150,21 @@ export default async function Home() {
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Homeopathway",
+      "name": "HomeoPathway",
       "description": "Leading platform for homeopathic remedies and natural health solutions"
     }
   };
-  
+
 
   return (
     <>
-    <script
-           type="application/ld+json"
-           dangerouslySetInnerHTML={{
-             __html: JSON.stringify(structuredData),
-           }}
-         />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData),
+        }}
+      />
       <HomePageContent initialAilments={ailments} initialTopRemedies={topRemedies} />
-     </>
+    </>
   );
 }

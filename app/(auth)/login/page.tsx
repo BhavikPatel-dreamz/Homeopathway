@@ -4,8 +4,8 @@ import { createClient } from '../../../lib/supabase/server';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Login - Access Your Homeopathway Account',
-  description: 'Sign in to your Homeopathway account to access personalized remedy recommendations, save your favorite treatments, and manage your health profile.',
+  title: 'Login - Access Your HomeoPathway Account',
+  description: 'Sign in to your HomeoPathway account to access personalized remedy recommendations, save your favorite treatments, and manage your health profile.',
   keywords: [
     'login',
     'sign in',
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     follow: true,
   },
   openGraph: {
-    title: 'Login - Access Your Homeopathway Account',
+    title: 'Login - Access Your HomeoPathway Account',
     description: 'Sign in to access personalized homeopathic remedy recommendations and manage your health profile.',
     url: '/login',
   },

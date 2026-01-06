@@ -16,9 +16,9 @@ const CustomSlider = ({ slides }: { slides: string[] }) => {
   // Auto-play functionality
   useEffect(() => {
     if (!isAutoPlaying) return;
-    
+
     const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => 
+      setCurrentIndex((prevIndex) =>
         prevIndex === slides.length - 1 ? 0 : prevIndex + 1
       );
     }, 3000);
@@ -35,13 +35,13 @@ const CustomSlider = ({ slides }: { slides: string[] }) => {
   return (
     <div className="relative overflow-hidden">
       {/* Slides Container */}
-      <div 
+      <div
         className="flex transition-all duration-1000 ease-in-out"
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}
       >
         {slides.map((slide, index) => (
-          <div 
-            key={index} 
+          <div
+            key={index}
             className="relative min-h-[500px] sm:min-h-[460px] md:min-h-[500px] w-full flex-shrink-0"
           >
             {/* Background Image */}
@@ -49,7 +49,7 @@ const CustomSlider = ({ slides }: { slides: string[] }) => {
               <img
                 className="object-cover h-full w-full"
                 src={slide}
-                alt={`Homeopathway slide ${index + 1}`}
+                alt={`HomeoPathway slide ${index + 1}`}
               />
             </div>
           </div>
@@ -62,11 +62,10 @@ const CustomSlider = ({ slides }: { slides: string[] }) => {
           <button
             key={index}
             onClick={() => goToSlide(index)}
-            className={`transition-all duration-300 rounded-full ${
-              index === currentIndex 
-                ? 'bg-white w-10 h-2' 
-                : 'bg-white/50 hover:bg-white/75 w-10 h-2'
-            }`}
+            className={`transition-all duration-300 rounded-full ${index === currentIndex
+              ? 'bg-white w-10 h-2'
+              : 'bg-white/50 hover:bg-white/75 w-10 h-2'
+              }`}
             aria-label={`Go to slide ${index + 1}`}
           />
         ))}
@@ -239,28 +238,28 @@ export default function HeroSlider() {
       <div className="absolute bottom-[60px] lg:bottom-[100px] w-full left-1/2 -translate-x-1/2 z-10 pr-[15px] pl-[15px]">
         <div ref={searchRef} className="relative max-w-[870px] mx-auto">
 
-            {/* Content */}
-            <div className="relative  pb-3 md:pb-10">
-              <div className="flex items-center flex-col lg:flex-row justify-center mb-6 max-w-[900px] mx-auto w-full">
-                <div className="w-28 h-28 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 mb-4 lg:mb-0 lg:mr-6 flex-shrink-0">
-                  <img
-                    className="w-full h-full object-contain cursor-pointer"
-                    src="/banner-home.svg"
-                    alt="Homeopathway Logo"
-                  />
-                </div>
-                <div className="text-white lg:text-left text-center">
-                  <h1 className="text-3xl sm:text-2xl md:text-3xl lg:text-[40px] mb-3 md:mb-4 leading-tight font-semibold">
-                    Your Path to Healing
-                  </h1>
-                  <h6 className="text-2xl sm:text-base md:text-lg lg:text-[24px] font-normal">
-                    Find trusted homeopathic solutions for your health concerns, backed by
-                    community reviews and expert guidance.
-                  </h6>
-                </div>
+          {/* Content */}
+          <div className="relative  pb-3 md:pb-10">
+            <div className="flex items-center flex-col lg:flex-row justify-center mb-6 max-w-[900px] mx-auto w-full">
+              <div className="w-28 h-28 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 mb-4 lg:mb-0 lg:mr-6 flex-shrink-0">
+                <img
+                  className="w-full h-full object-contain cursor-pointer"
+                  src="/banner-home.svg"
+                  alt="HomeoPathway Logo"
+                />
+              </div>
+              <div className="text-white lg:text-left text-center">
+                <h1 className="text-3xl sm:text-2xl md:text-3xl lg:text-[40px] mb-3 md:mb-4 leading-tight font-semibold">
+                  Your Path to Healing
+                </h1>
+                <h6 className="text-2xl sm:text-base md:text-lg lg:text-[24px] font-normal">
+                  Find trusted homeopathic solutions for your health concerns, backed by
+                  community reviews and expert guidance.
+                </h6>
               </div>
             </div>
-            
+          </div>
+
           <div className="relative">
             <img
               src="/search.svg"
@@ -364,8 +363,8 @@ export default function HeroSlider() {
                               {remedy.name}
                             </div>
                             <div className="text-sm text-gray-500 hover:text-gray-700 break-words whitespace-pre-wrap line-clamp-3">
-                            {remedy.description}
-                           </div>
+                              {remedy.description}
+                            </div>
                           </div>
                         </button>
                       ))}

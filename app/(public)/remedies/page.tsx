@@ -26,7 +26,7 @@ export const metadata: Metadata = {
         url: "/og-remedies.jpg",
         width: 1200,
         height: 630,
-        alt: "Homeopathway Remedies Database",
+        alt: "HomeoPathway Remedies Database",
       },
     ],
   },

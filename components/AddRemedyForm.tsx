@@ -16,13 +16,8 @@ export default function AddRemedyForm() {
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
-    scientific_name: '',
-    common_name: '',
     description: '',
     key_symptoms: '',
-    constitutional_type: '',
-    dosage_forms: '',
-    safety_precautions: '',
     icon: '',
     image_url: '',
   });
@@ -44,10 +39,6 @@ export default function AddRemedyForm() {
         .map(s => s.trim())
         .filter(s => s.length > 0);
 
-      const dosageForms = formData.dosage_forms
-        .split(',')
-        .map(s => s.trim())
-        .filter(s => s.length > 0);
 
       const { error: insertError } = await supabase
         .from('remedies')
@@ -55,13 +46,8 @@ export default function AddRemedyForm() {
           {
             name: formData.name,
             slug: slug,
-            scientific_name: formData.scientific_name || null,
-            common_name: formData.common_name || null,
             description: formData.description,
             key_symptoms: keySymptoms,
-            constitutional_type: formData.constitutional_type || null,
-            dosage_forms: dosageForms,
-            safety_precautions: formData.safety_precautions || null,
             icon: formData.icon || null,
             image_url: formData.image_url || null,
             created_by: user?.id,
@@ -83,7 +69,7 @@ export default function AddRemedyForm() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    
+
     setFormData(prev => ({
       ...prev,
       [name]: value,
@@ -111,7 +97,7 @@ export default function AddRemedyForm() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <Link 
+        <Link
           href="/admin/remedies"
           className="text-teal-600 hover:text-teal-700 flex items-center gap-2 mb-4"
         >
@@ -133,8 +119,6 @@ export default function AddRemedyForm() {
 
           {/* Basic Information */}
           <div className="border-b pb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
-            
             <div className="space-y-4">
               {/* Name */}
               <div>
@@ -171,38 +155,6 @@ export default function AddRemedyForm() {
                 <p className="text-sm text-gray-500 mt-1">Auto-generated from remedy name, but can be edited</p>
               </div>
 
-              {/* Scientific Name */}
-              <div>
-                <label htmlFor="scientific_name" className="block text-sm font-medium text-gray-700 mb-2">
-                  Scientific Name
-                </label>
-                <input
-                  type="text"
-                  id="scientific_name"
-                  name="scientific_name"
-                  value={formData.scientific_name}
-                  onChange={handleChange}
-                  placeholder="e.g., Arnica montana"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-                />
-              </div>
-
-              {/* Common Name */}
-              <div>
-                <label htmlFor="common_name" className="block text-sm font-medium text-gray-700 mb-2">
-                  Common Name
-                </label>
-                <input
-                  type="text"
-                  id="common_name"
-                  name="common_name"
-                  value={formData.common_name}
-                  onChange={handleChange}
-                  placeholder="e.g., Mountain Arnica, Deadly Nightshade"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-                />
-              </div>
-
               {/* Description */}
               <div>
                 <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
@@ -225,7 +177,7 @@ export default function AddRemedyForm() {
                 <label htmlFor="icon" className="block text-sm font-medium text-gray-700 mb-2">
                   Icon (Emoji)
                 </label>
-                
+
                 {/* Current Selection Display */}
                 <div className="mb-3">
                   <div className="flex items-center gap-3 p-3 border border-gray-300 rounded-lg bg-gray-50">
@@ -263,7 +215,7 @@ export default function AddRemedyForm() {
                       {showEmojiPicker ? 'Hide' : 'Show'} Emoji Options
                     </button>
                   </div>
-                  
+
                   {showEmojiPicker && (
                     <div className="grid grid-cols-12 gap-2 max-h-48 overflow-y-auto">
                       {healthEmojis.map((emoji, index) => (
@@ -274,11 +226,10 @@ export default function AddRemedyForm() {
                             setFormData({ ...formData, icon: emoji });
                             setShowEmojiPicker(false);
                           }}
-                          className={`p-2 text-xl rounded-lg border transition-all hover:bg-teal-50 hover:border-teal-300 ${
-                            formData.icon === emoji
-                              ? 'bg-teal-100 border-teal-500 ring-2 ring-teal-200'
-                              : 'bg-gray-50 border-gray-200 hover:shadow-sm'
-                          }`}
+                          className={`p-2 text-xl rounded-lg border transition-all hover:bg-teal-50 hover:border-teal-300 ${formData.icon === emoji
+                            ? 'bg-teal-100 border-teal-500 ring-2 ring-teal-200'
+                            : 'bg-gray-50 border-gray-200 hover:shadow-sm'
+                            }`}
                           title={`Select ${emoji}`}
                         >
                           {emoji}
@@ -286,7 +237,7 @@ export default function AddRemedyForm() {
                       ))}
                     </div>
                   )}
-                  
+
                   {!showEmojiPicker && (
                     <div className="text-sm text-gray-500">
                       Click &ldquo;Show Emoji Options&rdquo; to browse available emojis
@@ -335,9 +286,9 @@ export default function AddRemedyForm() {
                 </p>
                 {formData.image_url && (
                   <div className="mt-2">
-                    <Image 
-                      src={formData.image_url} 
-                      alt="Remedy preview" 
+                    <Image
+                      src={formData.image_url}
+                      alt="Remedy preview"
                       width={128}
                       height={128}
                       className="w-32 h-32 object-cover rounded-lg border border-gray-200"
@@ -353,8 +304,7 @@ export default function AddRemedyForm() {
 
           {/* Clinical Information */}
           <div className="border-b pb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Clinical Information</h3>
-            
+
             <div className="space-y-4">
               {/* Key Symptoms */}
               <div>
@@ -374,61 +324,9 @@ export default function AddRemedyForm() {
                 <p className="text-sm text-gray-500 mt-1">Separate symptoms with commas</p>
               </div>
 
-              {/* Constitutional Type */}
-              <div>
-                <label htmlFor="constitutional_type" className="block text-sm font-medium text-gray-700 mb-2">
-                  Constitutional Type
-                </label>
-                <input
-                  type="text"
-                  id="constitutional_type"
-                  name="constitutional_type"
-                  value={formData.constitutional_type}
-                  onChange={handleChange}
-                  placeholder="e.g., Nervous, Robust, Phlegmatic"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-                />
-              </div>
-
-              {/* Dosage Forms */}
-              <div>
-                <label htmlFor="dosage_forms" className="block text-sm font-medium text-gray-700 mb-2">
-                  Dosage Forms *
-                </label>
-                <input
-                  type="text"
-                  id="dosage_forms"
-                  name="dosage_forms"
-                  required
-                  value={formData.dosage_forms}
-                  onChange={handleChange}
-                  placeholder="30C, 200C, 6C, 1M"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-                />
-                <p className="text-sm text-gray-500 mt-1">Separate potencies with commas</p>
-              </div>
             </div>
           </div>
 
-          {/* Safety Information */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Safety Information</h3>
-            
-            <div>
-              <label htmlFor="safety_precautions" className="block text-sm font-medium text-gray-700 mb-2">
-                Safety Precautions
-              </label>
-              <textarea
-                id="safety_precautions"
-                name="safety_precautions"
-                value={formData.safety_precautions}
-                onChange={handleChange}
-                rows={3}
-                placeholder="List any contraindications, warnings, or special precautions..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 resize-none"
-              />
-            </div>
-          </div>
 
           {/* Action Buttons */}
           <div className="flex gap-4 pt-4">
@@ -458,9 +356,9 @@ export default function AddRemedyForm() {
               {/* Icon/Image Section */}
               <div className="flex-shrink-0">
                 {formData.image_url ? (
-                  <Image 
-                    src={formData.image_url} 
-                    alt={formData.name} 
+                  <Image
+                    src={formData.image_url}
+                    alt={formData.name}
                     width={80}
                     height={80}
                     className="w-20 h-20 object-cover rounded-lg border border-gray-200"
@@ -478,16 +376,11 @@ export default function AddRemedyForm() {
                   </div>
                 )}
               </div>
-              
+
               {/* Content Section */}
               <div className="flex-1">
                 <h4 className="text-xl font-bold text-gray-900">{formData.name}</h4>
-                {formData.scientific_name && (
-                  <p className="text-sm italic text-gray-600 mt-1">{formData.scientific_name}</p>
-                )}
-                {formData.common_name && (
-                  <p className="text-sm text-gray-600">Common: {formData.common_name}</p>
-                )}
+
                 {formData.description && (
                   <p className="text-gray-700 mt-3">{formData.description}</p>
                 )}
@@ -496,8 +389,8 @@ export default function AddRemedyForm() {
                     <p className="text-sm font-semibold text-gray-700 mb-2">Key Symptoms:</p>
                     <div className="flex flex-wrap gap-2">
                       {formData.key_symptoms.split(',').map((symptom, idx) => (
-                        <span 
-                          key={idx} 
+                        <span
+                          key={idx}
                           className="px-3 py-1 bg-teal-100 text-teal-800 rounded-full text-xs"
                         >
                           {symptom.trim()}
@@ -506,21 +399,7 @@ export default function AddRemedyForm() {
                     </div>
                   </div>
                 )}
-                {formData.dosage_forms && (
-                  <div className="mt-3">
-                    <p className="text-sm font-semibold text-gray-700 mb-2">Available Potencies:</p>
-                    <div className="flex gap-2">
-                      {formData.dosage_forms.split(',').map((dosage, idx) => (
-                        <span 
-                          key={idx} 
-                          className="px-2 py-1 bg-gray-200 text-gray-700 rounded text-xs font-mono"
-                        >
-                          {dosage.trim()}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
+
               </div>
             </div>
           </div>

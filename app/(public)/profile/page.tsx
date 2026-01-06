@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Account Settings - Manage Your Homeopathway Profile',
-  description: 'Manage your Homeopathway account settings, update personal information, change password, and customize your wellness preferences.',
+  title: 'Account Settings - Manage Your HomeoPathway Profile',
+  description: 'Manage your HomeoPathway account settings, update personal information, change password, and customize your wellness preferences.',
   keywords: [
     'account settings',
     'profile management',
@@ -46,17 +46,17 @@ export default async function ProfilePage() {
   }
 
   const { profile } = await getUserProfile(userId);
-  
+
 
   return (
-    
-    <AccountSettings 
+
+    <AccountSettings
       user={{
         id: userId,
         email: user?.email || '',
         first_name: profile?.first_name || '',
         last_name: profile?.last_name || '',
-        profile_img:profile?.profile_img || ""
+        profile_img: profile?.profile_img || ""
       }}
     />
   );
