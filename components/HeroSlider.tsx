@@ -8,65 +8,131 @@ import { checkIsUserLoggedIn } from "@/lib/userUtils";
 import UserAvatar from "./UserAvatar";
 import Link from "next/link";
 
-// Custom Slider Component
+// Custom Slider Component (LOOP ENABLED)
+// Custom Slider Component (FULLY FIXED LOOP)
 const CustomSlider = ({ slides }: { slides: string[] }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(1);
+  const [isAnimating, setIsAnimating] = useState(true);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
-  // Auto-play functionality
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
+
+  const SWIPE_THRESHOLD = 50;
+
+  // clone slides
+  const extendedSlides = [
+    slides[slides.length - 1],
+    ...slides,
+    slides[0],
+  ];
+
+  // autoplay
   useEffect(() => {
     if (!isAutoPlaying) return;
 
     const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) =>
-        prevIndex === slides.length - 1 ? 0 : prevIndex + 1
-      );
+      setCurrentIndex((prev) => prev + 1);
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [isAutoPlaying, slides.length]);
+  }, [isAutoPlaying]);
 
-  const goToSlide = (index: number) => {
-    setCurrentIndex(index);
+  const pauseAutoPlay = () => {
     setIsAutoPlaying(false);
     setTimeout(() => setIsAutoPlaying(true), 8000);
   };
 
+  // transition end handler (KEY FIX)
+  const handleTransitionEnd = () => {
+    if (currentIndex === 0) {
+      setIsAnimating(false);
+      setCurrentIndex(slides.length);
+    }
+
+    if (currentIndex === slides.length + 1) {
+      setIsAnimating(false);
+      setCurrentIndex(1);
+    }
+  };
+
+  // re-enable animation after silent jump
+  useEffect(() => {
+    if (!isAnimating) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setIsAnimating(true));
+      });
+    }
+  }, [isAnimating]);
+
+  // swipe handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStartX.current === null || touchEndX.current === null) return;
+
+    const deltaX = touchStartX.current - touchEndX.current;
+
+    if (Math.abs(deltaX) > SWIPE_THRESHOLD) {
+      setCurrentIndex((prev) => (deltaX > 0 ? prev + 1 : prev - 1));
+      pauseAutoPlay();
+    }
+
+    touchStartX.current = null;
+    touchEndX.current = null;
+  };
+
   return (
-    <div className="relative overflow-hidden">
-      {/* Slides Container */}
+    <div
+      className="relative overflow-hidden touch-pan-y"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Slides */}
       <div
-        className="flex transition-all duration-1000 ease-in-out"
+        className={`flex ${isAnimating ? "transition-transform duration-1000 ease-in-out" : ""
+          }`}
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+        onTransitionEnd={handleTransitionEnd}
       >
-        {slides.map((slide, index) => (
+        {extendedSlides.map((slide, index) => (
           <div
             key={index}
-            className="relative min-h-[500px] sm:min-h-[460px] md:min-h-[500px] w-full flex-shrink-0"
+            className="relative h-full
+              [@media(min-width:330px)_and_(max-width:400px)]:min-h-[540px]
+              [@media(min-width:300px)_and_(max-width:330px)]:min-h-[600px]
+              min-h-[500px] sm:min-h-[460px] md:min-h-[500px]
+              w-full flex-shrink-0"
           >
-            {/* Background Image */}
-            <div className="absolute top-0 left-0 w-full h-full">
-              <img
-                className="object-cover h-full w-full"
-                src={slide}
-                alt={`HomeoPathway slide ${index + 1}`}
-              />
-            </div>
+            <img
+              src={slide}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+            />
           </div>
         ))}
       </div>
 
-      {/* Dots Navigation */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
+      {/* Dots (desktop only) */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 hidden md:flex space-x-2 z-10">
         {slides.map((_, index) => (
           <button
             key={index}
-            onClick={() => goToSlide(index)}
-            className={`transition-all duration-300 rounded-full ${index === currentIndex
-              ? 'bg-white w-10 h-2'
-              : 'bg-white/50 hover:bg-white/75 w-10 h-2'
+            onClick={() => {
+              setCurrentIndex(index + 1);
+              pauseAutoPlay();
+            }}
+            className={`rounded-full transition-all duration-300 ${currentIndex === index + 1
+              ? "bg-white w-10 h-2"
+              : "bg-white/50 w-10 h-2"
               }`}
-            aria-label={`Go to slide ${index + 1}`}
           />
         ))}
       </div>
@@ -235,21 +301,21 @@ export default function HeroSlider() {
 
 
       {/* Searchbar with Auto-Suggestions */}
-      <div className="absolute bottom-[60px] lg:bottom-[100px] w-full left-1/2 -translate-x-1/2 z-10 pr-[15px] pl-[15px]">
-        <div ref={searchRef} className="relative max-w-[870px] mx-auto">
+      <div className="absolute bottom-[17px] lg:bottom-[75px] w-full left-1/2 -translate-x-1/2 z-10 pr-[15px] pl-[15px]">
+        <div ref={searchRef} className="relative max-w-[930px] mx-auto">
 
           {/* Content */}
-          <div className="relative  pb-3 md:pb-10">
-            <div className="flex items-center flex-col lg:flex-row justify-center mb-6 max-w-[900px] mx-auto w-full">
-              <div className="w-28 h-28 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 mb-4 lg:mb-0 lg:mr-6 flex-shrink-0">
+          <div className="relative  pb-0 md:pb-5">
+            <div className="flex items-center flex-col lg:flex-row justify-center mb-6  max-w-[930px] mx-auto w-full bg-[#0000004D] md:p-4 p-2">
+              <div className="w-35 h-35 md:w-40 md:h-40 lg:w-47.5 lg:h-47.5 mb-4 lg:mb-0 lg:mr-6 flex-shrink-0">
                 <img
                   className="w-full h-full object-contain cursor-pointer"
-                  src="/banner-home.svg"
+                  src="/homeopathway-logo.svg"
                   alt="HomeoPathway Logo"
                 />
               </div>
               <div className="text-white lg:text-left text-center">
-                <h1 className="text-3xl sm:text-2xl md:text-3xl lg:text-[40px] mb-3 md:mb-4 leading-tight font-semibold">
+                <h1 className="text-3xl sm:text-2xl md:text-3xl lg:text-[40px] mb-3 md:mb-4 leading-tight font-normal">
                   Your Path to Healing
                 </h1>
                 <h6 className="text-2xl sm:text-base md:text-lg lg:text-[24px] font-normal">
@@ -269,7 +335,7 @@ export default function HeroSlider() {
             <input
               type="text"
               placeholder="Search for ailments like 'headache' or 'anxiety' or search for remedies like 'arnica' or 'belladonna'"
-              className="w-full pl-12 pr-12 py-3 lg:py-6 bg-white rounded-[8px] text-[#0B0C0A] placeholder-[#41463B] focus:outline-none"
+              className="w-full pl-12 pr-3 sm:pr-12 py-3 lg:py-6 bg-white rounded-[8px] text-[#0B0C0A] placeholder-[#41463B] focus:outline-none"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
