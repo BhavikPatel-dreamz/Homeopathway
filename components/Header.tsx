@@ -22,13 +22,13 @@ export default function Header() {
   }, []);
 
   // ✅ if inner page → show HeaderInner only
-  if (!isHome ) {
+  if (!isHome) {
     return <HeaderInner />;
   }
 
   // ✅ if home page → show full Header
   return (
-    <header className='fixed top-0 left-0 w-full px-6 py-[17px] text-white z-50 '>
+    <header className='sticky top-0 left-0 w-full px-6 py-[17px] text-white z-50 '>
       <div className="max-w-7xl mx-auto px-0 lg:px-5 flex justify-end items-center">
         <div className="flex items-center gap-3">
           {isLoggedIn ? (

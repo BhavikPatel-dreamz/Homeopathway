@@ -10,11 +10,11 @@ import UserAvatar from "./UserAvatar";
 import SaveButton from "./SaveButton";
 
 export default function HeaderInner() {
-  const [isSticky, setIsSticky] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [hasShadow, setHasShadow] = useState(false);
 
-  // ✅ Check Supabase Auth State
+  // ✅ Supabase auth
   useEffect(() => {
     const fetchUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -23,58 +23,46 @@ export default function HeaderInner() {
 
     fetchUser();
 
-    // Listen for login/logout changes
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
 
-    return () => {
-      listener.subscription.unsubscribe();
-    };
+    return () => listener.subscription.unsubscribe();
   }, []);
 
-  // ✅ Handle sticky header on scroll
+  // ✅ Only for visual effects (no layout changes)
   useEffect(() => {
-    const handleScroll = () => setIsSticky(window.scrollY > 100);
+    const handleScroll = () => setHasShadow(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <header
-      className={`bg-[#f5f1e8] w-full px-4 lg:px-6 py-[16px] text-white z-50 transition-all duration-500 ${
-        isSticky ? "fixed top-0 left-0 shadow-md z-[1000]" : "relative"
-      }`}
+      className={`sticky top-0 z-50 w-full bg-[#f5f1e8] px-4 lg:px-6 py-[16px] transition-shadow duration-300 ${hasShadow ? "shadow-md" : ""
+        }`}
     >
       <div className="max-w-7xl mx-auto px-0 lg:px-5 flex justify-between items-center">
-        {/*------ Main Logo -----*/}
         <Logo />
-
-        {/*------ Searchbar -----*/}
         <SearchBar />
 
-        {/*------ Header Buttons -----*/}
         <div className="flex items-center gap-2">
-          {/* Share Button */}
           <button
             onClick={() => setShowShareModal(true)}
-            className="flex items-center justify-center w-[25px] h-[25px] md:w-[35px] md:h-[35px] lg:w-[44px] lg:h-[44px] cursor-pointer hover:bg-gray-200 rounded-full transition-colors"
+            className="flex items-center justify-center w-[25px] h-[25px] md:w-[35px] md:h-[35px] lg:w-[44px] lg:h-[44px] hover:bg-gray-200 rounded-full transition-colors"
             title="Share this page"
           >
             <Image height={20} width={20} src="/share-icon.svg" alt="Share" />
           </button>
 
-          {/* ✅ Show SaveButton only if logged in */}
           {user && (
             <SaveButton className="w-[25px] h-[25px] md:w-[35px] md:h-[35px] lg:w-[44px] lg:h-[44px]" />
           )}
 
-          {/* User Avatar (always visible) */}
-          <UserAvatar className="w-[28px] h-[28px] md:w-[35px] md:h-[35px] lg:w-[44px] lg:h-[44px] text-[12px] lg:text-[16px] font-semibold cursor-pointer hover:opacity-80 transition-opacity" />
+          <UserAvatar className="w-[28px] h-[28px] md:w-[35px] md:h-[35px] lg:w-[44px] lg:h-[44px]" />
         </div>
       </div>
 
-      {/* Share Modal */}
       <ShareModal isOpen={showShareModal} onClose={() => setShowShareModal(false)} />
     </header>
   );
