@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabaseClient';
@@ -26,6 +26,33 @@ export default function AdminRemediesManager() {
   const [itemsPerPage] = useState(50);
   const [totalRemedies, setTotalRemedies] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [importProgress, setImportProgress] = useState<number>(0);
+   const [importing, setImporting] = useState(false);
+
+
+  const handleExport = () => {
+    window.location.href = '/api/admin/remedies/export';
+  };
+
+
+  const handleImport = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const res = await fetch('/api/admin/remedies/import', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!res.ok) {
+      throw new Error('Import failed');
+    }
+
+    // 🔁 refresh remedies list after import
+    await fetchRemedies();
+  };
+
 
   const fetchRemedies = useCallback(async () => {
     setLoading(true);
@@ -109,15 +136,51 @@ export default function AdminRemediesManager() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Manage Remedies</h2>
-          <p className="text-gray-600 mt-1">Add, edit, or remove homeopathic remedies</p>
+          <p className="text-gray-600 mt-1">
+            Add, edit, or remove homeopathic remedies
+          </p>
         </div>
-        <Link
-          href="/admin/remedies/add"
-          className="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors font-medium"
-        >
-          + Add Remedy
-        </Link>
+
+        <div className="flex gap-3 items-center">
+          {/* EXPORT */}
+          <button
+            onClick={handleExport}
+            className="px-4 py-2 border border-gray-400 text-gray-800 bg-white rounded-lg text-sm font-medium hover:bg-gray-50"
+          >
+            Export XLSX
+          </button>
+
+          {/* IMPORT */}
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="px-4 py-2 border border-gray-400 text-gray-800 bg-white rounded-lg text-sm font-medium hover:bg-gray-50"
+          >
+            Import XLSX
+          </button>
+
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".xlsx"
+            className="hidden"
+            onChange={(e) => {
+              if (e.target.files?.[0]) {
+                handleImport(e.target.files[0]);
+              }
+            }}
+          />
+
+          {/* ADD REMEDY */}
+          <Link
+            href="/admin/remedies/add"
+            className="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors font-medium"
+          >
+            + Add Remedy
+          </Link>
+        </div>
       </div>
+
 
       {/* Success/Error Message */}
       {message && (
@@ -131,6 +194,21 @@ export default function AdminRemediesManager() {
         </div>
       )}
 
+
+      {importing && (
+        <div className="bg-white border rounded-lg p-4">
+          <div className="flex justify-between text-sm text-gray-600 mb-2">
+            <span>Importing XML...</span>
+            <span>{importProgress}%</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div
+              className="bg-teal-600 h-2 rounded-full transition-all duration-300"
+              style={{ width: `${importProgress}%` }}
+            />
+          </div>
+        </div>
+      )}
       {/* Search and Stats */}
       <div className="bg-white rounded-lg shadow-sm p-4">
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
