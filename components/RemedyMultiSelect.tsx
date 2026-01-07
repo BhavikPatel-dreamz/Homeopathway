@@ -37,10 +37,10 @@ export default function RemedyMultiSelect({
     query.trim().length === 0
       ? []
       : remedies.filter((r) => {
-          if (!r.id || !r.name) return false;
-          if (r.id === primaryRemedyId) return false;
-          return r.name.toLowerCase().includes(query.toLowerCase());
-        });
+        if (!r.id || !r.name) return false;
+        if (r.id === primaryRemedyId) return false;
+        return r.name.toLowerCase().includes(query.toLowerCase());
+      });
 
   /* ---------------- Select remedy ---------------- */
   const selectRemedy = (remedy: RemedyOption) => {
@@ -116,67 +116,66 @@ export default function RemedyMultiSelect({
 
       {/* DROPDOWN (ONLY WHILE SEARCHING) */}
       {query && (
-      <div
-        className="
+        <div
+          className="
           border border-[#E6E6E3]
-          rounded-[10px]
+          rounded-[12px]
           bg-white
           shadow-[0px_0px_12px_-4px_rgba(26,26,26,0.16)]
           overflow-hidden
         "
-      >
-        {/* Scrollable area */}
-        <div
-          className="
+        >
+          {/* Scrollable area */}
+          <div
+            className="
             max-h-[72px]
             overflow-y-auto
             pl-1 pr-4 py-1
             scrollbar
           "
-        >
-          {loading && (
-            <p className="text-sm text-center py-3 text-[#8E8E8A]">
-              Loading remedies…
-            </p>
-          )}
+          >
+            {loading && (
+              <p className="text-sm text-center py-3 text-[#8E8E8A]">
+                Loading remedies…
+              </p>
+            )}
 
-          {!loading && filtered.length === 0 && (
-            <p className="text-sm text-center py-3 text-[#8E8E8A]">
-              No remedies found
-            </p>
-          )}
+            {!loading && filtered.length === 0 && (
+              <p className="text-sm text-center py-3 text-[#8E8E8A]">
+                No remedies found
+              </p>
+            )}
 
-          {filtered.map((r, index) => (
-            <button
-              key={r.id}
-              type="button"
-              onClick={() => selectRemedy(r)}
-              className={`
+            {filtered.map((r, index) => (
+              <button
+                key={r.id}
+                type="button"
+                onClick={() => selectRemedy(r)}
+                className={`
                 w-full
                 flex items-center gap-3
                 px-2 py-1
                 rounded-[8px]
                 text-left
                 transition
-                ${
-                  index === activeIndex
+                ${index === activeIndex
                     ? "bg-[#F3F4F0] border border-[#6C7463]"
                     : "hover:bg-[#F7F7F5]"
-                }
+                  }
               `}
-            >
-              <span className="w-[24px] h-[24px] bg-[#F9F7F2] rounded-[45px] flex items-center justify-center text-[16px]">
-                {r.icon || "🌿"}
-              </span>
+              >
+                <span className="w-[24px] h-[24px] bg-[#F9F7F2] rounded-[45px] flex items-center justify-center text-[16px]">
+                  {r.icon || "🌿"}
+                </span>
 
-              <span className="flex-1 font-medium text-[16px] leading-[24px] text-[#0B0C0A]">
-                {r.name}
-              </span>
-            </button>
-          ))}
+                <span className="flex-1 font-medium text-[16px] leading-[24px] text-[#0B0C0A]">
+                  {r.name}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
-    )}
+      )}
 
 
       {/* SELECTED CHIPS (MATCH IMAGE) */}
@@ -188,8 +187,8 @@ export default function RemedyMultiSelect({
               className="
                 flex items-center gap-1
                 px-3 py-1.5
-                rounded-[6px]
-                bg-[#F1F2F0]
+                rounded-[4px]
+                bg-[#F5F3ED]
                 font-medium
                 text-[14px]
                 leading-[22px]

@@ -252,7 +252,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
 
   return (
     <div className="fixed inset-0 bg-[rgba(0,0,0,0.6)] backdrop-blur-[5.5px] flex items-center justify-center p-3 sm:p-4 z-[9999]">
-      <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-lg relative max-h-[95vh] overflow-y-auto">
+      <div className="bg-white rounded-xl w-full max-w-lg relative max-h-[95vh] overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={handleClose}
@@ -263,7 +263,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
         </button>
 
         {/* Content */}
-        <div className="py-5 px-4 pt-8 sm:p-10 sm:pt-12">
+        <div className="pb-5 px-6 pt-8 sm:pt-10 sm:pt-15">
           {/* Header */}
           <div className="mb-2 pr-8">
             <h2 className="font-kingred font-normal text-[22px] sm:text-[26px] lg:text-[32px] leading-[30px] sm:leading-[34px] lg:leading-[40px] text-[#0B0C0A] break-words">
@@ -286,14 +286,14 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
             <div className="space-y-2">
 
               {/* Line 1 */}
-              <p className="font-montserrat font-medium text-[20px] leading-[28px] text-[#4B544A]">
+              <p className="font-montserrat font-medium sm:text-[20px] text-[16px] leading-[28px] text-[#4B544A]">
                 Your Primary Remedy:{" "}
-                <span className="font-montserrat font-medium text-[16px] leading-[24px] text-[#41463B] mb-3">{remedyName}</span>
+                <span className="font-montserrat font-medium sm:text-[16px] text-[14px] leading-[24px] text-[#41463B] mb-3">{remedyName}</span>
 
               </p>
 
               {/* Line 2 */}
-              <p className="font-montserrat font-medium text-[16px] leading-[24px] text-[#41463B]">
+              <p className="font-montserrat font-medium sm:text-[16px] text-[14px] leading-[24px] text-[#41463B]">
                 Used in combination with{" "}
                 <span className="font-montserrat font-normal text-[12px] leading-[20px] text-[#41463B]">
                   (optional)
@@ -334,11 +334,11 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
 
           {/* Step 2: Potency - Multi-Remedy Support */}
           {step === 2 && (
-            <div className="flex flex-col gap-[40px]">
+            <div className="flex flex-col gap-[16px]">
               {allRemedies.map(rem => (
                 <div key={rem.id} className="flex flex-col gap-[16px]">
 
-                  <p className="text-[#41463B] text-base font-medium">
+                  <p className="text-[#41463B] sm:text-base text-sm font-medium">
                     What was the potency?
                   </p>
 
@@ -348,15 +348,19 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                       <button
                         key={type}
                         onClick={() => handlePotencyType(rem.id, type)}
-                        className={`px-4 py-2 rounded-lg border transition-all font-medium text-sm text-[#41463B] ${remedyExtras[rem.id]?.potencyType === type
-                            ? 'border-[#0B0C0A] border-2 text-[#0B0C0A]'
-                            : 'border-[#B5B6B1] text-[#41463B]'
+                        className={`px-4 py-2 sm:rounded-lg rounded-md border transition-all font-medium sm:text-sm text-xs text-[#41463B] ${remedyExtras[rem.id]?.potencyType === type
+                          ? 'border-[#6C7463] border outline-1 outline-[#6C7463] text-[#0B0C0A]'
+                          : 'border-[#B5B6B1] text-[#41463B]'
                           }`}
 
                       >
                         {type}
                         {remedyExtras[rem.id]?.potencyType === type && (
-                          <span className="ml-2">✓</span>
+                          <span className="ml-2 inline-flex">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="11" viewBox="0 0 15 11" fill="none">
+                              <path d="M5.30333 7.66083L12.9633 0L14.1425 1.17833L5.30333 10.0175L0 4.71417L1.17833 3.53583L5.30333 7.66083Z" fill="#0B0C0A" />
+                            </svg>
+                          </span>
                         )}
                       </button>
                     ))}
@@ -367,11 +371,11 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                     placeholder="Free text...."
                     value={remedyExtras[rem.id]?.notes || ''}
                     onChange={e => handleNotes(rem.id, e.target.value)}
-                    className="w-full p-4 border border-[#B5B6B1] rounded-xl min-h-[120px] text-[#0B0C0A] placeholder:text-[#9A9A96]"
+                    className="w-full p-4 border-2 border-[#6C7463] sm:text-base text-xs sm:rounded-xl rounded-md min-h-[90px] text-[#0B0C0A] placeholder:text-[#9A9A96]"
                   />
 
                   {/* Remedy Name */}
-                  <p className="text-sm font-semibold text-[#0B0C0A]">
+                  <p className="sm:text-base text-sm font-medium text-[#41463B]">
                     {rem.name}:
                   </p>
 
@@ -381,9 +385,9 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                       <button
                         key={pot}
                         onClick={() => handleSpecificPotency(rem.id, pot)}
-                        className={`px-[12px] py-[8px] rounded-lg border text-sm font-medium ${remedyPotencies[rem.id] === pot
-                            ? 'border-[#0B0C0A] border-2 text-[#0B0C0A]'
-                            : 'border-[#D1D1CB] text-[#41463B]'
+                        className={`px-[12px] py-[8px] rounded-lg border sm:text-sm text-xs font-medium ${remedyPotencies[rem.id] === pot
+                          ? 'border-[#0B0C0A] border-2 text-[#0B0C0A]'
+                          : 'border-[#D1D1CB] text-[#41463B]'
                           }`}
 
                       >
@@ -578,7 +582,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
           {/* ---- Success Modal ---- */}
           {showSuccess && (
             <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-[99999]">
-              <div className="bg-white w-[368px] h-[312] sm:w-[495px] sm:h-[328px] rounded-2xl shadow-2xl w-full max-w-md relative text-center p-10 animate-fadeIn scale-100">
+              <div className="bg-white w-[368px] h-[312] sm:w-[495px] sm:h-[328px] rounded-xl shadow-2xl w-full max-w-md relative text-center p-10 animate-fadeIn scale-100">
                 <button
                   onClick={onClose}
                   className="absolute top-4 right-4 text-[#41463B] hover:[#41463B]"
