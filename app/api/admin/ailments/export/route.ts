@@ -11,18 +11,19 @@ const supabase = createClient(
 )
 
 /**
- * Shape of exported ailment row (LIMITED COLUMNS)
+ * Excel export row with helper columns
  */
 interface AilmentExportRow {
   name: string
   description: string | null
   icon: string | null
   slug: string | null
+  ailment_name: string
+  related_remedies: string
 }
 
 export async function GET() {
   try {
-    // ✅ Fetch ONLY required columns
     const { data, error } = await supabase
       .from('ailments')
       .select('name, description, icon, slug')
@@ -30,20 +31,20 @@ export async function GET() {
 
     if (error) throw error
 
-    const rows: AilmentExportRow[] = data ?? []
+    const rows: AilmentExportRow[] = (data ?? []).map(a => ({
+      name: a.name,
+      description: a.description,
+      icon: a.icon,
+      slug: a.slug,
+      ailment_name: a.name,      // 👈 helper column
+      related_remedies: '',      // 👈 user fills this
+    }))
 
-    // ✅ Create workbook
     const workbook = XLSX.utils.book_new()
-
     const worksheet = XLSX.utils.json_to_sheet(rows)
 
-    XLSX.utils.book_append_sheet(
-      workbook,
-      worksheet,
-      'Ailments'
-    )
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Ailments')
 
-    // ✅ Generate ArrayBuffer (web-safe)
     const array = XLSX.write(workbook, {
       bookType: 'xlsx',
       type: 'array',
@@ -56,7 +57,7 @@ export async function GET() {
         'Content-Type':
           'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'Content-Disposition':
-          'attachment; filename="ailments.xlsx"',
+          'attachment; filename="ailments-with-remedies.xlsx"',
       },
     })
   } catch (error) {
