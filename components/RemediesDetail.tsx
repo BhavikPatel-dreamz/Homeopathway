@@ -20,7 +20,6 @@ interface RemediesDetailPageProps {
     scientific_name?: string;
     common_name?: string;
     constitutional_type?: string;
-    dosage_forms?: string[];
     safety_precautions?: string;
     slug: string;
   };
@@ -75,12 +74,12 @@ export default function RemediesDetailPage({
   review,
 }: RemediesDetailPageProps) {
   // activeTab is initialized to "Overview", fixing the initial tab issue.
-  const [activeTab, setActiveTab] = useState("Overview"); 
+  const [activeTab, setActiveTab] = useState("Overview");
 
-    const overviewRef = useRef<HTMLDivElement>(null!);
-   const originRef = useRef<HTMLDivElement>(null!);
-const reviewsRef = useRef<HTMLDivElement>(null!);
-const relatedRef = useRef<HTMLDivElement>(null!);
+  const overviewRef = useRef<HTMLDivElement>(null!);
+  const originRef = useRef<HTMLDivElement>(null!);
+  const reviewsRef = useRef<HTMLDivElement>(null!);
+  const relatedRef = useRef<HTMLDivElement>(null!);
 
   // Parse symptoms from remedy data
   const symptoms = React.useMemo(() => {
@@ -157,13 +156,13 @@ const relatedRef = useRef<HTMLDivElement>(null!);
         const distance = Math.abs(rect.top - tabsBottom);
 
         // ⭐ UNCOMMENTED: This logic must run to change the active tab on scroll
-        if (distance < minDistance) { 
+        if (distance < minDistance) {
           minDistance = distance;
           closestTab = s.tab;
         }
       });
 
-      setActiveTab(closestTab); 
+      setActiveTab(closestTab);
     };
 
     const onScroll = () => {
@@ -174,11 +173,11 @@ const relatedRef = useRef<HTMLDivElement>(null!);
         ticking = false;
       });
     };
-    
+
     // ⭐ NEW FIX FOR INITIAL SCROLL POSITION (Browser Scroll Restoration)
     // Force scroll to top (0, 0) immediately after mount
     if (typeof window !== 'undefined' && window.pageYOffset !== 0) {
-        window.scrollTo(0, 0);
+      window.scrollTo(0, 0);
     }
     // ⭐ END NEW FIX
 
@@ -204,10 +203,10 @@ const relatedRef = useRef<HTMLDivElement>(null!);
         items={
           ailmentContext
             ? [
-                { label: "Home", href: "/" },
-                { label: ailmentContext.name, href: `/${ailmentContext.slug}` },
-                { label: remedy.name, isActive: true },
-              ]
+              { label: "Home", href: "/" },
+              { label: ailmentContext.name, href: `/${ailmentContext.slug}` },
+              { label: remedy.name, isActive: true },
+            ]
             : breadcrumbPaths.remedyDetail(remedy.name, "All Remedies", "/remedies")
         }
       />
@@ -223,11 +222,10 @@ const relatedRef = useRef<HTMLDivElement>(null!);
               <button
                 key={tab}
                 onClick={() => handleTabClick(tab)}
-                className={`snap-start py-2 sm:py-3 md:pt-8 px-1 sm:px-2 text-[12px] sm:text-sm md:text-sm lg:text-base border-t-2 transition-all cursor-pointer whitespace-nowrap flex-shrink-0 ${
-                  activeTab === tab
-                    ? "border-[#0B0C0A] text-[#0B0C0A] font-medium"
-                    : "border-transparent text-[#41463B] hover:text-[#0B0C0A] hover:border-[#0B0C0A] transition-all duration-300"
-                }`}
+                className={`snap-start py-2 sm:py-3 md:pt-8 px-1 sm:px-2 text-[12px] sm:text-sm md:text-sm lg:text-base border-t-2 transition-all cursor-pointer whitespace-nowrap flex-shrink-0 ${activeTab === tab
+                  ? "border-[#0B0C0A] text-[#0B0C0A] font-medium"
+                  : "border-transparent text-[#41463B] hover:text-[#0B0C0A] hover:border-[#0B0C0A] transition-all duration-300"
+                  }`}
               >
                 {tab}
               </button>
@@ -246,49 +244,49 @@ const relatedRef = useRef<HTMLDivElement>(null!);
           {/* Left Content */}
           <div className="flex flex-col lg:w-[71%] bg-white rounded-lg ">
             <div className="p-4 sm:p-6 flex items-start">
-            <div className="flex items-center">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-15 md:h-15 p-2 sm:p-3 bg-[#F9F7F2] rounded-full flex items-center justify-center text-2xl sm:text-3xl flex-shrink-0 mr-2 sm:mr-3">
-                {remedy.icon}
+              <div className="flex items-center">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-15 md:h-15 p-2 sm:p-3 bg-[#F9F7F2] rounded-full flex items-center justify-center text-2xl sm:text-3xl flex-shrink-0 mr-2 sm:mr-3">
+                  {remedy.icon}
+                </div>
               </div>
-            </div>
-            <div className="w-full">
-              <h1 className="text-4xl sm:text-4xl lg:text-[32px] xl:text-[40px] font-serif text-[#0B0C0A] mb-2 lg:mb-0 wrap-break-word font-normal">
-                {remedy.name}
-              </h1>
-              <p className="text-[16px] leading-6 sm:text-base text-[#41463B] mb-3 sm:mb-4 font-nomal md:font-medium">
-                {remedy.description}
-              </p>
-              <div className="text-[14px] leading-3.5  flex items-center gap-2 mb-4 sm:mb-6 flex-wrap">
-                {renderStars(remedy.average_rating)}
-                <span className="text-[#41463B] text-xs sm:text-sm">
-                  {remedy.average_rating.toFixed(1)} ({remedy.review_count} {remedy.review_count === 1 ? "review" : "reviews"})
-                </span>
-              </div>
+              <div className="w-full">
+                <h1 className="text-4xl sm:text-4xl lg:text-[32px] xl:text-[40px] font-serif text-[#0B0C0A] mb-2 lg:mb-0 wrap-break-word font-normal">
+                  {remedy.name}
+                </h1>
+                <p className="text-[16px] leading-6 sm:text-base text-[#41463B] mb-3 sm:mb-4 font-nomal md:font-medium">
+                  {remedy.description}
+                </p>
+                <div className="text-[14px] leading-3.5  flex items-center gap-2 mb-4 sm:mb-6 flex-wrap">
+                  {renderStars(remedy.average_rating)}
+                  <span className="text-[#41463B] text-xs sm:text-sm">
+                    {remedy.average_rating.toFixed(1)} ({remedy.review_count} {remedy.review_count === 1 ? "review" : "reviews"})
+                  </span>
+                </div>
 
-              <h4 className="text-base sm:text-lg md:text-[20px] text-[#2B2E28] font-bold mb-3 sm:mb-5 text-montserrat">
-                Key Symptoms for {remedy.name} Headaches:
-              </h4>
-              <div className="text-black" ref={originRef}></div>
-              <div className="grid gap-3 sm:gap-4 md:gap-y-8 md:grid-cols-2">
-                {symptoms.map((s, i) => (
-                  <div key={i} className="flex gap-2 sm:gap-3 items-start">
-                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-[#C3AF76] rounded-full shrink-0 mt-1" />
-                    <div className="min-w-0">
-                      <p className="text-md sm:text-base text-[#2B2E28] font-semibold wrap-break-word">
-                        {capitalize(s.title)}
-                      </p>
-                      {s.desc && (
-                        <p className="text-xs sm:text-sm text-[#2B2E28] font-medium">
-                          {capitalize(s.desc)}
+                <h4 className="text-base sm:text-lg md:text-[20px] text-[#2B2E28] font-bold mb-3 sm:mb-5 text-montserrat">
+                  Key Symptoms for {remedy.name} Headaches:
+                </h4>
+                <div className="text-black" ref={originRef}></div>
+                <div className="grid gap-3 sm:gap-4 md:gap-y-8 md:grid-cols-2">
+                  {symptoms.map((s, i) => (
+                    <div key={i} className="flex gap-2 sm:gap-3 items-start">
+                      <div className="w-2 h-2 sm:w-3 sm:h-3 bg-[#C3AF76] rounded-full shrink-0 mt-1" />
+                      <div className="min-w-0">
+                        <p className="text-md sm:text-base text-[#2B2E28] font-semibold wrap-break-word">
+                          {capitalize(s.title)}
                         </p>
-                      )}
+                        {s.desc && (
+                          <p className="text-xs sm:text-sm text-[#2B2E28] font-medium">
+                            {capitalize(s.desc)}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
-            </div>
-                
+
           </div>
 
           {/* Right Sidebar - Quick Stats */}
@@ -314,53 +312,8 @@ const relatedRef = useRef<HTMLDivElement>(null!);
                 <span className="font-semibold text-[#175F3D] text-sm">N/A</span>
               </li>
             </ul>
-
-            {/* <div className="mt-4 sm:mt-6">
-              <p className="text-md sm:text-base text-[#0B0C0A] mb-2 font-semibold">
-                Common Potencies
-              </p>
-              <div className="flex justify-between flex-wrap font-medium text-[#2B2E28] text-xs sm:text-sm">
-                <div>
-                  {(remedy.dosage_forms || [])
-                    .map((item) => item.replace(/^'+|'+$/g, "").replace(/^"+|"+$/g, ""))
-                    .join(", ")}
-                </div>
-              </div>
-            </div> */}
-     <div className="mt-4 sm:mt-6">
-  <p className="text-md sm:text-base text-[#0B0C0A] mb-2 font-semibold">
-    Common Potencies
-  </p>
-
-  {/* Mobile 320px View */}
-  <div className="flex flex-col gap-1 sm:hidden font-medium text-[#2B2E28] text-xs">
-    {(remedy.dosage_forms || []).map((item, index) => (
-      <div
-        key={index}
-        className="flex justify-between w-full  pb-1"
-      >
-        <span>
-          {item.replace(/^'+|'+$/g, "").replace(/^"+|"+$/g, "")}
-        </span>
-        <span className="font-semibold">common</span>
-      </div>
-    ))}
-  </div>
-
-  {/* Desktop View */}
-  <div className="hidden sm:flex justify-between flex-wrap font-medium text-[#2B2E28] text-xs sm:text-sm">
-    <div>
-      {(remedy.dosage_forms || [])
-        .map((item) =>
-          item.replace(/^'+|'+$/g, "").replace(/^"+|"+$/g, "")
-        )
-        .join("   ")}
-    </div>
-  </div>
-</div>
-
           </aside>
-       
+
         </section>
 
         {/* Origin Section */}
@@ -398,10 +351,10 @@ const relatedRef = useRef<HTMLDivElement>(null!);
             ailmentContext={
               ailmentContext
                 ? {
-                    id: ailmentContext.id,
-                    name: ailmentContext.name,
-                    slug: ailmentContext.slug,
-                  }
+                  id: ailmentContext.id,
+                  name: ailmentContext.name,
+                  slug: ailmentContext.slug,
+                }
                 : undefined
             }
           />
@@ -418,7 +371,7 @@ const relatedRef = useRef<HTMLDivElement>(null!);
               {filteredRelatedRemedies.map((item) => (
                 <Link href={`/remedies/${item.slug}`} key={item.id}>
                   <div className="bg-white rounded-[8px] hover:shadow-md transition-shadow pt-4 pr-2 pb-4 pl-4 flex items-start gap-4 h-full cursor-pointer">
-                    
+
                     {/* Icon */}
                     <div className="w-15 h-15 bg-[#F9F7F2] rounded-full flex items-center justify-center text-3xl flex-shrink-0">
                       {item.icon || "💊"}
@@ -426,7 +379,7 @@ const relatedRef = useRef<HTMLDivElement>(null!);
 
                     {/* Content */}
                     <div className="flex flex-col gap-1 min-w-0">
-                      
+
                       {/* Title */}
                       <h4 className="font-semibold text-[20px] leading-[28px] text-[#0B0C0A] truncate font-family-montserrat">
                         {item.name}
@@ -439,10 +392,10 @@ const relatedRef = useRef<HTMLDivElement>(null!);
                         <span className="ml-1 font-medium">
                           {(item.average_rating || 0).toFixed(1)}
                         </span>
-                       <span className="font-montserrat font-medium text-[14px] leading-[22px] text-[#41463B]">
-                        ({item.review_count}{" "}
-                        {item.review_count === 1 ? "review" : "reviews"})
-                      </span>
+                        <span className="font-montserrat font-medium text-[14px] leading-[22px] text-[#41463B]">
+                          ({item.review_count}{" "}
+                          {item.review_count === 1 ? "review" : "reviews"})
+                        </span>
                       </div>
 
                       {/* Description */}

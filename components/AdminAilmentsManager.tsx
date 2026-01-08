@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { supabase } from '../lib/supabaseClient';
 import Pagination from './Pagination';
@@ -30,6 +30,50 @@ export default function AdminAilmentsManager() {
   const [itemsPerPage] = useState(50);
   const [totalAilments, setTotalAilments] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [importProgress, setImportProgress] = useState<number>(0);
+  const [importing, setImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleExport = () => {
+    window.location.href = '/api/admin/ailments/export';
+  };
+
+
+
+  const handleImport = async (file: File) => {
+    setImporting(true);
+    setImportProgress(5);
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      setImportProgress(20);
+
+      const res = await fetch('/api/admin/ailments/import', {
+        method: 'POST',
+        body: formData,
+      });
+
+
+      if (!res.ok) throw new Error('Import failed');
+
+      setImportProgress(100);
+      setMessage({ type: 'success', text: 'Import completed successfully!' });
+
+      await fetchAilments();
+    } catch (err) {
+      console.error(err);
+      setMessage({ type: 'error', text: 'Import failed. Please check the Excel (.xlsx) file.' });
+    } finally {
+      setTimeout(() => {
+        setImporting(false);
+        setImportProgress(0);
+      }, 1000);
+    }
+  };
+
+
 
   const fetchAilments = useCallback(async () => {
     setLoading(true);
@@ -157,18 +201,82 @@ export default function AdminAilmentsManager() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
+        {/* LEFT: Title */}
         <div>
           <h2 className="text-3xl font-serif text-gray-900">Manage Ailments</h2>
-          <p className="text-gray-600 mt-1">Add, edit, or remove ailments from your database</p>
+          <p className="text-gray-600 mt-1">
+            Add, edit, or remove ailments from your database
+          </p>
         </div>
-        <Link
-          href="/admin/ailments/add"
-          className="px-6 py-3 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 transition-colors flex items-center gap-2"
-        >
-          <span className="text-xl">+</span>
-          Add Ailment
-        </Link>
+
+        {/* RIGHT: Actions */}
+        <div className="flex gap-3 items-center">
+          {/* Export */}
+          <button
+            onClick={handleExport}
+            className="h-[52px] px-5 rounded-lg bg-emerald-600 text-white font-medium shadow-sm hover:bg-emerald-700 active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer">
+            {/* Download Icon */}
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v12m0 0l4-4m-4 4l-4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" />
+            </svg>
+
+            Export XLSX
+          </button>
+
+          {/* Import */}
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className=" h-[52px] px-5 rounded-lg border border-[#0f75ae] text-white font-medium bg-[#0f75ae] shadow-sm hover:bg-[#04659b] hover:border-[#0f75ae] active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer">
+            {/* Upload Icon */}
+            <svg
+              className="w-5 h-5 text-white"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 16V6m0 0l-3 3m3-3l3 3M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"
+              />
+            </svg>
+
+            Import XLSX
+          </button>
+
+
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".xlsx"
+            className="hidden"
+            onChange={(e) => {
+              if (e.target.files?.[0]) {
+                handleImport(e.target.files[0])
+              }
+            }}
+          />
+
+          {/* Add Ailment */}
+          <Link
+            href="/admin/ailments/add"
+            className="px-6 py-3 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 transition-colors flex items-center gap-2 cursor-pointer"
+          >
+            <span className="text-xl">+</span>
+            Add Ailment
+          </Link>
+        </div>
       </div>
+
+
 
       {/* Success/Error Message */}
       {message && (
@@ -176,6 +284,22 @@ export default function AdminAilmentsManager() {
           {message.text}
         </div>
       )}
+
+      {importing && (
+        <div className="bg-white border rounded-lg p-4">
+          <div className="flex justify-between text-sm text-gray-600 mb-2">
+            <span>Importing XML...</span>
+            <span>{importProgress}%</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div
+              className="bg-teal-600 h-2 rounded-full transition-all duration-300"
+              style={{ width: `${importProgress}%` }}
+            />
+          </div>
+        </div>
+      )}
+
 
       {/* Search and Stats */}
       <div className="bg-white rounded-lg shadow-sm p-4">
@@ -239,7 +363,7 @@ export default function AdminAilmentsManager() {
                   </td>
                   <td className="px-6 py-4">
                     <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                      {ailment.remedies_count}remedies
+                      {ailment.remedies_count}
                     </span>
                   </td>
                   <td className="px-6 py-4">

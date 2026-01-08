@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabaseClient';
@@ -26,6 +26,33 @@ export default function AdminRemediesManager() {
   const [itemsPerPage] = useState(50);
   const [totalRemedies, setTotalRemedies] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [importProgress, setImportProgress] = useState<number>(0);
+   const [importing, setImporting] = useState(false);
+
+
+  const handleExport = () => {
+    window.location.href = '/api/admin/remedies/export';
+  };
+
+
+  const handleImport = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const res = await fetch('/api/admin/remedies/import', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!res.ok) {
+      throw new Error('Import failed');
+    }
+
+    // 🔁 refresh remedies list after import
+    await fetchRemedies();
+  };
+
 
   const fetchRemedies = useCallback(async () => {
     setLoading(true);
@@ -42,7 +69,7 @@ export default function AdminRemediesManager() {
 
       // Apply search filter
       if (searchTerm) {
-        query = query.or(`name.ilike.%${searchTerm}%,scientific_name.ilike.%${searchTerm}%`);
+        query = query.or(`name.ilike.%${searchTerm}%`);
       }
 
       const { data, error, count } = await query;
@@ -109,29 +136,79 @@ export default function AdminRemediesManager() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Manage Remedies</h2>
-          <p className="text-gray-600 mt-1">Add, edit, or remove homeopathic remedies</p>
+          <p className="text-gray-600 mt-1">
+            Add, edit, or remove homeopathic remedies
+          </p>
         </div>
-        <Link
-          href="/admin/remedies/add"
-          className="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors font-medium"
-        >
-          + Add Remedy
-        </Link>
+
+        <div className="flex gap-3 items-center">
+          {/* EXPORT */}
+          <button
+            onClick={handleExport}
+            className="px-4 py-2 border border-gray-400 text-gray-800 bg-white rounded-lg text-sm font-medium hover:bg-gray-50"
+          >
+            Export XLSX
+          </button>
+
+          {/* IMPORT */}
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="px-4 py-2 border border-gray-400 text-gray-800 bg-white rounded-lg text-sm font-medium hover:bg-gray-50"
+          >
+            Import XLSX
+          </button>
+
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".xlsx"
+            className="hidden"
+            onChange={(e) => {
+              if (e.target.files?.[0]) {
+                handleImport(e.target.files[0]);
+              }
+            }}
+          />
+
+          {/* ADD REMEDY */}
+          <Link
+            href="/admin/remedies/add"
+            className="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors font-medium"
+          >
+            + Add Remedy
+          </Link>
+        </div>
       </div>
+
 
       {/* Success/Error Message */}
       {message && (
         <div
-          className={`p-4 rounded-lg ${
-            message.type === 'success'
-              ? 'bg-green-50 text-green-800 border border-green-200'
-              : 'bg-red-50 text-red-800 border border-red-200'
-          }`}
+          className={`p-4 rounded-lg ${message.type === 'success'
+            ? 'bg-green-50 text-green-800 border border-green-200'
+            : 'bg-red-50 text-red-800 border border-red-200'
+            }`}
         >
           {message.text}
         </div>
       )}
 
+
+      {importing && (
+        <div className="bg-white border rounded-lg p-4">
+          <div className="flex justify-between text-sm text-gray-600 mb-2">
+            <span>Importing XML...</span>
+            <span>{importProgress}%</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div
+              className="bg-teal-600 h-2 rounded-full transition-all duration-300"
+              style={{ width: `${importProgress}%` }}
+            />
+          </div>
+        </div>
+      )}
       {/* Search and Stats */}
       <div className="bg-white rounded-lg shadow-sm p-4">
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -174,9 +251,6 @@ export default function AdminRemediesManager() {
                   Remedy Name
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Scientific Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Rating
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -193,9 +267,9 @@ export default function AdminRemediesManager() {
                   <td className="px-6 py-4">
                     <div className="w-10 h-10 flex items-center justify-center">
                       {remedy.image_url ? (
-                        <Image 
-                          src={remedy.image_url} 
-                          alt={remedy.name} 
+                        <Image
+                          src={remedy.image_url}
+                          alt={remedy.name}
                           width={40}
                           height={40}
                           className="w-10 h-10 object-cover rounded-lg border border-gray-200"
@@ -216,16 +290,12 @@ export default function AdminRemediesManager() {
                     <div className="font-medium text-gray-900">{remedy.name}</div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-sm text-gray-600 italic">{remedy.scientific_name}</div>
-                  </td>
-                  <td className="px-6 py-4">
                     <div className="flex items-center">
-                      <span className="text-yellow-500 mr-1">★</span>
-                      <span className="text-sm font-medium text-gray-500">{remedy.average_rating.toFixed(1)}</span>
+                      <span className="text-sm font-medium text-gray-500 block w-[50px] text-center">{remedy.average_rating.toFixed(1)}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-sm text-gray-600">{remedy.review_count} reviews</span>
+                    <span className="text-sm text-gray-600 block w-[50px] text-center">{remedy.review_count}</span>
                   </td>
                   <td className="px-6 py-4 text-right space-x-2">
                     <Link
@@ -235,7 +305,7 @@ export default function AdminRemediesManager() {
                       Edit
                     </Link>
                     <button
-                     onClick={() => handleDelete(remedy.id!)}
+                      onClick={() => handleDelete(remedy.id!)}
                       disabled={loading}
                       className="text-red-600 hover:text-red-800 font-medium text-sm disabled:opacity-50"
                     >

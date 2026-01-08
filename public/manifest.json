@@ -1,13 +1,18 @@
 {
-  "name": "Homeopathway - Natural Homeopathic Remedies",
-  "short_name": "Homeopathway",
+  "name": "HomeoPathway - Natural Homeopathic Remedies",
+  "short_name": "HomeoPathway",
   "description": "Discover effective homeopathic remedies for common ailments. Browse our comprehensive database of natural treatments and wellness solutions.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#10b981",
   "orientation": "portrait-primary",
-  "categories": ["health", "medical", "wellness", "lifestyle"],
+  "categories": [
+    "health",
+    "medical",
+    "wellness",
+    "lifestyle"
+  ],
   "lang": "en",
   "scope": "/",
   "icons": [

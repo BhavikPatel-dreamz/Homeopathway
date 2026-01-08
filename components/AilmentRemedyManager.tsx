@@ -14,9 +14,9 @@ interface RemedyWithRelation extends Remedy {
   relation_id?: string;
 }
 
-export default function AilmentRemedyManager({ 
-  ailmentId, 
-  onRemedyRelationsChange 
+export default function AilmentRemedyManager({
+  ailmentId,
+  onRemedyRelationsChange
 }: AilmentRemedyManagerProps) {
   const [activeTab, setActiveTab] = useState<'available' | 'related'>('available');
   const [remedies, setRemedies] = useState<RemedyWithRelation[]>([]);
@@ -24,47 +24,12 @@ export default function AilmentRemedyManager({
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [savingRelation, setSavingRelation] = useState<string | null>(null);
-  const [testingConnection, setTestingConnection] = useState(false);
 
-  const testDatabaseConnection = async () => {
-    setTestingConnection(true);
-    try {
-      console.log('Testing database connection...');
-      
-      // Test 1: Can we read from ailment_remedies?
-      const { data: readTest, error: readError } = await supabase
-        .from('ailment_remedies')
-        .select('*')
-        .limit(1);
-      
-      if (readError) {
-        setError(`Read test failed: ${readError.message}`);
-        return;
-      }
-      
-      // Test 2: Get current user
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      
-      if (userError || !user) {
-        setError(`User authentication failed: ${userError?.message || 'No user'}`);
-        return;
-      }
-      
-      setError(null);
-      alert('Database connection test passed! Check console for details.');
-      
-    } catch (err) {
-      console.error('Connection test error:', err);
-      setError(`Connection test failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
-    } finally {
-      setTestingConnection(false);
-    }
-  };
 
   const loadRemedies = useCallback(async () => {
     try {
       setLoading(true);
-      
+
       // Load all remedies
       const { data: remediesData, error: remediesError } = await supabase
         .from('remedies')
@@ -104,11 +69,11 @@ export default function AilmentRemedyManager({
       });
 
       setRemedies(remediesWithRelations);
-      
+
       // Notify parent of current relations
       const currentRelations = existingRelations;
       onRemedyRelationsChange?.(currentRelations);
-      
+
     } catch (err) {
       console.error('Error loading remedies:', err);
       setError(err instanceof Error ? err.message : 'Failed to load remedies');
@@ -125,13 +90,13 @@ export default function AilmentRemedyManager({
   const handleRemedyToggle = async (remedyId: string) => {
     if (!ailmentId) {
       // In add mode, just toggle selection locally and notify parent
-      const updatedRemedies = remedies.map(remedy => 
-        remedy.id === remedyId 
+      const updatedRemedies = remedies.map(remedy =>
+        remedy.id === remedyId
           ? { ...remedy, isSelected: !remedy.isSelected }
           : remedy
       );
       setRemedies(updatedRemedies);
-      
+
       // Create relations array for selected remedies to pass to parent
       const selectedRelations = updatedRemedies
         .filter(r => r.isSelected)
@@ -142,7 +107,7 @@ export default function AilmentRemedyManager({
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         }));
-      
+
       onRemedyRelationsChange?.(selectedRelations);
       return;
     }
@@ -150,11 +115,11 @@ export default function AilmentRemedyManager({
     try {
       setSavingRelation(remedyId);
       const remedy = remedies.find(r => r.id === remedyId);
-      
+
       if (!remedy) {
         throw new Error('Remedy not found');
       }
-      
+
       if (remedy.isSelected) {
         // Remove relation
         if (remedy.relation_id) {
@@ -171,7 +136,7 @@ export default function AilmentRemedyManager({
       } else {
         // Add relation
         const { data: { user }, error: userError } = await supabase.auth.getUser();
-        
+
         if (userError) {
           console.error('Auth error:', userError);
           throw new Error('Authentication failed');
@@ -198,7 +163,7 @@ export default function AilmentRemedyManager({
           console.error('Database error adding relation:', error);
           console.error('Full error details:', JSON.stringify(error, null, 2));
           console.error('Insert data:', insertData);
-          
+
           // Try to provide more specific error information
           if (error.message.includes('permission denied')) {
             throw new Error('Database permission error. The RLS policies may be blocking this operation. Please run the permission fix SQL script.');
@@ -216,7 +181,7 @@ export default function AilmentRemedyManager({
 
       // Reload to get updated data
       await loadRemedies();
-      
+
     } catch (err) {
       console.error('Error toggling remedy relation:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to update remedy relation';
@@ -228,9 +193,9 @@ export default function AilmentRemedyManager({
 
   const filteredRemedies = remedies.filter(remedy => {
     const matchesSearch = remedy.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         remedy.scientific_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         remedy.common_name?.toLowerCase().includes(searchQuery.toLowerCase());
-    
+      remedy.scientific_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      remedy.common_name?.toLowerCase().includes(searchQuery.toLowerCase());
+
     if (activeTab === 'available') {
       return matchesSearch;
     } else {
@@ -263,16 +228,9 @@ export default function AilmentRemedyManager({
           <h3 className="text-lg font-semibold text-gray-900">
             Manage Related Remedies
           </h3>
-          <button
-            onClick={testDatabaseConnection}
-            disabled={testingConnection}
-            className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-          >
-            {testingConnection ? 'Testing...' : 'Test DB'}
-          </button>
         </div>
         <p className="text-sm text-gray-600">
-          {ailmentId 
+          {ailmentId
             ? "Add or remove remedies that are effective for treating this ailment"
             : "Select remedies to relate with this ailment (will be saved when ailment is created)"
           }
@@ -302,21 +260,19 @@ export default function AilmentRemedyManager({
           <nav className="-mb-px flex space-x-8">
             <button
               onClick={() => setActiveTab('available')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'available'
-                  ? 'border-teal-500 text-teal-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'available'
+                ? 'border-teal-500 text-teal-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
             >
               All Remedies ({remedies.length})
             </button>
             <button
               onClick={() => setActiveTab('related')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'related'
-                  ? 'border-teal-500 text-teal-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'related'
+                ? 'border-teal-500 text-teal-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
             >
               Related Remedies ({relatedRemediesCount})
             </button>
@@ -380,7 +336,7 @@ export default function AilmentRemedyManager({
                       </p>
                     </div>
                   </div>
-                  
+
                   {savingRelation === remedy.id && (
                     <div className="ml-2">
                       <div className="animate-spin h-4 w-4 border-2 border-teal-500 border-t-transparent rounded-full"></div>

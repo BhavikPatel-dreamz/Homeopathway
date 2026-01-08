@@ -1,4 +1,4 @@
-# Copilot Instructions for Homeopathway
+# Copilot Instructions for HomeoPathway
 
 ## Project Overview
 - This is a Next.js app using the `/app` directory structure, bootstrapped with `create-next-app`.

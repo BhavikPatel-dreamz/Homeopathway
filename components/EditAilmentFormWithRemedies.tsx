@@ -26,7 +26,6 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
     name: '',
     icon: '',
     description: '',
-    personalizedApproach: '',
   });
 
   const fetchAilment = useCallback(async () => {
@@ -53,7 +52,6 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
         name: data.name || '',
         icon: data.icon || '',
         description: data.description || '',
-        personalizedApproach: data.personalized_approach || '',
       });
       setOriginalName(data.name || '');
       setGeneratedSlug(data.slug || '');
@@ -106,7 +104,6 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
         name: formData.name,
         icon: formData.icon,
         description: formData.description,
-        personalized_approach: formData.personalizedApproach,
         updated_at: new Date().toISOString(),
       };
 
@@ -171,22 +168,20 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
             <button
               type="button"
               onClick={() => setActiveTab('basic')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'basic'
-                  ? 'border-teal-500 text-teal-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'basic'
+                ? 'border-teal-500 text-teal-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
             >
               Basic Information
             </button>
             <button
               type="button"
               onClick={() => setActiveTab('remedies')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'remedies'
-                  ? 'border-teal-500 text-teal-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'remedies'
+                ? 'border-teal-500 text-teal-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
             >
               Related Remedies
             </button>
@@ -243,7 +238,7 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Icon (Emoji) *
                     </label>
-                    
+
                     {/* Current Selection Display */}
                     <div className="mb-3">
                       <div className="flex items-center gap-3 p-3 border border-gray-300 rounded-lg bg-gray-50">
@@ -281,7 +276,7 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
                           {showEmojiPicker ? 'Hide' : 'Show'} Emoji Options
                         </button>
                       </div>
-                      
+
                       {showEmojiPicker && (
                         <div className="grid grid-cols-6 gap-2 max-h-48 overflow-y-auto">
                           {healthEmojis.map((emoji, index) => (
@@ -292,11 +287,10 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
                                 setFormData({ ...formData, icon: emoji });
                                 setShowEmojiPicker(false);
                               }}
-                              className={`p-2 text-2xl rounded-lg border transition-all hover:bg-teal-50 hover:border-teal-300 ${
-                                formData.icon === emoji
-                                  ? 'bg-teal-100 border-teal-500 ring-2 ring-teal-200'
-                                  : 'bg-gray-50 border-gray-200 hover:shadow-sm'
-                              }`}
+                              className={`p-2 text-2xl rounded-lg border transition-all hover:bg-teal-50 hover:border-teal-300 ${formData.icon === emoji
+                                ? 'bg-teal-100 border-teal-500 ring-2 ring-teal-200'
+                                : 'bg-gray-50 border-gray-200 hover:shadow-sm'
+                                }`}
                               title={`Select ${emoji}`}
                             >
                               {emoji}
@@ -304,7 +298,7 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
                           ))}
                         </div>
                       )}
-                      
+
                       {!showEmojiPicker && (
                         <div className="text-sm text-gray-500">
                           Click &ldquo;Show Emoji Options&rdquo; to browse available emojis
@@ -349,22 +343,6 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Personalized Approach *
-                    </label>
-                    <textarea
-                      required
-                      value={formData.personalizedApproach}
-                      onChange={(e) =>
-                        setFormData({ ...formData, personalizedApproach: e.target.value })
-                      }
-                      rows={5}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-gray-500"
-                      placeholder="Describe the personalized approach and treatment recommendations for this ailment..."
-                    />
-                  </div>
-
                   <div className="flex gap-3">
                     <button
                       type="submit"
@@ -400,11 +378,6 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
                       <p className="text-sm text-gray-600 mb-2">
                         {formData.description || 'Description will appear here...'}
                       </p>
-                      {formData.personalizedApproach && (
-                        <p className="text-sm text-gray-600 italic">
-                          <strong>Approach:</strong> {formData.personalizedApproach}
-                        </p>
-                      )}
                     </div>
                   </div>
                 </div>

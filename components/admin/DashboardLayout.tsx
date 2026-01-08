@@ -12,7 +12,7 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children, userName }: DashboardLayoutProps) {
   const pathname = usePathname();
-  
+
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
@@ -26,70 +26,68 @@ export default function DashboardLayout({ children, userName }: DashboardLayoutP
   };
 
 
-   const navigation = [
-  { name: 'Overview', href: '/admin', icon: '📊' },
-  { 
-    name: 'Ailments', 
-    href: '/admin/ailments', 
-    icon: '' 
-  },
-  { 
-    name: 'Remedies', 
-    href: '/admin/remedies', 
-    icon: '' 
-  },
-  { name: 'Users', href: '/admin/users', icon: '👥' },
-  { name: 'Reviews', href: '/admin/reviews', icon: '⭐' },
-];
+  const navigation = [
+    { name: 'Overview', href: '/admin', icon: '📊' },
+    {
+      name: 'Ailments',
+      href: '/admin/ailments',
+      icon: ''
+    },
+    {
+      name: 'Remedies',
+      href: '/admin/remedies',
+      icon: ''
+    },
+    { name: 'Users', href: '/admin/users', icon: '👥' },
+    { name: 'Reviews', href: '/admin/reviews', icon: '⭐' },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
       <aside
-        className={`${
-          isSidebarOpen ? 'w-64' : 'w-20'
-        } bg-[#2B2E28] text-white transition-all duration-300 flex flex-col fixed h-full z-30`}
+        className={`${isSidebarOpen ? 'w-64' : 'w-20'
+          } bg-[#2B2E28] text-white transition-all duration-300 flex flex-col fixed h-full z-30`}
       >
         {/* Logo */}
         <div className="p-6 border-b border-white/10">
-        <Link href="/admin">
-          <div className="flex items-center gap-3 cursor-pointer">
-            <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
-              <img src="/favicon.svg" alt="" />
-            </div>
-            {isSidebarOpen && (
-              <div>
-                <h1 className="text-lg font-semibold">Homeopathway</h1>
-                <p className="text-xs text-white">Admin Panel</p>
+          <Link href="/admin">
+            <div className="flex items-center gap-3 cursor-pointer">
+              <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                <img src="/favicon.svg" alt="" />
               </div>
-            )}
-          </div>
+              {isSidebarOpen && (
+                <div>
+                  <h1 className="text-lg font-semibold">HomeoPathway</h1>
+                  <p className="text-xs text-white">Admin Panel</p>
+                </div>
+              )}
+            </div>
           </Link>
         </div>
 
         {/* Navigation */}
         <nav className="flex-1 px-4 py-6 space-y-1">
           {navigation.map((item) => {
-            const isActive = pathname === item.href ;
+            const isActive = pathname === item.href;
             return (
               <Link key={item.name} href={item.href}>
                 <div
-                  className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-colors ${
-                    isActive
-                      ? 'bg-white/10 text-white'
-                      : 'text-gray-300 hover:bg-white/5 hover:text-white'
-                  }`}
+                  className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-colors ${isActive
+                    ? 'bg-white/10 text-white'
+                    : 'text-gray-300 hover:bg-white/5 hover:text-white'
+                    }`}
                 >
-                {item.icon=='' ? (
-             <Image 
-                  src={item.name =='Ailments'? '/ailments-icon.svg':'/top-remedies.svg'} 
-                  alt={`${item.name} icon`} 
-                  width={21} 
-                  height={21}
-              />
-           ) : (
-              <span>{item.icon}</span>
-             )}
+                  {item.icon == '' ? (
+                    <Image
+                      src={item.name == 'Ailments' ? '/ailments-icon.svg' : '/top-remedies.svg'}
+                      alt={`${item.name} icon`}
+                      width={21}
+                      height={21}
+                    />
+                  ) : (
+                    <span>{item.icon}</span>
+                  )}
                   {isSidebarOpen && (
                     <span className={isActive ? "font-semibold" : "font-medium"}>
                       {item.name}
@@ -114,7 +112,7 @@ export default function DashboardLayout({ children, userName }: DashboardLayoutP
               </div>
             )}
           </div>
-          
+
           {/* Logout Button */}
           {isSidebarOpen && (
             <button
@@ -147,7 +145,7 @@ export default function DashboardLayout({ children, userName }: DashboardLayoutP
                   {navigation.find((item) => pathname === item.href)?.name || 'Dashboard'}
                 </h2>
                 <p className="text-sm text-gray-500 mt-0.5">
-                  Manage your homeopathy platform
+                  Manage your HomeoPathway platform
                 </p>
               </div>
               <div className="flex items-center gap-3">

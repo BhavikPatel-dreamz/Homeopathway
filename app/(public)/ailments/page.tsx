@@ -33,7 +33,7 @@ export const metadata: Metadata = {
         url: "/og-ailments.jpg",
         width: 1200,
         height: 630,
-        alt: "Homeopathway Ailments Database",
+        alt: "HomeoPathway Ailments Database",
       },
     ],
   },

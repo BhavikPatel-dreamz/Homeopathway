@@ -2,7 +2,7 @@ import { getDashboardCounts } from '@/lib/review';
 import DashboardHome from '../../components/admin/DashboardHome';
 
 export const metadata = {
-  title: 'Admin Dashboard - Homeopathway',
+  title: 'Admin Dashboard - HomeoPathway',
 };
 
 export default async function AdminDashboardPage() {
@@ -13,7 +13,7 @@ export default async function AdminDashboardPage() {
     // You could return an error component here
   }
 
-  return <DashboardHome 
+  return <DashboardHome
     remediesCount={counts?.totalRemedies}
     ailmentsCount={counts?.totalAilment || 0}
     usersCount={counts?.totalUsers}

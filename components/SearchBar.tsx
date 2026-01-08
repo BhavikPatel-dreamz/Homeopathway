@@ -219,10 +219,10 @@ export default function SearchBar() {
             className="flex items-center justify-center w-10 h-10 rounded-full transition-shadow"
           >
             <Image
-              width={24}
-              height={24}
-              src="/search.svg"
-              className="w-6 h-6"
+              width={20}
+              height={20}
+              src="/search-black.svg"
+              className="w-4 h-4"
               alt="Search"
             />
           </button>
@@ -269,7 +269,7 @@ export default function SearchBar() {
                 </button>
               )}
             </div>
-            
+
             {/* Mobile Close Button */}
             {isMobileSearchExpanded && (
               <button

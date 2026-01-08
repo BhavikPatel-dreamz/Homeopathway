@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {getDashboardCounts} from "@/lib/review"
+import { getDashboardCounts } from "@/lib/review"
 
 interface DashboardHomeProps {
   remediesCount?: number;
@@ -44,7 +44,7 @@ export default function DashboardHome({
             <div className="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
               <span className="text-2xl">👥</span>
             </div>
-            <span className="text-xs text-gray-500">Active</span>
+            <span className="text-xs text-gray-500">Total Users</span>
           </div>
           <div className="text-2xl font-bold text-gray-900">{usersCount.toLocaleString()}</div>
           <div className="text-sm text-gray-600">Users</div>
@@ -68,7 +68,7 @@ export default function DashboardHome({
           href="/admin/ailments/add"
           className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
         >
-           <img className="text-3xl mb-3" src="/ailments-icon.svg" alt="" />
+          <img className="text-3xl mb-3" src="/ailments-icon.svg" alt="" />
           <h3 className="text-lg font-semibold mb-1">Add Ailment</h3>
           <p className="text-sm text-blue-100">Create a new ailment category</p>
         </Link>

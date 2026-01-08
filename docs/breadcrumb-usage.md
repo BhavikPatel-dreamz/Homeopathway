@@ -1,7 +1,7 @@
 # Global Breadcrumb Component
 
 ## Overview
-The global Breadcrumb component provides a consistent navigation breadcrumb across all pages in the Homeopathway application.
+The global Breadcrumb component provides a consistent navigation breadcrumb across all pages in the HomeoPathway application.
 
 ## Files
 - `components/Breadcrumb.tsx` - The main breadcrumb component

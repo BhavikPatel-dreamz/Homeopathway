@@ -54,7 +54,7 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      
+
       if (filterOptions.search) params.append('search', filterOptions.search);
       if (filterOptions.remedy) params.append('remedy', filterOptions.remedy);
       if (filterOptions.rating) params.append('rating', filterOptions.rating);
@@ -65,13 +65,13 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
       params.append('limit', '10');
 
       const response = await fetch(`/api/admin/reviews/search?${params.toString()}`);
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch reviews');
       }
 
       const data: ApiResponse = await response.json();
-      
+
       setReviews(data.reviews);
       setTotal(data.total);
       setTotalPages(data.totalPages);
@@ -86,11 +86,11 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
   // Check if any filters are applied (excluding page)
   const hasFiltersApplied = (filterOptions: FilterOptions) => {
     return filterOptions.search !== '' ||
-           filterOptions.remedy !== '' ||
-           filterOptions.rating !== '' ||
-           filterOptions.dateRange !== '' ||
-           filterOptions.effectivenessRange !== '' ||
-           filterOptions.sideEffects !== '';
+      filterOptions.remedy !== '' ||
+      filterOptions.rating !== '' ||
+      filterOptions.dateRange !== '' ||
+      filterOptions.effectivenessRange !== '' ||
+      filterOptions.sideEffects !== '';
   };
 
   // Apply filters with debouncing
@@ -130,9 +130,9 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
       }
 
       await response.json();
-      
-      setReviews(prev => 
-        prev.map(review => 
+
+      setReviews(prev =>
+        prev.map(review =>
           review.id === reviewId ? { ...review, ...updatedData } : review
         )
       );
@@ -239,7 +239,7 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
             Clear All
           </button>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           {/* Search */}
           <div className="relative">
@@ -372,7 +372,7 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
             </div>
           </div>
         )}
-        
+
         <div className={`overflow-x-auto ${loading ? 'opacity-50' : ''}`}>
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -421,8 +421,8 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
               <div className="text-gray-400 text-6xl mb-4">📝</div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">No reviews found</h3>
               <p className="text-gray-600">
-                {reviews.length === 0 
-                  ? "No reviews have been submitted yet." 
+                {reviews.length === 0
+                  ? "No reviews have been submitted yet."
                   : "Try adjusting your filters to see more results."
                 }
               </p>
@@ -464,21 +464,21 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
                     >
                       Previous
                     </button>
-                    
+
                     {/* Page numbers */}
                     {(() => {
                       const currentPage = filters.page;
                       const pages = [];
                       const maxVisiblePages = 5;
-                      
+
                       let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
                       const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-                      
+
                       // Adjust start if we're near the end
                       if (endPage - startPage + 1 < maxVisiblePages) {
                         startPage = Math.max(1, endPage - maxVisiblePages + 1);
                       }
-                      
+
                       // Add first page and ellipsis if needed
                       if (startPage > 1) {
                         pages.push(
@@ -491,7 +491,7 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
                             1
                           </button>
                         );
-                        
+
                         if (startPage > 2) {
                           pages.push(
                             <span key="ellipsis1" className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">
@@ -500,7 +500,7 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
                           );
                         }
                       }
-                      
+
                       // Add visible page numbers
                       for (let i = startPage; i <= endPage; i++) {
                         pages.push(
@@ -508,11 +508,10 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
                             key={i}
                             onClick={() => setFilters(prev => ({ ...prev, page: i }))}
                             disabled={loading}
-                            className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50 ${
-                              currentPage === i
+                            className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50 ${currentPage === i
                                 ? 'z-10 bg-indigo-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600'
                                 : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
-                            }`}
+                              }`}
                           >
                             {i}
                           </button>
@@ -520,7 +519,7 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
                       }
                       return pages;
                     })()}
-                    
+
                     <button
                       onClick={() => setFilters(prev => ({ ...prev, page: Math.min(totalPages, prev.page + 1) }))}
                       disabled={filters.page === totalPages || loading}
@@ -553,17 +552,17 @@ interface ReviewRowProps {
   loading: boolean;
 }
 
-function ReviewRow({ 
-  review, 
-  remedyName, 
-  isEditing, 
-  onEdit, 
-  onDelete, 
-  onStartEdit, 
-  onCancelEdit, 
-  formatDate, 
+function ReviewRow({
+  review,
+  remedyName,
+  isEditing,
+  onEdit,
+  onDelete,
+  onStartEdit,
+  onCancelEdit,
+  formatDate,
   renderStars,
-  loading 
+  loading
 }: ReviewRowProps) {
   const [editData, setEditData] = useState({
     star_count: review.star_count,
@@ -572,7 +571,6 @@ function ReviewRow({
     dosage: review.dosage || '',
     duration_used: review.duration_used || '',
     notes: review.notes || '',
-    experienced_side_effects: review.experienced_side_effects,
   });
 
   const handleSave = () => {
@@ -587,7 +585,6 @@ function ReviewRow({
       dosage: review.dosage || '',
       duration_used: review.duration_used || '',
       notes: review.notes || '',
-      experienced_side_effects: review.experienced_side_effects,
     });
     onCancelEdit();
   };
@@ -687,26 +684,12 @@ function ReviewRow({
               onChange={(e) => setEditData(prev => ({ ...prev, duration_used: e.target.value }))}
               className="w-full text-sm border border-gray-300 rounded px-2 py-1 text-gray-700"
             />
-            <label className="flex items-center text-sm text-gray-700">
-              <input
-                type="checkbox"
-                checked={editData.experienced_side_effects}
-                onChange={(e) => setEditData(prev => ({ ...prev, experienced_side_effects: e.target.checked }))}
-                className="mr-2"
-              />
-              Side effects
-            </label>
           </div>
         ) : (
           <div className="text-sm space-y-1 max-w-xs text-gray-500">
             {review.potency && <div><span className="font-medium">Potency:</span> {review.potency}</div>}
             {review.dosage && <div><span className="font-medium">Dosage:</span> {review.dosage}</div>}
             {review.duration_used && <div><span className="font-medium">Duration:</span> {review.duration_used}</div>}
-            <div className="flex items-center gap-2">
-              <span className={review.experienced_side_effects ? 'text-red-600' : 'text-green-600'}>
-                {review.experienced_side_effects ? '⚠️ Side effects' : '✅ No side effects'}
-              </span>
-            </div>
           </div>
         )}
       </td>
