@@ -80,7 +80,7 @@ export default function UserAvatar({ className = "" }: UserAvatarProps) {
       try {
         // First, check localStorage for cached data
         const cachedData = getCachedData();
-        
+
         if (cachedData) {
           // Use cached data
           setUser(cachedData.user);
@@ -216,7 +216,7 @@ export default function UserAvatar({ className = "" }: UserAvatarProps) {
           />
         ) : (
           <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-400">
-          <span className="text-white font-semibold text-sm">{initials}</span>
+            <span className="text-white font-semibold text-sm">{initials}</span>
           </div>
         )}
       </div>
