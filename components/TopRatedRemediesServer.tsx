@@ -31,7 +31,7 @@ export default function TopRatedRemediesServer({
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
-  const displayCount = isMobile ? 3 : topRemedies.length;
+  const displayCount = isMobile ? 5 : topRemedies.length;
   
   // Just use the original remedy data - no need to refetch stats
   // The stats are already calculated and stored in the remedies table
