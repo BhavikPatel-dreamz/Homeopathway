@@ -135,7 +135,7 @@ export default function AdminRemediesManager() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Manage Remedies</h2>
+          <h2 className="text-3xl font-bold text-gray-900">Manage Remedies</h2>
           <p className="text-gray-600 mt-1">
             Add, edit, or remove homeopathic remedies
           </p>
@@ -145,16 +145,42 @@ export default function AdminRemediesManager() {
           {/* EXPORT */}
           <button
             onClick={handleExport}
-            className="px-4 py-2 border border-gray-400 text-gray-800 bg-white rounded-lg text-sm font-medium hover:bg-gray-50"
-          >
+            className="h-[52px] px-5 rounded-lg bg-emerald-600 text-white font-medium shadow-sm hover:bg-emerald-700 active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer">
+
+              {/* Download Icon */}
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v12m0 0l4-4m-4 4l-4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" />
+            </svg>
+
             Export XLSX
           </button>
 
           {/* IMPORT */}
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="px-4 py-2 border border-gray-400 text-gray-800 bg-white rounded-lg text-sm font-medium hover:bg-gray-50"
-          >
+            className="h-[52px] px-5 rounded-lg border border-[#0f75ae] text-white font-medium bg-[#0f75ae] shadow-sm hover:bg-[#04659b] hover:border-[#0f75ae] active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer">
+
+              {/* Upload Icon */}
+            <svg
+              className="w-5 h-5 text-white"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 16V6m0 0l-3 3m3-3l3 3M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"
+              />
+            </svg>
+            
             Import XLSX
           </button>
 
@@ -174,9 +200,10 @@ export default function AdminRemediesManager() {
           {/* ADD REMEDY */}
           <Link
             href="/admin/remedies/add"
-            className="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors font-medium"
+            className="px-6 py-3 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 transition-colors flex items-center gap-2 cursor-pointer"
           >
-            + Add Remedy
+            <span className="text-xl">+</span>
+            Add Remedy
           </Link>
         </div>
       </div>
