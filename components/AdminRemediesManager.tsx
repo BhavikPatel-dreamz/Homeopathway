@@ -28,13 +28,60 @@ export default function AdminRemediesManager() {
   const [totalPages, setTotalPages] = useState(0);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [importProgress, setImportProgress] = useState<number>(0);
-   const [importing, setImporting] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [sortBy, setSortBy] = useState<
+    'created_at' | 'name' | 'average_rating' | 'review_count'
+  >('created_at');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+
 
 
   const handleExport = () => {
     window.location.href = '/api/admin/remedies/export';
   };
 
+
+  const SortArrows = ({
+  active,
+  order,
+}: {
+  active: boolean;
+  order: 'asc' | 'desc';
+}) => {
+  return (
+    <span className="ml-2 inline-flex flex-col items-center justify-center leading-none flex-shrink-0">
+      <span
+        className={`text-[9px] ${
+          active && order === 'asc'
+            ? 'text-gray-900'
+            : 'text-gray-500'
+        }`}
+      >
+        ▲
+      </span>
+      <span
+        className={`text-[9px] -mt-[1px] ${
+          active && order === 'desc'
+            ? 'text-gray-900'
+            : 'text-gray-500'
+        }`}
+      >
+        ▼
+      </span>
+    </span>
+  );
+};
+
+
+  const handleSort = (column: 'name' | 'average_rating' | 'review_count') => {
+    if (sortBy === column) {
+      setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortBy(column);
+      setSortOrder(column === 'name' ? 'asc' : 'desc');
+    }
+    setCurrentPage(1);
+  };
 
   const handleImport = async (file: File) => {
     const formData = new FormData();
@@ -64,7 +111,7 @@ export default function AdminRemediesManager() {
       let query = supabase
         .from('remedies')
         .select('*', { count: 'exact' })
-        .order('created_at', { ascending: false })
+        .order(sortBy, { ascending: sortOrder === 'asc' })
         .range(offset, offset + itemsPerPage - 1);
 
       // Apply search filter
@@ -85,7 +132,7 @@ export default function AdminRemediesManager() {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, searchTerm, itemsPerPage]);
+  }, [currentPage, searchTerm, itemsPerPage, sortBy, sortOrder]);
 
   useEffect(() => {
     fetchRemedies();
@@ -147,7 +194,7 @@ export default function AdminRemediesManager() {
             onClick={handleExport}
             className="h-[52px] px-5 rounded-lg bg-emerald-600 text-white font-medium shadow-sm hover:bg-emerald-700 active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer">
 
-              {/* Download Icon */}
+            {/* Download Icon */}
             <svg
               className="w-5 h-5"
               fill="none"
@@ -166,7 +213,7 @@ export default function AdminRemediesManager() {
             onClick={() => fileInputRef.current?.click()}
             className="h-[52px] px-5 rounded-lg border border-[#0f75ae] text-white font-medium bg-[#0f75ae] shadow-sm hover:bg-[#04659b] hover:border-[#0f75ae] active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer">
 
-              {/* Upload Icon */}
+            {/* Upload Icon */}
             <svg
               className="w-5 h-5 text-white"
               fill="none"
@@ -180,7 +227,7 @@ export default function AdminRemediesManager() {
                 d="M12 16V6m0 0l-3 3m3-3l3 3M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"
               />
             </svg>
-            
+
             Import XLSX
           </button>
 
@@ -271,19 +318,49 @@ export default function AdminRemediesManager() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider">
                   Icon
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Remedy Name
+                <th
+                  onClick={() => handleSort('name')}
+                  className="px-6 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider cursor-pointer select-none whitespace-nowrap"
+                >
+                  <div className="inline-flex items-center">
+                    Remedy Name
+                    <SortArrows
+                      active={sortBy === 'name'}
+                      order={sortOrder}
+                    />
+                  </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Rating
+
+                <th
+                  onClick={() => handleSort('average_rating')}
+                  className="px-6 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider cursor-pointer select-none whitespace-nowrap"
+                >
+                  <div className="inline-flex items-center">
+                    Rating
+                    <SortArrows
+                      active={sortBy === 'average_rating'}
+                      order={sortOrder}
+                    />
+                  </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Reviews
+
+                <th
+                  onClick={() => handleSort('review_count')}
+                  className="px-6 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider cursor-pointer select-none whitespace-nowrap"
+                >
+                  <div className="inline-flex items-center">
+                    Reviews
+                    <SortArrows
+                      active={sortBy === 'review_count'}
+                      order={sortOrder}
+                    />
+                  </div>
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+
+                <th className="px-6 py-3 text-right text-xs font-semibold text-gray-900 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
