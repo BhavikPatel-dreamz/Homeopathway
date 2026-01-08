@@ -11,7 +11,7 @@ interface RemedyListPageProps {
   totalPages: number;
 }
 
-const ITEMS_PER_PAGE = 12;
+const ITEMS_PER_PAGE = 10;
 
 export default function RemedyListPage({
   remedies: initialRemedies = [],
