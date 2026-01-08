@@ -34,7 +34,7 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
 
   const [loading, setLoading] = useState(false);
   const [avatarLoading, setAvatarLoading] = useState(false);
-  
+
   // Toast notification state
   const [toast, setToast] = useState<{
     type: "success" | "error";
@@ -145,7 +145,7 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
 
   const handleFieldChange = (name: string, value: string) => {
     setFormData({ ...formData, [name]: value });
-    
+
     // Clear error for this field when user starts typing
     if (fieldErrors[name as keyof typeof fieldErrors]) {
       setFieldErrors({ ...fieldErrors, [name]: undefined });
@@ -208,7 +208,7 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
 
       // Convert image to base64 directly
       const reader = new FileReader();
-      
+
       const base64Image = await new Promise<string>((resolve, reject) => {
         reader.onload = (e) => {
           const result = e.target?.result as string;
@@ -229,10 +229,10 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
       }
 
       setAvatarUrl(base64Image);
-      
+
       // Update cache after avatar change
       await updateCache();
-      
+
       showToast("success", "Avatar updated successfully!");
     } catch (error: any) {
       console.error("Avatar upload error:", error);
@@ -267,17 +267,17 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
         .from("profiles")
         .update({ profile_img: null })
         .eq("id", user.id);
-  
+
       if (updateError) {
         throw updateError;
       }
-  
+
       setAvatarUrl("");
       setPreviewUrl(null);
-      
+
       // Update cache after avatar removal
       await updateCache();
-      
+
       showToast("success", "Avatar removed successfully!");
     } catch (error: any) {
       console.error("Avatar removal error:", error);
@@ -315,8 +315,8 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
 
       showToast("success", "Profile updated successfully!");
       setIsEditing(false);
-      setFormData((prev) => ({ 
-        ...prev, 
+      setFormData((prev) => ({
+        ...prev,
         password: "",
         newpassword: "",
         confirmpassword: ""
@@ -344,10 +344,10 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) console.error("Logout error:", error);
-      
+
       // Clear cache on logout
       localStorage.removeItem(USER_CACHE_KEY);
-      
+
       router.push("/login");
     } catch (err) {
       console.error("Logout error:", err);
@@ -365,11 +365,10 @@ sm:left-auto sm:right-4 sm:translate-x-0
 z-50 animate-in slide-in-from-top-2
 ">
           <div
-            className={`min-w-[300px]  max-w-md p-4 rounded-lg shadow-lg flex items-start gap-3 ${
-              toast.type === "success"
+            className={`min-w-[300px]  max-w-md p-4 rounded-lg shadow-lg flex items-start gap-3 ${toast.type === "success"
                 ? "bg-green-50 text-green-800 border border-green-200"
                 : "bg-red-50 text-red-800 border border-red-200"
-            }`}
+              }`}
           >
             {toast.type === "success" ? (
               <svg
@@ -449,9 +448,8 @@ z-50 animate-in slide-in-from-top-2
             <div className="flex flex-col md:flex-row items-start md:items-center gap-4 justify-between">
               <div className="relative">
                 <div
-                  className={`w-20 h-20 rounded-full overflow-hidden border-2 border-gray-200 cursor-pointer transition-all duration-200 ${
-                    isEditing ? "hover:border-[#6B7B5E] hover:shadow-lg" : ""
-                  } ${avatarLoading ? "opacity-50" : ""}`}
+                  className={`w-20 h-20 rounded-full overflow-hidden border-2 border-gray-200 cursor-pointer transition-all duration-200 ${isEditing ? "hover:border-[#6B7B5E] hover:shadow-lg" : ""
+                    } ${avatarLoading ? "opacity-50" : ""}`}
                   onClick={handleAvatarClick}
                 >
                   {previewUrl || avatarUrl ? (
@@ -559,9 +557,8 @@ z-50 animate-in slide-in-from-top-2
                   onChange={(e) => handleFieldChange("full_name", e.target.value)}
                   disabled={!isEditing}
                   placeholder="Full Name"
-                  className={`w-full pl-9 xs:pl-10 sm:pl-12 pr-3 xs:pr-4 py-2 xs:py-2.5 border text-xs xs:text-sm sm:text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] disabled:bg-[#F1F2F0] disabled:text-[#41463B] text-gray-500 ${
-                    fieldErrors.full_name ? "border-red-500" : "border-[#D3D6D1]"
-                  }`}
+                  className={`w-full pl-9 xs:pl-10 sm:pl-12 pr-3 xs:pr-4 py-2 xs:py-2.5 border text-xs xs:text-sm sm:text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] disabled:bg-[#F1F2F0] disabled:text-[#41463B] text-gray-500 ${fieldErrors.full_name ? "border-red-500" : "border-[#D3D6D1]"
+                    }`}
                 />
               </div>
               {fieldErrors.full_name && (
@@ -630,9 +627,8 @@ z-50 animate-in slide-in-from-top-2
                     disabled={!isEditing}
                     autoComplete="off"
                     placeholder={isEditing ? "Enter current password" : "••••••••••"}
-                    className={`w-full pl-9 xs:pl-10 sm:pl-12 pr-10 xs:pr-12 py-2 xs:py-2.5 sm:py-3 border text-xs xs:text-sm sm:text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] disabled:bg-[#F1F2F0] disabled:text-[#41463B] text-gray-500 ${
-                      fieldErrors.password ? "border-red-500" : "border-[#D3D6D1]"
-                    }`}
+                    className={`w-full pl-9 xs:pl-10 sm:pl-12 pr-10 xs:pr-12 py-2 xs:py-2.5 sm:py-3 border text-xs xs:text-sm sm:text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] disabled:bg-[#F1F2F0] disabled:text-[#41463B] text-gray-500 ${fieldErrors.password ? "border-red-500" : "border-[#D3D6D1]"
+                      }`}
                   />
                   {isEditing && (
                     <button
@@ -709,9 +705,8 @@ z-50 animate-in slide-in-from-top-2
                     disabled={!isEditing}
                     autoComplete="new-password"
                     placeholder={isEditing ? "Enter new password" : "••••••••••"}
-                    className={`w-full pl-9 xs:pl-10 sm:pl-12 pr-10 xs:pr-12 py-2 xs:py-2.5 sm:py-3 border text-xs xs:text-sm sm:text-[16px] text-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] disabled:bg-[#F1F2F0] disabled:text-[#41463B] ${
-                      fieldErrors.newpassword ? "border-red-500" : "border-[#D3D6D1]"
-                    }`}
+                    className={`w-full pl-9 xs:pl-10 sm:pl-12 pr-10 xs:pr-12 py-2 xs:py-2.5 sm:py-3 border text-xs xs:text-sm sm:text-[16px] text-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] disabled:bg-[#F1F2F0] disabled:text-[#41463B] ${fieldErrors.newpassword ? "border-red-500" : "border-[#D3D6D1]"
+                      }`}
                   />
                   {isEditing && (
                     <button
@@ -792,9 +787,8 @@ z-50 animate-in slide-in-from-top-2
                     onChange={(e) => handleFieldChange("confirmpassword", e.target.value)}
                     disabled={!isEditing}
                     placeholder={isEditing ? "Enter Confirm new password" : "••••••••••"}
-                    className={`w-full pl-9 xs:pl-10 sm:pl-12 pr-10 xs:pr-12 py-2 xs:py-2.5 sm:py-3 border text-xs xs:text-sm sm:text-[16px] text-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] disabled:bg-[#F1F2F0] disabled:text-[#41463B] ${
-                      fieldErrors.confirmpassword ? "border-red-500" : "border-[#D3D6D1]"
-                    }`}
+                    className={`w-full pl-9 xs:pl-10 sm:pl-12 pr-10 xs:pr-12 py-2 xs:py-2.5 sm:py-3 border text-xs xs:text-sm sm:text-[16px] text-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] disabled:bg-[#F1F2F0] disabled:text-[#41463B] ${fieldErrors.confirmpassword ? "border-red-500" : "border-[#D3D6D1]"
+                      }`}
                   />
                   {isEditing && (
                     <button

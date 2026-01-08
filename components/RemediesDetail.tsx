@@ -250,7 +250,7 @@ export default function RemediesDetailPage({
                 </div>
               </div>
               <div className="w-full">
-                <h1 className="text-4xl sm:text-4xl lg:text-[32px] xl:text-[40px] font-serif text-[#0B0C0A] mb-2 lg:mb-0 wrap-break-word font-normal">
+                <h1 className="text-2xl sm:text-2xl lg:text-[32px] xl:text-[40px] font-serif text-[#0B0C0A] mb-2 lg:mb-0 wrap-break-word font-normal">
                   {remedy.name}
                 </h1>
                 <p className="text-[16px] leading-6 sm:text-base text-[#41463B] mb-3 sm:mb-4 font-nomal md:font-medium">
