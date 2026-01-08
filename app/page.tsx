@@ -119,7 +119,7 @@ export default async function Home() {
     .select("name, average_rating, review_count, description, slug, icon")
     .order("average_rating", { ascending: false })
     .order("review_count", { ascending: false })
-    .limit(5);
+    .limit(8);
 
   if (remediesError) {
     console.error("Error fetching top remedies:", remediesError);
