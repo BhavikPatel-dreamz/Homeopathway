@@ -8,7 +8,7 @@ export default function Page() {
       {/* Breadcrumb (KEEP – matches original) */}
       <Breadcrumb
         items={[
-          { label: "Back to home", href: "/" },
+          { label: "Home", href: "/" },
           { label: "Safety & Research", isActive: true }
         ]}
       />

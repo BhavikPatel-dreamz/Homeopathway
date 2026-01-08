@@ -32,7 +32,7 @@ export default function TopRatedRemediesServer({
   }, []);
 
   const displayCount = isMobile ? 3 : topRemedies.length;
-
+  
   // Just use the original remedy data - no need to refetch stats
   // The stats are already calculated and stored in the remedies table
   const remediesWithStats = topRemedies.slice(0, displayCount);
