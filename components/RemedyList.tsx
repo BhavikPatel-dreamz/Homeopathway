@@ -24,7 +24,7 @@ export default function RemedyListPage({
   const filteredRemedies = useMemo(() => {
     if (!searchQuery) return initialRemedies;
     return initialRemedies.filter((remedy) =>
-       (remedy.slug || '').toLowerCase().includes(searchQuery.toLowerCase())
+      (remedy.slug || '').toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [initialRemedies, searchQuery]);
 
@@ -80,20 +80,20 @@ export default function RemedyListPage({
 
   return (
     <div className="min-h-screen bg-[#F5F1E8]">
-      
+
       {/* Breadcrumb */}
-      <Breadcrumb 
+      <Breadcrumb
         items={[
-          { label: "Back to home", href: "/" },
+          { label: "Home", href: "/" },
           { label: "All Remedies", isActive: true }
-        ]} 
+        ]}
         className="border-b border-gray-200"
       />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-0 lg:px-5 py-8">
         {/* Remedies Section */}
-       <div className="bg-white rounded-2xl p-6 shadow-sm">
+        <div className="bg-white rounded-2xl p-6 shadow-sm">
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-2">
@@ -132,34 +132,34 @@ export default function RemedyListPage({
           )}
 
           {/* Remedies Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-6 gap-3">
             {paginatedRemedies.length > 0 ? (
               paginatedRemedies.map((remedy) => {
                 return (
-                <Link href={`/remedies/${remedy.slug}`} key={remedy.slug}>
-                  <div
-                    className="bg-white rounded-xl p-6 border border-gray-200 hover:shadow-lg  transition-all text-left h-full flex flex-col justify-between group cursor-pointer"
-                  >
-                  <div>
-                    <div className="text-5xl mb-3">{remedy.icon || '🌿'}</div>
-                    <h4 className="font-semibold text-lg mb-2 text-gray-900 group-hover:text-[#2C5F4F] transition-colors">
-                      {remedy.name}
-                    </h4>
-                    <p className="text-sm text-gray-600 line-clamp-2">{remedy.description}</p>
-                  </div>
-                  <div className="text-sm text-gray-500 mt-3 flex items-center gap-2">
-                    <span className="flex items-center gap-1 text-[#E69E29]">
-                      <Image src="/star.svg" alt="Star" width={16} height={16} />
-                      <span>{(remedy.rating ?? remedy.average_rating)?.toFixed(1)}</span>
-                    </span>
-                    <span className="text-gray-400">|</span>
-                    <span>
-                         {remedy.reviewCount ?? remedy.review_count}{" "}
-                         {(remedy.reviewCount ?? remedy.review_count) === 1 ? "review" : "reviews"}
-                   </span>
-                  </div>
-                  </div>
-                </Link>
+                  <Link href={`/remedies/${remedy.slug}`} key={remedy.slug}>
+                    <div
+                      className="bg-white rounded-xl sm:p-6 p-3 border border-gray-200 hover:shadow-lg  transition-all text-left h-full flex flex-col justify-between group cursor-pointer"
+                    >
+                      <div>
+                        <div className="text-5xl mb-3">{remedy.icon || '🌿'}</div>
+                        <h4 className="font-semibold text-lg mb-2 text-gray-900 group-hover:text-[#2C5F4F] transition-colors">
+                          {remedy.name}
+                        </h4>
+                        <p className="text-sm text-gray-600 line-clamp-2">{remedy.description}</p>
+                      </div>
+                      <div className="sm:text-sm text-xs text-gray-500 mt-3 flex sm:flex-nowrap flex-wrap  items-center gap-2">
+                        <span className="flex items-center gap-1 text-[#E69E29]">
+                          <Image src="/star.svg" alt="Star" width={16} height={16} />
+                          <span>{(remedy.rating ?? remedy.average_rating)?.toFixed(1)}</span>
+                        </span>
+                        <span className="text-gray-400">|</span>
+                        <span>
+                          {remedy.reviewCount ?? remedy.review_count}{" "}
+                          {(remedy.reviewCount ?? remedy.review_count) === 1 ? "review" : "reviews"}
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
                 );
               })
             ) : (
@@ -186,17 +186,16 @@ export default function RemedyListPage({
                 >
                   Previous
                 </button>
-                
+
                 {getPageNumbers().map((page, index) => (
                   typeof page === 'number' ? (
                     <button
                       key={index}
                       onClick={() => goToPage(page)}
-                      className={`px-4 py-2 rounded-lg transition-colors font-medium ${
-                        currentPage === page
-                          ? 'bg-[#4B544A] text-white'
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                      }`}
+                      className={`px-4 py-2 rounded-lg transition-colors font-medium ${currentPage === page
+                        ? 'bg-[#4B544A] text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        }`}
                     >
                       {page}
                     </button>
@@ -206,7 +205,7 @@ export default function RemedyListPage({
                     </span>
                   )
                 ))}
-                
+
                 <button
                   onClick={goToNext}
                   disabled={currentPage === totalPages}
@@ -215,7 +214,7 @@ export default function RemedyListPage({
                   Next
                 </button>
               </div>
-              
+
               <div className="text-center mt-4 text-sm text-gray-600">
                 Page {currentPage} of {totalPages}
               </div>

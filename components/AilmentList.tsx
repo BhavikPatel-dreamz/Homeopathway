@@ -125,43 +125,43 @@ export default function AilmentListPage({
     return pages;
   };
 
- 
+
 
   return (
     <div className="min-h-screen bg-[#F5F1E8]">
       {/* Header */}
-      
+
       {/* Breadcrumb */}
-      <Breadcrumb 
+      <Breadcrumb
         items={[
-          { label: "Back to home", href: "/" },
+          { label: "Home", href: "/" },
           { label: "All Ailments", isActive: true }
-        ]} 
+        ]}
       />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-0 lg:px-5 py-8">
         {/* Ailments Section */}
-   <div className="bg-white rounded-2xl p-8 shadow-sm">
-  <div className="mb-8">
-    <div className="flex items-center gap-3 mb-2">
-      <img className="w-[40px] h-[40px] sm:w-[50px] sm:h-[50px] lg:w-[60px] lg:h-[60px]" alt="" src="/ailments-icon.svg" />
-      <h1 className="text-4xl font-serif text-gray-900">All Ailments</h1>
-    </div>
-    <p className="text-gray-600 mt-2">
-      Browse through our comprehensive collection of ailments and find the right homeopathic remedies for you.
-    </p>
-  </div>
+        <div className="bg-white rounded-2xl p-8 shadow-sm">
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-2">
+              <img className="w-[40px] h-[40px] sm:w-[50px] sm:h-[50px] lg:w-[60px] lg:h-[60px]" alt="" src="/ailments-icon.svg" />
+              <h1 className="text-4xl font-serif text-gray-900">All Ailments</h1>
+            </div>
+            <p className="text-gray-600 mt-2">
+              Browse through our comprehensive collection of ailments and find the right homeopathic remedies for you.
+            </p>
+          </div>
 
-          
 
-        
+
+
           {/* Ailments Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-6 gap-3">
             {paginatedAilments.length > 0 ? (
               paginatedAilments.map((ailment) => (
                 <Link href={`/${ailment.slug}`} key={ailment.slug}>
-                  <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg  transition-all text-left h-full flex flex-col justify-between group cursor-pointer">
+                  <div className="bg-white rounded-xl sm:p-6 p-3 border border-gray-200 hover:shadow-lg  transition-all text-left h-full flex flex-col justify-between group cursor-pointer">
                     <div>
                       <div className="text-5xl mb-3">{ailment.icon}</div>
                       <h4 className="font-semibold text-lg mb-2 text-gray-900 group-hover:text-[#2C5F4F] transition-colors">
@@ -202,17 +202,16 @@ export default function AilmentListPage({
                 >
                   Previous
                 </button>
-                
+
                 {getPageNumbers().map((page, index) => (
                   typeof page === 'number' ? (
                     <button
                       key={index}
                       onClick={() => goToPage(page)}
-                      className={`px-4 py-2 rounded-lg transition-colors font-medium ${
-                        currentPage === page
-                          ? 'bg-[#4B544A] text-white'
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                      }`}
+                      className={`px-4 py-2 rounded-lg transition-colors font-medium ${currentPage === page
+                        ? 'bg-[#4B544A] text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        }`}
                     >
                       {page}
                     </button>
@@ -222,7 +221,7 @@ export default function AilmentListPage({
                     </span>
                   )
                 ))}
-                
+
                 <button
                   onClick={goToNext}
                   disabled={currentPage === totalPages}
@@ -231,7 +230,7 @@ export default function AilmentListPage({
                   Next
                 </button>
               </div>
-              
+
               <div className="text-center mt-4 text-sm text-gray-600">
                 Page {currentPage} of {totalPages}
               </div>
