@@ -7,6 +7,15 @@ import { User } from "@supabase/supabase-js";
 import UserDropdown from "./UserDropdown";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { sha256 } from "js-sha256";
+
+function getGravatarURL(email: string) {
+  const address = email.trim().toLowerCase();
+  const hash = sha256(address);
+  return `https://www.gravatar.com/avatar/${hash}?d=identicon&s=80`;
+}
+
+
 
 interface UserAvatarProps {
   className?: string;
@@ -215,10 +224,13 @@ export default function UserAvatar({ className = "" }: UserAvatarProps) {
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-400">
-            <span className="text-white font-semibold text-sm">{initials}</span>
-          </div>
+          <img
+            src={getGravatarURL(profile.email)}
+            alt="User Avatar"
+            className="w-full h-full object-cover"
+          />
         )}
+
       </div>
 
       <UserDropdown

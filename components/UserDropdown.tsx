@@ -6,6 +6,14 @@ import { UserProfile } from '@/types/supabase';
 import { User } from '@supabase/supabase-js';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { sha256 } from "js-sha256";
+
+
+function getGravatarURL(email: string) {
+  const address = email.trim().toLowerCase();
+  const hash = sha256(address);
+  return `https://www.gravatar.com/avatar/${hash}?d=identicon&s=64`;
+}
 
 interface UserDropdownProps {
   isOpen: boolean;
@@ -75,17 +83,29 @@ export default function UserDropdown({ isOpen, onClose, user, profile }: UserDro
       className="absolute right-0 top-full mt-2 w-56 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-[1002]"
     >
       {/* User Info */}
-      <div className="px-4 py-3 border-b border-gray-100">
-        <p className="text-sm font-medium text-gray-900">
-          {profile.first_name} {profile.last_name}
-        </p>
-        <p className="text-sm text-gray-500 truncate">{profile.email}</p>
-        {profile.role === 'admin' && (
-          <span className="inline-block mt-1 px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
-            Admin
-          </span>
-        )}
+      <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-3">
+        <img
+          src={profile.profile_img || getGravatarURL(profile.email)}
+          alt="User Avatar"
+          className="w-10 h-10 rounded-full object-cover border"
+        />
+
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-gray-900 truncate">
+            {profile.first_name} {profile.last_name}
+          </p>
+          <p className="text-sm text-gray-500 truncate">
+            {profile.email}
+          </p>
+
+          {profile.role === "admin" && (
+            <span className="inline-block mt-1 px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
+              Admin
+            </span>
+          )}
+        </div>
       </div>
+
 
       {/* Menu Items */}
       <Link
