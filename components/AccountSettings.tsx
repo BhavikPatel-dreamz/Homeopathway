@@ -5,6 +5,15 @@ import { supabase } from "../lib/supabaseClient";
 import UserAvatar from "./UserAvatar";
 import Breadcrumb from "./Breadcrumb";
 
+import { sha256 } from "js-sha256";
+
+function getGravatarURL(email: string) {
+  const address = String(email).trim().toLowerCase();
+  const hash = sha256(address);
+  return `https://www.gravatar.com/avatar/${hash}?d=identicon&s=200`;
+}
+
+
 interface AccountSettingsProps {
   user: {
     id: string;
@@ -49,7 +58,9 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
     confirmpassword?: string;
   }>({});
 
-  const [avatarUrl, setAvatarUrl] = useState(user.profile_img || "");
+  const [avatarUrl, setAvatarUrl] = useState(
+    user.profile_img || getGravatarURL(user.email)
+  );
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -272,7 +283,7 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
         throw updateError;
       }
 
-      setAvatarUrl("");
+      setAvatarUrl(getGravatarURL(user.email));
       setPreviewUrl(null);
 
       // Update cache after avatar removal
@@ -366,8 +377,8 @@ z-50 animate-in slide-in-from-top-2
 ">
           <div
             className={`min-w-[300px]  max-w-md p-4 rounded-lg shadow-lg flex items-start gap-3 ${toast.type === "success"
-                ? "bg-green-50 text-green-800 border border-green-200"
-                : "bg-red-50 text-red-800 border border-red-200"
+              ? "bg-green-50 text-green-800 border border-green-200"
+              : "bg-red-50 text-red-800 border border-red-200"
               }`}
           >
             {toast.type === "success" ? (
@@ -458,6 +469,7 @@ z-50 animate-in slide-in-from-top-2
                       alt="Profile Avatar"
                       className="w-full h-full object-cover"
                     />
+
                   ) : (
                     <div className="w-full h-full bg-gray-400 flex items-center justify-center">
                       <span className="text-gray-100 text-xl font-semibold">

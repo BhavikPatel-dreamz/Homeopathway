@@ -33,11 +33,53 @@ export default function AdminAilmentsManager() {
   const [importProgress, setImportProgress] = useState<number>(0);
   const [importing, setImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [sortBy, setSortBy] = useState<'name' | 'remedies_count'>('name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+
 
   const handleExport = () => {
     window.location.href = '/api/admin/ailments/export';
   };
 
+
+  const handleSort = (column: 'name' | 'remedies_count') => {
+    if (sortBy === column) {
+      setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortBy(column);
+      setSortOrder('asc');
+    }
+    setCurrentPage(1);
+  };
+
+  const SortArrows = ({
+    active,
+    order,
+  }: {
+    active: boolean;
+    order: 'asc' | 'desc';
+  }) => {
+    return (
+      <span className="ml-2 inline-flex flex-col leading-none">
+        <span
+          className={`text-[10px] transition-colors ${active && order === 'asc'
+              ? 'text-gray-900'
+              : 'text-gray-500'
+            }`}
+        >
+          ▲
+        </span>
+        <span
+          className={`text-[10px] transition-colors ${active && order === 'desc'
+              ? 'text-gray-900'
+              : 'text-gray-500'
+            }`}
+        >
+          ▼
+        </span>
+      </span>
+    );
+  };
 
 
   const handleImport = async (file: File) => {
@@ -85,7 +127,7 @@ export default function AdminAilmentsManager() {
       let query = supabase
         .from('ailments')
         .select('*', { count: 'exact' })
-        .order('name', { ascending: true })
+        .order(sortBy, { ascending: sortOrder === 'asc' })
         .range(offset, offset + itemsPerPage - 1);
 
       // Apply search filter
@@ -106,7 +148,8 @@ export default function AdminAilmentsManager() {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, searchTerm, itemsPerPage]);
+  }, [currentPage, searchTerm, itemsPerPage, sortBy, sortOrder]);
+
 
   useEffect(() => {
     fetchAilments();
@@ -336,9 +379,30 @@ export default function AdminAilmentsManager() {
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
               <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Icon</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Name</th>
+              <th
+                onClick={() => handleSort('name')}
+                className="px-6 py-4 text-left text-sm font-semibold text-gray-900 cursor-pointer select-none flex items-center"
+              >
+                Name
+                <SortArrows
+                  active={sortBy === 'name'}
+                  order={sortOrder}
+                />
+              </th>
+
               <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Description</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Remedies</th>
+              <th
+                onClick={() => handleSort('remedies_count')}
+                className="px-6 py-4 text-left text-sm font-semibold text-gray-900 cursor-pointer select-none flex items-center"
+              >
+                Remedies
+                <SortArrows
+                  active={sortBy === 'remedies_count'}
+                  order={sortOrder}
+                />
+              </th>
+
+
               <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900">Actions</th>
             </tr>
           </thead>
