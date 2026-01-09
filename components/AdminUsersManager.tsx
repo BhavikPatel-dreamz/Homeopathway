@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
 import Pagination from './Pagination';
 import { User } from '@/types'
+import * as XLSX from 'xlsx';
 
 // interface User {
 //   id: string;
@@ -24,6 +25,58 @@ export default function AdminUsersManager() {
   const [itemsPerPage] = useState(25);
   const [totalUsers, setTotalUsers] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+
+
+  const handleExport = async () => {
+    try {
+      setLoading(true);
+
+      let query = supabase
+        .from('profiles')
+        .select('id,email,first_name,last_name,role,created_at')
+        .order('created_at', { ascending: false });
+
+      if (searchTerm) {
+        query = query.or(
+          `email.ilike.%${searchTerm}%,first_name.ilike.%${searchTerm}%,last_name.ilike.%${searchTerm}%`
+        );
+      }
+
+      if (roleFilter !== 'all') {
+        query = query.eq('role', roleFilter);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+
+      const rows = (data || [])
+        .filter(user => user.role !== 'admin') // 🚫 exclude admins
+        .map(user => ({
+          Name: `${user.first_name ?? ''} ${user.last_name ?? ''}`.trim(),
+          Email: user.email,
+          Role: user.role,
+          Joined: new Date(user.created_at).toLocaleDateString(),
+        }));
+
+
+      const workbook = XLSX.utils.book_new();
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Users');
+
+      XLSX.writeFile(
+        workbook,
+        `users_export_${new Date().toISOString().slice(0, 10)}.xlsx`
+      );
+    } catch (err) {
+      console.error(err);
+      setMessage({ type: 'error', text: 'Failed to export users' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
@@ -137,22 +190,32 @@ export default function AdminUsersManager() {
           <h2 className="text-2xl font-bold text-gray-900">Manage Users</h2>
           <p className="text-gray-600 mt-1">View and manage user accounts and permissions</p>
         </div>
-        <Link
-          href="/admin/users/add"
-          className="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors font-medium"
-        >
-          + Add User
-        </Link>
+        <div className="flex gap-3">
+          <button
+            onClick={handleExport}
+            disabled={loading}
+            className="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors font-medium"
+          >
+            Export XLSX
+          </button>
+
+          <Link
+            href="/admin/users/add"
+            className="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors font-medium"
+          >
+            + Add User
+          </Link>
+        </div>
+
       </div>
 
       {/* Success/Error Message */}
       {message && (
         <div
-          className={`p-4 rounded-lg ${
-            message.type === 'success'
-              ? 'bg-green-50 text-green-800 border border-green-200'
-              : 'bg-red-50 text-red-800 border border-red-200'
-          }`}
+          className={`p-4 rounded-lg ${message.type === 'success'
+            ? 'bg-green-50 text-green-800 border border-green-200'
+            : 'bg-red-50 text-red-800 border border-red-200'
+            }`}
         >
           {message.text}
         </div>
@@ -261,11 +324,10 @@ export default function AdminUsersManager() {
                         value={user.role}
                         onChange={(e) => handleRoleChange(user.id, e.target.value)}
                         disabled={loading}
-                        className={`px-3 py-1 text-xs font-medium rounded-full border ${
-                          user.role === 'admin'
-                            ? 'bg-purple-100 text-purple-800 border-purple-200'
-                            : 'bg-blue-100 text-blue-800 border-blue-200'
-                        } disabled:opacity-50`}
+                        className={`px-3 py-1 text-xs font-medium rounded-full border ${user.role === 'admin'
+                          ? 'bg-purple-100 text-purple-800 border-purple-200'
+                          : 'bg-blue-100 text-blue-800 border-blue-200'
+                          } disabled:opacity-50`}
                       >
                         <option value="user">User</option>
                         <option value="admin">Admin</option>
@@ -305,8 +367,8 @@ export default function AdminUsersManager() {
               {searchTerm || roleFilter !== 'all' ? 'No users found' : 'No users yet'}
             </h3>
             <p className="text-gray-600 mb-4">
-              {searchTerm || roleFilter !== 'all' 
-                ? 'Try adjusting your search or filters' 
+              {searchTerm || roleFilter !== 'all'
+                ? 'Try adjusting your search or filters'
                 : 'Get started by adding your first user'}
             </p>
             {!searchTerm && roleFilter === 'all' && (
