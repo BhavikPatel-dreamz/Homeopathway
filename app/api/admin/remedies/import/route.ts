@@ -35,32 +35,68 @@ export async function POST(req: Request) {
     const arrayBuffer = await file.arrayBuffer()
     const workbook = XLSX.read(arrayBuffer, { type: 'array' })
 
-    const sheet = workbook.Sheets['Remedies']
+    // Try to find a sheet named 'Remedies', otherwise fall back to the first sheet (works for CSV)
+    let sheet = workbook.Sheets['Remedies']
+    if (!sheet) {
+      const firstSheetName = Object.keys(workbook.Sheets)[0]
+      sheet = workbook.Sheets[firstSheetName]
+    }
+
     if (!sheet) {
       return NextResponse.json(
-        { error: 'Remedies sheet missing' },
+        { error: 'No sheets found in uploaded file' },
         { status: 400 }
       )
     }
 
     const rows = XLSX.utils.sheet_to_json<RemedyImportRow>(sheet)
 
+    // small util to create a slug from a name when missing
+    const slugify = (input?: string | null) => {
+      if (!input) return null
+      return input
+        .toString()
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)+/g, '')
+    }
+
     for (const row of rows) {
-      if (!row.id) continue
+      // Allow CSV cells to contain comma-separated key_symptoms; keep as-is if already array-like
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const keySymptomsVal: any = row.key_symptoms ?? null
 
-      const { error } = await supabase
-        .from('remedies')
-        .update({
-          name: row.name ?? null,
-          scientific_name: row.scientific_name ?? null,
-          common_name: row.common_name ?? null,
-          description: row.description ?? null,
-          key_symptoms: row.key_symptoms ?? null,
-          slug: row.slug ?? null,
-        })
-        .eq('id', row.id)
+      const key_symptoms = typeof keySymptomsVal === 'string' && keySymptomsVal.includes(',')
+        ? keySymptomsVal.split(',').map(s => s.trim()).filter(Boolean)
+        : keySymptomsVal
 
-      if (error) throw error
+      const payload = {
+        name: row.name ?? null,
+        scientific_name: row.scientific_name ?? null,
+        common_name: row.common_name ?? null,
+        description: row.description ?? null,
+        key_symptoms: key_symptoms ?? null,
+        slug: row.slug ?? slugify(row.name ?? null),
+      }
+
+      if (row.id) {
+        const { error } = await supabase
+          .from('remedies')
+          .update(payload)
+          .eq('id', row.id)
+
+        if (error) throw error
+      } else {
+        // Insert new remedy when there's no id
+        const { data: inserted, error } = await supabase
+          .from('remedies')
+          .insert(payload)
+          .select()
+          .single()
+
+        if (error) throw error
+      }
     }
 
     return NextResponse.json({ success: true })

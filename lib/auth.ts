@@ -162,7 +162,8 @@ export async function getUserProfile(userId?: string) {
 export async function isAdmin(userId?: string) {
   const { profile, error } = await getUserProfile(userId);
   if (error) return false;
-  return profile?.role === 'admin';
+  // Treat 'moderator' as privileged for accessing admin area
+  return profile?.role === 'admin' || profile?.role === 'moderator';
 }
 
 export default {

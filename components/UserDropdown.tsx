@@ -103,6 +103,11 @@ export default function UserDropdown({ isOpen, onClose, user, profile }: UserDro
               Admin
             </span>
           )}
+          {profile.role === "moderator" && (
+            <span className="inline-block mt-1 px-2 py-1 text-xs bg-green-100 text-green-800 rounded">
+              Moderator
+            </span>
+          )}
         </div>
       </div>
 
@@ -119,7 +124,7 @@ export default function UserDropdown({ isOpen, onClose, user, profile }: UserDro
         My Profile
       </Link>
 
-      {profile.role === 'admin' && (
+      {(profile.role === 'admin' || profile.role === 'moderator') && (
         <Link
           href="/admin"
           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"

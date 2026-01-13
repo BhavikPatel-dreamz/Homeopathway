@@ -36,8 +36,24 @@ export default function AdminRemediesManager() {
 
 
 
-  const handleExport = () => {
-    window.location.href = '/api/admin/remedies/export';
+  const handleExport = async () => {
+    try {
+      const res = await fetch('/api/admin/remedies/export?format=csv');
+      if (!res.ok) throw new Error('Export failed');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'remedies.csv';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Export error', err);
+      setMessage({ type: 'error', text: 'Export failed' });
+      setTimeout(() => setMessage(null), 4000);
+    }
   };
 
 
@@ -205,7 +221,7 @@ export default function AdminRemediesManager() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v12m0 0l4-4m-4 4l-4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" />
             </svg>
 
-            Export XLSX
+            Export CSV
           </button>
 
           {/* IMPORT */}
@@ -228,14 +244,14 @@ export default function AdminRemediesManager() {
               />
             </svg>
 
-            Import XLSX
+            Import XLSX / CSV
           </button>
 
           {/* Hidden file input */}
           <input
             ref={fileInputRef}
             type="file"
-            accept=".xlsx"
+            accept=".xlsx,.csv"
             className="hidden"
             onChange={(e) => {
               if (e.target.files?.[0]) {
@@ -352,7 +368,7 @@ export default function AdminRemediesManager() {
                   className="px-6 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider cursor-pointer select-none whitespace-nowrap"
                 >
                   <div className="inline-flex items-center">
-                    Reviews
+                      Reviews Count
                     <SortArrows
                       active={sortBy === 'review_count'}
                       order={sortOrder}

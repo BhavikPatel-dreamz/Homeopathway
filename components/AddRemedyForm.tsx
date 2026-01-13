@@ -267,38 +267,7 @@ export default function AddRemedyForm() {
                 </p>
               </div>
 
-              {/* Image URL */}
-              <div>
-                <label htmlFor="image_url" className="block text-sm font-medium text-gray-700 mb-2">
-                  Image URL
-                </label>
-                <input
-                  type="url"
-                  id="image_url"
-                  name="image_url"
-                  value={formData.image_url}
-                  onChange={handleChange}
-                  placeholder="https://example.com/remedy-image.jpg"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-                />
-                <p className="text-sm text-gray-500 mt-1">
-                  Optional: Add a URL to an image of the remedy plant/substance
-                </p>
-                {formData.image_url && (
-                  <div className="mt-2">
-                    <Image
-                      src={formData.image_url}
-                      alt="Remedy preview"
-                      width={128}
-                      height={128}
-                      className="w-32 h-32 object-cover rounded-lg border border-gray-200"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
+              {/* Image URL removed per request (UI-only) */}
             </div>
           </div>
 

@@ -395,7 +395,7 @@ export default function AdminAilmentsManager() {
                 onClick={() => handleSort('remedies_count')}
                 className="px-6 py-4 text-left text-sm font-semibold text-gray-900 cursor-pointer select-none flex items-center"
               >
-                Remedies
+                Remedy Count
                 <SortArrows
                   active={sortBy === 'remedies_count'}
                   order={sortOrder}

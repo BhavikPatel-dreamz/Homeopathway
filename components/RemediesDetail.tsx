@@ -192,6 +192,60 @@ export default function RemediesDetailPage({
 
   const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
+  // Common potencies extracted from reviews
+  const [commonPotencies, setCommonPotencies] = useState<string[]>([]);
+
+  useEffect(() => {
+    let mounted = true;
+    async function loadPotencies() {
+      try {
+        const { getReviews } = await import('@/lib/review');
+        // fetch many reviews for frequency analysis
+        const { data: reviews } = await getReviews({ remedyId: remedy.id, limit: 10000 });
+        if (!reviews || reviews.length === 0) {
+          if (mounted) setCommonPotencies([]);
+          return;
+        }
+
+        const freq: Record<string, number> = {};
+
+        const normalize = (raw?: string | null) => {
+          if (!raw) return '';
+          const s = raw.toString().trim().toUpperCase();
+
+          // Prefer explicit potency token like '12C', '30C', '200C', '6X', 'LM1', 'CH30'
+          const m = s.match(/(LM\d*|CH\d*|\d+\s*[A-Z]{1,3})/);
+          if (m && m[0]) return m[0].replace(/\s+/g, '');
+
+          // Fallback: remove whitespace and non-alphanumeric
+          return s.replace(/\s+/g, '').replace(/[^0-9A-Z]/g, '');
+        };
+
+        for (const r of reviews) {
+          const p1raw = (r.potency || '') as string;
+          const p2raw = (r.potency_2 || '') as string;
+          const p1 = normalize(p1raw);
+          const p2 = normalize(p2raw);
+          if (p1) freq[p1] = (freq[p1] || 0) + 1;
+          if (p2) freq[p2] = (freq[p2] || 0) + 1;
+        }
+
+        const sorted = Object.entries(freq)
+          .sort((a, b) => b[1] - a[1])
+          .map(([potency]) => potency)
+          .filter(Boolean)
+          .slice(0, 3);
+
+        if (mounted) setCommonPotencies(sorted);
+      } catch (err) {
+        console.error('Failed to load potencies', err);
+      }
+    }
+
+    loadPotencies();
+    return () => { mounted = false };
+  }, [remedy.id]);
+
   if (!remedy) {
     return <div>Loading remedy details...</div>;
   }
@@ -307,9 +361,37 @@ export default function RemediesDetailPage({
                   {review?.total_reviews || remedy.review_count}
                 </span>
               </li>
-              <li className="flex justify-between text-sm">
-                <span className="text-[#2B2E28] text-sm font-medium">Success Rate</span>
-                <span className="font-semibold text-[#175F3D] text-sm">N/A</span>
+              <li className="pt-2">
+                <span className="text-[#0B0C0A] text-md sm:text-base font-semibold">Common Potencies</span>
+                <div className="mt-2 grid grid-cols-3 gap-6 text-sm">
+                  {(() => {
+                    if (!commonPotencies || commonPotencies.length === 0) {
+                      return <div className="col-span-3 text-sm text-gray-500">—</div>;
+                    }
+
+                    // Prepare three slots so we can align items: left, center, right
+                    const slots: (string | null)[] = [null, null, null];
+                    if (commonPotencies.length === 1) {
+                      slots[1] = commonPotencies[0];
+                    } else if (commonPotencies.length === 2) {
+                      slots[0] = commonPotencies[0];
+                      slots[1] = commonPotencies[1];
+                    } else {
+                      slots[0] = commonPotencies[0] || null;
+                      slots[1] = commonPotencies[1] || null;
+                      slots[2] = commonPotencies[2] || null;
+                    }
+
+                    return slots.map((s, idx) => (
+                      <div
+                        key={idx}
+                        className={`text-[#2B2E28] font-medium text-md sm:text-base ${idx === 0 ? 'text-left' : idx === 1 ? 'text-center' : 'text-right'}`}
+                      >
+                        {s || ''}
+                      </div>
+                    ));
+                  })()}
+                </div>
               </li>
             </ul>
           </aside>

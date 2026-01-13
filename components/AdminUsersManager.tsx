@@ -20,7 +20,8 @@ export default function AdminUsersManager() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [roleFilter, setRoleFilter] = useState<'all' | 'user' | 'admin'>('all');
+  const [roleFilter, setRoleFilter] = useState<'all' | 'user' | 'admin' | 'moderator'>('all');
+  const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(25);
   const [totalUsers, setTotalUsers] = useState(0);
@@ -119,6 +120,26 @@ export default function AdminUsersManager() {
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
+
+  // Fetch current user role to enforce moderator limitations in UI
+  useEffect(() => {
+    async function loadCurrentRole() {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return setCurrentUserRole(null);
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        setCurrentUserRole(profile?.role || null);
+      } catch (err) {
+        console.error('Failed to load current user role', err);
+      }
+    }
+
+    loadCurrentRole();
+  }, []);
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
@@ -239,11 +260,12 @@ export default function AdminUsersManager() {
           <div>
             <select
               value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value as 'all' | 'user' | 'admin')}
+              onChange={(e) => setRoleFilter(e.target.value as 'all' | 'user' | 'admin' | 'moderator')}
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-500"
             >
               <option value="all">All Roles</option>
               <option value="user">Users</option>
+              <option value="moderator">Moderators</option>
               <option value="admin">Admins</option>
             </select>
           </div>
@@ -320,18 +342,19 @@ export default function AdminUsersManager() {
                       <div className="text-sm text-gray-600">{user.email}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <select
-                        value={user.role}
-                        onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                        disabled={loading}
-                        className={`px-3 py-1 text-xs font-medium rounded-full border ${user.role === 'admin'
-                          ? 'bg-purple-100 text-purple-800 border-purple-200'
-                          : 'bg-blue-100 text-blue-800 border-blue-200'
-                          } disabled:opacity-50`}
-                      >
-                        <option value="user">User</option>
-                        <option value="admin">Admin</option>
-                      </select>
+                                <select
+                                  value={user.role}
+                                  onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                                  disabled={loading || (currentUserRole === 'moderator' && user.role === 'admin')}
+                                  className={`px-3 py-1 text-xs font-medium rounded-full border ${user.role === 'admin'
+                                    ? 'bg-purple-100 text-purple-800 border-purple-200'
+                                    : 'bg-blue-100 text-blue-800 border-blue-200'
+                                    } disabled:opacity-50`}
+                                >
+                                  <option value="user">User</option>
+                                  <option value="moderator">Moderator</option>
+                                  <option value="admin" disabled={currentUserRole === 'moderator'}>Admin</option>
+                                </select>
                     </td>
                     <td className="px-6 py-4">
                       <span className="text-sm text-gray-600">
@@ -347,7 +370,8 @@ export default function AdminUsersManager() {
                       </Link>
                       <button
                         onClick={() => handleDelete(user.id)}
-                        disabled={loading}
+                        disabled={loading || (currentUserRole === 'moderator' && user.role === 'admin')}
+                        title={currentUserRole === 'moderator' && user.role === 'admin' ? 'Moderators cannot delete admin users' : undefined}
                         className="text-red-600 hover:text-red-800 font-medium text-sm disabled:opacity-50"
                       >
                         Delete

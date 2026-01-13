@@ -8,9 +8,10 @@ import Image from 'next/image';
 interface DashboardLayoutProps {
   children: React.ReactNode;
   userName?: string;
+  userRole?: string | null;
 }
 
-export default function DashboardLayout({ children, userName }: DashboardLayoutProps) {
+export default function DashboardLayout({ children, userName, userRole }: DashboardLayoutProps) {
   const pathname = usePathname();
 
   const router = useRouter();
@@ -108,7 +109,10 @@ export default function DashboardLayout({ children, userName }: DashboardLayoutP
             {isSidebarOpen && (
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate text-white">{userName || 'Admin'}</p>
-                <p className="text-xs text-white">Administrator</p>
+                <p className="text-xs text-white">
+                  {/** Show role label based on passed prop (admin/moderator) */}
+                  {userRole === 'moderator' ? 'Moderator' : 'Administrator'}
+                </p>
               </div>
             )}
           </div>

@@ -40,7 +40,7 @@ export default async function AdminDashboardLayout({
             <span className="text-3xl">⛔</span>
           </div>
           <h2 className="text-2xl font-serif mb-2">Admin Access Required</h2>
-          <p className="text-gray-600 mb-6">You don't have permission to access the admin dashboard.</p>
+          <p className="text-gray-600 mb-6">You dont have permission to access the admin dashboard.</p>
           <Link href="/">
             <button className="px-6 py-3 bg-[#6B7B5E] text-white rounded-lg font-medium hover:bg-[#5A6A4D] transition-colors">
               Go to Home
@@ -54,7 +54,7 @@ export default async function AdminDashboardLayout({
   const { profile } = await getUserProfile(userId);
 
   return (
-    <DashboardLayout userName={profile?.first_name || 'Admin'}>
+    <DashboardLayout userName={profile?.first_name || 'Admin'} userRole={profile?.role}>
       {children}
     </DashboardLayout>
   );
