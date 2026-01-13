@@ -21,37 +21,94 @@ export async function POST(req: Request) {
     const file = formData.get('file')
 
     if (!(file instanceof File)) {
-      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 })
-    }
-
-    /* ---------- READ EXCEL ---------- */
-    const arrayBuffer = await file.arrayBuffer()
-    const workbook = XLSX.read(arrayBuffer, { type: 'array' })
-
-    const sheet = workbook.Sheets['Alignments']
-    if (!sheet) {
       return NextResponse.json(
-        { error: 'Alignments sheet missing' },
+        { error: 'No file uploaded' },
         { status: 400 }
       )
     }
 
-    const rows = XLSX.utils.sheet_to_json<AlignmentRow>(sheet)
+    let rows: AlignmentRow[] = []
 
-    /* ---------- CACHE REMEDIES ---------- */
-    const { data: remedies } = await supabase
+    /* =====================================================
+       READ CSV
+    ===================================================== */
+    if (file.name.toLowerCase().endsWith('.csv')) {
+      const text = await file.text()
+      const lines = text.split('\n').filter(l => l.trim())
+
+      if (lines.length < 2) {
+        return NextResponse.json(
+          { error: 'CSV file is empty or invalid' },
+          { status: 400 }
+        )
+      }
+
+      const headers = lines[0]
+        .split(',')
+        .map(h => h.trim().toLowerCase())
+
+      rows = lines.slice(1).map(line => {
+        const values = line
+          .split(',')
+          .map(v => v.replace(/^"|"$/g, '').trim())
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const row: any = {}
+        headers.forEach((h, i) => {
+          row[h] = values[i]
+        })
+
+        return row as AlignmentRow
+      })
+    }
+
+    /* =====================================================
+       READ XLSX
+    ===================================================== */
+    if (file.name.toLowerCase().endsWith('.xlsx')) {
+      const arrayBuffer = await file.arrayBuffer()
+      const workbook = XLSX.read(arrayBuffer, { type: 'array' })
+
+      const sheet =
+        workbook.Sheets['Alignments'] ||
+        workbook.Sheets[workbook.SheetNames[0]]
+
+      if (!sheet) {
+        return NextResponse.json(
+          { error: 'Alignments sheet missing' },
+          { status: 400 }
+        )
+      }
+
+      rows = XLSX.utils.sheet_to_json<AlignmentRow>(sheet)
+    }
+
+    if (!rows.length) {
+      return NextResponse.json(
+        { error: 'No valid rows found' },
+        { status: 400 }
+      )
+    }
+
+    /* =====================================================
+       CACHE REMEDIES
+    ===================================================== */
+    const { data: remedies, error: remediesError } = await supabase
       .from('remedies')
       .select('id, name')
+
+    if (remediesError) throw remediesError
 
     const remedyMap = new Map<string, string>(
       (remedies ?? []).map(r => [r.name.toLowerCase(), r.id])
     )
 
-    /* ---------- PROCESS ROWS ---------- */
+    /* =====================================================
+       PROCESS ROWS
+    ===================================================== */
     for (const row of rows) {
       if (!row.ailment_name || !row.related_remedies) continue
 
-      // 🔹 Fetch ailment ID
       const { data: ailment } = await supabase
         .from('ailments')
         .select('id')
@@ -79,7 +136,6 @@ export async function POST(req: Request) {
           .eq('remedy_id', remedyId)
           .maybeSingle()
 
-        // ✅ If already exists → skip
         if (existing) continue
 
         /* ---------- CREATE NEW ALIGNMENT ---------- */
@@ -93,6 +149,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('ALIGNMENT IMPORT ERROR:', error)
-    return NextResponse.json({ error: 'Import failed' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Import failed' },
+      { status: 500 }
+    )
   }
 }

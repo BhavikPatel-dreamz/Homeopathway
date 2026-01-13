@@ -29,6 +29,7 @@ export default function AdminRemediesManager() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [importProgress, setImportProgress] = useState<number>(0);
   const [importing, setImporting] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [sortBy, setSortBy] = useState<
     'created_at' | 'name' | 'average_rating' | 'review_count'
   >('created_at');
@@ -38,6 +39,7 @@ export default function AdminRemediesManager() {
 
   const handleExport = async () => {
     try {
+      setExporting(true);
       const res = await fetch('/api/admin/remedies/export?format=csv');
       if (!res.ok) throw new Error('Export failed');
       const blob = await res.blob();
@@ -53,6 +55,8 @@ export default function AdminRemediesManager() {
       console.error('Export error', err);
       setMessage({ type: 'error', text: 'Export failed' });
       setTimeout(() => setMessage(null), 4000);
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -208,20 +212,33 @@ export default function AdminRemediesManager() {
           {/* EXPORT */}
           <button
             onClick={handleExport}
-            className="h-[52px] px-5 rounded-lg bg-emerald-600 text-white font-medium shadow-sm hover:bg-emerald-700 active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer">
+            disabled={exporting}
+            className={`h-[52px] px-5 rounded-lg bg-emerald-600 text-white font-medium shadow-sm hover:bg-emerald-700 active:scale-[0.98] transition-all flex items-center gap-2 ${exporting ? 'opacity-70 cursor-wait' : 'cursor-pointer'}`}>
 
-            {/* Download Icon */}
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v12m0 0l4-4m-4 4l-4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" />
-            </svg>
+            {exporting ? (
+              <>
+                <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                </svg>
+                Exporting...
+              </>
+            ) : (
+              <>
+                {/* Download Icon */}
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v12m0 0l4-4m-4 4l-4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" />
+                </svg>
 
-            Export CSV
+                Export CSV
+              </>
+            )}
           </button>
 
           {/* IMPORT */}
