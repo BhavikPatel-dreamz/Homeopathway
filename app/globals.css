@@ -138,6 +138,13 @@ select option{
   color: #20231E;
 }
 
+/* Admin dashboard: ensure input text is visible when typing */
+.admin-dashboard input,
+.admin-dashboard textarea,
+.admin-dashboard select {
+  color: #000000 !important;
+}
+
 .main-wrapper{
   display: flex;
   flex-direction: column;

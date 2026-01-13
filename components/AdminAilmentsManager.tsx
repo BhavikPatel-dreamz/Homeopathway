@@ -51,9 +51,12 @@ export default function AdminAilmentsManager() {
       a.href = url;
       a.download = 'ailments.csv';
       document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      // ensure the anchor is attached before clicking and delay revoke
+      setTimeout(() => {
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+      }, 50);
     } catch (err) {
       console.error('Export error', err);
       setMessage({ type: 'error', text: 'Export failed' });

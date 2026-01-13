@@ -169,7 +169,7 @@ export default function DashboardLayout({ children, userName, userRole }: Dashbo
         </header>
 
         {/* Page Content */}
-        <main className="p-6">{children}</main>
+        <main className="p-6 admin-dashboard">{children}</main>
       </div>
     </div>
   );

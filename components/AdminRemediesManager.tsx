@@ -48,9 +48,13 @@ export default function AdminRemediesManager() {
       a.href = url;
       a.download = 'remedies.csv';
       document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      // schedule click to ensure element is in DOM and browser starts download
+      setTimeout(() => {
+        a.click();
+        a.remove();
+        // revoke after a short delay to avoid cancelling the download in some browsers
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+      }, 50);
     } catch (err) {
       console.error('Export error', err);
       setMessage({ type: 'error', text: 'Export failed' });
