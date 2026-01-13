@@ -54,6 +54,7 @@ export default function EditUserForm({ userId }: EditUserFormProps) {
         role: data.role || 'user',
       });
       setIsTargetAdmin(data.role === 'admin');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error('Error fetching user:', err);
       setError(err.message || 'Failed to load user');
@@ -102,6 +103,7 @@ export default function EditUserForm({ userId }: EditUserFormProps) {
 
       // Success - redirect back to users page
       router.push('/admin/users');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error('Error updating user:', err);
       setError(err.message || 'Failed to update user');
