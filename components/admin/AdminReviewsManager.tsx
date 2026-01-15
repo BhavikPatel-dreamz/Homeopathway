@@ -70,7 +70,7 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
           Dosage: review.dosage ?? '',
           Duration: review.duration_used ?? '',
           Notes: review.notes ?? '',
-          Side_Effects: review.side_effects ? 'Yes' : 'No',
+          Side_Effects: review.experienced_side_effects ? 'Yes' : 'No',
           Date: formatDate(review.created_at),
         };
       });

@@ -461,7 +461,7 @@ export default function AdminRemediesManager() {
                   className="px-6 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider cursor-pointer select-none whitespace-nowrap"
                 >
                   <div className="inline-flex items-center">
-                      Reviews Count
+                      Review Count
                     <SortArrows
                       active={sortBy === 'review_count'}
                       order={sortOrder}
