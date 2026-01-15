@@ -66,6 +66,7 @@ export async function POST(req: Request) {
           .split(',')
           .map(v => v.replace(/^"|"$/g, '').trim())
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const row: any = {}
         headers.forEach((h, i) => {
           row[h] = values[i]
@@ -89,6 +90,7 @@ export async function POST(req: Request) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       rows = XLSX.utils.sheet_to_json<any>(sheet).map((r: any) => {
         // normalize keys to lower-case with underscores
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const normalized: any = {}
         Object.keys(r).forEach(k => {
           const key = String(k).trim().toLowerCase().replace(/\s+/g, '_')
@@ -186,6 +188,7 @@ export async function POST(req: Request) {
     if (remediesError) throw remediesError
 
     const remedyMap = new Map<string, string>()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(remedies ?? []).forEach((r: any) => {
       if (r.name) remedyMap.set(String(r.name).toLowerCase(), r.id)
       if (r.slug) remedyMap.set(String(r.slug).toLowerCase(), r.id)
@@ -201,7 +204,16 @@ export async function POST(req: Request) {
         setProgress(progressId, pct)
       }
 
-      const name = (raw.name || raw.ailment_name || '').toString().trim()
+const name =
+  ('name' in raw && raw.name
+    ? raw.name
+    : 'ailment_name' in raw
+    ? raw.ailment_name
+    : ''
+  )
+    ?.toString()
+    .trim()
+
       if (!name) continue
 
       const description = (raw as AilmentImportRow).description ?? null
@@ -222,6 +234,7 @@ export async function POST(req: Request) {
       }
 
       if (!ailmentId) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const insertPayload: any = {
           name,
           description,
@@ -252,6 +265,7 @@ export async function POST(req: Request) {
       if (!ailmentId) continue
 
       // parse related remedies
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const relatedRaw = (raw as any).related_remedies || ''
       const related = String(relatedRaw)
         .split(/[;,|]+/)
