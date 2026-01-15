@@ -29,6 +29,7 @@ export default function AdminRemediesManager() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [importProgress, setImportProgress] = useState<number>(0);
   const [importing, setImporting] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [sortBy, setSortBy] = useState<
     'created_at' | 'name' | 'average_rating' | 'review_count'
   >('created_at');
@@ -36,8 +37,31 @@ export default function AdminRemediesManager() {
 
 
 
-  const handleExport = () => {
-    window.location.href = '/api/admin/remedies/export';
+  const handleExport = async () => {
+    try {
+      setExporting(true);
+      const res = await fetch('/api/admin/remedies/export?format=csv');
+      if (!res.ok) throw new Error('Export failed');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'remedies.csv';
+      document.body.appendChild(a);
+      // schedule click to ensure element is in DOM and browser starts download
+      setTimeout(() => {
+        a.click();
+        a.remove();
+        // revoke after a short delay to avoid cancelling the download in some browsers
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+      }, 50);
+    } catch (err) {
+      console.error('Export error', err);
+      setMessage({ type: 'error', text: 'Export failed' });
+      setTimeout(() => setMessage(null), 4000);
+    } finally {
+      setExporting(false);
+    }
   };
 
 
@@ -87,17 +111,88 @@ export default function AdminRemediesManager() {
     const formData = new FormData();
     formData.append('file', file);
 
-    const res = await fetch('/api/admin/remedies/import', {
-      method: 'POST',
-      body: formData,
-    });
+    // small client-generated import id so server can report processing progress
+    const importId = `${Date.now()}-${Math.random().toString(36).slice(2,9)}`
+    formData.append('importId', importId)
 
-    if (!res.ok) {
-      throw new Error('Import failed');
+    setImportProgress(0)
+    setImporting(true)
+
+    // Include the current user's access token so the server can authenticate
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData?.session?.access_token || null;
+
+    try {
+      // Upload with progress
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest()
+        xhr.open('POST', '/api/admin/remedies/import', true)
+
+        if (accessToken) xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`)
+
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            const pct = Math.round((e.loaded / e.total) * 100)
+            setImportProgress(Math.min(pct, 95)) // hold below 100 until server finishes
+          } else {
+            setImportProgress((p) => Math.min(95, p + 10))
+          }
+        }
+
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) resolve()
+          else {
+            try {
+              const json = JSON.parse(xhr.responseText || '{}')
+              reject(new Error(json?.error || 'Import failed'))
+            } catch (e) {
+              reject(new Error('Import failed'))
+            }
+          }
+        }
+
+        xhr.onerror = () => reject(new Error('Import failed'))
+        xhr.onabort = () => reject(new Error('Import aborted'))
+
+        xhr.send(formData)
+      })
+
+      // After upload finishes, poll server for processing progress
+      const poll = async () => {
+        const start = Date.now()
+        while (true) {
+          try {
+            const res = await fetch(`/api/admin/remedies/import/progress?importId=${encodeURIComponent(importId)}`)
+            if (res.ok) {
+              const json = await res.json()
+              const pct = Number(json?.progress || 0)
+              setImportProgress(pct)
+              if (pct >= 100) break
+            }
+          } catch (e) {
+            // ignore transient
+          }
+
+          // safety timeout: stop polling after 2 minutes
+          if (Date.now() - start > 120_000) break
+          await new Promise(r => setTimeout(r, 500))
+        }
+      }
+
+      await poll()
+
+      // refresh remedies list after import
+      await fetchRemedies()
+      setMessage({ type: 'success', text: 'Import completed successfully' })
+      setTimeout(() => setMessage(null), 4000)
+    } catch (err) {
+      console.error('Import error', err)
+      setMessage({ type: 'error', text: 'Import failed' })
+      setTimeout(() => setMessage(null), 4000)
+    } finally {
+      setImporting(false)
+      setTimeout(() => setImportProgress(0), 800)
     }
-
-    // 🔁 refresh remedies list after import
-    await fetchRemedies();
   };
 
 
@@ -192,26 +287,40 @@ export default function AdminRemediesManager() {
           {/* EXPORT */}
           <button
             onClick={handleExport}
-            className="h-[52px] px-5 rounded-lg bg-emerald-600 text-white font-medium shadow-sm hover:bg-emerald-700 active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer">
+            disabled={exporting}
+            className={`h-[52px] px-5 rounded-lg bg-emerald-600 text-white font-medium shadow-sm hover:bg-emerald-700 active:scale-[0.98] transition-all flex items-center gap-2 ${exporting ? 'opacity-70 cursor-wait' : 'cursor-pointer'}`}>
 
-            {/* Download Icon */}
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v12m0 0l4-4m-4 4l-4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" />
-            </svg>
+            {exporting ? (
+              <>
+                <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                </svg>
+                Exporting...
+              </>
+            ) : (
+              <>
+                {/* Download Icon */}
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v12m0 0l4-4m-4 4l-4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" />
+                </svg>
 
-            Export XLSX
+                Export CSV
+              </>
+            )}
           </button>
 
           {/* IMPORT */}
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="h-[52px] px-5 rounded-lg border border-[#0f75ae] text-white font-medium bg-[#0f75ae] shadow-sm hover:bg-[#04659b] hover:border-[#0f75ae] active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer">
+            disabled={importing}
+            className={`h-[52px] px-5 rounded-lg border border-[#0f75ae] text-white font-medium bg-[#0f75ae] shadow-sm hover:bg-[#04659b] hover:border-[#0f75ae] active:scale-[0.98] transition-all flex items-center gap-2 ${importing ? 'opacity-70 cursor-wait' : 'cursor-pointer'}`}>
 
             {/* Upload Icon */}
             <svg
@@ -228,14 +337,14 @@ export default function AdminRemediesManager() {
               />
             </svg>
 
-            Import XLSX
+            Import XLSX / CSV
           </button>
 
           {/* Hidden file input */}
           <input
             ref={fileInputRef}
             type="file"
-            accept=".xlsx"
+            accept=".xlsx,.csv"
             className="hidden"
             onChange={(e) => {
               if (e.target.files?.[0]) {
@@ -352,7 +461,7 @@ export default function AdminRemediesManager() {
                   className="px-6 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider cursor-pointer select-none whitespace-nowrap"
                 >
                   <div className="inline-flex items-center">
-                    Reviews
+                      Reviews Count
                     <SortArrows
                       active={sortBy === 'review_count'}
                       order={sortOrder}

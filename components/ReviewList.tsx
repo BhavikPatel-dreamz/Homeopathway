@@ -171,7 +171,7 @@ export default function ReviewListPage({
     userName: "",
   });
 
-  
+
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<SortBy>("newest");
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -189,7 +189,7 @@ export default function ReviewListPage({
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isPageLoading, setIsPageLoading] = useState(false);
   const [allReviesList, setAllReviewsList] = useState<ReviewType[]>([]);
-  
+
 
   // ---------------------------
   // Fetch Reviews + Stats
@@ -322,11 +322,11 @@ export default function ReviewListPage({
   const refreshReviews = () => fetchReviews(false);
 
   const sortOptions: { label: string; value: SortBy }[] = [
-  { label: "Most Recent", value: "newest" },
-  { label: "Oldest", value: "oldest" },
-  { label: "Highest Rated", value: "highest_rated" },
-  { label: "Lowest Rated", value: "lowest_rated" },
-];
+    { label: "Most Recent", value: "newest" },
+    { label: "Oldest", value: "oldest" },
+    { label: "Highest Rated", value: "highest_rated" },
+    { label: "Lowest Rated", value: "lowest_rated" },
+  ];
 
   if (!remedy) return <div>Loading remedy details...</div>;
 
@@ -350,21 +350,21 @@ export default function ReviewListPage({
 
               <div className="mt-3 ml-[-8px] w-full flex flex-col gap-2.5  mb-4 sm:mb-6">
                 {reviewStats && [5, 4, 3, 2, 1].map((star) => {
-                    const percentage = reviewStats.total_reviews > 0 ? (reviewStats.rating_distribution[star] / reviewStats.total_reviews) * 100 : 0;
-                    const isActive = filters.rating.includes(star);
-                    return (
-                      <button
-                        key={star}
-                        onClick={() => setFilters((prev) => ({ ...prev, rating: prev.rating.includes(star) ? [] : [star] }))}
-                        className={`flex items-center text-sm sm:text-sm w-full rounded-md  hover:bg-[#6C74631A] px-3 py-2 transition ${isActive ? "bg-[#6C74631A]" : "border-[#6C74631A]/10 "} `} >
-                        <Image src="/star.svg" alt={`${star} Star`} width={15} height={15} className="sm:w-4 sm:h-4 mr-1" />
-                        <span className="w-3 text-gray-700 font-medium mr-5">{star}</span>
-                        <div className="flex-1 h-2 bg-[#4B544A]/20 rounded-xl overflow-hidden">
-                          <div className="h-full transition-all duration-300 rounded-xl bg-[#6C7463]" style={{ width: `${percentage}%` }} />
-                        </div>
-                      </button>
-                    );
-                  })}
+                  const percentage = reviewStats.total_reviews > 0 ? (reviewStats.rating_distribution[star] / reviewStats.total_reviews) * 100 : 0;
+                  const isActive = filters.rating.includes(star);
+                  return (
+                    <button
+                      key={star}
+                      onClick={() => setFilters((prev) => ({ ...prev, rating: prev.rating.includes(star) ? [] : [star] }))}
+                      className={`flex items-center text-sm sm:text-sm w-full rounded-md  hover:bg-[#6C74631A] px-3 py-2 transition ${isActive ? "bg-[#6C74631A]" : "border-[#6C74631A]/10 "} `} >
+                      <Image src="/star.svg" alt={`${star} Star`} width={15} height={15} className="sm:w-4 sm:h-4 mr-1" />
+                      <span className="w-3 text-gray-700 font-medium mr-5">{star}</span>
+                      <div className="flex-1 h-2 bg-[#4B544A]/20 rounded-xl overflow-hidden">
+                        <div className="h-full transition-all duration-300 rounded-xl bg-[#6C7463]" style={{ width: `${percentage}%` }} />
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
 
               <button
@@ -392,7 +392,7 @@ export default function ReviewListPage({
 
                 {/* Filter Button */}
                 <div className="relative" ref={filterDropdownRef}>
-                  
+
                   {/* Filter Button INSIDE Input */}
                   <button
                     onClick={() => setIsFilterModalOpen(true)}
@@ -400,10 +400,10 @@ export default function ReviewListPage({
                   >
                     <SlidersHorizontal className="w-[22px] h-[18px]" />
                     {filters.rating.length + filters.dosage.length + filters.form.length + (filters.dateRange !== "all" ? 1 : 0) + (filters.userName ? 1 : 0) > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                          {filters.rating.length + filters.dosage.length + filters.form.length + (filters.dateRange !== "all" ? 1 : 0) + (filters.userName ? 1 : 0)}
-                        </span>
-                      )}
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                        {filters.rating.length + filters.dosage.length + filters.form.length + (filters.dateRange !== "all" ? 1 : 0) + (filters.userName ? 1 : 0)}
+                      </span>
+                    )}
                   </button>
                 </div>
               </div>
@@ -456,8 +456,8 @@ export default function ReviewListPage({
 
                 {reviews.map((review) => {
                   const userName = review.profiles?.first_name || review.profiles?.last_name
-                      ? `${review.profiles?.first_name || ""} ${review.profiles?.last_name?.[0] || ""}.`
-                      : "Anonymous";
+                    ? `${review.profiles?.first_name || ""} ${review.profiles?.last_name?.[0] || ""}.`
+                    : "Anonymous";
 
                   const user_name = review.profiles?.user_name;
                   const profile_image = review.profiles?.profile_img;
@@ -493,7 +493,7 @@ export default function ReviewListPage({
                             </div>
                           </div>
                         </div>
-                        
+
                         {/* <p className="text-[14px] text-[#83857D]">{formatTimeAgo(review.created_at)}</p> */}
 
                         <div
@@ -514,7 +514,7 @@ export default function ReviewListPage({
                           >
                             <span className="text-lg leading-none">
                               <svg width="4" height="18" viewBox="0 0 4 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M2 0C0.9 0 0 0.9 0 2C0 3.1 0.9 4 2 4C3.1 4 4 3.1 4 2C4 0.9 3.1 0 2 0ZM2 14C0.9 14 0 14.9 0 16C0 17.1 0.9 18 2 18C3.1 18 4 17.1 4 16C4 14.9 3.1 14 2 14ZM2 7C0.9 7 0 7.9 0 9C0 10.1 0.9 11 2 11C3.1 11 4 10.1 4 9C4 7.9 3.1 7 2 7Z" fill="#41463B"/>
+                                <path d="M2 0C0.9 0 0 0.9 0 2C0 3.1 0.9 4 2 4C3.1 4 4 3.1 4 2C4 0.9 3.1 0 2 0ZM2 14C0.9 14 0 14.9 0 16C0 17.1 0.9 18 2 18C3.1 18 4 17.1 4 16C4 14.9 3.1 14 2 14ZM2 7C0.9 7 0 7.9 0 9C0 10.1 0.9 11 2 11C3.1 11 4 10.1 4 9C4 7.9 3.1 7 2 7Z" fill="#41463B" />
                               </svg>
                             </span>
                           </button>
@@ -530,10 +530,10 @@ export default function ReviewListPage({
                                 className="w-full px-4 py-2 flex items-center gap-3 text-sm text-[#20231E] hover:bg-gray-100 font-semibold"
                               >
                                 <span className="w-[16px] h-[16px]">
-                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                    <path d="M11.1713 2.00039L9.838 3.33372H3.33333V12.6671H12.6667V6.16239L14 4.82906V13.3337C14 13.5105 13.9298 13.6801 13.8047 13.8051C13.6797 13.9302 13.5101 14.0004 13.3333 14.0004H2.66667C2.48986 14.0004 2.32029 13.9302 2.19526 13.8051C2.07024 13.6801 2 13.5105 2 13.3337V2.66706C2 2.49025 2.07024 2.32068 2.19526 2.19565C2.32029 2.07063 2.48986 2.00039 2.66667 2.00039H11.1713V2.00039ZM13.6567 1.40039L14.6 2.34439L8.472 8.47239L7.53067 8.47439L7.52933 7.52972L13.6567 1.40039V1.40039Z" fill="#20231E"/>
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M11.1713 2.00039L9.838 3.33372H3.33333V12.6671H12.6667V6.16239L14 4.82906V13.3337C14 13.5105 13.9298 13.6801 13.8047 13.8051C13.6797 13.9302 13.5101 14.0004 13.3333 14.0004H2.66667C2.48986 14.0004 2.32029 13.9302 2.19526 13.8051C2.07024 13.6801 2 13.5105 2 13.3337V2.66706C2 2.49025 2.07024 2.32068 2.19526 2.19565C2.32029 2.07063 2.48986 2.00039 2.66667 2.00039H11.1713V2.00039ZM13.6567 1.40039L14.6 2.34439L8.472 8.47239L7.53067 8.47439L7.52933 7.52972L13.6567 1.40039V1.40039Z" fill="#20231E" />
                                   </svg>
-                                </span> 
+                                </span>
                                 Edit
                               </button>
 
@@ -546,9 +546,9 @@ export default function ReviewListPage({
                               >
                                 <span className="w-[16px] h-[16px]">
                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                    <path d="M11.333 3.99967H14.6663V5.33301H13.333V13.9997C13.333 14.1765 13.2628 14.3461 13.1377 14.4711C13.0127 14.5961 12.8432 14.6663 12.6663 14.6663H3.33301C3.1562 14.6663 2.98663 14.5961 2.8616 14.4711C2.73658 14.3461 2.66634 14.1765 2.66634 13.9997V5.33301H1.33301V3.99967H4.66634V1.99967C4.66634 1.82286 4.73658 1.65329 4.8616 1.52827C4.98663 1.40325 5.1562 1.33301 5.33301 1.33301H10.6663C10.8432 1.33301 11.0127 1.40325 11.1377 1.52827C11.2628 1.65329 11.333 1.82286 11.333 1.99967V3.99967ZM11.9997 5.33301H3.99967V13.333H11.9997V5.33301ZM5.99967 7.33301H7.33301V11.333H5.99967V7.33301ZM8.66634 7.33301H9.99967V11.333H8.66634V7.33301ZM5.99967 2.66634V3.99967H9.99967V2.66634H5.99967Z" fill="#20231E"/>
+                                    <path d="M11.333 3.99967H14.6663V5.33301H13.333V13.9997C13.333 14.1765 13.2628 14.3461 13.1377 14.4711C13.0127 14.5961 12.8432 14.6663 12.6663 14.6663H3.33301C3.1562 14.6663 2.98663 14.5961 2.8616 14.4711C2.73658 14.3461 2.66634 14.1765 2.66634 13.9997V5.33301H1.33301V3.99967H4.66634V1.99967C4.66634 1.82286 4.73658 1.65329 4.8616 1.52827C4.98663 1.40325 5.1562 1.33301 5.33301 1.33301H10.6663C10.8432 1.33301 11.0127 1.40325 11.1377 1.52827C11.2628 1.65329 11.333 1.82286 11.333 1.99967V3.99967ZM11.9997 5.33301H3.99967V13.333H11.9997V5.33301ZM5.99967 7.33301H7.33301V11.333H5.99967V7.33301ZM8.66634 7.33301H9.99967V11.333H8.66634V7.33301ZM5.99967 2.66634V3.99967H9.99967V2.66634H5.99967Z" fill="#20231E" />
                                   </svg>
-                                </span> 
+                                </span>
                                 Delete
                               </button>
                             </div>
@@ -557,17 +557,20 @@ export default function ReviewListPage({
                       </div>
 
                       {/* UPDATED: Single grey container with increased spacing between bracketed remedies */}
-                      {secondaryRemedies.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mt-2 mb-3">
-                          <div className="text-[12px] px-3 py-1 rounded-[4px] bg-[#F1F2F0] text-[#41463B] font-medium border border-transparent tracking-wide">
-                            {secondaryRemedies.map((r, index) => (
-                              <span key={r.name} className="mr-[10px] sm:mb-0 mb-2">
-                                [{r.name}]
-                              </span>
-                            ))}
-                          </div>
+                      <div className="flex flex-wrap items-center gap-2 mt-2 mb-3">
+                        <span className="text-[13px] font-medium text-[#2B2E28] mr-1">
+                          Used in Combination with:
+                        </span>
+
+                        <div className="text-[12px] px-3 py-1 rounded-[4px] bg-[#F1F2F0] text-[#41463B] font-medium">
+                          {secondaryRemedies.map((r) => (
+                            <span key={r.name} className="mr-[10px]">
+                              [{r.name}]
+                            </span>
+                          ))}
                         </div>
-                      )}
+                      </div>
+
 
                       {/* Pill Containers - Usage details like "Pellet", "6C" */}
                       {usageTags.length > 0 && (

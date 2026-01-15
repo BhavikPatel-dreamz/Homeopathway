@@ -73,7 +73,8 @@ export const checkIsAdmin = async (): Promise<boolean> => {
       return false;
     }
 
-    return profile?.role === 'admin';
+    // Allow moderators to be considered privileged for admin access
+    return profile?.role === 'admin' || profile?.role === 'moderator';
   } catch (error) {
     console.error('Error in checkIsAdmin:', error);
     return false;
@@ -247,7 +248,7 @@ export const getUserDisplayName = (user: User | null, profile: UserProfile | nul
 };
 
 export const isAdmin = (profile: UserProfile | null): boolean => {
-  return profile?.role === 'admin';
+  return profile?.role === 'admin' || profile?.role === 'moderator';
 };
 
 export const getUserEmail = (user: User | null): string => {

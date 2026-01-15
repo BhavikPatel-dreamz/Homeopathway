@@ -42,10 +42,7 @@ export default function HomeopathyPage() {
 
           {/* INTRO */}
           <p className={BODY_TEXT}>
-            Homeopathy is a complementary system of medicine founded over 200 years ago
-            by the German physician Dr. Samuel Hahnemann. He observed that the body has
-            an inherent ability to heal itself and developed a therapeutic approach
-            based on how the body responds to certain substances.
+            Homeopathy is a complementary system of medicine founded over 200 years ago by the German physician Dr. Samuel Hahnemann. He observed that the body has an inherent ability to heal itself and developed a therapeutic approach based on how the body responds to certain substances.
           </p>
 
           <p className={`${BODY_TEXT} mt-4 mb-6`}>
@@ -95,11 +92,11 @@ export default function HomeopathyPage() {
               {/* TEXT */}
               <div className="space-y-6">
                 <ContentBlock title="Used worldwide">
-                  Homeopathy is practiced in many parts of the world, including Europe, South Asia, South America, and the United States. Some people use it for common everyday concerns, while others take a more classical approachand integrate it with conventional care.
+                  Homeopathy is practiced in many parts of the world, including Europe, South Asia, South America, and the United States. Some people use it for common everyday concerns, while others take a more classical approach and integrate it with conventional care.
                 </ContentBlock>
 
                 <ContentBlock title="Non toxic and gentle">
-                  Because remedies are highly diluted, they are typically safe for a wide range of users, including children and older adults. However, individuals should use their own judgement and consult appropriate care when needed.
+                  Because remedies are highly diluted, they are typically safe for a wide range of users, including children and older adults. However, individuals should use their own judgement and consult a healthcare professional when needed.
                 </ContentBlock>
               </div>
 
@@ -107,14 +104,14 @@ export default function HomeopathyPage() {
           </div>
 
           {/* FOOTER */}
-          <div className="mt-5">
+          {/* <div className="mt-5">
             <h2 className={`${MAIN_TITLE_STYLE} mb-2`}>
               Why HomeoPathway Exists?
             </h2>
             <p className={BODY_TEXT}>
               Homeopathy can feel overwhelming because there are many remedies and detailed symptom patterns. HomeoPathway helps by organizing real user experiences, remedy insights, and community reported outcomes in one place, making it easier for people to learn from others and explore what has worked for different symptoms.
             </p>
-          </div>
+          </div> */}
 
         </div>
       </div>

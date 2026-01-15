@@ -135,6 +135,9 @@ export default function RemedyListPage({
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-6 gap-3">
             {paginatedRemedies.length > 0 ? (
               paginatedRemedies.map((remedy) => {
+                const avg = Number(remedy.rating ?? remedy.average_rating ?? 0);
+                const reviews = Number(remedy.reviewCount ?? remedy.review_count ?? 0);
+
                 return (
                   <Link href={`/remedies/${remedy.slug}`} key={remedy.slug}>
                     <div
@@ -150,12 +153,12 @@ export default function RemedyListPage({
                       <div className="sm:text-sm text-xs text-gray-500 mt-3 flex sm:flex-nowrap flex-wrap  items-center gap-2">
                         <span className="flex items-center gap-1 text-[#E69E29]">
                           <Image src="/star.svg" alt="Star" width={16} height={16} />
-                          <span>{(remedy.rating ?? remedy.average_rating)?.toFixed(1)}</span>
+                          <span>{avg.toFixed(1)}</span>
                         </span>
                         <span className="text-gray-400">|</span>
                         <span>
-                          {remedy.reviewCount ?? remedy.review_count}{" "}
-                          {(remedy.reviewCount ?? remedy.review_count) === 1 ? "review" : "reviews"}
+                          {reviews} {" "}
+                          {reviews === 1 ? "review" : "reviews"}
                         </span>
                       </div>
                     </div>

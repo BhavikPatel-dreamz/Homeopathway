@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import { X, Star } from 'lucide-react';
 import Image from 'next/image';
@@ -59,7 +60,7 @@ export default function ReviewFilterModal({
       // Filter by form
       if (localFilters.form.length > 0 ) {
         const hasMatchingForm = localFilters.form.some(
-          (f) => review.dosage === f
+          (f) => (review.form || '').toString() === f
         );
 
         if (!hasMatchingForm) return false;

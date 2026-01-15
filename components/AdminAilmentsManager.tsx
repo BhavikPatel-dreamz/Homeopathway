@@ -32,14 +32,103 @@ export default function AdminAilmentsManager() {
   const [totalPages, setTotalPages] = useState(0);
   const [importProgress, setImportProgress] = useState<number>(0);
   const [importing, setImporting] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const importProgressRef = useRef<number>(0)
+  const progressAnimRef = useRef<number | null>(null)
+
+  // Keep ref synced with state
+  useEffect(() => {
+    importProgressRef.current = importProgress
+  }, [importProgress])
+
+  // Smoothly animate progress to target (handles up and down)
+  const animateTo = useCallback((target: number) => {
+    // clamp
+    target = Math.max(0, Math.min(100, Math.round(target)))
+
+    // clear existing timer
+    if (progressAnimRef.current) {
+      window.clearInterval(progressAnimRef.current)
+      progressAnimRef.current = null
+    }
+
+    // immediate set if same
+    if (importProgressRef.current === target) {
+      setImportProgress(target)
+      return
+    }
+
+    const stepMs = 25
+    progressAnimRef.current = window.setInterval(() => {
+      const cur = importProgressRef.current || 0
+      if (cur === target) {
+        if (progressAnimRef.current) {
+          window.clearInterval(progressAnimRef.current)
+          progressAnimRef.current = null
+        }
+        return
+      }
+
+      const delta = target - cur
+      let inc = 1
+      if (Math.abs(delta) > 20) inc = Math.ceil(Math.abs(delta) * 0.06)
+      else if (Math.abs(delta) > 8) inc = Math.ceil(Math.abs(delta) * 0.12)
+
+      const next = delta > 0 ? Math.min(target, cur + inc) : Math.max(target, cur - inc)
+      importProgressRef.current = next
+      setImportProgress(next)
+
+      if (next === target) {
+        if (progressAnimRef.current) {
+          window.clearInterval(progressAnimRef.current)
+          progressAnimRef.current = null
+        }
+      }
+    }, stepMs)
+  }, [setImportProgress])
+
+  // cleanup
+  useEffect(() => {
+    return () => {
+      if (progressAnimRef.current) {
+        window.clearInterval(progressAnimRef.current)
+        progressAnimRef.current = null
+      }
+    }
+  }, [])
   const [sortBy, setSortBy] = useState<'name' | 'remedies_count'>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
 
-  const handleExport = () => {
-    window.location.href = '/api/admin/ailments/export';
+  const handleExport = async () => {
+    try {
+      setExporting(true);
+      const res = await fetch('/api/admin/ailments/export?format=csv');
+      if (!res.ok) throw new Error('Export failed');
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+
+      a.href = url;
+      a.download = 'ailments.csv';
+      document.body.appendChild(a);
+      // ensure the anchor is attached before clicking and delay revoke
+      setTimeout(() => {
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+      }, 50);
+    } catch (err) {
+      console.error('Export error', err);
+      setMessage({ type: 'error', text: 'Export failed' });
+      setTimeout(() => setMessage(null), 4000);
+    } finally {
+      setExporting(false);
+    }
   };
+
 
 
   const handleSort = (column: 'name' | 'remedies_count') => {
@@ -63,16 +152,16 @@ export default function AdminAilmentsManager() {
       <span className="ml-2 inline-flex flex-col leading-none">
         <span
           className={`text-[10px] transition-colors ${active && order === 'asc'
-              ? 'text-gray-900'
-              : 'text-gray-500'
+            ? 'text-gray-900'
+            : 'text-gray-500'
             }`}
         >
           ▲
         </span>
         <span
           className={`text-[10px] transition-colors ${active && order === 'desc'
-              ? 'text-gray-900'
-              : 'text-gray-500'
+            ? 'text-gray-900'
+            : 'text-gray-500'
             }`}
         >
           ▼
@@ -83,35 +172,96 @@ export default function AdminAilmentsManager() {
 
 
   const handleImport = async (file: File) => {
-    setImporting(true);
-    setImportProgress(5);
-
     const formData = new FormData();
     formData.append('file', file);
 
+    // small client-generated import id so server can report processing progress
+    const importId = `${Date.now()}-${Math.random().toString(36).slice(2,9)}`
+    formData.append('importId', importId)
+
+    setImportProgress(0)
+    setImporting(true)
+    // kick off a small visible start so animation begins from 1
+    animateTo(1)
+
+    // Include the current user's access token so the server can authenticate
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData?.session?.access_token || null;
+
     try {
-      setImportProgress(20);
+      // Upload with progress using XHR so we can track bytes uploaded
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest()
+        xhr.open('POST', '/api/admin/ailments/import', true)
 
-      const res = await fetch('/api/admin/ailments/import', {
-        method: 'POST',
-        body: formData,
-      });
+        if (accessToken) xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`)
 
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            const pct = Math.round((e.loaded / e.total) * 100)
+            animateTo(Math.min(pct, 95)) // hold below 100 until server finishes
+          } else {
+            animateTo(Math.min(95, (importProgressRef.current || 0) + 10))
+          }
+        }
 
-      if (!res.ok) throw new Error('Import failed');
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) resolve()
+          else {
+            try {
+              const json = JSON.parse(xhr.responseText || '{}')
+              reject(new Error(json?.error || 'Import failed'))
+            } catch (e) {
+              reject(new Error('Import failed'))
+            }
+          }
+        }
 
-      setImportProgress(100);
-      setMessage({ type: 'success', text: 'Import completed successfully!' });
+        xhr.onerror = () => reject(new Error('Import failed'))
+        xhr.onabort = () => reject(new Error('Import aborted'))
 
-      await fetchAilments();
+        xhr.send(formData)
+      })
+
+      // After upload finishes, poll server for processing progress
+      const poll = async () => {
+        const start = Date.now()
+        while (true) {
+          try {
+            const res = await fetch(`/api/admin/ailments/import/progress?importId=${encodeURIComponent(importId)}`)
+            if (res.ok) {
+              const json = await res.json()
+              const pct = Number(json?.progress || 0)
+              animateTo(pct)
+              if (pct >= 100) break
+            }
+          } catch (e) {
+            // ignore transient
+          }
+
+          // safety timeout: stop polling after 2 minutes
+          if (Date.now() - start > 120_000) break
+          await new Promise(r => setTimeout(r, 500))
+        }
+      }
+
+      await poll()
+
+      // ensure progress reaches 100 visually, wait briefly, then refresh
+      animateTo(100)
+      await new Promise(r => setTimeout(r, 700))
+
+      // refresh ailments list after import
+      await fetchAilments()
+      setMessage({ type: 'success', text: 'Import completed successfully' })
+      setTimeout(() => setMessage(null), 4000)
     } catch (err) {
       console.error(err);
-      setMessage({ type: 'error', text: 'Import failed. Please check the Excel (.xlsx) file.' });
+      setMessage({ type: 'error', text: 'Import failed. Please check the CSV or XLSX file.'});
     } finally {
-      setTimeout(() => {
-        setImporting(false);
-        setImportProgress(0);
-      }, 1000);
+      setImporting(false)
+      // keep 100 visible briefly then animate back to 0
+      setTimeout(() => animateTo(0), 1200)
     }
   };
 
@@ -257,19 +407,32 @@ export default function AdminAilmentsManager() {
           {/* Export */}
           <button
             onClick={handleExport}
-            className="h-[52px] px-5 rounded-lg bg-emerald-600 text-white font-medium shadow-sm hover:bg-emerald-700 active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer">
-            {/* Download Icon */}
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v12m0 0l4-4m-4 4l-4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" />
-            </svg>
+            disabled={exporting}
+            className={`h-[52px] px-5 rounded-lg bg-emerald-600 text-white font-medium shadow-sm hover:bg-emerald-700 active:scale-[0.98] transition-all flex items-center gap-2 ${exporting ? 'opacity-70 cursor-wait' : 'cursor-pointer'}`}>
+            {exporting ? (
+              <>
+                <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                </svg>
+                Exporting...
+              </>
+            ) : (
+              <>
+                {/* Download Icon */}
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v12m0 0l4-4m-4 4l-4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" />
+                </svg>
 
-            Export XLSX
+                Export CSV
+              </>
+            )}
           </button>
 
           {/* Import */}
@@ -291,7 +454,7 @@ export default function AdminAilmentsManager() {
               />
             </svg>
 
-            Import XLSX
+            Import XLSX/CSV
           </button>
 
 
@@ -299,14 +462,15 @@ export default function AdminAilmentsManager() {
           <input
             ref={fileInputRef}
             type="file"
-            accept=".xlsx"
+            accept=".xlsx,.csv"
             className="hidden"
             onChange={(e) => {
               if (e.target.files?.[0]) {
-                handleImport(e.target.files[0])
+                handleImport(e.target.files[0]);
               }
             }}
           />
+
 
           {/* Add Ailment */}
           <Link
@@ -331,7 +495,7 @@ export default function AdminAilmentsManager() {
       {importing && (
         <div className="bg-white border rounded-lg p-4">
           <div className="flex justify-between text-sm text-gray-600 mb-2">
-            <span>Importing XML...</span>
+            <span>Importing file...</span>
             <span>{importProgress}%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
@@ -395,7 +559,7 @@ export default function AdminAilmentsManager() {
                 onClick={() => handleSort('remedies_count')}
                 className="px-6 py-4 text-left text-sm font-semibold text-gray-900 cursor-pointer select-none flex items-center"
               >
-                Remedies
+                Remedy Count
                 <SortArrows
                   active={sortBy === 'remedies_count'}
                   order={sortOrder}

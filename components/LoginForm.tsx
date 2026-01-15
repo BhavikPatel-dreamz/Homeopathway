@@ -65,8 +65,8 @@ export default function LoginForm() {
         
         // Redirect based on role
         setTimeout(() => {
-          if (profile?.role === 'admin') {
-            console.log('👑 Redirecting admin to dashboard');
+          if (profile?.role === 'admin' || profile?.role === 'moderator') {
+            console.log('👑 Redirecting admin/moderator to dashboard');
             router.push('/admin');
           } else {
             console.log('👤 Redirecting user to home');

@@ -20,6 +20,8 @@ export default function EditUserForm({ userId }: EditUserFormProps) {
     last_name: '',
     role: 'user',
   });
+  const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
+  const [isTargetAdmin, setIsTargetAdmin] = useState<boolean>(false);
 
   useEffect(() => {
     fetchUser();
@@ -51,6 +53,8 @@ export default function EditUserForm({ userId }: EditUserFormProps) {
         last_name: data.last_name || '',
         role: data.role || 'user',
       });
+      setIsTargetAdmin(data.role === 'admin');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error('Error fetching user:', err);
       setError(err.message || 'Failed to load user');
@@ -58,6 +62,26 @@ export default function EditUserForm({ userId }: EditUserFormProps) {
       setFetching(false);
     }
   };
+
+  // Load current user role to enforce moderator limitations in UI
+  useEffect(() => {
+    async function loadCurrentRole() {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return setCurrentUserRole(null);
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        setCurrentUserRole(profile?.role || null);
+      } catch (err) {
+        console.error('Failed to load current user role', err);
+      }
+    }
+
+    loadCurrentRole();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,6 +103,7 @@ export default function EditUserForm({ userId }: EditUserFormProps) {
 
       // Success - redirect back to users page
       router.push('/admin/users');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error('Error updating user:', err);
       setError(err.message || 'Failed to update user');
@@ -204,9 +229,11 @@ export default function EditUserForm({ userId }: EditUserFormProps) {
                   value={formData.role}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  disabled={currentUserRole === 'moderator' && isTargetAdmin}
                 >
                   <option value="user">User</option>
-                  <option value="admin">Admin</option>
+                  <option value="moderator">Moderator</option>
+                  <option value="admin" disabled={currentUserRole === 'moderator'}>Admin</option>
                 </select>
                 <p className="text-sm text-gray-500 mt-1">
                   Admins have full access to the dashboard
@@ -233,7 +260,7 @@ export default function EditUserForm({ userId }: EditUserFormProps) {
           <div className="flex gap-4">
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || (currentUserRole === 'moderator' && isTargetAdmin)}
               className="flex-1 bg-teal-600 text-white py-3 px-6 rounded-lg hover:bg-teal-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors"
             >
               {loading ? 'Updating...' : 'Update User'}

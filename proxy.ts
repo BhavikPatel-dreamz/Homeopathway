@@ -85,8 +85,9 @@ export async function proxy(req: NextRequest) {
       .eq('id', user.id)
       .single();
 
-    if (profile?.role !== 'admin') {
-      // Not an admin, redirect to home
+    // Allow both 'admin' and 'moderator' roles to access admin routes
+    if (profile?.role !== 'admin' && profile?.role !== 'moderator') {
+      // Not authorized, redirect to home
       const redirectUrl = new URL('/', req.url);
       return NextResponse.redirect(redirectUrl);
     }

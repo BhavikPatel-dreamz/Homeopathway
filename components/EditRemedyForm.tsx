@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { supabase } from '@/lib/supabaseClient';
 import { createUniqueSlugFromName, generateSlug } from '@/lib/slugUtils';
 import { healthEmojis } from '@/lib/emojiList';
@@ -18,13 +17,14 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
   const [fetching, setFetching] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [rating, setRating] = useState<number>(0);
+const [reviewCount, setReviewCount] = useState<number>(0);
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
     description: '',
     key_symptoms: '',
     icon: '',
-    image_url: '',
   });
 
   useEffect(() => {
@@ -49,13 +49,17 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
         }
 
         setFormData({
-          name: data.name || '',
-          slug: data.slug || '',
-          description: data.description || '',
-          key_symptoms: Array.isArray(data.key_symptoms) ? data.key_symptoms.join(', ') : '',
-          icon: data.icon || '',
-          image_url: data.image_url || '',
-        });
+  name: data.name || '',
+  slug: data.slug || '',
+  description: data.description || '',
+  key_symptoms: Array.isArray(data.key_symptoms) ? data.key_symptoms.join(', ') : '',
+  icon: data.icon || '',
+});
+
+// ✅ NEW
+setRating(data.average_rating || 0);
+setReviewCount(data.review_count || 0);
+
       } catch (err: unknown) {
         console.error('Error fetching remedy:', err);
         const errorMessage = err instanceof Error ? err.message : 'Failed to load remedy';
@@ -67,6 +71,23 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
 
     fetchRemedy();
   }, [remedyId]);
+
+  const renderStars = (value: number) => {
+  const rounded = Math.round(value);
+  return (
+    <div className="flex items-center gap-1">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <span
+          key={i}
+          className={i <= rounded ? 'text-yellow-400' : 'text-gray-300'}
+        >
+          ★
+        </span>
+      ))}
+    </div>
+  );
+};
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,7 +115,6 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
           description: formData.description,
           key_symptoms: keySymptoms,
           icon: formData.icon || null,
-          image_url: formData.image_url || null,
           updated_at: new Date().toISOString(),
         })
         .eq('id', remedyId);
@@ -323,38 +343,6 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
                 </p>
               </div>
 
-              {/* Image URL */}
-              <div>
-                <label htmlFor="image_url" className="block text-sm font-medium text-gray-700 mb-2">
-                  Image URL
-                </label>
-                <input
-                  type="url"
-                  id="image_url"
-                  name="image_url"
-                  value={formData.image_url}
-                  onChange={handleChange}
-                  placeholder="https://example.com/remedy-image.jpg"
-                  className="w-full px-4 py-2 text-gray-400 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-                />
-                <p className="text-sm text-gray-500 mt-1">
-                  Optional: Add a URL to an image of the remedy plant/substance
-                </p>
-                {formData.image_url && (
-                  <div className="mt-2">
-                    <Image
-                      src={formData.image_url}
-                      alt="Remedy preview"
-                      width={128}
-                      height={128}
-                      className="w-32 h-32 object-cover rounded-lg border border-gray-200"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
             </div>
           </div>
 
@@ -404,63 +392,50 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
       </div>
 
       {/* Preview Card */}
-      {formData.name && (
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Preview</h3>
-          <div className="border border-gray-200 rounded-lg p-4">
-            <div className="flex items-start gap-4">
-              {/* Icon/Image Section */}
-              <div className="flex-shrink-0">
-                {formData.image_url ? (
-                  <Image
-                    src={formData.image_url}
-                    alt={formData.name}
-                    width={80}
-                    height={80}
-                    className="w-20 h-20 object-cover rounded-lg border border-gray-200"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
-                  />
-                ) : formData.icon ? (
-                  <div className="w-20 h-20 flex items-center justify-center text-4xl bg-gray-50 rounded-lg border border-gray-200">
-                    {formData.icon}
-                  </div>
-                ) : (
-                  <div className="w-20 h-20 flex items-center justify-center bg-gray-100 rounded-lg border border-gray-200">
-                    <span className="text-gray-400 text-xs text-center">No icon/image</span>
-                  </div>
-                )}
-              </div>
+      {/* Preview Card */}
+{formData.name && (
+  <div className="bg-white rounded-lg shadow-md p-6">
+    <h3 className="text-lg font-semibold text-gray-900 mb-4">Preview</h3>
 
-              {/* Content Section */}
-              <div className="flex-1">
-                <h4 className="text-xl font-bold text-gray-900">{formData.name}</h4>
-
-                {formData.description && (
-                  <p className="text-gray-700 mt-3">{formData.description}</p>
-                )}
-                {formData.key_symptoms && (
-                  <div className="mt-4">
-                    <p className="text-sm font-semibold text-gray-700 mb-2">Key Symptoms:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {formData.key_symptoms.split(',').map((symptom, idx) => (
-                        <span
-                          key={idx}
-                          className="px-3 py-1 bg-teal-100 text-teal-800 rounded-full text-xs"
-                        >
-                          {symptom.trim()}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-              </div>
-            </div>
-          </div>
+    <div className="border border-gray-200 rounded-xl p-5 flex items-center gap-5">
+      {/* Icon */}
+      <div className="flex-shrink-0">
+        <div className="w-16 h-16 flex items-center justify-center rounded-full bg-teal-50 text-3xl">
+          {formData.icon || '💊'}
         </div>
-      )}
+      </div>
+
+      {/* Content */}
+      <div className="flex-1">
+        <h4 className="text-xl font-bold text-gray-900">
+          {formData.name}
+        </h4>
+
+        {/* Subtitle (first key symptom like 2nd image) */}
+        {formData.key_symptoms && (
+          <p className="text-sm text-gray-500 mt-1 capitalize">
+            {formData.key_symptoms.split(',')[0].trim()}
+          </p>
+        )}
+
+        {/* Rating */}
+        <div className="flex items-center gap-2 mt-2">
+          {renderStars(rating)}
+          <span className="text-sm text-gray-500">
+            {rating.toFixed(1)} ({reviewCount} reviews)
+          </span>
+        </div>
+
+        {/* Description */}
+        {formData.description && (
+          <p className="text-gray-700 mt-2 text-sm">
+            {formData.description}
+          </p>
+        )}
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }

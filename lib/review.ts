@@ -93,19 +93,10 @@ export async function addReview({
       const totalStars = allReviews.reduce((sum, review) => sum + review.star_count, 0);
       const averageRating = totalStars / reviewCount;
 
-      // Update the remedy table
-      const { error: updateError } = await client
-        .from('remedies')
-        .update({
-          average_rating: averageRating,
-          review_count: reviewCount,
-        })
-        .eq('id', remedyId);
-
-      if (updateError) {
-        console.error('Error updating remedy statistics:', updateError);
-        // Don't fail the entire operation, just log the error
-      }
+      // No-op: remedy statistics are maintained by the DB trigger
+      // `sync_remedy_review_stats` keeps `remedies.review_count` and
+      // `remedies.average_rating` up-to-date after review inserts/updates/deletes.
+      // Leaving this block empty avoids duplicate updates from application code.
     }
   } catch (updateError) {
     console.error('Error in remedy statistics update:', updateError);

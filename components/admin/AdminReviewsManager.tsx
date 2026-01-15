@@ -1,6 +1,8 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { Review } from '@/types';
+import * as XLSX from 'xlsx';
+
 
 interface Remedy {
   id: string;
@@ -48,6 +50,53 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
     sideEffects: '',
     page: 1,
   });
+
+
+  const handleExportReviews = async () => {
+    try {
+      setLoading(true);
+
+      // Export currently visible reviews (filtered result)
+      const rows = reviews.map((review) => {
+        const userProfile = review.profiles || review.user_profile;
+
+        return {
+          User: `${userProfile?.first_name || ''} ${userProfile?.last_name || ''}`.trim() || 'Anonymous',
+          Email: userProfile?.email || '',
+          Remedy: getRemedyName(review.remedy_id, review),
+          Rating: review.star_count,
+          Effectiveness: review.effectiveness ?? '',
+          Potency: review.potency ?? '',
+          Dosage: review.dosage ?? '',
+          Duration: review.duration_used ?? '',
+          Notes: review.notes ?? '',
+          Side_Effects: review.side_effects ? 'Yes' : 'No',
+          Date: formatDate(review.created_at),
+        };
+      });
+
+      if (rows.length === 0) {
+        alert('No reviews to export');
+        return;
+      }
+
+      const workbook = XLSX.utils.book_new();
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Reviews');
+
+      XLSX.writeFile(
+        workbook,
+        `reviews_export_${new Date().toISOString().slice(0, 10)}.xlsx`
+      );
+    } catch (error) {
+      console.error('Export failed:', error);
+      alert('Failed to export reviews');
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   // Fetch reviews with filters from API
   const fetchReviews = async (filterOptions: FilterOptions) => {
@@ -225,6 +274,14 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
             Manage and moderate user reviews ({reviews.length} of {total})
           </p>
         </div>
+
+        <button
+          onClick={handleExportReviews}
+          disabled={loading || reviews.length === 0}
+          className="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors font-medium"
+        >
+          Export XLSX
+        </button>
       </div>
 
       {/* Filters */}
@@ -509,8 +566,8 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
                             onClick={() => setFilters(prev => ({ ...prev, page: i }))}
                             disabled={loading}
                             className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50 ${currentPage === i
-                                ? 'z-10 bg-indigo-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600'
-                                : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
+                              ? 'z-10 bg-indigo-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600'
+                              : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
                               }`}
                           >
                             {i}

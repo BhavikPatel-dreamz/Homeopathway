@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
 
 export default function AddUserForm() {
   const router = useRouter();
+  const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
@@ -71,6 +72,7 @@ export default function AddUserForm() {
 
       // Success - redirect back to users page
       router.push('/admin/users');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error('Error adding user:', err);
       setError(err.message || 'Failed to add user');
@@ -84,6 +86,26 @@ export default function AddUserForm() {
       [e.target.name]: e.target.value,
     });
   };
+
+  // Load current user role to prevent moderators from creating admins
+  useEffect(() => {
+    async function loadRole() {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return setCurrentUserRole(null);
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        setCurrentUserRole(profile?.role || null);
+      } catch (err) {
+        console.error('Failed to load current user role', err);
+      }
+    }
+
+    loadRole();
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -186,7 +208,8 @@ export default function AddUserForm() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="user">User</option>
-                  <option value="admin">Admin</option>
+                  <option value="moderator">Moderator</option>
+                  <option value="admin" disabled={currentUserRole === 'moderator'}>Admin</option>
                 </select>
                 <p className="text-sm text-gray-500 mt-1">
                   Admins have full access to the dashboard

@@ -49,7 +49,7 @@ export interface UserProfile {
   first_name: string;
   last_name: string;
   email: string;
-  role: 'user' | 'admin';
+  role: 'user' | 'admin' | 'moderator';
   created_at: string;
   updated_at: string;
   profile_img?: string;
