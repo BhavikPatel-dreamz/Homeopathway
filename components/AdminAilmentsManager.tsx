@@ -70,7 +70,7 @@ export default function AdminAilmentsManager() {
         return
       }
 
-      let delta = target - cur
+      const delta = target - cur
       let inc = 1
       if (Math.abs(delta) > 20) inc = Math.ceil(Math.abs(delta) * 0.06)
       else if (Math.abs(delta) > 8) inc = Math.ceil(Math.abs(delta) * 0.12)
