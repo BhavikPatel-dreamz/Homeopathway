@@ -342,19 +342,33 @@ export default function AdminUsersManager() {
                       <div className="text-sm text-gray-600">{user.email}</div>
                     </td>
                     <td className="px-6 py-4">
-                                <select
-                                  value={user.role}
-                                  onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                                  disabled={loading || (currentUserRole === 'moderator' && user.role === 'admin')}
-                                  className={`px-3 py-1 text-xs font-medium rounded-full border ${user.role === 'admin'
-                                    ? 'bg-purple-100 text-purple-800 border-purple-200'
-                                    : 'bg-blue-100 text-blue-800 border-blue-200'
-                                    } disabled:opacity-50`}
-                                >
-                                  <option value="user">User</option>
-                                  <option value="moderator">Moderator</option>
-                                  <option value="admin" disabled={currentUserRole === 'moderator'}>Admin</option>
-                                </select>
+                      <select
+                        value={user.role}
+                        onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                        disabled={loading || (currentUserRole === 'moderator' && user.role === 'admin')}
+                        className={`px-3 py-1 text-xs font-medium rounded-full border transition-colors
+    ${user.role === 'admin'
+                            ? 'bg-purple-100 text-purple-800 border-purple-200'
+                            : 'bg-blue-100 text-blue-800 border-blue-200'
+                          }
+    disabled:opacity-70 disabled:cursor-not-allowed`}
+                      >
+                        <option value="user">User</option>
+                        <option value="moderator">Moderator</option>
+
+                        <option
+                          value="admin"
+                          disabled={currentUserRole === 'moderator'}
+                          className={
+                            currentUserRole === 'moderator'
+                              ? 'text-gray-400 underline decoration-dotted'
+                              : ''
+                          }
+                        >
+                          Admin {currentUserRole === 'moderator' ? '(restricted)' : ''}
+                        </option>
+                      </select>
+
                     </td>
                     <td className="px-6 py-4">
                       <span className="text-sm text-gray-600">
