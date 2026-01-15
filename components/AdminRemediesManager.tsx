@@ -111,17 +111,88 @@ export default function AdminRemediesManager() {
     const formData = new FormData();
     formData.append('file', file);
 
-    const res = await fetch('/api/admin/remedies/import', {
-      method: 'POST',
-      body: formData,
-    });
+    // small client-generated import id so server can report processing progress
+    const importId = `${Date.now()}-${Math.random().toString(36).slice(2,9)}`
+    formData.append('importId', importId)
 
-    if (!res.ok) {
-      throw new Error('Import failed');
+    setImportProgress(0)
+    setImporting(true)
+
+    // Include the current user's access token so the server can authenticate
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData?.session?.access_token || null;
+
+    try {
+      // Upload with progress
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest()
+        xhr.open('POST', '/api/admin/remedies/import', true)
+
+        if (accessToken) xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`)
+
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            const pct = Math.round((e.loaded / e.total) * 100)
+            setImportProgress(Math.min(pct, 95)) // hold below 100 until server finishes
+          } else {
+            setImportProgress((p) => Math.min(95, p + 10))
+          }
+        }
+
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) resolve()
+          else {
+            try {
+              const json = JSON.parse(xhr.responseText || '{}')
+              reject(new Error(json?.error || 'Import failed'))
+            } catch (e) {
+              reject(new Error('Import failed'))
+            }
+          }
+        }
+
+        xhr.onerror = () => reject(new Error('Import failed'))
+        xhr.onabort = () => reject(new Error('Import aborted'))
+
+        xhr.send(formData)
+      })
+
+      // After upload finishes, poll server for processing progress
+      const poll = async () => {
+        const start = Date.now()
+        while (true) {
+          try {
+            const res = await fetch(`/api/admin/remedies/import/progress?importId=${encodeURIComponent(importId)}`)
+            if (res.ok) {
+              const json = await res.json()
+              const pct = Number(json?.progress || 0)
+              setImportProgress(pct)
+              if (pct >= 100) break
+            }
+          } catch (e) {
+            // ignore transient
+          }
+
+          // safety timeout: stop polling after 2 minutes
+          if (Date.now() - start > 120_000) break
+          await new Promise(r => setTimeout(r, 500))
+        }
+      }
+
+      await poll()
+
+      // refresh remedies list after import
+      await fetchRemedies()
+      setMessage({ type: 'success', text: 'Import completed successfully' })
+      setTimeout(() => setMessage(null), 4000)
+    } catch (err) {
+      console.error('Import error', err)
+      setMessage({ type: 'error', text: 'Import failed' })
+      setTimeout(() => setMessage(null), 4000)
+    } finally {
+      setImporting(false)
+      setTimeout(() => setImportProgress(0), 800)
     }
-
-    // 🔁 refresh remedies list after import
-    await fetchRemedies();
   };
 
 
@@ -248,7 +319,8 @@ export default function AdminRemediesManager() {
           {/* IMPORT */}
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="h-[52px] px-5 rounded-lg border border-[#0f75ae] text-white font-medium bg-[#0f75ae] shadow-sm hover:bg-[#04659b] hover:border-[#0f75ae] active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer">
+            disabled={importing}
+            className={`h-[52px] px-5 rounded-lg border border-[#0f75ae] text-white font-medium bg-[#0f75ae] shadow-sm hover:bg-[#04659b] hover:border-[#0f75ae] active:scale-[0.98] transition-all flex items-center gap-2 ${importing ? 'opacity-70 cursor-wait' : 'cursor-pointer'}`}>
 
             {/* Upload Icon */}
             <svg

@@ -34,6 +34,69 @@ export default function AdminAilmentsManager() {
   const [importing, setImporting] = useState(false);
   const [exporting, setExporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const importProgressRef = useRef<number>(0)
+  const progressAnimRef = useRef<number | null>(null)
+
+  // Keep ref synced with state
+  useEffect(() => {
+    importProgressRef.current = importProgress
+  }, [importProgress])
+
+  // Smoothly animate progress to target (handles up and down)
+  const animateTo = useCallback((target: number) => {
+    // clamp
+    target = Math.max(0, Math.min(100, Math.round(target)))
+
+    // clear existing timer
+    if (progressAnimRef.current) {
+      window.clearInterval(progressAnimRef.current)
+      progressAnimRef.current = null
+    }
+
+    // immediate set if same
+    if (importProgressRef.current === target) {
+      setImportProgress(target)
+      return
+    }
+
+    const stepMs = 25
+    progressAnimRef.current = window.setInterval(() => {
+      const cur = importProgressRef.current || 0
+      if (cur === target) {
+        if (progressAnimRef.current) {
+          window.clearInterval(progressAnimRef.current)
+          progressAnimRef.current = null
+        }
+        return
+      }
+
+      let delta = target - cur
+      let inc = 1
+      if (Math.abs(delta) > 20) inc = Math.ceil(Math.abs(delta) * 0.06)
+      else if (Math.abs(delta) > 8) inc = Math.ceil(Math.abs(delta) * 0.12)
+
+      const next = delta > 0 ? Math.min(target, cur + inc) : Math.max(target, cur - inc)
+      importProgressRef.current = next
+      setImportProgress(next)
+
+      if (next === target) {
+        if (progressAnimRef.current) {
+          window.clearInterval(progressAnimRef.current)
+          progressAnimRef.current = null
+        }
+      }
+    }, stepMs)
+  }, [setImportProgress])
+
+  // cleanup
+  useEffect(() => {
+    return () => {
+      if (progressAnimRef.current) {
+        window.clearInterval(progressAnimRef.current)
+        progressAnimRef.current = null
+      }
+    }
+  }, [])
   const [sortBy, setSortBy] = useState<'name' | 'remedies_count'>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
@@ -109,35 +172,96 @@ export default function AdminAilmentsManager() {
 
 
   const handleImport = async (file: File) => {
-    setImporting(true);
-    setImportProgress(5);
-
     const formData = new FormData();
     formData.append('file', file);
 
+    // small client-generated import id so server can report processing progress
+    const importId = `${Date.now()}-${Math.random().toString(36).slice(2,9)}`
+    formData.append('importId', importId)
+
+    setImportProgress(0)
+    setImporting(true)
+    // kick off a small visible start so animation begins from 1
+    animateTo(1)
+
+    // Include the current user's access token so the server can authenticate
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData?.session?.access_token || null;
+
     try {
-      setImportProgress(20);
+      // Upload with progress using XHR so we can track bytes uploaded
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest()
+        xhr.open('POST', '/api/admin/ailments/import', true)
 
-      const res = await fetch('/api/admin/ailments/import', {
-        method: 'POST',
-        body: formData,
-      });
+        if (accessToken) xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`)
 
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            const pct = Math.round((e.loaded / e.total) * 100)
+            animateTo(Math.min(pct, 95)) // hold below 100 until server finishes
+          } else {
+            animateTo(Math.min(95, (importProgressRef.current || 0) + 10))
+          }
+        }
 
-      if (!res.ok) throw new Error('Import failed');
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) resolve()
+          else {
+            try {
+              const json = JSON.parse(xhr.responseText || '{}')
+              reject(new Error(json?.error || 'Import failed'))
+            } catch (e) {
+              reject(new Error('Import failed'))
+            }
+          }
+        }
 
-      setImportProgress(100);
-      setMessage({ type: 'success', text: 'Import completed successfully!' });
+        xhr.onerror = () => reject(new Error('Import failed'))
+        xhr.onabort = () => reject(new Error('Import aborted'))
 
-      await fetchAilments();
+        xhr.send(formData)
+      })
+
+      // After upload finishes, poll server for processing progress
+      const poll = async () => {
+        const start = Date.now()
+        while (true) {
+          try {
+            const res = await fetch(`/api/admin/ailments/import/progress?importId=${encodeURIComponent(importId)}`)
+            if (res.ok) {
+              const json = await res.json()
+              const pct = Number(json?.progress || 0)
+              animateTo(pct)
+              if (pct >= 100) break
+            }
+          } catch (e) {
+            // ignore transient
+          }
+
+          // safety timeout: stop polling after 2 minutes
+          if (Date.now() - start > 120_000) break
+          await new Promise(r => setTimeout(r, 500))
+        }
+      }
+
+      await poll()
+
+      // ensure progress reaches 100 visually, wait briefly, then refresh
+      animateTo(100)
+      await new Promise(r => setTimeout(r, 700))
+
+      // refresh ailments list after import
+      await fetchAilments()
+      setMessage({ type: 'success', text: 'Import completed successfully' })
+      setTimeout(() => setMessage(null), 4000)
     } catch (err) {
       console.error(err);
       setMessage({ type: 'error', text: 'Import failed. Please check the CSV or XLSX file.'});
     } finally {
-      setTimeout(() => {
-        setImporting(false);
-        setImportProgress(0);
-      }, 1000);
+      setImporting(false)
+      // keep 100 visible briefly then animate back to 0
+      setTimeout(() => animateTo(0), 1200)
     }
   };
 
