@@ -41,6 +41,7 @@ export default function DashboardLayout({ children, userName, userRole }: Dashbo
     },
     { name: 'Users', href: '/admin/users', icon: '👥' },
     { name: 'Reviews', href: '/admin/reviews', icon: '⭐' },
+    { name: 'Requests', href: '/admin/requests', icon: '📝' },
   ];
 
   return (

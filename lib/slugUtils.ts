@@ -30,22 +30,23 @@ export async function checkSlugExists(slug: string, table: 'ailments' | 'remedie
   try {
     let query = supabase
       .from(table)
-      .select('slug')
-      .eq('slug', slug);
+      .select('slug', { count: 'exact' })
+      .eq('slug', slug)
+      .limit(1);
 
     // Exclude current record when editing
     if (excludeId) {
       query = query.neq('id', excludeId);
     }
 
-    const { data, error } = await query.single();
+    const { count, error } = await query;
 
-    if (error && error.code !== 'PGRST116') {
-      // PGRST116 is "not found" error, which means slug doesn't exist
-      throw error;
+    if (error) {
+      console.error('Error checking slug:', error);
+      return false;
     }
 
-    return !!data;
+    return (count ?? 0) > 0;
   } catch (error) {
     console.error('Error checking slug:', error);
     return false;

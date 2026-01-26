@@ -4,10 +4,12 @@ import { Ailment, Remedy } from "@/types";
 import supabase from "@/lib/supabaseClient";
 import { isMobileDevice } from "@/lib/userUtils";
 import Image from "next/image";
+import RequestAilmentRemedyModal from "./RequestAilmentRemedyModal";
 
 export default function SearchBar() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const [showRequestModal, setShowRequestModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isMobileSearchExpanded, setIsMobileSearchExpanded] = useState(false);
 
@@ -197,11 +199,34 @@ export default function SearchBar() {
             </div>
           )}
 
+          {/* Request New Ailment or Remedy Button */}
+          {searchQuery.trim() && (filteredAilments.length > 0 || filteredRemedies.length > 0) && (
+            <div className="border-t border-gray-100 px-4 py-3">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-sm text-[#7D5C4E] font-medium">
+                  Can&apos;t find what you&apos;re looking for?
+                </p>
+                <button
+                  onClick={() => setShowRequestModal(true)}
+                  className="px-4 py-2 bg-[#5D7B6F] hover:bg-[#4a5f56] text-white text-sm rounded-lg font-medium transition-colors whitespace-nowrap"
+                >
+                  Request a new Ailment or Remedy
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Empty State */}
           {filteredAilments.length === 0 && filteredRemedies.length === 0 && (
             <div className="p-8 text-center text-[#0B0C0A]">
-              <p className="text-base md:text-lg font-medium">No results found</p>
-              <p className="text-sm mt-1">Try searching for different keywords</p>
+              <p className="text-base md:text-lg font-medium">Can&apos;t find what you&apos;re looking for?</p>
+              <p className="text-sm mt-1 mb-4">Try searching for different keywords</p>
+              <button
+                onClick={() => setShowRequestModal(true)}
+                className="inline-block px-6 py-2 bg-[#E8E6E0] hover:bg-[#DDD9CE] text-[#0B0C0A] rounded-full font-medium transition-colors"
+              >
+                Request a new ailment or remedy
+              </button>
             </div>
           )}
         </>
@@ -287,6 +312,13 @@ export default function SearchBar() {
           {showSuggestions && <SuggestionsDropdown />}
         </div>
       </div>
+
+      {/* Request Modal */}
+      <RequestAilmentRemedyModal
+        isOpen={showRequestModal}
+        onClose={() => setShowRequestModal(false)}
+        type="both"
+      />
     </div>
   );
 }
