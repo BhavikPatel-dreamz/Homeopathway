@@ -6,7 +6,9 @@ import { X } from 'lucide-react';
 import { getCurrentUser } from '@/lib/auth';
 import Image from 'next/image';
 import RemedyMultiSelect from './RemedyMultiSelect';
-import type { RemedyOption } from "@/types";
+import RequestAilmentRemedyModal from './RequestAilmentRemedyModal';
+import supabase from '@/lib/supabaseClient';
+import type { RemedyOption, Ailment } from "@/types";
 
 
 
@@ -26,6 +28,11 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
   const [error, setError] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [ailments, setAilments] = useState<Ailment[]>([]);
+  const [selectedAilment, setSelectedAilment] = useState<string>(ailmentId || '');
+  const [showRequestAilmentModal, setShowRequestAilmentModal] = useState(false);
+  const [showRequestRemedyModal, setShowRequestRemedyModal] = useState(false);
+  const [ailmentsLoading, setAilmentsLoading] = useState(true);
   const [remedyPotencies, setRemedyPotencies] = useState<Record<string, string>>({
     [remedyId]: ''
   });
@@ -57,7 +64,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
 
 
 
-  const totalSteps = 7;
+  const totalSteps = 8;
 
   const allRemedies = [
     { id: remedyId, name: remedyName },
@@ -66,6 +73,11 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
 
 
   useEffect(() => {
+    const allRemedies = [
+      { id: remedyId, name: remedyName },
+      ...selectedRemedies
+    ];
+
     allRemedies.forEach(rem => {
       setRemedyExtras(prev => {
         if (prev[rem.id]) return prev;
@@ -75,7 +87,29 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
         };
       });
     });
-  }, [selectedRemedies]);
+  }, [selectedRemedies, remedyId, remedyName]);
+
+  // Fetch ailments from database
+  useEffect(() => {
+    const fetchAilments = async () => {
+      try {
+        setAilmentsLoading(true);
+        const { data, error } = await supabase
+          .from('ailments')
+          .select('id, name, slug, icon, remedies_count')
+          .order('name', { ascending: true });
+
+        if (error) throw error;
+        setAilments(data || []);
+      } catch (err) {
+        console.error('Error fetching ailments:', err);
+      } finally {
+        setAilmentsLoading(false);
+      }
+    };
+
+    fetchAilments();
+  }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -164,7 +198,6 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
         throw new Error(errorData.error || 'Failed to submit review');
       }
 
-      const result = await response.json();
       setShowSuccess(true);
       // onClose();
     } catch (err) {
@@ -212,11 +245,6 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
         notes
       }
     }));
-  };
-
-
-  const handlePotency = (potency: string) => {
-    setFormData({ ...formData, potency });
   };
 
   const handleSpecificPotency = (id: string, pot: string) => {
@@ -281,8 +309,40 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
             </div>
           )}
 
-          {/* Step 0: Combination Remedies */}
+          {/* Step 0: Select Ailment */}
           {step === 0 && (
+            <div className="space-y-4">
+              <p className="font-montserrat font-medium sm:text-[16px] text-[14px] leading-[24px] text-[#4B544A]">
+                Select Ailment
+              </p>
+              <select
+                value={selectedAilment}
+                onChange={(e) => setSelectedAilment(e.target.value)}
+                disabled={ailmentsLoading}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2C3E3E] text-[#0B0C0A] bg-white"
+              >
+                <option value="">Choose an ailment...</option>
+                {ailments.map((ailment) => (
+                  <option key={ailment.id} value={ailment.id}>
+                    {ailment.icon} {ailment.name}
+                  </option>
+                ))}
+              </select>
+              <p className="text-sm text-[#7D5C4E]">
+                Can&apos;t find what you&apos;re looking for?{" "}
+                <button
+                  type="button"
+                  onClick={() => setShowRequestAilmentModal(true)}
+                  className="text-[#2C3E3E] hover:text-[#1a2a29] font-medium transition-colors"
+                >
+                  Add an Ailment
+                </button>
+              </p>
+            </div>
+          )}
+
+          {/* Step 1: Combination Remedies */}
+          {step === 1 && (
             <div className="space-y-2">
 
               {/* Line 1 */}
@@ -306,12 +366,23 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                 selected={selectedRemedies}
                 onChange={setSelectedRemedies}
               />
+              
+              <p className="text-sm text-[#7D5C4E] mt-3">
+                Can&apos;t find what you&apos;re looking for?{" "}
+                <button
+                  type="button"
+                  onClick={() => setShowRequestRemedyModal(true)}
+                  className="text-[#2C3E3E] hover:text-[#1a2a29] font-medium transition-colors"
+                >
+                  Add a Remedy
+                </button>
+              </p>
             </div>
           )}
 
 
-          {/* Step 1: Rating */}
-          {step === 1 && (
+          {/* Step 2: Rating */}
+          {step === 2 && (
             <div className="space-y-3 sm:space-y-4">
               <p className="text-gray-800 text-sm sm:text-base">How do you rate the remedy?</p>
               <div className="flex gap-2 sm:gap-3 justify-start">
@@ -332,78 +403,83 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
             </div>
           )}
 
-          {/* Step 2: Potency - Multi-Remedy Support */}
-          {step === 2 && (
+          {/* Step 3: Potency - Multi-Remedy Support */}
+          {step === 3 && (
             <div className="flex flex-col gap-[16px]">
-              {allRemedies.map(rem => (
-                <div key={rem.id} className="flex flex-col gap-[16px]">
-
-                  <p className="text-[#41463B] sm:text-base text-sm font-medium">
-                    What was the potency?
-                  </p>
-
-                  {/* Potency Type */}
-                  <div className="flex gap-2">
-                    {['Pellet', 'Liquid', 'Ointment'].map(type => (
-                      <button
-                        key={type}
-                        onClick={() => handlePotencyType(rem.id, type)}
-                        className={`px-4 py-2 sm:rounded-lg rounded-md border transition-all font-medium sm:text-sm text-xs text-[#41463B] ${remedyExtras[rem.id]?.potencyType === type
-                          ? 'border-[#6C7463] border outline-1 outline-[#6C7463] text-[#0B0C0A]'
-                          : 'border-[#B5B6B1] text-[#41463B]'
-                          }`}
-
-                      >
-                        {type}
-                        {remedyExtras[rem.id]?.potencyType === type && (
-                          <span className="ml-2 inline-flex">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="11" viewBox="0 0 15 11" fill="none">
-                              <path d="M5.30333 7.66083L12.9633 0L14.1425 1.17833L5.30333 10.0175L0 4.71417L1.17833 3.53583L5.30333 7.66083Z" fill="#0B0C0A" />
-                            </svg>
-                          </span>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Notes */}
-                  <textarea
-                    placeholder="Free text...."
-                    value={remedyExtras[rem.id]?.notes || ''}
-                    onChange={e => handleNotes(rem.id, e.target.value)}
-                    className="w-full p-4 border-2 border-[#6C7463] sm:text-base text-xs sm:rounded-xl rounded-md min-h-[90px] text-[#0B0C0A] placeholder:text-[#9A9A96]"
-                  />
-
-                  {/* Remedy Name */}
-                  <p className="sm:text-base text-sm font-medium text-[#41463B]">
-                    {rem.name}:
-                  </p>
-
-                  {/* Potency Buttons */}
-                  <div className="flex flex-wrap gap-[8px]">
-                    {['6C', '6X', '12C', '30C', '200C', '1M', '10M', 'CM'].map(pot => (
-                      <button
-                        key={pot}
-                        onClick={() => handleSpecificPotency(rem.id, pot)}
-                        className={`px-[12px] py-[8px] rounded-lg border sm:text-sm text-xs font-medium ${remedyPotencies[rem.id] === pot
-                          ? 'border-[#0B0C0A] border-2 text-[#0B0C0A]'
-                          : 'border-[#D1D1CB] text-[#41463B]'
-                          }`}
-
-                      >
-                        {pot}
-                      </button>
-                    ))}
-                  </div>
-
+              {/* Form Type */}
+              <div>
+                <p className="text-[#41463B] sm:text-base text-sm font-medium mb-3">
+                  What form was the combined remedy?
+                </p>
+                <div className="flex gap-2">
+                  {['Liquid', 'Pellets', 'Ointment'].map(type => (
+                    <button
+                      key={type}
+                      onClick={() => handlePotencyType(remedyId, type)}
+                      className={`px-4 py-2 sm:rounded-lg rounded-md border transition-all font-medium sm:text-sm text-xs text-[#41463B] ${remedyExtras[remedyId]?.potencyType === type
+                        ? 'border-[#6C7463] border-2 outline-1 outline-[#6C7463] text-[#0B0C0A]'
+                        : 'border-[#B5B6B1] text-[#41463B]'
+                        }`}
+                    >
+                      {type}
+                      {remedyExtras[remedyId]?.potencyType === type && (
+                        <span className="ml-2 inline-flex">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="11" viewBox="0 0 15 11" fill="none">
+                            <path d="M5.30333 7.66083L12.9633 0L14.1425 1.17833L5.30333 10.0175L0 4.71417L1.17833 3.53583L5.30333 7.66083Z" fill="#0B0C0A" />
+                          </svg>
+                        </span>
+                      )}
+                    </button>
+                  ))}
                 </div>
-              ))}
+              </div>
+
+              {/* Potency for each remedy */}
+              <div>
+                <p className="text-[#41463B] sm:text-base text-sm font-medium mb-3">
+                  What was the potency?
+                </p>
+                
+                {allRemedies.map(rem => (
+                  <div key={rem.id} className="mb-6">
+                    {/* Remedy Name */}
+                    <p className="sm:text-base text-sm font-medium text-[#41463B] mb-2">
+                      {rem.name}:
+                    </p>
+
+                    {/* Potency Buttons */}
+                    <div className="flex flex-wrap gap-[8px] mb-2">
+                      {['6C', '6X', '12C', '30C', '200C', '1M', '10M', 'CM'].map(pot => (
+                        <button
+                          key={pot}
+                          onClick={() => handleSpecificPotency(rem.id, pot)}
+                          className={`px-[12px] py-[8px] rounded-lg border sm:text-sm text-xs font-medium ${remedyPotencies[rem.id] === pot
+                            ? 'border-[#0B0C0A] border-2 text-[#0B0C0A]'
+                            : 'border-[#D1D1CB] text-[#41463B]'
+                            }`}
+                        >
+                          {pot}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Free Text Input */}
+                    <input
+                      type="text"
+                      placeholder="Free text..."
+                      value={remedyExtras[rem.id]?.notes || ''}
+                      onChange={e => handleNotes(rem.id, e.target.value)}
+                      className="w-32 px-3 py-2 border border-[#D1D1CB] rounded-lg sm:text-sm text-xs text-[#0B0C0A] placeholder:text-[#9A9A96]"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
 
-          {/* Step 3: Dosage */}
-          {step === 3 && (
+          {/* Step 4: Dosage */}
+          {step === 4 && (
             <div className="space-y-4 sm:space-y-6">
               <p className="text-[#41463B] font-medium text-sm sm:text-base">What was the dosage?</p>
 
@@ -440,8 +516,8 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
             </div>
           )}
 
-          {/* Step 4: Duration */}
-          {step === 4 && (
+          {/* Step 5: Duration */}
+          {step === 5 && (
             <div className="space-y-4 sm:space-y-6">
               <p className="text-[#41463B] font-medium text-sm sm:text-base">How long did you use it?</p>
 
@@ -478,8 +554,8 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
             </div>
           )}
 
-          {/* Step 5: Effectiveness */}
-          {step === 5 && (
+          {/* Step 6: Effectiveness */}
+          {step === 6 && (
             <div className="space-y-4 sm:space-y-6">
               <p className="text-[#41463B] font-medium text-sm sm:text-base">How effective was it?</p>
 
@@ -514,8 +590,8 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
             </div>
           )}
 
-          {/* Step 6: Additional Notes */}
-          {step === 6 && (
+          {/* Step 7: Additional Notes */}
+          {step === 7 && (
             <div className="space-y-4 sm:space-y-6">
               <p className="text-[#41463B] font-medium text-sm sm:text-base">Share details of your situation, what you did, and the outcome.</p>
 
@@ -557,17 +633,18 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
               onClick={handleNext}
               disabled={
                 loading ||
-                (step === 1 && formData.rating === 0) ||
-                (step === 2 &&
+                (step === 0 && !selectedAilment) ||
+                (step === 2 && formData.rating === 0) ||
+                (step === 3 &&
                   (
                     !remedyExtras[remedyId]?.potencyType ||
                     !remedyPotencies[remedyId]
                   )
                 )
                 ||
-                (step === 3 && !formData.dosage) ||
-                (step === 4 && !formData.duration) ||
-                (step === 5 && !formData.effectiveness)
+                (step === 4 && !formData.dosage) ||
+                (step === 5 && !formData.duration) ||
+                (step === 6 && !formData.effectiveness)
               }
               className="px-5 py-2.5 h-[44px] min-w-[138px] rounded-full bg-[#6C7463] text-white disabled:bg-[#F1F2F0] disabled:text-[#2B2E28] disabled:cursor-not-allowed transition-all font-semibold text-sm sm:text-base cursor-pointer hover:bg-[#4B544A]"
             >
@@ -591,9 +668,11 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                 </button>
 
                 <div className="flex flex-col items-center space-y-3">
-                  <img
+                  <Image
                     src="/login-logo.svg"
                     alt="icon"
+                    width={120}
+                    height={120}
                     className="sm:w-30 sm:h-30 w-20 h-20 mx-auto"
                   />
 
@@ -610,6 +689,20 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
             </div>
           )}
         </div>
+
+        {/* Request Ailment Modal */}
+        <RequestAilmentRemedyModal
+          isOpen={showRequestAilmentModal}
+          onClose={() => setShowRequestAilmentModal(false)}
+          type="ailment"
+        />
+
+        {/* Request Remedy Modal */}
+        <RequestAilmentRemedyModal
+          isOpen={showRequestRemedyModal}
+          onClose={() => setShowRequestRemedyModal(false)}
+          type="remedy"
+        />
       </div>
     </div>
   );

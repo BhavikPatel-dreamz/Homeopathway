@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -71,6 +72,8 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
     newpassword: "",
     confirmpassword: "",
   });
+
+
 
   // Helper function to update localStorage cache
   const updateCache = async () => {
@@ -268,6 +271,8 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
+
+
   const handleRemoveAvatar = async () => {
     if (!avatarUrl) return;
 
@@ -297,6 +302,8 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
       setAvatarLoading(false);
     }
   };
+
+
 
   const handleSave = async () => {
     // Validate form
@@ -886,6 +893,27 @@ z-50 animate-in slide-in-from-top-2
               </div>
             )}
           </div>
+        </div>
+
+        {/* My Request Link */}
+        <div className="mt-8 bg-white rounded-lg shadow-sm p-4 sm:p-6">
+          <button
+            onClick={() => router.push('/my-requests')}
+            className="w-full flex items-center justify-between text-left hover:bg-gray-50 p-4 rounded-lg transition-colors"
+          >
+            <div>
+              <h3 className="text-xl sm:text-2xl font-bold text-[#0B0C0A]">My Requests</h3>
+              <p className="text-gray-600 text-sm mt-1">View all your submitted ailments and remedy requests</p>
+            </div>
+            <svg
+              className="w-6 h-6 text-gray-400 flex-shrink-0 ml-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
         </div>
 
         {!isEditing && (
