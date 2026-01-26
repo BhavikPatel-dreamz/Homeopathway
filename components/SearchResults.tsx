@@ -98,7 +98,7 @@ export default function SearchResults({
               No results found
             </h2>
             <p className="text-[#7D5C4E] mb-8">
-              We couldn&apos;t find any ailments or remedies matching "{searchQuery}". 
+              We couldn&apos;t find any ailments or remedies matching &quot;{searchQuery}&quot;. 
               Try searching with different keywords.
             </p>
             <div className="bg-white rounded-lg p-6 max-w-md mx-auto">
