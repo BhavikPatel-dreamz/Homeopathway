@@ -98,14 +98,14 @@ export default function RequestAilmentRemedyModal({
         requestType === "ailment" ? "ailments" : "remedies"
       );
 
-      // Insert into ailments or remedies table with pending status
+      // Insert into ailments or remedies table with approved status
       const tableName = requestType === "ailment" ? "ailments" : "remedies";
       const insertData: any = {
         name: formData.name,
         icon: formData.emoji,
         slug: slug,
         description: formData.description || null,
-        status: "pending",
+        status: "approved",
         requested_by_user_id: authUser.id,
         is_user_submission: true,
       };
@@ -186,11 +186,8 @@ export default function RequestAilmentRemedyModal({
             <h2 className="text-3xl font-bold text-[#0B0C0A] mb-3 text-center">
               Request Submitted Successfully!
             </h2>
-            <p className="text-lg text-[#7D5C4E] text-center mb-2">
-              Your request is under review.
-            </p>
             <p className="text-lg text-[#7D5C4E] text-center mb-8">
-              We&apos;ll notify you once it&apos;s approved.
+              Your {requestType} has been added successfully!
             </p>
             <button
               onClick={() => {

@@ -158,6 +158,7 @@ export default function UserAvatar({ className = "" }: UserAvatarProps) {
 
   if (!user || !profile) {
     // Guest user - show a generic icon
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const pathname = usePathname();
     const isHome = pathname === "/";
     const borderColor = isHome ? "#fff" : "#20231E";
