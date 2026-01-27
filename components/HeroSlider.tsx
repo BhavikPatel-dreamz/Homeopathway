@@ -7,6 +7,7 @@ import { Ailment, Remedy } from "@/types";
 import { checkIsUserLoggedIn } from "@/lib/userUtils";
 import UserAvatar from "./UserAvatar";
 import Link from "next/link";
+import RequestAilmentRemedyModal from "./RequestAilmentRemedyModal";
 
 // Custom Slider Component (LOOP ENABLED)
 // Custom Slider Component (FULLY FIXED LOOP)
@@ -145,6 +146,7 @@ export default function HeroSlider() {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showRequestModal, setShowRequestModal] = useState(false);
 
   // Auto-suggestion states
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -447,12 +449,34 @@ export default function HeroSlider() {
                         </p>
                       </div>
                     )}
+
+                  {/* Request Button Section */}
+                  <div className="border-t border-gray-100 px-4 py-4 bg-[#f5f3ed] flex items-center justify-between gap-3">
+                    <p className="text-[#7D5C4E] font-medium text-sm whitespace-nowrap">
+                      Can&apos;t find what you&apos;re looking for?
+                    </p>
+                    <button
+                      onClick={() => {
+                        setShowRequestModal(true);
+                        setShowSuggestions(false);
+                      }}
+                      className="px-4 py-2 bg-[#5D7B6F] hover:bg-[#4a5f56] text-white font-medium text-sm rounded-lg transition-colors flex-shrink-0 whitespace-nowrap"
+                    >
+                      Request a new ailment or remedy
+                    </button>
+                  </div>
                 </>
               )}
             </div>
           )}
         </div>
       </div>
+
+      {/* Request Modal */}
+      <RequestAilmentRemedyModal 
+        isOpen={showRequestModal}
+        onClose={() => setShowRequestModal(false)} 
+      />
     </section>
   );
 }

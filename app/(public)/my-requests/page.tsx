@@ -489,32 +489,41 @@ z-50 animate-in slide-in-from-top-2
 
               {/* Edit Modal - Shown when editing */}
               {editingId && editType && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                  <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-xl font-semibold text-[#0B0C0A]">
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+                  <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
+                    {/* Header */}
+                    <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+                      <h2 className="text-2xl font-bold text-[#0B0C0A]">
                         Edit {editType === 'ailment' ? 'Ailment' : 'Remedy'}
-                      </h3>
+                      </h2>
                       <button
                         onClick={handleEditCancel}
-                        className="text-gray-400 hover:text-gray-600"
+                        className="text-gray-400 hover:text-gray-600 transition-colors"
                       >
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                         </svg>
                       </button>
                     </div>
 
-                    <div className="space-y-4">
+                    {/* Form */}
+                    <form onSubmit={(e) => { e.preventDefault(); handleEditSave(); }} className="p-6 space-y-6">
+                      {/* Form Title */}
+                      <h3 className="text-lg font-semibold text-[#0B0C0A]">
+                        {editType === 'ailment' ? 'Ailment' : 'Remedy'} Details
+                      </h3>
+
                       {/* Name Field */}
                       <div>
                         <label className="block text-sm font-medium text-[#0B0C0A] mb-2">
-                          Name <span className="text-red-500">*</span>
+                          {editType === 'ailment' ? 'Ailment' : 'Remedy'} Name
+                          <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="text"
                           value={editFormData.name}
                           onChange={(e) => setEditFormData({...editFormData, name: e.target.value})}
+                          placeholder={editType === 'ailment' ? 'e.g., Headache' : 'e.g., Belladonna'}
                           className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2C3E3E] text-[#0B0C0A] placeholder-gray-400"
                           disabled={editLoading}
                         />
@@ -522,12 +531,14 @@ z-50 animate-in slide-in-from-top-2
 
                       {/* Emoji Field */}
                       <div>
-                        <label className="block text-sm font-medium text-[#0B0C0A] mb-2">Emoji</label>
+                        <label className="block text-sm font-medium text-[#0B0C0A] mb-2">
+                          {editType === 'ailment' ? 'Ailment' : 'Remedy'} Emoji (optional)
+                        </label>
                         <div className="relative">
                           <button
                             type="button"
                             onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg flex items-center justify-between bg-white hover:bg-gray-50 text-[#0B0C0A]"
+                            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg flex items-center justify-between bg-white hover:bg-gray-50 transition-colors text-[#0B0C0A]"
                             disabled={editLoading}
                           >
                             <span className="text-xl">{editFormData.emoji}</span>
@@ -558,53 +569,56 @@ z-50 animate-in slide-in-from-top-2
                         </div>
                       </div>
 
-                      {/* Description Field */}
-                      <div>
-                        <label className="block text-sm font-medium text-[#0B0C0A] mb-2">Description</label>
-                        <textarea
-                          value={editFormData.description}
-                          onChange={(e) => setEditFormData({...editFormData, description: e.target.value})}
-                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2C3E3E] resize-none text-[#0B0C0A] placeholder-gray-400"
-                          rows={3}
-                          disabled={editLoading}
-                        />
-                      </div>
-
                       {/* Remedy-specific: Key Symptoms */}
                       {editType === 'remedy' && (
                         <div>
                           <label className="block text-sm font-medium text-[#0B0C0A] mb-2">
-                            Key Symptoms (comma-separated)
+                            Key Symptoms
+                            <span className="text-red-500">*</span>
                           </label>
                           <input
                             type="text"
                             value={editFormData.key_symptoms}
                             onChange={(e) => setEditFormData({...editFormData, key_symptoms: e.target.value})}
-                            placeholder="e.g., fever, cough, headache"
+                            placeholder="e.g., fever, cough, headache (comma-separated)"
                             className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2C3E3E] text-[#0B0C0A] placeholder-gray-400"
                             disabled={editLoading}
                           />
                         </div>
                       )}
 
-                      {/* Action Buttons */}
-                      <div className="flex gap-3 pt-4">
-                        <button
-                          onClick={handleEditSave}
+                      {/* Description Field */}
+                      <div>
+                        <label className="block text-sm font-medium text-[#0B0C0A] mb-2">
+                          {editType === 'ailment' ? 'Ailment' : 'Remedy'} Description (optional)
+                        </label>
+                        <textarea
+                          value={editFormData.description}
+                          onChange={(e) => setEditFormData({...editFormData, description: e.target.value})}
+                          placeholder="Type your message..."
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2C3E3E] text-[#0B0C0A] placeholder-gray-400 resize-none"
+                          rows={4}
                           disabled={editLoading}
-                          className="flex-1 px-4 py-2.5 bg-[#5D7B6F] hover:bg-[#4a5f56] disabled:bg-gray-400 text-white font-semibold rounded-lg transition-colors"
-                        >
-                          {editLoading ? "Saving..." : "Save Changes"}
-                        </button>
-                        <button
-                          onClick={handleEditCancel}
-                          disabled={editLoading}
-                          className="flex-1 px-4 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg transition-colors"
-                        >
-                          Cancel
-                        </button>
+                        />
                       </div>
-                    </div>
+
+                      {/* Action Buttons */}
+                      <button
+                        type="submit"
+                        disabled={editLoading}
+                        className="w-full py-3 bg-[#5D7B6F] hover:bg-[#4a5f56] disabled:bg-gray-400 text-white font-semibold rounded-lg transition-colors duration-200"
+                      >
+                        {editLoading ? "Saving..." : "Save Changes"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleEditCancel}
+                        disabled={editLoading}
+                        className="w-full py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </form>
                   </div>
                 </div>
               )}

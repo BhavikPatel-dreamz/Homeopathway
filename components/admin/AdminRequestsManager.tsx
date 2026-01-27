@@ -33,7 +33,7 @@ export default function AdminRequestsManager() {
     type: "success" | "error" | "info";
     text: string;
   } | null>(null);
-  const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'declined'>('pending');
+  const [filter, setFilter] = useState<'all' | 'pending' | 'ailment' | 'remedy'>('pending');
   const [editingRequest, setEditingRequest] = useState<EditingRequest | null>(null);
 
   useEffect(() => {
@@ -54,32 +54,20 @@ export default function AdminRequestsManager() {
         setLoading(true);
 
         // Fetch from ailments table
-        let ailmentsQuery = supabase
+        const { data: ailmentRequests, error: ailmentsError } = await supabase
           .from('ailments')
           .select('id, requested_by_user_id, name, icon, slug, description, status, created_at, is_user_submission')
           .eq('is_user_submission', true)
           .order('created_at', { ascending: false });
 
-        if (filter !== 'all') {
-          ailmentsQuery = ailmentsQuery.eq('status', filter);
-        }
-
-        const { data: ailmentRequests, error: ailmentsError } = await ailmentsQuery;
-
         if (ailmentsError) throw ailmentsError;
 
         // Fetch from remedies table
-        let remediesQuery = supabase
+        const { data: remedyRequests, error: remediesError } = await supabase
           .from('remedies')
           .select('id, requested_by_user_id, name, icon, slug, description, status, created_at, is_user_submission, key_symptoms')
           .eq('is_user_submission', true)
           .order('created_at', { ascending: false });
-
-        if (filter !== 'all') {
-          remediesQuery = remediesQuery.eq('status', filter);
-        }
-
-        const { data: remedyRequests, error: remediesError } = await remediesQuery;
 
         if (remediesError) throw remediesError;
 
@@ -99,12 +87,30 @@ export default function AdminRequestsManager() {
         // Fetch user emails for each request
         const requestsWithEmails = await Promise.all(
           allRequests.map(async (req) => {
-            const { data: userData } = await supabase
-              .from('profiles')
-              .select('email')
-              .eq('id', req.requested_by_user_id)
-              .single();
-            return { ...req, user_email: userData?.email || 'Unknown' };
+            let userEmail = 'Unknown';
+            
+            if (req.requested_by_user_id) {
+              try {
+                // Try to get email from profiles table
+                const { data: userData, error: profileError } = await supabase
+                  .from('profiles')
+                  .select('email')
+                  .eq('id', req.requested_by_user_id)
+                  .single();
+                
+                if (userData?.email) {
+                  userEmail = userData.email;
+                } else if (!profileError) {
+                  // Profile exists but no email, try auth
+                  const { data: authData } = await supabase.auth.admin.getUserById(req.requested_by_user_id);
+                  userEmail = authData?.user?.email || 'Unknown';
+                }
+              } catch (error) {
+                console.error('Error fetching user email:', error);
+              }
+            }
+            
+            return { ...req, user_email: userEmail };
           })
         );
 
@@ -279,7 +285,7 @@ export default function AdminRequestsManager() {
 
   const filteredRequests = filter === 'all' 
     ? requests 
-    : requests.filter(r => r.status === filter);
+    : requests.filter(r => r.type === filter);
 
   return (
     <div className="space-y-6">
@@ -311,19 +317,27 @@ export default function AdminRequestsManager() {
 
       {/* Filter Tabs */}
       <div className="flex gap-2 border-b border-gray-200">
-        {(['all', 'pending', 'approved', 'declined'] as const).map((status) => (
-          <button
-            key={status}
-            onClick={() => setFilter(status)}
-            className={`px-4 py-3 font-medium text-sm transition-colors ${
-              filter === status
-                ? 'text-[#6B7B5E] border-b-2 border-[#6B7B5E]'
-                : 'text-gray-600 hover:text-gray-800'
-            }`}
-          >
-            {status === 'all' ? 'All Requests' : status.charAt(0).toUpperCase() + status.slice(1)}
-          </button>
-        ))}
+        {(['all', /* 'pending', */ 'ailment', 'remedy'] as const).map((status) => {
+          const labels: Record<string, string> = {
+            'all': 'All Requests',
+            /* 'pending': 'Pending', */
+            'ailment': 'Ailments',
+            'remedy': 'Remedies'
+          };
+          return (
+            <button
+              key={status}
+              onClick={() => setFilter(status)}
+              className={`px-4 py-3 font-medium text-sm transition-colors ${
+                filter === status
+                  ? 'text-[#6B7B5E] border-b-2 border-[#6B7B5E]'
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              {labels[status]}
+            </button>
+          );
+        })}
       </div>
 
       {/* Loading State */}
@@ -337,7 +351,7 @@ export default function AdminRequestsManager() {
           <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
-          <p className="text-gray-500 text-lg">No {filter === 'all' ? 'requests' : `${filter} requests`}</p>
+          <p className="text-gray-500 text-lg">No {filter === 'all' ? 'requests' : filter === 'ailment' ? 'ailment requests' : filter === 'remedy' ? 'remedy requests' : `${filter} requests`}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -378,9 +392,9 @@ export default function AdminRequestsManager() {
 
                 {/* Actions */}
                 <div className="flex gap-2">
-                  {request.status === 'pending' && (
+                  {(request.status === 'pending' || request.status === 'approved') && (
                     <>
-                      <button
+                      {/* <button
                         onClick={() => handleApprove(request)}
                         disabled={actionLoading === request.id}
                         className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded transition-colors disabled:opacity-50"
@@ -393,7 +407,7 @@ export default function AdminRequestsManager() {
                         className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded transition-colors disabled:opacity-50"
                       >
                         Decline
-                      </button>
+                      </button> */}
                       <button
                         onClick={() => handleEdit(request)}
                         disabled={actionLoading === request.id}
