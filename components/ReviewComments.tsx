@@ -45,7 +45,7 @@ const ReviewComments: React.FC<ReviewCommentsProps> = ({ reviewId, onCommentCoun
 
     setLoading(true);
     const result = await addReviewComment(reviewId, content, parentCommentId);
-    
+
     if (result.success) {
       setNewComment('');
       setReplyingTo(null);
@@ -61,7 +61,7 @@ const ReviewComments: React.FC<ReviewCommentsProps> = ({ reviewId, onCommentCoun
 
     setLoading(true);
     const result = await updateReviewComment(commentId, editContent);
-    
+
     if (result.success) {
       setEditingComment(null);
       setEditContent('');
@@ -77,7 +77,7 @@ const ReviewComments: React.FC<ReviewCommentsProps> = ({ reviewId, onCommentCoun
 
     setLoading(true);
     const result = await deleteReviewComment(commentId);
-    
+
     if (result.success) {
       await loadComments();
     } else {
@@ -111,7 +111,7 @@ const ReviewComments: React.FC<ReviewCommentsProps> = ({ reviewId, onCommentCoun
   const parentComments = comments.filter(comment => !comment.parent_comment_id);
   const childComments = comments.filter(comment => comment.parent_comment_id);
 
-  const getChildComments = (parentId: string) => 
+  const getChildComments = (parentId: string) =>
     childComments.filter(comment => comment.parent_comment_id === parentId);
 
   const renderComment = (comment: ReviewComment, isReply: boolean = false) => {
@@ -126,8 +126,8 @@ const ReviewComments: React.FC<ReviewCommentsProps> = ({ reviewId, onCommentCoun
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-[#4B544A] text-white flex items-center justify-center text-sm font-semibold overflow-hidden">
               {comment.user_profile_img ? (
-                <img 
-                  src={comment.user_profile_img} 
+                <img
+                  src={comment.user_profile_img}
                   alt={userInitial}
                   className="w-full h-full object-cover"
                 />
@@ -149,7 +149,7 @@ const ReviewComments: React.FC<ReviewCommentsProps> = ({ reviewId, onCommentCoun
               >
                 <MoreHorizontal className="w-4 h-4 text-gray-500" />
               </button>
-              
+
               {showDropdown === comment.id && (
                 <div className="absolute right-0 top-8 bg-white border rounded-lg shadow-lg py-1 z-10 min-w-[120px]">
                   <button
@@ -261,7 +261,7 @@ const ReviewComments: React.FC<ReviewCommentsProps> = ({ reviewId, onCommentCoun
 
   return (
     <div className="mt-4 border-t border-gray-200 pt-4">
-      <h4 className="font-semibold text-sm text-gray-900 mb-3">
+      <h4 className="font-semibold text-sm text-gray-900 mb-3 font-family-montserrat">
         Comments ({comments.length})
       </h4>
 
@@ -272,13 +272,13 @@ const ReviewComments: React.FC<ReviewCommentsProps> = ({ reviewId, onCommentCoun
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             placeholder="Add a comment..."
-            className="w-full p-3 border border-gray-300 rounded-lg text-sm resize-none"
+            className="w-full p-3 border border-gray-300 rounded-lg text-sm resize-none text-[#0B0C0A] placeholder:text-[#41463B]"
             rows={3}
           />
           <button
             onClick={() => handleAddComment()}
             disabled={loading || !newComment.trim()}
-            className="mt-2 px-4 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 disabled:opacity-50 flex items-center gap-2"
+            className="mt-2 px-4 py-2 bg-[#6C7463] text-white text-sm font-semibold rounded-full hover:bg-[#41463B] disabled:opacity-50 flex items-center gap-2"
           >
             <Send className="w-4 h-4" />
             {loading ? 'Posting...' : 'Post Comment'}
@@ -288,7 +288,7 @@ const ReviewComments: React.FC<ReviewCommentsProps> = ({ reviewId, onCommentCoun
 
       {!user && (
         <div className="mb-4 p-3 bg-gray-100 rounded-lg text-sm text-gray-600">
-          Please <a href="/login" className="text-blue-500 hover:underline">log in</a> to comment
+          Please <a href="/login" className="text-[#0B0C0A] hover:underline">log in</a> to comment
         </div>
       )}
 
