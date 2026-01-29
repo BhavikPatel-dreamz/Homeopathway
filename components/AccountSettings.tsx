@@ -443,8 +443,8 @@ z-50 animate-in slide-in-from-top-2
       </div>
 
       {/* Main Content */}
-      <main className="max-w-5xl mx-auto px-3 sm:px-5 py-6 sm:py-9">
-        <div className="bg-white rounded-[12px] py-8 sm:py-10 px-4 sm:px-6">
+      <main className="max-w-7xl mx-auto px-3 sm:px-5 py-6 sm:py-9">
+        <div className="aliment-table-card py-6 px-4 sm:py-9 sm:px-6 bg-white rounded-lg shadow-md">
           {/* Header */}
           <div className="flex items-center justify-between mb-4 sm:mb-6">
             <h1 className="text-4xl font-normal text-[#20231E]">
@@ -453,7 +453,7 @@ z-50 animate-in slide-in-from-top-2
             {!isEditing && (
               <button
                 onClick={() => setIsEditing(true)}
-                className="flex items-center gap-1 py-2 text-[#20231E] pr-3 xs:pr-5 sm:pl-0 cursor-pointer rounded-lg transition-colors whitespace-nowrap text-xs xs:text-sm sm:text-base"
+                className="flex items-center gap-1 py-2 text-[#20231E] hover:text-[#6B7B5E] pr-3 xs:pr-5 sm:pl-0 cursor-pointer rounded-lg transition-colors whitespace-nowrap text-xs xs:text-sm sm:text-base"
               >
                 <img src="/edit-profile.svg" alt="" className="w-4 h-4" />
                 <span className="font-semibold mt-0.5">Edit Profile</span>
@@ -576,7 +576,7 @@ z-50 animate-in slide-in-from-top-2
                   onChange={(e) => handleFieldChange("full_name", e.target.value)}
                   disabled={!isEditing}
                   placeholder="Full Name"
-                  className={`w-full pl-9 xs:pl-10 sm:pl-12 pr-3 xs:pr-4 py-2 xs:py-2.5 border text-xs xs:text-sm sm:text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] disabled:bg-[#F1F2F0] disabled:text-[#41463B] text-gray-500 ${fieldErrors.full_name ? "border-red-500" : "border-[#D3D6D1]"
+                  className={`bg-[#F1F2F0] text-[#41463B] w-full pl-9 xs:pl-10 sm:pl-12 pr-3 xs:pr-4 py-2 xs:py-2.5 h-[44px] border text-xs xs:text-sm sm:text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] disabled:bg-[#F1F2F0] disabled:text-[#41463B] ${fieldErrors.full_name ? "border-red-500" : "border-[#D3D6D1]"
                     }`}
                 />
               </div>
@@ -607,7 +607,7 @@ z-50 animate-in slide-in-from-top-2
                   type="email"
                   value={formData.email}
                   disabled
-                  className="w-full pl-9 xs:pl-10 sm:pl-12 pr-3 xs:pr-4 py-2 xs:py-2.5 border border-[#D3D6D1] text-xs xs:text-sm sm:text-[16px] rounded-lg bg-[#F1F2F0] text-[#41463B] cursor-not-allowed"
+                  className="w-full pl-9 xs:pl-10 sm:pl-12 pr-3 xs:pr-4 py-2 xs:py-2.5 h-[44px] border border-[#D3D6D1] text-xs xs:text-sm sm:text-[16px] rounded-lg bg-[#F1F2F0] text-[#41463B] cursor-not-allowed"
                 />
               </div>
               <p className="text-[10px] xs:text-xs text-[#83857D] mt-1 xs:mt-1.5">
@@ -646,7 +646,7 @@ z-50 animate-in slide-in-from-top-2
                     disabled={!isEditing}
                     autoComplete="off"
                     placeholder={isEditing ? "Enter current password" : "••••••••••"}
-                    className={`w-full pl-9 xs:pl-10 sm:pl-12 pr-10 xs:pr-12 py-2 xs:py-2.5 sm:py-3 border text-xs xs:text-sm sm:text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] disabled:bg-[#F1F2F0] disabled:text-[#41463B] text-gray-500 ${fieldErrors.password ? "border-red-500" : "border-[#D3D6D1]"
+                    className={`bg-[#F1F2F0] text-[#41463B] w-full pl-9 xs:pl-10 sm:pl-12 pr-10 xs:pr-12 py-2 xs:py-2.5 sm:py-3 h-[44px] border text-xs xs:text-sm sm:text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] disabled:bg-[#F1F2F0] disabled:text-[#41463B] ${fieldErrors.password ? "border-red-500" : "border-[#D3D6D1]"
                       }`}
                   />
                   {isEditing && (
@@ -724,7 +724,7 @@ z-50 animate-in slide-in-from-top-2
                     disabled={!isEditing}
                     autoComplete="new-password"
                     placeholder={isEditing ? "Enter new password" : "••••••••••"}
-                    className={`w-full pl-9 xs:pl-10 sm:pl-12 pr-10 xs:pr-12 py-2 xs:py-2.5 sm:py-3 border text-xs xs:text-sm sm:text-[16px] text-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] disabled:bg-[#F1F2F0] disabled:text-[#41463B] ${fieldErrors.newpassword ? "border-red-500" : "border-[#D3D6D1]"
+                    className={`bg-[#F1F2F0] text-[#41463B] w-full pl-9 xs:pl-10 sm:pl-12 pr-10 xs:pr-12 py-2 xs:py-2.5 sm:py-3 border text-xs xs:text-sm sm:text-[16px] text-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] disabled:bg-[#F1F2F0] disabled:text-[#41463B] ${fieldErrors.newpassword ? "border-red-500" : "border-[#D3D6D1]"
                       }`}
                   />
                   {isEditing && (
@@ -806,7 +806,7 @@ z-50 animate-in slide-in-from-top-2
                     onChange={(e) => handleFieldChange("confirmpassword", e.target.value)}
                     disabled={!isEditing}
                     placeholder={isEditing ? "Enter Confirm new password" : "••••••••••"}
-                    className={`w-full pl-9 xs:pl-10 sm:pl-12 pr-10 xs:pr-12 py-2 xs:py-2.5 sm:py-3 border text-xs xs:text-sm sm:text-[16px] text-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] disabled:bg-[#F1F2F0] disabled:text-[#41463B] ${fieldErrors.confirmpassword ? "border-red-500" : "border-[#D3D6D1]"
+                    className={`bg-[#F1F2F0] text-[#41463B] w-full pl-9 xs:pl-10 sm:pl-12 pr-10 xs:pr-12 py-2 xs:py-2.5 sm:py-3 border text-xs xs:text-sm sm:text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] disabled:bg-[#F1F2F0] disabled:text-[#41463B] ${fieldErrors.confirmpassword ? "border-red-500" : "border-[#D3D6D1]"
                       }`}
                   />
                   {isEditing && (
@@ -902,7 +902,7 @@ z-50 animate-in slide-in-from-top-2
             className="w-full flex items-center justify-between text-left hover:bg-gray-50 p-4 rounded-lg transition-colors"
           >
             <div>
-              <h3 className="text-xl sm:text-2xl font-bold text-[#0B0C0A]">My Requests</h3>
+              <h3 className="text-4xl font-normal text-[#20231E]">My Requests</h3>
               <p className="text-gray-600 text-sm mt-1">View all your submitted ailments and remedy requests</p>
             </div>
             <svg
@@ -916,17 +916,17 @@ z-50 animate-in slide-in-from-top-2
           </button>
         </div>
 
-        {!isEditing && (
-          <div className="flex justify-center mt-6 px-3">
-            <button
-              onClick={handleLogout}
-              className="px-4 py-3 sm:px-6 w-full lg:w-auto bg-[#FCEBEC] text-[#B62E31] rounded-[50px] font-semibold cursor-pointer transition-colors flex items-center justify-center gap-2"
-            >
-              <img src="/logout.svg" alt="" className="w-4 h-4" />
-              <span>Logout</span>
-            </button>
-          </div>
-        )}
+
+        <div className="flex justify-center mt-6 px-3">
+          <button
+            onClick={handleLogout}
+            className="px-4 py-3 sm:px-6 w-full lg:w-auto bg-[#FCEBEC] hover:bg-[#B62E31] group hover:text-white text-[#B62E31] rounded-[50px] font-semibold cursor-pointer transition flex items-center justify-center gap-2"
+          >
+            <img src="/logout.svg" alt="" className="w-4 h-4 filter group-hover:brightness-0 group-hover:invert transition" />
+            <span>Logout</span>
+          </button>
+        </div>
+
       </main>
     </div>
   );

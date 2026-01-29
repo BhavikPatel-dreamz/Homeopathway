@@ -159,17 +159,17 @@ export default function MyRequests() {
       if (error) throw error;
 
       // Update local state
-      setRequests(requests.map(r => 
-        r.id === editingId 
+      setRequests(requests.map(r =>
+        r.id === editingId
           ? {
-              ...r,
-              name: editFormData.name,
-              icon: editFormData.emoji,
-              description: editFormData.description,
-              key_symptoms: editType === 'remedy' 
-                ? editFormData.key_symptoms.split(",").map((s) => s.trim()).filter((s) => s.length > 0)
-                : undefined,
-            }
+            ...r,
+            name: editFormData.name,
+            icon: editFormData.emoji,
+            description: editFormData.description,
+            key_symptoms: editType === 'remedy'
+              ? editFormData.key_symptoms.split(",").map((s) => s.trim()).filter((s) => s.length > 0)
+              : undefined,
+          }
           : r
       ));
 
@@ -205,11 +205,10 @@ sm:left-auto sm:right-4 sm:translate-x-0
 z-50 animate-in slide-in-from-top-2
 ">
           <div
-            className={`min-w-[300px] max-w-md p-4 rounded-lg shadow-lg flex items-start gap-3 ${
-              toast.type === "success"
-                ? "bg-green-50 text-green-800 border border-green-200"
-                : "bg-red-50 text-red-800 border border-red-200"
-            }`}
+            className={`min-w-[300px] max-w-md p-4 rounded-lg shadow-lg flex items-start gap-3 ${toast.type === "success"
+              ? "bg-green-50 text-green-800 border border-green-200"
+              : "bg-red-50 text-red-800 border border-red-200"
+              }`}
           >
             {toast.type === "success" ? (
               <svg
@@ -267,13 +266,13 @@ z-50 animate-in slide-in-from-top-2
       </div>
 
       {/* Main Content */}
-      <main className="max-w-5xl mx-auto px-3 sm:px-5 py-6 sm:py-9">
-        <div className="bg-white rounded-[12px] py-8 sm:py-10 px-4 sm:px-6">
+      <main className="max-w-7xl mx-auto px-6 py-6">
+        <div className="my-requests-card">
           {/* Header */}
-          <div className="mb-8">
+          {/* <div className="mb-8">
             <h1 className="text-4xl font-normal text-[#20231E]">My Requests</h1>
             <p className="text-gray-600 mt-2">View and manage all your ailment and remedy requests</p>
-          </div>
+          </div> */}
 
           {/* Content */}
           {requestsLoading ? (
@@ -294,65 +293,82 @@ z-50 animate-in slide-in-from-top-2
               {/* Ailments Section */}
               {requests.filter(r => r.type === 'ailment').length > 0 && (
                 <div>
-                  <h2 className="text-2xl font-semibold text-[#20231E] mb-6">Ailment</h2>
+                  <h2 className="sm:text-[40px] text-3xl font-normal sm:leading-[40px] leading-8 text-[#0B0C0A] mb-6">Ailment</h2>
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
-                        <tr className="border-b border-gray-300">
-                          <th className="px-4 py-4 text-left text-sm font-semibold text-[#0B0C0A]">Req No 1</th>
-                          <th className="px-4 py-4 text-left text-sm font-semibold text-[#0B0C0A]">Ailment Name</th>
-                          <th className="px-4 py-4 text-center text-sm font-semibold text-[#0B0C0A]">Emoji</th>
-                          <th className="px-4 py-4 text-left text-sm font-semibold text-[#0B0C0A]">Slug</th>
-                          <th className="px-4 py-4 text-left text-sm font-semibold text-[#0B0C0A]">Description</th>
-                          <th className="px-4 py-4 text-right text-sm font-semibold text-[#0B0C0A]">Status</th>
-                          <th className="px-4 py-4 text-right text-sm font-semibold text-[#0B0C0A]">Action</th>
+                        <tr className="border-b-8 border-b-[#F5F3ED] bg-white">
+                          <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-left sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[120px] w-[120px]">Req No 1</th>
+                          <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[200px] w-[200px]">Ailment Name</th>
+                          <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[100px] w-[100px]">Emoji</th>
+                          <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[100px] w-[100px]">Slug</th>
+                          <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-left sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[300px] w-[300px]">Description</th>
+                          <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[115px] w-[115px]">Status</th>
+                          <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[115px] w-[115px]">Action</th>
                         </tr>
                       </thead>
-                      <tbody>
+                      <tbody className="bg-white">
                         {requests.filter(r => r.type === 'ailment').map((request, index) => (
-                          <tr key={request.id} className="border-b border-gray-200 hover:bg-gray-50">
-                            <td className="px-4 py-4 text-sm text-gray-600">Req #{index + 1}</td>
-                            <td className="px-4 py-4 text-sm text-[#0B0C0A]">{request.name}</td>
-                            <td className="px-4 py-4 text-center text-lg">{request.icon}</td>
-                            <td className="px-4 py-4 text-sm text-gray-600">N/A</td>
-                            <td className="px-4 py-4 text-sm text-gray-600">Lorem ipsum...</td>
-                            <td className="px-4 py-4 text-right">
-                              <span className={`text-xs font-semibold ${
-                                request.status === 'approved' ? 'text-green-600' :
-                                request.status === 'declined' ? 'text-red-600' :
-                                'text-orange-600'
-                              }`}>
+                          <tr key={request.id} className="border-1 border-b-2 border-[#F5F3ED] hover:bg-gray-50">
+                            <td className="border-r border-r-[#D3D6D1] px-4 py-4 sm:text-base text-sm text-[#2B2E28] font-medium w-[120px]">Req #{index + 1}</td>
+                            <td className="border-r border-r-[#D3D6D1] px-4 py-4 sm:text-base text-sm text-center text-[#0B0C0A] w-[200px]">{request.name}</td>
+                            <td className="border-r border-r-[#D3D6D1] px-4 py-4 text-center text-lg w-[100px]">{request.icon}</td>
+                            <td className="border-r border-r-[#D3D6D1] px-4 py-4 text-center sm:text-base text-sm text-[#2B2E28] font-medium w-[100px]">N/A</td>
+                            <td className="border-r border-r-[#D3D6D1] px-4 py-4 sm:text-base text-sm text-[#2B2E28] font-medium w-[300px]">Lorem ipsum...</td>
+                            <td className="border-r border-r-[#D3D6D1] px-4 py-4 text-center w-[115px]">
+                              <span className={`sm:text-sm text-xs font-medium px-2 py-1 rounded-full ${request.status === 'approved' ? 'text-[#175F3D] bg-[#E9F5F0]' :
+                                request.status === 'declined' ? 'sm:text-sm text-xs font-medium px-2 py-1 rounded-full text-[#B62E31] bg-[#FCEBEC]' :
+                                  'text-orange-600'
+                                }`}>
                                 {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
                               </span>
                             </td>
-                            <td className="px-4 py-4 text-right">
-                              <div className="flex gap-2 justify-end">
+                            <td className="px-4 py-4 text-center w-[115px]">
+                              <div className="flex gap-2 justify-center">
                                 <button
                                   onClick={() => handleEditClick(request)}
                                   disabled={request.status === 'approved'}
-                                  className={`p-1 transition-colors ${
-                                    request.status === 'approved' 
-                                      ? 'opacity-40 cursor-not-allowed' 
-                                      : 'hover:text-gray-700'
-                                  }`}
-                                  title={request.status === 'approved' ? 'Cannot edit approved requests' : 'Edit'}
+                                  className={`p-1 transition-colors ${request.status === 'approved'
+                                    ? 'cursor-not-allowed fill-[#83857D]'
+                                    : 'hover:fill-gray-700 fill-[#203581]'
+                                    }`}
+                                  title={
+                                    request.status === 'approved'
+                                      ? 'Cannot edit approved requests'
+                                      : 'Edit'
+                                  }
                                 >
-                                  <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                  <svg
+                                    className="sm:w-4.5 sm:h-4.5 w-3 h-3"
+                                    viewBox="0 0 19 19"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M13.757 0.9L11.757 2.9H2V16.9H16V7.143L18 5.143V17.9C18 18.1652 17.8946 18.4196 17.7071 18.6071C17.5196 18.7946 17.2652 18.9 17 18.9H1C0.734784 18.9 0.48043 18.7946 0.292893 18.6071C0.105357 18.4196 0 18.1652 0 17.9V1.9C0 1.63478 0.105357 1.38043 0.292893 1.19289C0.48043 1.00536 0.734784 0.9 1 0.9H13.757ZM17.485 0L18.9 1.416L9.708 10.608L8.296 10.611L8.294 9.194L17.485 0Z"
+                                    />
                                   </svg>
                                 </button>
                                 <button
                                   onClick={() => handleDeleteRequest(request.id, request.type)}
                                   disabled={request.status === 'approved'}
-                                  className={`p-1 transition-colors ${
+                                  className={`p-1 transition-colors ${request.status === 'approved'
+                                    ? 'cursor-not-allowed fill-[#83857D]'
+                                    : 'hover:fill-red-700 fill-[#B62E31]'
+                                    }`}
+                                  title={
                                     request.status === 'approved'
-                                      ? 'opacity-40 cursor-not-allowed'
-                                      : 'hover:text-red-700'
-                                  }`}
-                                  title={request.status === 'approved' ? 'Cannot delete approved requests' : 'Delete'}
+                                      ? 'Cannot delete approved requests'
+                                      : 'Delete'
+                                  }
                                 >
-                                  <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                  <svg
+                                    className="sm:w-4.5 sm:h-4.5 w-3 h-3"
+                                    viewBox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M15 4H20V6H18V19C18 19.2652 17.8946 19.5196 17.7071 19.7071C17.5196 19.8946 17.2652 20 17 20H3C2.73478 20 2.48043 19.8946 2.29289 19.7071C2.10536 19.5196 2 19.2652 2 19V6H0V4H5V1C5 0.734784 5.10536 0.48043 5.29289 0.292893C5.48043 0.105357 5.73478 0 6 0H14C14.2652 0 14.5196 0.105357 14.7071 0.292893C14.8946 0.48043 15 0.734784 15 1V4ZM16 6H4V18H16V6ZM7 9H9V15H7V9ZM11 9H13V15H11V9ZM7 2V4H13V2H7Z"
+                                    />
                                   </svg>
                                 </button>
                               </div>
@@ -363,7 +379,7 @@ z-50 animate-in slide-in-from-top-2
                     </table>
                   </div>
                   <div className="mt-6 flex justify-center items-center gap-3">
-                    <button className="p-1 text-gray-600 hover:text-gray-900">
+                    <button className="p-1 text-[#0B0C0A] hover:text-[#6C7463]">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                       </svg>
@@ -371,16 +387,15 @@ z-50 animate-in slide-in-from-top-2
                     {[1, 2, 3, 4].map((page) => (
                       <button
                         key={page}
-                        className={`w-7 h-7 rounded-full text-xs font-medium transition-colors flex items-center justify-center ${
-                          page === 1
-                            ? 'bg-gray-700 text-white'
-                            : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
-                        }`}
+                        className={`w-[40px] h-[40px] rounded-full text-xs font-medium transition-colors flex items-center justify-center ${page === 1
+                          ? 'bg-[#6C7463] text-white'
+                          : 'bg-[#F5F3ED] text-[#41463B] hover:bg-[#6C7463] hover:text-white'
+                          }`}
                       >
                         {page}
                       </button>
                     ))}
-                    <button className="p-1 text-gray-600 hover:text-gray-900">
+                    <button className="p-1 text-[#0B0C0A] hover:text-[#6C7463]">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
@@ -392,67 +407,85 @@ z-50 animate-in slide-in-from-top-2
               {/* Remedies Section */}
               {requests.filter(r => r.type === 'remedy').length > 0 && (
                 <div>
-                  <h2 className="text-2xl font-semibold text-[#20231E] mb-6">Remedy</h2>
+                  <h2 className="sm:text-[40px] text-3xl font-normal sm:leading-[40px] leading-8 text-[#0B0C0A] mb-6">Remedy</h2>
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
-                        <tr className="border-b border-gray-300">
-                          <th className="px-4 py-4 text-left text-sm font-semibold text-[#0B0C0A]">Req No 1</th>
-                          <th className="px-4 py-4 text-left text-sm font-semibold text-[#0B0C0A]">Remedy Name</th>
-                          <th className="px-4 py-4 text-center text-sm font-semibold text-[#0B0C0A]">Emoji</th>
-                          <th className="px-4 py-4 text-left text-sm font-semibold text-[#0B0C0A]">Slug</th>
-                          <th className="px-4 py-4 text-left text-sm font-semibold text-[#0B0C0A]">Description</th>
-                          <th className="px-4 py-4 text-right text-sm font-semibold text-[#0B0C0A]">Status</th>
-                          <th className="px-4 py-4 text-right text-sm font-semibold text-[#0B0C0A]">Action</th>
+                        <tr className="border-b-8 border-b-[#F5F3ED] bg-white">
+                          <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-left sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[120px] w-[120px]">Req No 1</th>
+                          <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[200px] w-[200px]">Remedy Name</th>
+                          <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[100px] w-[100px]">Emoji</th>
+                          <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[100px] w-[100px]">Slug</th>
+                          <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-left sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[300px] w-[300px]">Description</th>
+                          <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[115px] w-[115px]">Status</th>
+                          <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[115px] w-[115px]">Action</th>
                         </tr>
                       </thead>
-                      <tbody>
+                      <tbody className="bg-white">
                         {requests.filter(r => r.type === 'remedy').map((request, index) => (
-                          <tr key={request.id} className="border-b border-gray-200 hover:bg-gray-50">
-                            <td className="px-4 py-4 text-sm text-gray-600">Req #{index + 1}</td>
-                            <td className="px-4 py-4 text-sm text-[#0B0C0A]">{request.name}</td>
-                            <td className="px-4 py-4 text-center text-lg">{request.icon}</td>
-                            <td className="px-4 py-4 text-sm text-gray-600">N/A</td>
-                            <td className="px-4 py-4 text-sm text-gray-600">Lorem ipsum...</td>
-                            <td className="px-4 py-4 text-right">
-                              <span className={`text-xs font-semibold ${
-                                request.status === 'approved' ? 'text-green-600' :
+                          <tr key={request.id} className="border-1 border-b-2 border-[#F5F3ED] hover:bg-gray-50">
+                            <td className="font-medium border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 sm:text-base text-sm text-[#2B2E28] min-w-[120px] w-[120px]">Req #{index + 1}</td>
+                            <td className="font-medium border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 sm:text-base text-sm text-[#2B2E28] text-center min-w-[200px] w-[200px]">{request.name}</td>
+                            <td className="font-medium border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center text-lg min-w-[100px] w-[100px]">{request.icon}</td>
+                            <td className="font-medium border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 sm:text-base text-sm text-[#2B2E28] text-center min-w-[100px] w-[100px]">N/A</td>
+                            <td className="font-medium border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 sm:text-base text-sm text-[#2B2E28] min-w-[300px] w-[300px]">Lorem ipsum...</td>
+                            <td className="font-medium border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm text-[#2B2E28] min-w-[115px] w-[115px]">
+                              <span className={`sm:text-sm text-xs font-medium px-2 py-1 rounded-full ${request.status === 'approved' ? 'text-[#175F3D] bg-[#E9F5F0]' :
                                 request.status === 'declined' ? 'text-red-600' :
-                                'text-orange-600'
-                              }`}>
+                                  'text-orange-600'
+                                }`}>
                                 {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
                               </span>
                             </td>
-                            <td className="px-4 py-4 text-right">
-                              <div className="flex gap-2 justify-end">
+                            <td className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-right w-[115px]">
+                              <div className="flex gap-2 justify-center">
                                 <button
                                   onClick={() => handleEditClick(request)}
                                   disabled={request.status === 'approved'}
-                                  className={`p-1 transition-colors ${
-                                    request.status === 'approved' 
-                                      ? 'opacity-40 cursor-not-allowed' 
-                                      : 'hover:text-gray-700'
-                                  }`}
-                                  title={request.status === 'approved' ? 'Cannot edit approved requests' : 'Edit'}
+                                  className={`p-1 transition-colors ${request.status === 'approved'
+                                    ? 'cursor-not-allowed fill-[#83857D]'
+                                    : 'hover:fill-gray-700 fill-[#203581]'
+                                    }`}
+                                  title={
+                                    request.status === 'approved'
+                                      ? 'Cannot edit approved requests'
+                                      : 'Edit'
+                                  }
                                 >
-                                  <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                  <svg
+                                    className="sm:w-4.5 sm:h-4.5 w-3 h-3"
+                                    viewBox="0 0 19 19"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M13.757 0.9L11.757 2.9H2V16.9H16V7.143L18 5.143V17.9C18 18.1652 17.8946 18.4196 17.7071 18.6071C17.5196 18.7946 17.2652 18.9 17 18.9H1C0.734784 18.9 0.48043 18.7946 0.292893 18.6071C0.105357 18.4196 0 18.1652 0 17.9V1.9C0 1.63478 0.105357 1.38043 0.292893 1.19289C0.48043 1.00536 0.734784 0.9 1 0.9H13.757ZM17.485 0L18.9 1.416L9.708 10.608L8.296 10.611L8.294 9.194L17.485 0Z"
+                                    />
                                   </svg>
                                 </button>
                                 <button
                                   onClick={() => handleDeleteRequest(request.id, request.type)}
                                   disabled={request.status === 'approved'}
-                                  className={`p-1 transition-colors ${
+                                  className={`p-1 transition-colors ${request.status === 'approved'
+                                    ? 'cursor-not-allowed fill-[#83857D]'
+                                    : 'hover:fill-red-700 fill-[#B62E31]'
+                                    }`}
+                                  title={
                                     request.status === 'approved'
-                                      ? 'opacity-40 cursor-not-allowed'
-                                      : 'hover:text-red-700'
-                                  }`}
-                                  title={request.status === 'approved' ? 'Cannot delete approved requests' : 'Delete'}
+                                      ? 'Cannot delete approved requests'
+                                      : 'Delete'
+                                  }
                                 >
-                                  <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                  <svg
+                                    className="sm:w-4.5 sm:h-4.5 w-3 h-3"
+                                    viewBox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M15 4H20V6H18V19C18 19.2652 17.8946 19.5196 17.7071 19.7071C17.5196 19.8946 17.2652 20 17 20H3C2.73478 20 2.48043 19.8946 2.29289 19.7071C2.10536 19.5196 2 19.2652 2 19V6H0V4H5V1C5 0.734784 5.10536 0.48043 5.29289 0.292893C5.48043 0.105357 5.73478 0 6 0H14C14.2652 0 14.5196 0.105357 14.7071 0.292893C14.8946 0.48043 15 0.734784 15 1V4ZM16 6H4V18H16V6ZM7 9H9V15H7V9ZM11 9H13V15H11V9ZM7 2V4H13V2H7Z"
+                                    />
                                   </svg>
                                 </button>
+
                               </div>
                             </td>
                           </tr>
@@ -461,7 +494,7 @@ z-50 animate-in slide-in-from-top-2
                     </table>
                   </div>
                   <div className="mt-6 flex justify-center items-center gap-3">
-                    <button className="p-1 text-gray-600 hover:text-gray-900">
+                    <button className="p-1 text-[#0B0C0A] hover:text-[#6C7463]">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                       </svg>
@@ -469,16 +502,15 @@ z-50 animate-in slide-in-from-top-2
                     {[1, 2, 3, 4].map((page) => (
                       <button
                         key={page}
-                        className={`w-7 h-7 rounded-full text-xs font-medium transition-colors flex items-center justify-center ${
-                          page === 1
-                            ? 'bg-gray-700 text-white'
-                            : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
-                        }`}
+                        className={`w-[40px] h-[40px] rounded-full text-xs font-medium transition-colors flex items-center justify-center ${page === 1
+                          ? 'bg-[#6C7463] text-white'
+                          : 'bg-[#F5F3ED] text-[#41463B] hover:bg-[#6C7463] hover:text-white'
+                          }`}
                       >
                         {page}
                       </button>
                     ))}
-                    <button className="p-1 text-gray-600 hover:text-gray-900">
+                    <button className="p-1 text-[#0B0C0A] hover:text-[#6C7463]">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
@@ -522,7 +554,7 @@ z-50 animate-in slide-in-from-top-2
                         <input
                           type="text"
                           value={editFormData.name}
-                          onChange={(e) => setEditFormData({...editFormData, name: e.target.value})}
+                          onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
                           placeholder={editType === 'ailment' ? 'e.g., Headache' : 'e.g., Belladonna'}
                           className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2C3E3E] text-[#0B0C0A] placeholder-gray-400"
                           disabled={editLoading}
@@ -555,7 +587,7 @@ z-50 animate-in slide-in-from-top-2
                                     key={idx}
                                     type="button"
                                     onClick={() => {
-                                      setEditFormData({...editFormData, emoji});
+                                      setEditFormData({ ...editFormData, emoji });
                                       setShowEmojiPicker(false);
                                     }}
                                     className="text-2xl hover:bg-gray-100 rounded p-2 transition-colors"
@@ -579,7 +611,7 @@ z-50 animate-in slide-in-from-top-2
                           <input
                             type="text"
                             value={editFormData.key_symptoms}
-                            onChange={(e) => setEditFormData({...editFormData, key_symptoms: e.target.value})}
+                            onChange={(e) => setEditFormData({ ...editFormData, key_symptoms: e.target.value })}
                             placeholder="e.g., fever, cough, headache (comma-separated)"
                             className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2C3E3E] text-[#0B0C0A] placeholder-gray-400"
                             disabled={editLoading}
@@ -594,7 +626,7 @@ z-50 animate-in slide-in-from-top-2
                         </label>
                         <textarea
                           value={editFormData.description}
-                          onChange={(e) => setEditFormData({...editFormData, description: e.target.value})}
+                          onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
                           placeholder="Type your message..."
                           className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2C3E3E] text-[#0B0C0A] placeholder-gray-400 resize-none"
                           rows={4}
@@ -629,7 +661,7 @@ z-50 animate-in slide-in-from-top-2
           <div className="mt-8 flex justify-start">
             <button
               onClick={() => router.back()}
-              className="px-6 py-2 text-sm font-semibold text-[#6B7B5E] hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-2"
+              className="px-3 py-3 text-sm font-semibold bg-[#6B7B5E] text-white hover:bg-[#5D7B6F] rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />

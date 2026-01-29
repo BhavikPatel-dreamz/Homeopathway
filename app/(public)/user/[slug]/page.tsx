@@ -3,8 +3,10 @@ import UserReviewListPage from "@/components/UserReview";
 import { supabase } from "@/lib/supabaseClient";
 
 export default async function UserProfilePage({ params }: { params: { slug: string } }) {
-  const { slug } =await params;
- 
+  const { slug } = await params;
+
+  console.log(params)
+
   // Fetch user with their reviews
   const { data: user, error } = await supabase
     .from("profiles")
@@ -12,7 +14,18 @@ export default async function UserProfilePage({ params }: { params: { slug: stri
     .eq("user_name", slug)
     .single();
 
- const { data: reviews, error: reviewsError } = await supabase
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-[#F5F1E8] p-10">
+        <div className="max-w-4xl mx-auto bg-white rounded-lg p-6">
+          <p className="text-gray-600">User not found.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const { data: reviews, error: reviewsError } = await supabase
     .from("reviews")
     .select(`
       *,
@@ -22,11 +35,11 @@ export default async function UserProfilePage({ params }: { params: { slug: stri
     .eq("user_id", user.id)
     .order('created_at', { ascending: false });
 
-// Combine the data
-const userData = {
-  ...user,
-  reviews: reviews || []
-};
+  // Combine the data
+  const userData = {
+    ...user,
+    reviews: reviews || []
+  };
 
   if (error) {
     console.error("Error fetching user:", error);
@@ -39,15 +52,7 @@ const userData = {
     );
   }
 
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-[#F5F1E8] p-10">
-        <div className="max-w-4xl mx-auto bg-white rounded-lg p-6">
-          <p className="text-gray-600">User not found.</p>
-        </div>
-      </div>
-    );
-  }
+
 
   return (
     <div className="min-h-screen bg-[#F5F1E8]">

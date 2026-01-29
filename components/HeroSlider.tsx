@@ -375,7 +375,7 @@ export default function HeroSlider() {
                 </div>
               ) : (
                 <>
-                  <div className="search-menu-scrollbar max-h-96 overflow-y-auto">
+                  <div className="search-menu-scrollbar lg:max-h-96 max-h-60 overflow-y-auto">
                     {/* Ailments Section */}
                     {filteredAilments.length > 0 && (
                       <div className="border-b border-gray-100 aliments-menu">
