@@ -3,19 +3,32 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --font-size-xs: 0.75rem; /* 12px */
-  --font-size-sm: 1rem; /* 14px */
-  --font-size-base: 1rem; /* 16px */
-  --font-size-lg: 1.125rem; /* 18px */
-  --font-size-xl: 1.25rem; /* 20px */
-  --font-size-2xl: 1.5rem; /* 24px */
-  --font-size-3xl: 1.875rem; /* 30px */
-  --font-size-4xl: 2.25rem; /* 36px */
-  --font-size-5xl: 40px; /* 48px */
-  --font-size-6xl: 3.75rem; /* 60px */
-  --font-size-7xl: 4.5rem; /* 72px */
-  --font-size-8xl: 6rem; /* 96px */
-  --font-size-9xl: 8rem; /* 128px */
+  --font-size-xs: 0.75rem;
+  /* 12px */
+  --font-size-sm: 1rem;
+  /* 14px */
+  --font-size-base: 1rem;
+  /* 16px */
+  --font-size-lg: 1.125rem;
+  /* 18px */
+  --font-size-xl: 1.25rem;
+  /* 20px */
+  --font-size-2xl: 1.5rem;
+  /* 24px */
+  --font-size-3xl: 1.875rem;
+  /* 30px */
+  --font-size-4xl: 2.25rem;
+  /* 36px */
+  --font-size-5xl: 40px;
+  /* 48px */
+  --font-size-6xl: 3.75rem;
+  /* 60px */
+  --font-size-7xl: 4.5rem;
+  /* 72px */
+  --font-size-8xl: 6rem;
+  /* 96px */
+  --font-size-9xl: 8rem;
+  /* 128px */
 }
 
 @theme inline {
@@ -25,6 +38,7 @@
   --font-mono: var(--font-geist-mono);
 
 }
+
 /* ✅ I------------------- */
 html,
 body {
@@ -33,20 +47,25 @@ body {
   scroll-behavior: smooth;
   overscroll-behavior: none;
 }
- .my-scrollbar::-webkit-scrollbar {
-    width: 10px;
+
+.my-scrollbar::-webkit-scrollbar {
+  width: 10px;
 }
+
 .my-scrollbar::-webkit-scrollbar-track {
-    background: rgba(108, 116, 99, 0.2);
-    border-radius: 10px;
+  background: rgba(108, 116, 99, 0.2);
+  border-radius: 10px;
 }
+
 .my-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(108, 116, 99, 0.7); 
-    border-radius: 10px;
+  background: rgba(108, 116, 99, 0.7);
+  border-radius: 10px;
 }
+
 .font-family-montserrat {
-    font-family: 'Montserrat', sans-serif;
+  font-family: 'Montserrat', sans-serif;
 }
+
 /* ✅ Prevent iOS bounce effect (optional) */
 body {
   position: relative;
@@ -56,9 +75,16 @@ body {
 
 /* ✅ Tailwind customizations (optional) */
 @layer base {
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-semibold;
   }
+
   p {
     @apply text-gray-700;
   }
@@ -68,13 +94,14 @@ body {
 body.overflow-hidden {
   overflow: hidden !important;
 }
+
 /* ✅ ----------------------- */
 
 @media (prefers-color-scheme: dark) {
-:root {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-}
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
 }
 
 body {
@@ -83,9 +110,16 @@ body {
   font-size: 14px;
   font-family: "Montserrat", sans-serif;
 }
-h1,h2,h3,h4,h5,h6{
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: "kingred";
 }
+
 @font-face {
   font-family: "kingred";
   src: url("/fonts/kingred.woff2") format("woff2");
@@ -97,19 +131,23 @@ h1,h2,h3,h4,h5,h6{
 .text-montserrat {
   font-family: "Montserrat", sans-serif;
 }
+
 .text-kingred {
   font-family: "kingred";
 }
+
 .text-40 {
   font-size: 40px;
   line-height: 48px;
 }
-.home-slider .slick-dots{
+
+.home-slider .slick-dots {
   position: absolute;
   bottom: 25px;
 
 }
-.home-slider .slick-dots li button{
+
+.home-slider .slick-dots li button {
   width: 50px;
   height: 8px;
   border-radius: 50px;
@@ -117,24 +155,30 @@ h1,h2,h3,h4,h5,h6{
   transition: all 0.3s ease;
   padding: 0px;
 }
+
 .home-slider .slick-dots li button:hover {
   background: #ffffff;
 }
+
 .home-slider .slick-dots li {
   width: auto;
   height: auto;
   transition: all 0.3s ease;
 }
-.home-slider .slick-dots li button::before{
+
+.home-slider .slick-dots li button::before {
   display: none;
 }
-.home-slider .slick-dots li.slick-active button{
+
+.home-slider .slick-dots li.slick-active button {
   background: #ffffff;
 }
-.home-slider .slick-dots li:not(:last-child){
+
+.home-slider .slick-dots li:not(:last-child) {
   margin-right: 8px;
 }
-select option{
+
+select option {
   color: #20231E;
 }
 
@@ -145,19 +189,24 @@ select option{
   color: #000000 !important;
 }
 
-.main-wrapper{
+.main-wrapper {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
 @media only screen and (max-width:767px) {
-  .home-slider .slick-dots li button{
+  .home-slider .slick-dots li button {
     width: 40px;
   }
 }
+
 @media only screen and (max-width:320px) {
-    .custom-320 {
-      flex-direction: column;
-    }
+  .custom-320 {
+    flex-direction: column;
   }
+}
+
+.word-break-break-word {
+  word-break: break-word;
+}
