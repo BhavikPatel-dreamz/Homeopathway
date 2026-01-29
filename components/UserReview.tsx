@@ -3,6 +3,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Search, Loader2, ChevronDown, SlidersHorizontal, Heart, MessageCircle } from "lucide-react";
 import Image from "next/image";
+import { toggleReviewLike, getReviewInteractionCounts, ReviewInteractionCounts } from '@/lib/reviewInteractions';
+import { useAuth } from '@/lib/authContext';
+import ReviewComments from './ReviewComments';
 
 const renderStars = (rating: number) => {
   const fullStars = Math.floor(rating);
@@ -63,6 +66,25 @@ const formatMemberSince = (dateString: string) => {
 
 export default function UserReviewListPage({ user }: any ) {
   const [reviews] = useState(user?.reviews || []);
+  const [reviewInteractions, setReviewInteractions] = useState<Record<string, ReviewInteractionCounts>>({});
+  const [showComments, setShowComments] = useState<Record<string, boolean>>({});
+  const [loadingLikes, setLoadingLikes] = useState<Record<string, boolean>>({});
+  const { user: currentUser } = useAuth();
+  useEffect(() => {
+    const loadInteractionCounts = async () => {
+      const interactions: Record<string, ReviewInteractionCounts> = {};
+      for (const review of reviews) {
+        const counts = await getReviewInteractionCounts(review.id);
+        interactions[review.id] = counts;
+      }
+      setReviewInteractions(interactions);
+    };
+    
+    if (reviews.length > 0) {
+      loadInteractionCounts();
+    }
+  }, [reviews]);
+
   const userProfile = {
     initial: user?.first_name?.[0] || "",
     name: `${user?.first_name || ""} ${user?.last_name || ""}`,
@@ -73,6 +95,49 @@ export default function UserReviewListPage({ user }: any ) {
     location: user?.location || "N/A",
     profileImg: user?.profile_img || "",
     memberSince: formatMemberSince(user?.created_at || ""),
+  };
+
+  const handleLikeToggle = async (reviewId: string) => {
+    if (!currentUser) {
+      alert('Please log in to like reviews');
+      return;
+    }
+
+    setLoadingLikes(prev => ({ ...prev, [reviewId]: true }));
+    
+    const result = await toggleReviewLike(reviewId);
+    
+    if (result.success) {
+      setReviewInteractions(prev => ({
+        ...prev,
+        [reviewId]: {
+          ...prev[reviewId],
+          likes: result.totalLikes,
+          userHasLiked: result.userHasLiked
+        }
+      }));
+    } else {
+      alert('Failed to update like: ' + result.error);
+    }
+    
+    setLoadingLikes(prev => ({ ...prev, [reviewId]: false }));
+  };
+
+  const handleCommentCountChange = (reviewId: string, count: number) => {
+    setReviewInteractions(prev => ({
+      ...prev,
+      [reviewId]: {
+        ...prev[reviewId],
+        comments: count
+      }
+    }));
+  };
+
+  const toggleComments = (reviewId: string) => {
+    setShowComments(prev => ({
+      ...prev,
+      [reviewId]: !prev[reviewId]
+    }));
   };
   
   return (
@@ -200,20 +265,47 @@ export default function UserReviewListPage({ user }: any ) {
 
           {/* Actions */}
           <div className="flex items-center gap-6 text-[14px] font-semibold">
-            <button className="flex items-center gap-2 text-black  transition">
-              <Heart className="w-4 h-4" />
-              <span>{review.likes || 15} like</span>
+            <button 
+              onClick={() => handleLikeToggle(review.id)}
+              disabled={loadingLikes[review.id]}
+              className={`flex items-center gap-2 transition ${
+                reviewInteractions[review.id]?.userHasLiked 
+                  ? 'text-red-500' 
+                  : 'text-black hover:text-red-500'
+              } disabled:opacity-50`}
+            >
+              <Heart 
+                className={`w-4 h-4 ${
+                  reviewInteractions[review.id]?.userHasLiked ? 'fill-current' : ''
+                }`} 
+              />
+              <span>
+                {reviewInteractions[review.id]?.likes ?? 0} like{(reviewInteractions[review.id]?.likes ?? 0) !== 1 ? 's' : ''}
+              </span>
             </button>
 
-            <button className="flex items-center gap-2 text-black transition">
+            <button 
+              onClick={() => toggleComments(review.id)}
+              className="flex items-center gap-2 text-black transition hover:text-blue-500"
+            >
               <img
                 src="/message-2-line.svg"
                 className="w-4 h-4"
                 alt="comments"
               />
-              <span>{review.comments || 10} comments</span>
+              <span>
+                {reviewInteractions[review.id]?.comments ?? 0} comment{(reviewInteractions[review.id]?.comments ?? 0) !== 1 ? 's' : ''}
+              </span>
             </button>
           </div>
+
+          {/* Comments Section */}
+          {showComments[review.id] && (
+            <ReviewComments 
+              reviewId={review.id}
+              onCommentCountChange={(count) => handleCommentCountChange(review.id, count)}
+            />
+          )}
         </div>
       );
     })}
