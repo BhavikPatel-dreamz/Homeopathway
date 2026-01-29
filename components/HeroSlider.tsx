@@ -367,7 +367,7 @@ export default function HeroSlider() {
 
           {/* Auto-Suggestions Dropdown */}
           {showSuggestions && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-2xl border border-gray-100 max-h-96 overflow-y-auto z-20">
+            <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-2xl border border-gray-100 z-20">
               {loading ? (
                 <div className="p-8 text-center text-gray-500">
                   <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#2C3E3E]"></div>
@@ -375,83 +375,85 @@ export default function HeroSlider() {
                 </div>
               ) : (
                 <>
-                  {/* Ailments Section */}
-                  {filteredAilments.length > 0 && (
-                    <div className="border-b border-gray-100">
-                      <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-[#0B0C0A] uppercase tracking-wide flex items-center gap-2">
-                        <img
-                          className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]"
-                          src="/ailments-icon.svg"
-                          alt=""
-                        />{" "}
-                        Ailments
-                      </div>
-                      {filteredAilments.map((ailment) => (
-                        <button
-                          key={ailment.id}
-                          onClick={() => handleSelectAilment(ailment)}
-                          className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group"
-                        >
-                          <span className="text-2xl">{ailment.icon}</span>
-                          <div className="flex-1">
-                            <div className="font-medium text-[#2C3E3E] group-hover:text-[#0B0C0A]">
-                              {ailment.name}
+                  <div className="search-menu-scrollbar max-h-96 overflow-y-auto">
+                    {/* Ailments Section */}
+                    {filteredAilments.length > 0 && (
+                      <div className="border-b border-gray-100 aliments-menu">
+                        <div className="px-4 py-2 bg-gray-50 border-b border-gray-100 text-xs font-semibold text-[#0B0C0A] uppercase tracking-wide flex items-center gap-2">
+                          <img
+                            className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]"
+                            src="/ailments-icon.svg"
+                            alt=""
+                          />{" "}
+                          Ailments
+                        </div>
+                        {filteredAilments.map((ailment) => (
+                          <button
+                            key={ailment.id}
+                            onClick={() => handleSelectAilment(ailment)}
+                            className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group"
+                          >
+                            <span className="text-2xl">{ailment.icon}</span>
+                            <div className="flex-1">
+                              <div className="font-medium text-[#2C3E3E] group-hover:text-[#0B0C0A]">
+                                {ailment.name}
+                              </div>
+                              <div className="text-sm text-gray-500 hover:text-gray-700">
+                                🔬 {ailment.remedies_count} remedies available
+                              </div>
                             </div>
-                            <div className="text-sm text-gray-500 hover:text-gray-700">
-                              🔬 {ailment.remedies_count} remedies available
-                            </div>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Remedies Section */}
-                  {filteredRemedies.length > 0 && (
-                    <div>
-                      <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
-                        <img
-                          className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]"
-                          src="/top-remedies.svg"
-                          alt="Top Remedies Icon"
-                        />{" "}
-                        Remedies
-                      </div>
-                      {filteredRemedies.map((remedy, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handleSelectRemedy(remedy)}
-                          className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group"
-                        >
-                          <div className="w-10 h-10 rounded-full bg-[#F9F7F2] flex items-center justify-center text-xl flex-shrink-0">
-                            {remedy.icon}
-                          </div>
-                          <div className="flex-1">
-                            <div className="font-medium text-[#2C3E3E] group-hover:text-[#0B0C0A]">
-                              {remedy.name}
-                            </div>
-                            <div className="text-sm text-gray-500 hover:text-gray-700 break-words whitespace-pre-wrap line-clamp-3">
-                              {remedy.description}
-                            </div>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* No Results */}
-                  {filteredAilments.length === 0 &&
-                    filteredRemedies.length === 0 && (
-                      <div className="p-8 text-center text-[#0B0C0A]">
-                        <p className="text-lg font-medium">No results found</p>
-                        <p className="text-sm mt-1">
-                          Try searching for different keywords
-                        </p>
+                          </button>
+                        ))}
                       </div>
                     )}
 
+                    {/* Remedies Section */}
+                    {filteredRemedies.length > 0 && (
+                      <div className="border-b border-gray-100 remedies-menu">
+                        <div className="px-4 py-2 bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
+                          <img
+                            className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]"
+                            src="/top-remedies.svg"
+                            alt="Top Remedies Icon"
+                          />{" "}
+                          Remedies
+                        </div>
+                        {filteredRemedies.map((remedy, index) => (
+                          <button
+                            key={index}
+                            onClick={() => handleSelectRemedy(remedy)}
+                            className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group"
+                          >
+                            <div className="w-10 h-10 rounded-full bg-[#F9F7F2] flex items-center justify-center text-xl flex-shrink-0">
+                              {remedy.icon}
+                            </div>
+                            <div className="flex-1">
+                              <div className="font-medium text-[#2C3E3E] group-hover:text-[#0B0C0A]">
+                                {remedy.name}
+                              </div>
+                              <div className="text-sm text-gray-500 hover:text-gray-700 break-words whitespace-pre-wrap line-clamp-3">
+                                {remedy.description}
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* No Results */}
+                    {filteredAilments.length === 0 &&
+                      filteredRemedies.length === 0 && (
+                        <div className="no-results-menu p-8 text-center text-[#0B0C0A]">
+                          <p className="text-lg font-medium">No results found</p>
+                          <p className="text-sm mt-1">
+                            Try searching for different keywords
+                          </p>
+                        </div>
+                      )}
+                  </div>
+
                   {/* Request Button Section */}
-                  <div className="border-t border-gray-100 px-4 py-4 bg-[#f5f3ed] flex items-center justify-between gap-3">
+                  <div className="request-button-section border-t border-gray-100 px-4 py-4 bg-[#f5f3ed] flex flex-wrap items-center md:justify-between justify-center gap-3 position-sticky bottom-0">
                     <p className="text-[#7D5C4E] font-medium text-sm whitespace-nowrap">
                       Can&apos;t find what you&apos;re looking for?
                     </p>
@@ -460,7 +462,7 @@ export default function HeroSlider() {
                         setShowRequestModal(true);
                         setShowSuggestions(false);
                       }}
-                      className="px-4 py-2 bg-[#5D7B6F] hover:bg-[#4a5f56] text-white font-medium text-sm rounded-lg transition-colors flex-shrink-0 whitespace-nowrap"
+                      className="px-4 py-2 bg-[#5D7B6F] hover:bg-[#4a5f56] text-white font-medium text-sm rounded-lg transition-colors flex-shrink-0 whitespace-nowrap cursor-pointer"
                     >
                       Request a new ailment or remedy
                     </button>
@@ -473,9 +475,9 @@ export default function HeroSlider() {
       </div>
 
       {/* Request Modal */}
-      <RequestAilmentRemedyModal 
+      <RequestAilmentRemedyModal
         isOpen={showRequestModal}
-        onClose={() => setShowRequestModal(false)} 
+        onClose={() => setShowRequestModal(false)}
       />
     </section>
   );
