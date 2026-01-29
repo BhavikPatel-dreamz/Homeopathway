@@ -140,7 +140,7 @@ export default function RequestAilmentRemedyModal({
       <div className="bg-white rounded-xl w-full md:max-w-[495px] max-w-md max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
         {/* Header - Hide when success */}
         {!success && (
-          <div className="sticky top-0 bg-white px-6 pb-4 pt-10 sm:pt-15 flex items-center justify-between">
+          <div className="sticky top-0 bg-white px-6 pb-4 pt-10 sm:pt-15 flex items-center justify-between z-20">
             <button
               onClick={onClose}
               className="absolute top-4 right-4 sm:top-6 sm:right-6 text-gray-400 hover:text-gray-600 transition-colors z-[9999] cursor-pointer group"
@@ -374,7 +374,7 @@ export default function RequestAilmentRemedyModal({
                   onChange={handleInputChange}
                   placeholder="Type your message..."
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2C3E3E] text-[#0B0C0A] resize-none"
-                  rows={4}
+                  rows={10}
                   disabled={loading}
                 />
               </div>
