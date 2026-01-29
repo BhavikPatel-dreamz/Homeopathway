@@ -4,6 +4,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
+import Image from 'next/image';
 import { supabase } from "@/lib/supabaseClient";
 import { healthEmojis } from "@/lib/emojiList";
 import { createUniqueSlugFromName } from "@/lib/slugUtils";
@@ -137,7 +138,7 @@ export default function RequestAilmentRemedyModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[1001] p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-xl w-full md:max-w-[495px] max-w-md max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
+      <div className="bg-white rounded-xl w-full md:max-w-[542px] max-w-md max-h-[95vh] overflow-y-auto animate-in zoom-in-95 duration-200">
         {/* Header - Hide when success */}
         {!success && (
           <div className="sticky top-0 bg-white px-6 pb-4 pt-10 sm:pt-15 flex items-center justify-between z-20">
@@ -157,46 +158,34 @@ export default function RequestAilmentRemedyModal({
 
         {/* Success Message */}
         {success && (
-          <div className="relative flex flex-col items-center justify-center py-12 px-6">
+          <div className="relative flex flex-col items-center justify-center py-4.5 px-6">
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+              className="absolute top-5 right-6 text-gray-400 hover:text-gray-600 transition-colors"
             >
-              <X className="w-6 h-6" />
+              <svg className="w-5 h-5 fill-[#83857D] hover:fill-[#0B0C0A] transition-colors cursor-pointer" width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10.6067 8.25L18.8567 0L21.2133 2.35667L12.9633 10.6067L21.2133 18.8567L18.8567 21.2133L10.6067 12.9633L2.35667 21.2133L0 18.8567L8.25 10.6067L0 2.35667L2.35667 0L10.6067 8.25Z" />
+              </svg>
             </button>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="80"
-              height="80"
-              viewBox="0 0 100 100"
-              fill="none"
-              className="mb-6"
-            >
-              <path
-                d="M50 95C74.8528 95 95 74.8528 95 50C95 25.1472 74.8528 5 50 5C25.1472 5 5 25.1472 5 50C5 74.8528 25.1472 95 50 95Z"
-                stroke="#2C3E3E"
-                strokeWidth="2"
-              />
-              <path
-                d="M30 50L45 65L70 35"
-                stroke="#2C3E3E"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <h2 className="text-3xl font-bold text-[#0B0C0A] mb-3 text-center">
+            <Image
+              src="/login-logo.svg"
+              alt="icon"
+              width={120}
+              height={120}
+              className="sm:w-30 sm:h-30 w-20 h-20 mx-auto"
+            />
+            <h2 className="sm:text-[32px] text-3xl font-normal sm:leading-[40px] leading-10 text-[#0B0C0A] mb-4 text-center">
               Request Submitted Successfully!
             </h2>
-            <p className="text-lg text-[#7D5C4E] text-center mb-8">
-              Your {requestType} has been added successfully!
+            <p className="text-base font-medium text-[#41463B] text-center mb-8">
+              Your {requestType} is under review.<br></br> We’ll notify you once it’s approved.
             </p>
             <button
               onClick={() => {
                 onClose();
                 router.push('/my-requests');
               }}
-              className="w-full px-6 py-3 bg-[#5D7B6F] hover:bg-[#4a5f56] text-white font-semibold rounded-full transition-colors"
+              className="w-full px-6 py-3 bg-[#6C7463] text-base cursor-pointer hover:bg-[#4a5f56] text-white font-semibold rounded-full transition-colors"
             >
               View Request
             </button>
