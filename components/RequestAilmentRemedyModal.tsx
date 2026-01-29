@@ -137,19 +137,21 @@ export default function RequestAilmentRemedyModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[1001] p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
+      <div className="bg-white rounded-xl w-full md:max-w-[495px] max-w-md max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
         {/* Header - Hide when success */}
         {!success && (
-          <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-[#0B0C0A]">
-              Request a new ailment or remedy
-            </h2>
+          <div className="sticky top-0 bg-white px-6 pb-4 pt-10 sm:pt-15 flex items-center justify-between">
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="absolute top-4 right-4 sm:top-6 sm:right-6 text-gray-400 hover:text-gray-600 transition-colors z-[9999] cursor-pointer group"
             >
-              <X className="w-6 h-6" />
+              <svg className="w-5 h-5 fill-[#83857D] hover:fill-[#0B0C0A] transition-colors cursor-pointer" width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10.6067 8.25L18.8567 0L21.2133 2.35667L12.9633 10.6067L21.2133 18.8567L18.8567 21.2133L10.6067 12.9633L2.35667 21.2133L0 18.8567L8.25 10.6067L0 2.35667L2.35667 0L10.6067 8.25Z" />
+              </svg>
             </button>
+            <h2 className="sm:text-[32px] text-3xl font-normal sm:leading-[40px] leading-8 text-[#0B0C0A]">
+              Request a new ailment or remedy
+            </h2>
           </div>
         )}
 
@@ -212,165 +214,181 @@ export default function RequestAilmentRemedyModal({
             )}
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Radio Buttons - Only show if type is "both" */}
-          {type === "both" && (
-            <div className="flex items-center gap-8">
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="radio"
-                  value="ailment"
-                  checked={requestType === "ailment"}
-                  onChange={(e) => setRequestType(e.target.value as "ailment" | "remedy")}
-                  className="w-4 h-4"
-                />
-                <span className="text-lg font-medium text-[#0B0C0A]">Ailment</span>
-              </label>
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="radio"
-                  value="remedy"
-                  checked={requestType === "remedy"}
-                  onChange={(e) => setRequestType(e.target.value as "ailment" | "remedy")}
-                  className="w-4 h-4"
-                />
-                <span className="text-lg font-medium text-[#0B0C0A]">Remedy</span>
-              </label>
-            </div>
-          )}
-
-          {/* Form Title */}
-          <h3 className="text-lg font-semibold text-[#0B0C0A]">
-            {requestType === "ailment" ? "Ailment" : "Remedy"} Details
-          </h3>
-
-          {/* Name Field */}
-          <div>
-            <label className="block text-sm font-medium text-[#0B0C0A] mb-2">
-              {requestType === "ailment" ? "Ailment" : "Remedy"} Name
-              <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              placeholder={requestType === "ailment" ? "e.g., Headache" : "e.g., Belladonna"}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2C3E3E] text-[#0B0C0A]"
-              disabled={loading}
-            />
-          </div>
-
-          {/* Emoji Field */}
-          <div>
-            <label className="block text-sm font-medium text-[#0B0C0A] mb-2">
-              {requestType === "ailment" ? "Ailment" : "Remedy"} Emoji (optional)
-            </label>
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg flex items-center justify-between bg-white hover:bg-gray-50 transition-colors"
-                disabled={loading}
-              >
-                <span className="text-xl">{formData.emoji}</span>
-                <svg
-                  className={`w-5 h-5 text-gray-400 transition-transform ${
-                    showEmojiPicker ? "rotate-180" : ""
-                  }`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                  />
-                </svg>
-              </button>
-
-              {/* Emoji Picker */}
-              {showEmojiPicker && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg p-3 z-10 max-h-48 overflow-y-auto">
-                  <div className="grid grid-cols-6 gap-2">
-                    {healthEmojis.map((emoji, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        onClick={() => handleEmojiSelect(emoji)}
-                        className="text-2xl hover:bg-gray-100 rounded p-2 transition-colors"
-                      >
-                        {emoji}
-                      </button>
-                    ))}
-                  </div>
+            <form onSubmit={handleSubmit} className="p-6 pt-0 space-y-6">
+              {/* Radio Buttons - Only show if type is "both" */}
+              {type === "both" && (
+                <div className="flex items-center gap-8">
+                  <label className="flex items-center gap-3 cursor-pointer group relative">
+                    <input
+                      type="radio"
+                      value="ailment"
+                      checked={requestType === "ailment"}
+                      onChange={(e) => setRequestType(e.target.value as "ailment" | "remedy")}
+                      className="peer w-[16px] h-[16px] border-2 border-[#B5B6B1] cursor-pointer appearance-none
+                        checked:bg-[#83857D] checked:border-[#83857D] rounded-full
+                        transition"
+                    />
+                    <svg
+                      className="w-3 h-3 text-white absolute left-0.5 pointer-events-none"
+                      fill="none"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="3"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span className="sm:text-lg text-base font-medium text-[#0B0C0A]">Ailment</span>
+                  </label>
+                  <label className="flex items-center gap-3 cursor-pointer relative">
+                    <input
+                      type="radio"
+                      value="remedy"
+                      checked={requestType === "remedy"}
+                      onChange={(e) => setRequestType(e.target.value as "ailment" | "remedy")}
+                      className="peer w-[16px] h-[16px] border-2 border-[#B5B6B1] cursor-pointer appearance-none
+                        checked:bg-[#83857D] checked:border-[#83857D] rounded-full
+                        transition"
+                    />
+                    <svg
+                      className="w-3 h-3 text-white absolute left-0.5 pointer-events-none"
+                      fill="none"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="3"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span className="sm:text-lg text-base font-medium text-[#0B0C0A]">Remedy</span>
+                  </label>
                 </div>
               )}
-            </div>
-          </div>
 
-          {/* Remedy-specific: Key Symptoms */}
-          {requestType === "remedy" && (
-            <div>
-              <label className="block text-sm font-medium text-[#0B0C0A] mb-2">
-                Key Symptoms
-                <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="key_symptoms"
-                value={formData.key_symptoms}
-                onChange={handleInputChange}
-                placeholder="e.g., fever, cough, headache (comma-separated)"
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2C3E3E] text-[#0B0C0A]"
+              {/* Form Title */}
+              <h3 className="sm:text-xl text-lg leading-7 font-medium text-[#0B0C0A] font-family-montserrat">
+                {requestType === "ailment" ? "Ailment" : "Remedy"} Details
+              </h3>
+
+              {/* Name Field */}
+              <div>
+                <label className="block text-sm font-medium text-[#20231E] mb-2">
+                  {requestType === "ailment" ? "Ailment" : "Remedy"} Name
+                  <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  placeholder={requestType === "ailment" ? "e.g., Headache" : "e.g., Belladonna"}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2C3E3E] text-[#0B0C0A]"
+                  disabled={loading}
+                />
+              </div>
+
+              {/* Emoji Field */}
+              <div>
+                <label className="block text-sm font-medium text-[#0B0C0A] mb-2">
+                  {requestType === "ailment" ? "Ailment" : "Remedy"} Emoji <span className="text-xs font-normal text-[#41463B]">(optional)</span>
+                </label>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg flex items-center justify-between bg-white hover:bg-gray-50 transition-colors"
+                    disabled={loading}
+                  >
+                    <span className="text-xl">{formData.emoji}</span>
+
+                    <svg xmlns="http://www.w3.org/2000/svg" width="9" height="6" viewBox="0 0 9 6" fill="none" className={`w-3 h-3 text-gray-400 transition-transform ${showEmojiPicker ? "rotate-180" : ""
+                      }`}>
+                      <path d="M4.24267 3.3L7.54267 0L8.48533 0.942666L4.24267 5.18533L0 0.942666L0.942667 0L4.24267 3.3Z" fill="#41463B" />
+                    </svg>
+                  </button>
+
+                  {/* Emoji Picker */}
+                  {showEmojiPicker && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg p-3 z-10 max-h-48 overflow-y-auto">
+                      <div className="grid grid-cols-6 gap-2">
+                        {healthEmojis.map((emoji, index) => (
+                          <button
+                            key={index}
+                            type="button"
+                            onClick={() => handleEmojiSelect(emoji)}
+                            className="text-2xl hover:bg-gray-100 rounded p-2 transition-colors"
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Remedy-specific: Key Symptoms */}
+              {requestType === "remedy" && (
+                <div>
+                  <label className="block text-sm font-medium text-[#0B0C0A] mb-2">
+                    Key Symptoms
+                    <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="key_symptoms"
+                    value={formData.key_symptoms}
+                    onChange={handleInputChange}
+                    placeholder="e.g., fever, cough, headache (comma-separated)"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2C3E3E] text-[#0B0C0A]"
+                    disabled={loading}
+                  />
+                </div>
+              )}
+
+              {/* Slug Field (optional) */}
+              <div>
+                <label className="block text-sm font-medium text-[#0B0C0A] mb-2">
+                  {requestType === "ailment" ? "Ailment" : "Remedy"} Slug <span className="text-xs font-normal text-[#41463B]">(optional)</span>
+                </label>
+                <input
+                  type="text"
+                  name="slug"
+                  value={formData.slug}
+                  readOnly
+                  placeholder="auto-generated from name"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none text-[#0B0C0A] bg-gray-50 cursor-not-allowed"
+                />
+              </div>
+
+              {/* Description Field */}
+              <div>
+                <label className="block text-sm font-medium text-[#0B0C0A] mb-2">
+                  {requestType === "ailment" ? "Ailment" : "Remedy"} Description <span className="text-xs font-normal text-[#41463B]">(optional)</span>
+                </label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  placeholder="Type your message..."
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2C3E3E] text-[#0B0C0A] resize-none"
+                  rows={4}
+                  disabled={loading}
+                />
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
                 disabled={loading}
-              />
-            </div>
-          )}
-
-          {/* Slug Field (optional) */}
-          <div>
-            <label className="block text-sm font-medium text-[#0B0C0A] mb-2">
-              {requestType === "ailment" ? "Ailment" : "Remedy"} Slug (auto-generated)
-            </label>
-            <input
-              type="text"
-              name="slug"
-              value={formData.slug}
-              readOnly
-              placeholder="auto-generated from name"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none text-[#0B0C0A] bg-gray-50 cursor-not-allowed"
-            />
-          </div>
-
-          {/* Description Field */}
-          <div>
-            <label className="block text-sm font-medium text-[#0B0C0A] mb-2">
-              {requestType === "ailment" ? "Ailment" : "Remedy"} Description (optional)
-            </label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              placeholder="Type your message..."
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2C3E3E] text-[#0B0C0A] resize-none"
-              rows={4}
-              disabled={loading}
-            />
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-[#5D7B6F] hover:bg-[#4a5f56] disabled:bg-gray-400 text-white font-semibold rounded-lg transition-colors duration-200"
-          >
-            {loading
-              ? "Submitting..."
-              : `Request for New ${requestType === "ailment" ? "Ailment" : "Remedy"}`}
-          </button>
+                className="w-full py-3 bg-[#6C7463] hover:bg-[#4a5f56] disabled:bg-gray-400 text-white text-base font-semibold rounded-full transition-colors duration-200 cursor-pointer"
+              >
+                {loading
+                  ? "Submitting..."
+                  : `Request for New ${requestType === "ailment" ? "Ailment" : "Remedy"}`}
+              </button>
             </form>
           </>
         )}
