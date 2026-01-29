@@ -276,7 +276,7 @@ export default function RequestAilmentRemedyModal({
               <div>
                 <label className="block text-sm font-medium text-[#20231E] mb-2">
                   {requestType === "ailment" ? "Ailment" : "Remedy"} Name
-                  <span className="text-red-500">*</span>
+                  <span className="text-red-500">&nbsp;*</span>
                 </label>
                 <input
                   type="text"
@@ -334,7 +334,7 @@ export default function RequestAilmentRemedyModal({
                 <div>
                   <label className="block text-sm font-medium text-[#0B0C0A] mb-2">
                     Key Symptoms
-                    <span className="text-red-500">*</span>
+                    <span className="text-red-500">&nbsp;*</span>
                   </label>
                   <input
                     type="text"
