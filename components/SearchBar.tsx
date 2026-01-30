@@ -213,8 +213,8 @@ export default function SearchBar() {
 
           {/* Request Button Section */}{/* Request New Ailment or Remedy Button */}
           {searchQuery.trim() && (filteredAilments.length > 0 || filteredRemedies.length > 0) && (
-            <div className="request-button-section border-t border-gray-100 px-4 py-4 bg-[#f5f3ed] flex flex-wrap items-center md:justify-between justify-center gap-3 position-sticky bottom-0">
-              <p className="text-[#7D5C4E] font-medium text-sm whitespace-nowrap">
+            <div className="request-button-section px-4 py-4 flex flex-wrap items-center justify-flex-start gap-3 position-sticky bottom-0">
+              <p className="text-[#41463B] font-normal text-sm whitespace-nowrap">
                 Can&apos;t find what you&apos;re looking for?
               </p>
               <button
@@ -222,7 +222,7 @@ export default function SearchBar() {
                   setShowRequestModal(true);
                   setShowSuggestions(false);
                 }}
-                className="px-4 py-2 bg-[#5D7B6F] hover:bg-[#4a5f56] text-white font-medium text-sm rounded-lg transition-colors flex-shrink-0 whitespace-nowrap cursor-pointer"
+                className="px-2 py-1 ml-2 bg-white hover:bg-[#4a5f56] text-[#2B2E28] hover:text-white border border-black rounded-full font-semibold text-sm transition-colors flex-shrink-0 whitespace-nowrap cursor-pointer"
               >
                 Request a new Ailment or Remedy
               </button>

@@ -8,7 +8,7 @@ interface Remedy {
   id: string;
   name: string;
   indication: string;
-  rating: number; 
+  rating: number;
   reviewCount: number;
   description: string;
   key_symptoms?: string[];
@@ -32,16 +32,14 @@ interface AilmentDetailPageProps {
 }
 
 export default function AilmentDetailPage({ ailment, remedies }: AilmentDetailPageProps) {
-
- 
   const breadcrumbItems = [
     { label: "Home", href: "/" },
     // { label: "Ailments", href: "/ailments" },
     { label: ailment.name, isActive: true }
   ];
 
-  
-  
+
+
   return (
     <div className="min-h-screen bg-[#F5F1E8]">
       {/* Breadcrumb */}
@@ -50,15 +48,15 @@ export default function AilmentDetailPage({ ailment, remedies }: AilmentDetailPa
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 lg:px-5 pb-10">
         {/* Ailment Header */}
-        <div className="bg-white rounded-lg  pl-4 pr-4 pt-6 pb-6 lg:p-6 mb-6 lg:mb-10 flex-row lg:flex-col">
+        <div className="bg-white rounded-lg  pl-4 pr-4 pt-6 pb-6 lg:p-6 mb-4 lg:mb-6 flex-row lg:flex-col">
           <div className="flex justify-between items-start lg:items-center mb-6 flex-col lg:flex-row">
             <div className="text-7xl flex items-start lg:items-center flex-col lg:flex-row">
-              <div className="text-[40px] md:text-[50px] lg:text-[60px] mr-4 mb-2 lg:mb-0">{ailment.icon}</div>              
+              <div className="text-[40px] md:text-[50px] lg:text-[60px] mr-4 mb-2 lg:mb-0">{ailment.icon}</div>
               <h1 className="text-[32px] lg:text-[40px] mt-2 font-normal font-serif text-[#0B0C0A] mb-2 lg:mb-0">{ailment.name}</h1>
             </div>
             <div className="flex-1 ">
-               <p className="text-[#7D5C4E] text-[16px] font-medium flex items-center justify-end">
-                    <Image className="mr-1" src="/remedies.svg" alt="remedies icon" width={16} height={16} /> {ailment.remedies_count} remedies
+              <p className="text-[#7D5C4E] text-[16px] font-medium flex items-center justify-end">
+                <Image className="mr-1" src="/remedies.svg" alt="remedies icon" width={16} height={16} /> {ailment.remedies_count} remedies
               </p>
             </div>
           </div>
@@ -69,8 +67,18 @@ export default function AilmentDetailPage({ ailment, remedies }: AilmentDetailPa
           </div>
         </div>
 
+        {/* Action Row */}
+        <div className="flex justify-end mb-4 lg:mb-10">
+          <button
+            className="text-montserrat px-5 py-[9px] border border-[#6C7463] text-[#2B2E28] rounded-full font-semibold text-base leading-[24px] cursor-pointer transition-all duration-500 hover:bg-gray-300 hover:text-black hover:border-black"
+          >
+            Link an existing remedy
+          </button>
+        </div>
+
+
         {/* Top Remedies Section */}
-        <TopRemedies remedies={remedies} ailmentSlug={ailment.slug}/>
+        <TopRemedies remedies={remedies} ailmentSlug={ailment.slug} />
       </main>
 
 

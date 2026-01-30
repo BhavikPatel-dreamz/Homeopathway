@@ -378,15 +378,15 @@ export default function HeroSlider() {
                   <div className="search-menu-scrollbar lg:max-h-96 max-h-60 overflow-y-auto">
                     {/* Ailments Section */}
                     {filteredAilments.length > 0 && (
-                      <div className="border-b border-gray-100 aliments-menu">
-                        <div className="px-4 py-2 bg-gray-50 border-b border-gray-100 text-xs font-semibold text-[#0B0C0A] uppercase tracking-wide flex items-center gap-2">
+                      <div className="aliments-menu">
+                        {/* <div className="px-4 py-2 text-xs font-semibold text-[#0B0C0A] uppercase tracking-wide flex items-center gap-2">
                           <img
                             className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]"
                             src="/ailments-icon.svg"
                             alt=""
                           />{" "}
                           Ailments
-                        </div>
+                        </div> */}
                         {filteredAilments.map((ailment) => (
                           <button
                             key={ailment.id}
@@ -395,12 +395,12 @@ export default function HeroSlider() {
                           >
                             <span className="text-2xl">{ailment.icon}</span>
                             <div className="flex-1">
-                              <div className="font-medium text-[#2C3E3E] group-hover:text-[#0B0C0A]">
+                              <div className="font-medium sm:text-xl text-base text-[#2C3E3E] group-hover:text-[#0B0C0A]">
                                 {ailment.name}
                               </div>
-                              <div className="text-sm text-gray-500 hover:text-gray-700">
+                              {/* <div className="text-sm text-gray-500 hover:text-gray-700">
                                 🔬 {ailment.remedies_count} remedies available
-                              </div>
+                              </div> */}
                             </div>
                           </button>
                         ))}
@@ -409,31 +409,31 @@ export default function HeroSlider() {
 
                     {/* Remedies Section */}
                     {filteredRemedies.length > 0 && (
-                      <div className="border-b border-gray-100 remedies-menu">
-                        <div className="px-4 py-2 bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
+                      <div className="remedies-menu">
+                        {/* <div className="px-4 py-2 bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
                           <img
                             className="w-[20px] h-[20px] lg:w-[30px] lg:h-[30px]"
                             src="/top-remedies.svg"
                             alt="Top Remedies Icon"
                           />{" "}
                           Remedies
-                        </div>
+                        </div> */}
                         {filteredRemedies.map((remedy, index) => (
                           <button
                             key={index}
                             onClick={() => handleSelectRemedy(remedy)}
-                            className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group"
+                            className="w-full px-4 py-2 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group"
                           >
                             <div className="w-10 h-10 rounded-full bg-[#F9F7F2] flex items-center justify-center text-xl flex-shrink-0">
                               {remedy.icon}
                             </div>
                             <div className="flex-1">
-                              <div className="font-medium text-[#2C3E3E] group-hover:text-[#0B0C0A]">
+                              <div className="font-medium sm:text-xl text-base text-[#2C3E3E] group-hover:text-[#0B0C0A]">
                                 {remedy.name}
                               </div>
-                              <div className="text-sm text-gray-500 hover:text-gray-700 break-words whitespace-pre-wrap line-clamp-3">
+                              {/* <div className="text-sm text-gray-500 hover:text-gray-700 break-words whitespace-pre-wrap line-clamp-3">
                                 {remedy.description}
-                              </div>
+                              </div> */}
                             </div>
                           </button>
                         ))}
@@ -453,8 +453,8 @@ export default function HeroSlider() {
                   </div>
 
                   {/* Request Button Section */}
-                  <div className="request-button-section border-t border-gray-100 px-4 py-4 bg-[#f5f3ed] flex flex-wrap items-center md:justify-between justify-center gap-3 position-sticky bottom-0">
-                    <p className="text-[#7D5C4E] font-medium text-sm whitespace-nowrap">
+                  <div className="request-button-section px-4 py-4 flex flex-wrap items-center justify-flex-start gap-3 position-sticky bottom-0">
+                    <p className="text-[#41463B] font-medium text-sm whitespace-nowrap">
                       Can&apos;t find what you&apos;re looking for?
                     </p>
                     <button
@@ -462,7 +462,7 @@ export default function HeroSlider() {
                         setShowRequestModal(true);
                         setShowSuggestions(false);
                       }}
-                      className="px-4 py-2 bg-[#5D7B6F] hover:bg-[#4a5f56] text-white font-medium text-sm rounded-lg transition-colors flex-shrink-0 whitespace-nowrap cursor-pointer"
+                      className="px-2 py-1 ml-2 bg-white hover:bg-[#4a5f56] text-[#2B2E28] hover:text-white border border-black rounded-full font-semibold text-sm transition-colors flex-shrink-0 whitespace-nowrap cursor-pointer"
                     >
                       Request a new ailment or remedy
                     </button>

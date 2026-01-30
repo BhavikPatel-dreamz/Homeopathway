@@ -366,7 +366,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                 selected={selectedRemedies}
                 onChange={setSelectedRemedies}
               />
-              
+
               <p className="text-sm text-[#7D5C4E] mt-3">
                 Can&apos;t find what you&apos;re looking for?{" "}
                 <button
@@ -439,7 +439,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                 <p className="text-[#41463B] sm:text-base text-sm font-medium mb-3">
                   What was the potency?
                 </p>
-                
+
                 {allRemedies.map(rem => (
                   <div key={rem.id} className="mb-6">
                     {/* Remedy Name */}
@@ -681,8 +681,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                   </h2>
 
                   <p className="text-[#41463B] text-[16px] sm:text-[15px] leading-relaxed">
-                    Review your post below. If everything looks good, submit it to
-                    share with your community.
+                    Your review goes a long way to helping the homeopathic community.
                   </p>
                 </div>
               </div>
