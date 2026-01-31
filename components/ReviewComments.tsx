@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { Send, Reply, Edit, Trash2, MoreHorizontal } from 'lucide-react';
 import { getReviewComments, addReviewComment, updateReviewComment, deleteReviewComment, ReviewComment } from '@/lib/reviewInteractions';
 import { useAuth } from '@/lib/authContext';
@@ -20,19 +21,46 @@ const ReviewComments: React.FC<ReviewCommentsProps> = ({ reviewId, onCommentCoun
   const [showDropdown, setShowDropdown] = useState<string | null>(null);
   const { user } = useAuth();
 
-  useEffect(() => {
-    loadComments();
+  // fetchComments returns the raw result; refreshComments applies it to state.
+  const fetchComments = useCallback(async () => {
+    return await getReviewComments(reviewId);
   }, [reviewId]);
 
-  const loadComments = async () => {
-    const result = await getReviewComments(reviewId);
+  const refreshComments = useCallback(async () => {
+    const result = await fetchComments();
     if (result.success && result.comments) {
       setComments(result.comments);
       if (onCommentCountChange) {
         onCommentCountChange(result.comments.length);
       }
+    } else {
+      console.error('Failed to load comments:', result.error);
+      if (typeof window !== 'undefined') {
+        alert('Failed to load comments: ' + (result.error || 'Unknown error'));
+      }
     }
-  };
+    return result;
+  }, [fetchComments, onCommentCountChange]);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const result = await fetchComments();
+      if (!mounted) return;
+      if (result.success && result.comments) {
+        setComments(result.comments);
+        if (onCommentCountChange) {
+          onCommentCountChange(result.comments.length);
+        }
+      } else {
+        console.error('Failed to load comments:', result.error);
+        if (typeof window !== 'undefined') {
+          alert('Failed to load comments: ' + (result.error || 'Unknown error'));
+        }
+      }
+    })();
+    return () => { mounted = false; };
+  }, [reviewId, fetchComments, onCommentCountChange]);
 
   const handleAddComment = async (parentCommentId?: string) => {
     if (!user) {
@@ -46,12 +74,15 @@ const ReviewComments: React.FC<ReviewCommentsProps> = ({ reviewId, onCommentCoun
     setLoading(true);
     const result = await addReviewComment(reviewId, content, parentCommentId);
 
-    if (result.success) {
+    if (result.success && result.comment) {
+      // Optimistically update comments list with returned comment (avoid slow full reload)
       setNewComment('');
       setReplyingTo(null);
-      await loadComments();
+      setComments(prev => [...prev, result.comment as ReviewComment]);
+      if (onCommentCountChange) onCommentCountChange((comments.length || 0) + 1);
     } else {
-      alert('Failed to add comment: ' + result.error);
+      console.error('Failed to add review comment:', result.error);
+      alert('Failed to add comment: ' + (result.error || 'Unknown error'));
     }
     setLoading(false);
   };
@@ -65,7 +96,7 @@ const ReviewComments: React.FC<ReviewCommentsProps> = ({ reviewId, onCommentCoun
     if (result.success) {
       setEditingComment(null);
       setEditContent('');
-      await loadComments();
+      await refreshComments();
     } else {
       alert('Failed to update comment: ' + result.error);
     }
@@ -79,7 +110,7 @@ const ReviewComments: React.FC<ReviewCommentsProps> = ({ reviewId, onCommentCoun
     const result = await deleteReviewComment(commentId);
 
     if (result.success) {
-      await loadComments();
+      await refreshComments();
     } else {
       alert('Failed to delete comment: ' + result.error);
     }
@@ -121,7 +152,7 @@ const ReviewComments: React.FC<ReviewCommentsProps> = ({ reviewId, onCommentCoun
     const userName = `${comment.user_first_name || ''} ${comment.user_last_name || ''}`.trim() || comment.user_name || 'Anonymous';
 
     return (
-      <div key={comment.id} className={`${isReply ? 'ml-8 border-l-2 border-gray-100 pl-4' : ''} py-3`}>
+      <div key={comment.id} className={`${isReply ? 'ml-8 border-l-2 border-gray-100 pl-4' : ''} pt-3`}>
         <div className="flex justify-between items-start mb-2">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-[#4B544A] text-white flex items-center justify-center text-sm font-semibold overflow-hidden">
@@ -158,9 +189,9 @@ const ReviewComments: React.FC<ReviewCommentsProps> = ({ reviewId, onCommentCoun
                       setEditContent(comment.content);
                       setShowDropdown(null);
                     }}
-                    className="w-full text-left px-3 py-1 hover:bg-gray-100 text-sm flex items-center gap-2"
+                    className="w-full text-left px-3 py-1 hover:bg-gray-100 text-sm flex items-center gap-2 text-[#20231E]"
                   >
-                    <Edit className="w-3 h-3" />
+                    <Edit className="w-3 h-3 text-[#20231E]" />
                     Edit
                   </button>
                   <button
@@ -184,7 +215,7 @@ const ReviewComments: React.FC<ReviewCommentsProps> = ({ reviewId, onCommentCoun
             <textarea
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-lg text-sm resize-none"
+              className="w-full p-2 border border-gray-300 rounded-lg text-sm resize-none bg-white text-[#0B0C0A] placeholder:text-gray-400"
               rows={3}
               placeholder="Edit your comment..."
             />
@@ -192,7 +223,7 @@ const ReviewComments: React.FC<ReviewCommentsProps> = ({ reviewId, onCommentCoun
               <button
                 onClick={() => handleEditComment(comment.id)}
                 disabled={loading || !editContent.trim()}
-                className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 disabled:opacity-50"
+                className="px-3 py-1 bg-[#6C7463] text-white text-sm font-semibold rounded-full hover:bg-[#41463B] disabled:opacity-50"
               >
                 Save
               </button>
@@ -201,7 +232,7 @@ const ReviewComments: React.FC<ReviewCommentsProps> = ({ reviewId, onCommentCoun
                   setEditingComment(null);
                   setEditContent('');
                 }}
-                className="px-3 py-1 bg-gray-500 text-white text-sm rounded hover:bg-gray-600"
+                className="px-3 py-1 bg-gray-500 text-white text-sm font-semibold rounded-full hover:bg-[#41463B] hover:bg-gray-600"
               >
                 Cancel
               </button>
@@ -213,7 +244,7 @@ const ReviewComments: React.FC<ReviewCommentsProps> = ({ reviewId, onCommentCoun
             {!isReply && user && (
               <button
                 onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
-                className="text-xs text-blue-500 hover:text-blue-600 flex items-center gap-1"
+                className="text-sm font-medium leading-[22px] text-[#0B0C0A] flex items-center gap-1 cursor-pointer"
               >
                 <Reply className="w-3 h-3" />
                 Reply
@@ -228,14 +259,14 @@ const ReviewComments: React.FC<ReviewCommentsProps> = ({ reviewId, onCommentCoun
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder={`Reply to ${userName}...`}
-              className="w-full p-2 border border-gray-300 rounded-lg text-sm resize-none"
+              className="w-full p-2 border border-[#D3D6D1] rounded-[8px] text-sm resize-none bg-white text-[#0B0C0A] placeholder:text-[#41463B]"
               rows={2}
             />
             <div className="flex gap-2 mt-2">
               <button
                 onClick={() => handleAddComment(comment.id)}
                 disabled={loading || !newComment.trim()}
-                className="px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 disabled:opacity-50 flex items-center gap-1"
+                className="px-3 py-1 bg-[#6C7463] text-white text-sm font-semibold rounded-full hover:bg-[#41463B] disabled:opacity-50 flex gap-1 items-center"
               >
                 <Send className="w-3 h-3" />
                 Reply
@@ -245,7 +276,7 @@ const ReviewComments: React.FC<ReviewCommentsProps> = ({ reviewId, onCommentCoun
                   setReplyingTo(null);
                   setNewComment('');
                 }}
-                className="px-3 py-1 bg-gray-500 text-white text-xs rounded hover:bg-gray-600"
+                className="px-3 py-1 bg-gray-500 text-white text-sm font-semibold rounded-full hover:bg-[#41463B] hover:bg-gray-600"
               >
                 Cancel
               </button>
@@ -288,7 +319,7 @@ const ReviewComments: React.FC<ReviewCommentsProps> = ({ reviewId, onCommentCoun
 
       {!user && (
         <div className="mb-4 p-3 bg-gray-100 rounded-lg text-sm text-gray-600">
-          Please <a href="/login" className="text-[#0B0C0A] hover:underline">log in</a> to comment
+          Please <Link href="/login" className="text-[#0B0C0A] hover:underline">log in</Link> to comment
         </div>
       )}
 

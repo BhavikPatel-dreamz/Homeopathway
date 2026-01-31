@@ -5,8 +5,6 @@ import { supabase } from "@/lib/supabaseClient";
 export default async function UserProfilePage({ params }: { params: { slug: string } }) {
   const { slug } = await params;
 
-  console.log(params)
-
   // Fetch user with their reviews
   const { data: user, error } = await supabase
     .from("profiles")

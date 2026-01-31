@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -33,9 +34,15 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
   const [showRequestAilmentModal, setShowRequestAilmentModal] = useState(false);
   const [showRequestRemedyModal, setShowRequestRemedyModal] = useState(false);
   const [ailmentsLoading, setAilmentsLoading] = useState(true);
+  const [remediesList, setRemediesList] = useState<{ id: string; name: string }[]>([]);
+
+  // Allow selecting primary remedy instead of forcing the incoming prop
+  const [primaryRemedyId, setPrimaryRemedyId] = useState<string>(remedyId);
+  const [primaryRemedyName, setPrimaryRemedyName] = useState<string>(remedyName);
   const [remedyPotencies, setRemedyPotencies] = useState<Record<string, string>>({
-    [remedyId]: ''
+    [primaryRemedyId]: ''
   });
+
   const [formData, setFormData] = useState({
     remedy: remedyName,
     condition: condition,
@@ -55,26 +62,22 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
   };
 
   const [remedyExtras, setRemedyExtras] = useState<Record<string, RemedyExtra>>({
-    [remedyId]: {
+    [primaryRemedyId]: {
       potencyType: '',
       notes: ''
     }
   });
 
-
-
-
   const totalSteps = 8;
-
   const allRemedies = [
-    { id: remedyId, name: remedyName },
+    { id: primaryRemedyId, name: primaryRemedyName },
     ...selectedRemedies
   ];
 
 
   useEffect(() => {
     const allRemedies = [
-      { id: remedyId, name: remedyName },
+      { id: primaryRemedyId, name: primaryRemedyName },
       ...selectedRemedies
     ];
 
@@ -87,7 +90,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
         };
       });
     });
-  }, [selectedRemedies, remedyId, remedyName]);
+  }, [selectedRemedies, primaryRemedyId, primaryRemedyName]);
 
   // Fetch ailments from database
   useEffect(() => {
@@ -156,20 +159,43 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
     setShowSuccess(false);
   };
 
+  // Fetch remedies list for dropdown (simple id/name list)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('remedies')
+          .select('id, name')
+          .order('name', { ascending: true });
+        if (error) {
+          console.error('Error fetching remedies list:', error);
+          return;
+        }
+        if (cancelled) return;
+        setRemediesList((data || []).map((r: any) => ({ id: String(r.id), name: r.name })));
+      } catch (err) {
+        console.error(err);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
   const submitReview = async () => {
     setLoading(true);
     setError(null);
 
     try {
       const reviewData = {
-        remedy_id: remedyId,
-        ailment_id: ailmentId,
+        remedy_id: primaryRemedyId,
+        // Use the selected ailment from the form (fallback to null)
+        ailment_id: selectedAilment || null,
         star_count: formData.rating,
         secondary_remedy_ids: selectedRemedies.map(r => r.id),
         // Combines the global type with the primary remedy potency
         potency:
-          remedyExtras[remedyId]?.potencyType && remedyPotencies[remedyId]
-            ? `${remedyExtras[remedyId].potencyType} ${remedyPotencies[remedyId]}`
+          remedyExtras[primaryRemedyId]?.potencyType && remedyPotencies[primaryRemedyId]
+            ? `${remedyExtras[primaryRemedyId].potencyType} ${remedyPotencies[primaryRemedyId]}`
             : null,
         dosage: formData.dosage,
         duration_used: formData.duration,
@@ -185,6 +211,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
         all_potencies: remedyPotencies
       };
 
+      // Submit primary review
       const response = await fetch('/api/reviews', {
         method: 'POST',
         headers: {
@@ -196,6 +223,33 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to submit review');
+      }
+
+      // Also create matching review records for each selected secondary remedy
+      if (selectedRemedies.length > 0) {
+        const secondaryPromises = selectedRemedies.map((rem) => {
+          const secondaryData = {
+            ...reviewData,
+            remedy_id: rem.id,
+            // ensure secondary entries include the same selected ailment (or null)
+            ailment_id: selectedAilment || null,
+            // keep secondary_remedy_ids as-is so backend can store relations if used
+          };
+          return fetch('/api/reviews', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(secondaryData),
+          });
+        });
+
+        const secondaryResponses = await Promise.all(secondaryPromises);
+        const failed = secondaryResponses.find(r => !r.ok);
+        if (failed) {
+          const failedData = await failed.json().catch(() => ({}));
+          throw new Error(failedData.error || 'Failed to submit review for one or more secondary remedies');
+        }
       }
 
       setShowSuccess(true);
@@ -294,11 +348,8 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
         <div className="pb-5 px-6 pt-8 sm:pt-10 sm:pt-15">
           {/* Header */}
           <div className="mb-2 pr-8">
-            <h2 className="font-kingred font-normal text-[22px] sm:text-[26px] lg:text-[32px] leading-[30px] sm:leading-[34px] lg:leading-[40px] text-[#0B0C0A] break-words">
-              Your experience with
-            </h2>
             <h3 className=" font-kingred font-normal text-[24px] sm:text-[28px] lg:text-[32px] leading-[32px] sm:leading-[36px] lg:leading-[40px] text-[#0B0C0A] break-words ">
-              <span className="font-medium">{formData.remedy}</span> for {formData.condition}
+              Review a Remedy
             </h3>
           </div>
 
@@ -312,7 +363,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
           {/* Step 0: Select Ailment */}
           {step === 0 && (
             <div className="space-y-4">
-              <p className="font-montserrat font-medium sm:text-[16px] text-[14px] leading-[24px] text-[#4B544A]">
+              <p className="font-montserrat font-medium text-[14px] leading-[24px] text-[#20231E] mb-2">
                 Select Ailment
               </p>
               <select
@@ -328,12 +379,12 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                   </option>
                 ))}
               </select>
-              <p className="text-sm text-[#7D5C4E]">
+              <p className="text-sm text-[#41463B] font-normal text-center gap-2">
                 Can&apos;t find what you&apos;re looking for?{" "}
                 <button
                   type="button"
                   onClick={() => setShowRequestAilmentModal(true)}
-                  className="text-[#2C3E3E] hover:text-[#1a2a29] font-medium transition-colors"
+                  className="text-[#2B2E28] hover:text-[#1a2a29] leading-normal font-semibold transition-colors rounded-full text-center border border-[#6C7463] px-3 py-1 hover:bg-gray-300 cursor-pointer"
                 >
                   Add an Ailment
                 </button>
@@ -347,33 +398,54 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
 
               {/* Line 1 */}
               <p className="font-montserrat font-medium sm:text-[20px] text-[16px] leading-[28px] text-[#4B544A]">
-                Your Primary Remedy:{" "}
-                <span className="font-montserrat font-medium sm:text-[16px] text-[14px] leading-[24px] text-[#41463B] mb-3">{remedyName}</span>
+                Select Remedy:
+                <span className="font-montserrat font-medium sm:text-[16px] text-[14px] leading-[24px] text-[#41463B] mb-3">
+                  <select
+                    value={primaryRemedyId}
+                    onChange={(e) => {
+                      const id = e.target.value;
+                      setPrimaryRemedyId(id);
+                      const found = remediesList.find(r => r.id === id);
+                      setPrimaryRemedyName(found ? found.name : '');
+                      // ensure default entries exist
+                      setRemedyPotencies(prev => ({ ...prev, [id]: prev[id] ?? '' }));
+                      setRemedyExtras(prev => ({ ...prev, [id]: prev[id] ?? { potencyType: '', notes: '' } }));
+                    }}
+                    className="ml-2 px-2 py-1 rounded text-[#41463B]"
+                  >
+                    {/* Keep current primary remedy as first option if it's not in the list */}
+                    {primaryRemedyId && !remediesList.find(r => r.id === primaryRemedyId) && (
+                      <option value={primaryRemedyId}>{primaryRemedyName}</option>
+                    )}
+                    {remediesList.map(r => (
+                      <option key={r.id} value={r.id}>{r.name}</option>
+                    ))}
+                  </select>
+                </span>
 
               </p>
 
               {/* Line 2 */}
-              <p className="font-montserrat font-medium sm:text-[16px] text-[14px] leading-[24px] text-[#41463B]">
-                Used in combination with{" "}
+              <p className="font-montserrat font-medium text-[16px] leading-[24px] text-[#41463B] flex items-center gap-1">
+                Select multiple if used in combination 
                 <span className="font-montserrat font-normal text-[12px] leading-[20px] text-[#41463B]">
                   (optional)
                 </span>
               </p>
 
               <RemedyMultiSelect
-                primaryRemedyId={remedyId}
-                primaryRemedyName={remedyName}
+                primaryRemedyId={primaryRemedyId}
+                primaryRemedyName={primaryRemedyName}
                 selected={selectedRemedies}
                 onChange={setSelectedRemedies}
               />
 
-              <p className="text-sm text-[#7D5C4E] mt-3">
+              <p className="text-sm font-normal text-[#41463B] mt-3 flex justify-center items-center gap-2 text-center flex-col">
                 Can&apos;t find what you&apos;re looking for?{" "}
                 <button
                   type="button"
                   onClick={() => setShowRequestRemedyModal(true)}
-                  className="text-[#2C3E3E] hover:text-[#1a2a29] font-medium transition-colors"
-                >
+                  className="text-[#2B2E28] hover:text-[#1a2a29] leading-normal font-semibold transition-colors rounded-full text-center border border-[#6C7463] px-3 py-1 hover:bg-gray-300 cursor-pointer">
                   Add a Remedy
                 </button>
               </p>
@@ -408,21 +480,21 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
             <div className="flex flex-col gap-[16px]">
               {/* Form Type */}
               <div>
-                <p className="text-[#41463B] sm:text-base text-sm font-medium mb-3">
+                <p className="text-[#20231E] sm:text-xl text-sm font-medium mb-3">
                   What form was the combined remedy?
                 </p>
                 <div className="flex gap-2">
                   {['Liquid', 'Pellets', 'Ointment'].map(type => (
                     <button
                       key={type}
-                      onClick={() => handlePotencyType(remedyId, type)}
-                      className={`px-4 py-2 sm:rounded-lg rounded-md border transition-all font-medium sm:text-sm text-xs text-[#41463B] ${remedyExtras[remedyId]?.potencyType === type
-                        ? 'border-[#6C7463] border-2 outline-1 outline-[#6C7463] text-[#0B0C0A]'
+                      onClick={() => handlePotencyType(primaryRemedyId, type)}
+                      className={`px-4 py-2 sm:rounded-lg rounded-md border transition-all font-medium sm:text-sm text-xs text-[#41463B] ${remedyExtras[primaryRemedyId]?.potencyType === type
+                        ? 'border-[#6C7463] border-2 text-[#0B0C0A]'
                         : 'border-[#B5B6B1] text-[#41463B]'
                         }`}
                     >
                       {type}
-                      {remedyExtras[remedyId]?.potencyType === type && (
+                      {remedyExtras[primaryRemedyId]?.potencyType === type && (
                         <span className="ml-2 inline-flex">
                           <svg xmlns="http://www.w3.org/2000/svg" width="15" height="11" viewBox="0 0 15 11" fill="none">
                             <path d="M5.30333 7.66083L12.9633 0L14.1425 1.17833L5.30333 10.0175L0 4.71417L1.17833 3.53583L5.30333 7.66083Z" fill="#0B0C0A" />
@@ -436,7 +508,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
 
               {/* Potency for each remedy */}
               <div>
-                <p className="text-[#41463B] sm:text-base text-sm font-medium mb-3">
+                <p className="text-[#20231E] sm:text-xl text-sm font-medium mb-3">
                   What was the potency?
                 </p>
 
@@ -454,7 +526,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                           key={pot}
                           onClick={() => handleSpecificPotency(rem.id, pot)}
                           className={`px-[12px] py-[8px] rounded-lg border sm:text-sm text-xs font-medium ${remedyPotencies[rem.id] === pot
-                            ? 'border-[#0B0C0A] border-2 text-[#0B0C0A]'
+                            ? 'border-[#6C7463] border-2 text-[#0B0C0A]'
                             : 'border-[#D1D1CB] text-[#41463B]'
                             }`}
                         >
@@ -469,7 +541,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                       placeholder="Free text..."
                       value={remedyExtras[rem.id]?.notes || ''}
                       onChange={e => handleNotes(rem.id, e.target.value)}
-                      className="w-32 px-3 py-2 border border-[#D1D1CB] rounded-lg sm:text-sm text-xs text-[#0B0C0A] placeholder:text-[#9A9A96]"
+                      className="w-32 px-3 py-2 border-2 border-[#6C7463] rounded-[8px] sm:text-sm text-xs text-[#0B0C0A] placeholder:text-[#83857D]"
                     />
                   </div>
                 ))}
@@ -593,13 +665,13 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
           {/* Step 7: Additional Notes */}
           {step === 7 && (
             <div className="space-y-4 sm:space-y-6">
-              <p className="text-[#41463B] font-medium text-sm sm:text-base">Share details of your situation, what you did, and the outcome.</p>
+              <p className="text-[#41463B] font-medium text-sm sm:text-base mb-4">Share details of your situation, what you did, and the outcome.</p>
 
               <textarea
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 placeholder="Type your message..."
-                className="w-full sm:h-[328px] h-[200px] px-3 py-2 sm:px-4 sm:py-2 border-2 border-[#6C7463] rounded-lg sm:rounded-xl focus:border-[#6C7463] focus:outline-none resize-none text-black text-sm sm:text-base font-medium placeholder:text-[#9A9A96]"
+                className="w-full sm:h-[328px] h-[200px] px-3 py-2 sm:px-4 sm:py-2 border-2 border-[#6C7463] rounded-lg sm:rounded-xl focus:border-[#6C7463] focus:outline-none resize-none text-black text-sm sm:text-base font-medium placeholder:text-[#0B0C0A]"
                 rows={5}
                 autoFocus
               />
@@ -637,8 +709,8 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                 (step === 2 && formData.rating === 0) ||
                 (step === 3 &&
                   (
-                    !remedyExtras[remedyId]?.potencyType ||
-                    !remedyPotencies[remedyId]
+                    !remedyExtras[primaryRemedyId]?.potencyType ||
+                    !remedyPotencies[primaryRemedyId]
                   )
                 )
                 ||
@@ -646,7 +718,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                 (step === 5 && !formData.duration) ||
                 (step === 6 && !formData.effectiveness)
               }
-              className="px-5 py-2.5 h-[44px] min-w-[138px] rounded-full bg-[#6C7463] text-white disabled:bg-[#F1F2F0] disabled:text-[#2B2E28] disabled:cursor-not-allowed transition-all font-semibold text-sm sm:text-base cursor-pointer hover:bg-[#4B544A]"
+              className="px-5 py-2.5 h-[44px] min-w-[138px] rounded-full bg-[#F1F2F0] text-[#2B2E28] hover:text-white disabled:bg-[#F1F2F0] disabled:text-[#2B2E28] disabled:cursor-not-allowed transition-all font-semibold text-sm sm:text-base cursor-pointer hover:bg-[#4B544A]"
             >
               {loading
                 ? "Submitting..."
