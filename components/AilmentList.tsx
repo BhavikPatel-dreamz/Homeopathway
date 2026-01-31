@@ -62,6 +62,7 @@ export default function AilmentListPage({
 }: Partial<AilmentListPageProps>) {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(initialPage);
+  const [sortBy, setSortBy] = useState<string>(""); // "" | "az" | "most-reviewed"
 
   const filteredAilments = useMemo(() => {
     if (!searchQuery) return ailments;
@@ -70,16 +71,32 @@ export default function AilmentListPage({
     );
   }, [ailments, searchQuery]);
 
+  // Apply sorting to filtered ailments
+  const sortedAilments = useMemo(() => {
+    const arr = [...filteredAilments];
+    if (sortBy === "az") {
+      arr.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+    } else if (sortBy === "most-reviewed") {
+      arr.sort((a, b) => (b.remedies_count ?? 0) - (a.remedies_count ?? 0));
+    }
+    return arr;
+  }, [filteredAilments, sortBy]);
+
   // Calculate pagination
-  const totalPages = Math.ceil(filteredAilments.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(sortedAilments.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const paginatedAilments = filteredAilments.slice(startIndex, endIndex);
+  const paginatedAilments = sortedAilments.slice(startIndex, endIndex);
 
   // Reset to page 1 when search query changes
   React.useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery]);
+
+  // Reset to page 1 when sort changes
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [sortBy]);
 
   const goToPage = (page: number) => {
     setCurrentPage(page);
@@ -153,8 +170,19 @@ export default function AilmentListPage({
             </p>
           </div>
 
-
-
+          {/* Sort control */}
+          <div className="mb-6 flex items-center gap-3 justify-end">
+            <label className="text-sm text-gray-700">Sort:</label>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="px-3 py-1 border border-gray-300 rounded-md bg-white text-gray-700"
+            >
+              <option value="">Default</option>
+              <option value="az">A - Z</option>
+              <option value="most-reviewed">Most Reviewed</option>
+            </select>
+          </div>
 
           {/* Ailments Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-6 gap-3">

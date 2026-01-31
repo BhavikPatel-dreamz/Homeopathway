@@ -186,7 +186,7 @@ export default function RemedyMultiSelect({
               key={r.id}
               className="
                 flex items-center gap-1
-                px-3 py-1.5
+                px-2 py-1
                 rounded-[4px]
                 bg-[#F5F3ED]
                 font-medium

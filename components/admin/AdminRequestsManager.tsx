@@ -33,7 +33,7 @@ export default function AdminRequestsManager() {
     type: "success" | "error" | "info";
     text: string;
   } | null>(null);
-  const [filter, setFilter] = useState<'all' | 'pending' | 'ailment' | 'remedy'>('pending');
+  const [filter, setFilter] = useState<'all' | 'pending' | 'ailment' | 'remedy'>('all');
   const [editingRequest, setEditingRequest] = useState<EditingRequest | null>(null);
 
   useEffect(() => {
@@ -54,20 +54,32 @@ export default function AdminRequestsManager() {
         setLoading(true);
 
         // Fetch from ailments table
-        const { data: ailmentRequests, error: ailmentsError } = await supabase
+        let ailmentsQuery = supabase
           .from('ailments')
           .select('id, requested_by_user_id, name, icon, slug, description, status, created_at, is_user_submission')
           .eq('is_user_submission', true)
           .order('created_at', { ascending: false });
 
+        if (filter !== 'all') {
+          ailmentsQuery = ailmentsQuery.eq('status', filter);
+        }
+
+        const { data: ailmentRequests, error: ailmentsError } = await ailmentsQuery;
+
         if (ailmentsError) throw ailmentsError;
 
         // Fetch from remedies table
-        const { data: remedyRequests, error: remediesError } = await supabase
+        let remediesQuery = supabase
           .from('remedies')
           .select('id, requested_by_user_id, name, icon, slug, description, status, created_at, is_user_submission, key_symptoms')
           .eq('is_user_submission', true)
           .order('created_at', { ascending: false });
+
+        if (filter !== 'all') {
+          remediesQuery = remediesQuery.eq('status', filter);
+        }
+
+        const { data: remedyRequests, error: remediesError } = await remediesQuery;
 
         if (remediesError) throw remediesError;
 
@@ -87,30 +99,12 @@ export default function AdminRequestsManager() {
         // Fetch user emails for each request
         const requestsWithEmails = await Promise.all(
           allRequests.map(async (req) => {
-            let userEmail = 'Unknown';
-            
-            if (req.requested_by_user_id) {
-              try {
-                // Try to get email from profiles table
-                const { data: userData, error: profileError } = await supabase
-                  .from('profiles')
-                  .select('email')
-                  .eq('id', req.requested_by_user_id)
-                  .single();
-                
-                if (userData?.email) {
-                  userEmail = userData.email;
-                } else if (!profileError) {
-                  // Profile exists but no email, try auth
-                  const { data: authData } = await supabase.auth.admin.getUserById(req.requested_by_user_id);
-                  userEmail = authData?.user?.email || 'Unknown';
-                }
-              } catch (error) {
-                console.error('Error fetching user email:', error);
-              }
-            }
-            
-            return { ...req, user_email: userEmail };
+            const { data: userData } = await supabase
+              .from('profiles')
+              .select('email')
+              .eq('id', req.requested_by_user_id)
+              .single();
+            return { ...req, user_email: userData?.email || 'Unknown' };
           })
         );
 
@@ -285,6 +279,8 @@ export default function AdminRequestsManager() {
 
   const filteredRequests = filter === 'all' 
     ? requests 
+    : filter === 'pending'
+    ? requests.filter(r => r.status === 'pending')
     : requests.filter(r => r.type === filter);
 
   return (
@@ -392,7 +388,7 @@ export default function AdminRequestsManager() {
 
                 {/* Actions */}
                 <div className="flex gap-2">
-                  {(request.status === 'pending' || request.status === 'approved') && (
+                  {request.status === 'pending' && (
                     <>
                       {/* <button
                         onClick={() => handleApprove(request)}

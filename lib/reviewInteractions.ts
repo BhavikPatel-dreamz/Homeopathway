@@ -138,7 +138,8 @@ export async function addReviewComment(reviewId: string, content: string, parent
       return { success: false, error: 'User not authenticated' };
     }
 
-    const { data: comment, error: insertError } = await supabase
+    // Insert the comment (avoid using PostgREST join in .select which may fail if FK is missing)
+    const { data: inserted, error: insertError } = await supabase
       .from('review_comments')
       .insert([{
         review_id: reviewId,
@@ -146,37 +147,94 @@ export async function addReviewComment(reviewId: string, content: string, parent
         parent_comment_id: parentCommentId || null,
         content: content.trim()
       }])
-      .select(`
-        *,
-        profiles:user_id (
-          first_name,
-          last_name,
-          user_name,
-          profile_img
-        )
-      `)
+      .select('id, review_id, user_id, parent_comment_id, content, created_at, updated_at')
       .single();
 
     if (insertError) throw insertError;
 
-    return { success: true, comment: comment as ReviewComment };
+    // Fetch the user's profile to attach display fields
+    let profile = null;
+    try {
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('first_name, last_name, user_name, profile_img')
+        .eq('id', user.id)
+        .single();
+      if (!profileError) profile = profileData;
+    } catch (e) {
+      // ignore profile fetch errors, comment will still be returned
+      console.error('Error fetching profile for comment:', e);
+    }
+
+    const comment: ReviewComment = {
+      id: inserted.id,
+      review_id: inserted.review_id,
+      user_id: inserted.user_id,
+      parent_comment_id: inserted.parent_comment_id || null,
+      content: inserted.content,
+      created_at: inserted.created_at,
+      updated_at: inserted.updated_at,
+      user_first_name: profile?.first_name,
+      user_last_name: profile?.last_name,
+      user_name: profile?.user_name,
+      user_profile_img: profile?.profile_img,
+    };
+
+    return { success: true, comment };
   } catch (error: any) {
     console.error('Error adding review comment:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: error.message || String(error) };
   }
 }
 
 export async function getReviewComments(reviewId: string): Promise<{ success: boolean; comments?: ReviewComment[]; error?: string }> {
   try {
-    const { data: comments, error } = await supabase
-      .rpc('get_review_comments_with_profiles', { review_id: reviewId });
+    // Try RPC first (server-side optimized path)
+    const { data: rpcComments, error: rpcError } = await supabase.rpc('get_review_comments_with_profiles', { review_id: reviewId });
 
-    if (error) throw error;
+    if (!rpcError && rpcComments) {
+      return { success: true, comments: rpcComments };
+    }
 
-    return { success: true, comments: comments || [] };
+    if (rpcError) {
+      console.warn('RPC get_review_comments_with_profiles failed, falling back to client-side join:', rpcError);
+    }
+
+    // Fallback: fetch comments and their profiles manually
+    const { data: comments, error: commentsError } = await supabase
+      .from('review_comments')
+      .select('id, review_id, user_id, parent_comment_id, content, created_at, updated_at')
+      .eq('review_id', reviewId)
+      .order('created_at', { ascending: true });
+
+    if (commentsError) throw commentsError;
+
+    const userIds = Array.from(new Set((comments || []).map((c: any) => c.user_id).filter(Boolean)));
+
+    let profilesMap: Record<string, any> = {};
+    if (userIds.length > 0) {
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, user_name, profile_img')
+        .in('id', userIds as string[]);
+
+      if (!profilesError && profiles) {
+        profilesMap = Object.fromEntries((profiles as any[]).map(p => [p.id, p]));
+      }
+    }
+
+    const enriched = (comments || []).map((c: any) => ({
+      ...c,
+      user_first_name: profilesMap[c.user_id]?.first_name,
+      user_last_name: profilesMap[c.user_id]?.last_name,
+      user_name: profilesMap[c.user_id]?.user_name,
+      user_profile_img: profilesMap[c.user_id]?.profile_img,
+    })) as ReviewComment[];
+
+    return { success: true, comments: enriched };
   } catch (error: any) {
     console.error('Error getting review comments:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: error.message || String(error) };
   }
 }
 

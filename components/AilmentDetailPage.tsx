@@ -1,8 +1,11 @@
+"use client" 
 import Footer from "@/components/Footer";
 import Header from "./Header";
 import Breadcrumb from "./Breadcrumb";
 import TopRemedies from "./TopRemedies";
 import Image from "next/image";
+import { useState } from "react";
+import AddReviewForm from "./AddReviewForm";
 
 interface Remedy {
   id: string;
@@ -32,6 +35,7 @@ interface AilmentDetailPageProps {
 }
 
 export default function AilmentDetailPage({ ailment, remedies }: AilmentDetailPageProps) {
+  const [showAddReviewForm, setShowAddReviewForm] = useState(false);
   const breadcrumbItems = [
     { label: "Home", href: "/" },
     // { label: "Ailments", href: "/ailments" },
@@ -70,9 +74,10 @@ export default function AilmentDetailPage({ ailment, remedies }: AilmentDetailPa
         {/* Action Row */}
         <div className="flex justify-end mb-4 lg:mb-10">
           <button
+            onClick={() => setShowAddReviewForm(true)}
             className="text-montserrat px-5 py-[9px] border border-[#6C7463] text-[#2B2E28] rounded-full font-semibold text-base leading-[24px] cursor-pointer transition-all duration-500 hover:bg-gray-300 hover:text-black hover:border-black"
           >
-            Link an existing remedy
+            Review a Remedy
           </button>
         </div>
 
@@ -80,7 +85,15 @@ export default function AilmentDetailPage({ ailment, remedies }: AilmentDetailPa
         {/* Top Remedies Section */}
         <TopRemedies remedies={remedies} ailmentSlug={ailment.slug} />
       </main>
-
+      {showAddReviewForm && (
+        <AddReviewForm
+          onClose={() => setShowAddReviewForm(false)}
+          remedyId={remedies?.[0]?.id || ""}
+          remedyName={remedies?.[0]?.name || ""}
+          condition={ailment.name}
+          ailmentId={ailment.id}
+        />
+      )}
 
     </div>
   );

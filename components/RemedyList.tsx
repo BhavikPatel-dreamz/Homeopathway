@@ -20,6 +20,7 @@ export default function RemedyListPage({
 }: Partial<RemedyListPageProps>) {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(initialPage);
+  const [sortBy, setSortBy] = useState<string>(""); // "" | "az" | "most-reviewed"
 
   const filteredRemedies = useMemo(() => {
     if (!searchQuery) return initialRemedies;
@@ -28,16 +29,36 @@ export default function RemedyListPage({
     );
   }, [initialRemedies, searchQuery]);
 
+  // Apply sorting on the filtered results
+  const sortedRemedies = useMemo(() => {
+    const arr = [...filteredRemedies];
+    if (sortBy === "az") {
+      arr.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+    } else if (sortBy === "most-reviewed") {
+      arr.sort((a, b) => {
+        const ra = Number(a.reviewCount ?? a.review_count ?? 0);
+        const rb = Number(b.reviewCount ?? b.review_count ?? 0);
+        return rb - ra;
+      });
+    }
+    return arr;
+  }, [filteredRemedies, sortBy]);
+
   // Calculate pagination
-  const totalPages = Math.ceil(filteredRemedies.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(sortedRemedies.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const paginatedRemedies = filteredRemedies.slice(startIndex, endIndex);
+  const paginatedRemedies = sortedRemedies.slice(startIndex, endIndex);
 
   // Reset to page 1 when search query changes
   React.useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery]);
+
+  // Reset to page 1 when sort changes
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [sortBy]);
 
   const goToPage = (page: number) => {
     setCurrentPage(page);
@@ -130,6 +151,45 @@ export default function RemedyListPage({
               Showing {startIndex + 1}-{Math.min(endIndex, filteredRemedies.length)} of {filteredRemedies.length} remedies
             </div>
           )}
+
+          {/* Sort control */}
+          <div className="mb-6 flex items-center gap-3 justify-end">
+            <label className="text-base font-medium text-[#2B2E28]">Sort by:</label>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="text-[#2B2E28] text-base font-normal"
+            >
+              <option value="">Default</option>
+              <option value="az">A - Z</option>
+              <option value="most-reviewed">Most Reviewed</option>
+            </select>
+          </div>
+
+           {/* Sort By */}
+            {/* <div className="flex items-center justify-end gap-2 w-full sm:w-auto mt-2 sm:mt-0 justify-center relative" ref={dropdownRef}>
+              <span className="sm:font-semibold font-regular text-[#2B2E28] text-base leading-[24px]  whitespace-nowrap text-montserrat">Sort by:</span>
+              <button
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="appearance-none sm:pl-1 pr-5 py-2 text-base leading-[24px] min-w-[130px] text-[#20231E] font-medium focus:outline-none" >
+                {sortOptions.find((opt) => opt.value === sortBy)?.label}
+                <ChevronDown className={`absolute right-0 sm:right-0 top-1/2 -translate-y-1/2 w-4 h-4 text-[#20231E] pointer-events-none transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              {isDropdownOpen && (
+                <div className="absolute z-10 top-full left-0  bg-white border border-gray-300 rounded-md shadow-lg">
+                  {sortOptions.map((opt) => (
+                    <button
+                      key={opt.value}
+                      onClick={() => { setSortBy(opt.value); setIsDropdownOpen(false); }}
+                      className={`px-3 py-2 w-full text-sm text-start hover:bg-[#6c74631f] font-medium hover:text-[#6C7463] transition ${sortBy === opt.value ? "bg-[#6c74631f] text-[#6C7463] font-semibold" : "text-gray-700"}`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div> */}
 
           {/* Remedies Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-6 gap-3">
