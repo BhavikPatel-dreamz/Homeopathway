@@ -465,7 +465,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
               <p className="font-montserrat font-medium sm:text-[20px] text-[16px] leading-[28px] text-[#4B544A]">
                 Select Remedy:
 
-                <span className="inline-block ml-2 relative">
+                <span className="inline-block ml-2 relative w-[50%]">
                   <div ref={remedyDropdownRef} className="relative max-w-[300px] inline-block">
                     {/* Button (selected value) */}
                     <button
@@ -485,14 +485,14 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
 
                     {/* Dropdown List */}
                     {isRemedyOpen && (
-                      <ul className="absolute z-20 mt-1 left-0 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-auto">
+                      <ul className="absolute z-20 mt-1 left-0 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-auto w-[250px]">
 
                         {/* Keep current primary remedy if it's not in list */}
                         {primaryRemedyId &&
                           !remediesList.find(r => r.id === primaryRemedyId) && (
                             <li
                               onClick={() => setIsRemedyOpen(false)}
-                              className="px-3 py-2 text-sm cursor-pointer hover:bg-[#6c746333]"
+                              className="px-3 py-2 text-sm cursor-pointer hover:bg-[#6c746333] whitespace-nowrap"
                             >
                               {primaryRemedyName}
                             </li>
@@ -514,7 +514,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
 
                               setIsRemedyOpen(false);
                             }}
-                            className={`px-3 py-2 text-sm cursor-pointer transition-colors ${primaryRemedyId === r.id
+                            className={`px-3 py-2 text-sm cursor-pointer transition-colors whitespace-nowrap ${primaryRemedyId === r.id
                               ? "bg-[#6C7463] text-white font-medium"
                               : "text-gray-700 hover:bg-[#6c746333]"
                               }`}
