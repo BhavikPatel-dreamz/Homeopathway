@@ -462,8 +462,8 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
 
               {/* Line 1 */}
               {/* Line 1 */}
-              <p className="font-montserrat font-medium sm:text-[20px] text-[16px] leading-[28px] text-[#4B544A]">
-                Select Remedy:
+              <div className="font-montserrat font-medium sm:text-[20px] text-[16px] leading-[28px] text-[#4B544A]">
+                <div className="inline-block">Select Remedy:</div>
 
                 <span className="inline-block ml-2 relative w-[50%]">
                   <div ref={remedyDropdownRef} className="relative max-w-[300px] inline-block">
@@ -526,7 +526,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                     )}
                   </div>
                 </span>
-              </p>
+              </div>
 
 
               {/* Line 2 */}
