@@ -35,10 +35,12 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
   const [ailmentQuery, setAilmentQuery] = useState<string>('');
   const [ailmentActiveIndex, setAilmentActiveIndex] = useState<number>(-1);
   const ailmentInputRef = useRef<HTMLInputElement | null>(null);
+  const remedyDropdownRef = useRef<HTMLDivElement | null>(null);
   const [showRequestAilmentModal, setShowRequestAilmentModal] = useState(false);
   const [showRequestRemedyModal, setShowRequestRemedyModal] = useState(false);
   const [ailmentsLoading, setAilmentsLoading] = useState(true);
   const [remediesList, setRemediesList] = useState<{ id: string; name: string }[]>([]);
+  const [isRemedyOpen, setIsRemedyOpen] = useState(false);
 
   // Allow selecting primary remedy instead of forcing the incoming prop
   const [primaryRemedyId, setPrimaryRemedyId] = useState<string>(remedyId);
@@ -459,37 +461,77 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
             <div className="space-y-2">
 
               {/* Line 1 */}
+              {/* Line 1 */}
               <p className="font-montserrat font-medium sm:text-[20px] text-[16px] leading-[28px] text-[#4B544A]">
                 Select Remedy:
-                <span className="font-montserrat font-medium sm:text-[16px] text-[14px] leading-[24px] text-[#41463B] mb-3">
-                  <select
-                    value={primaryRemedyId}
-                    onChange={(e) => {
-                      const id = e.target.value;
-                      setPrimaryRemedyId(id);
-                      const found = remediesList.find(r => r.id === id);
-                      setPrimaryRemedyName(found ? found.name : '');
-                      // ensure default entries exist
-                      setRemedyPotencies(prev => ({ ...prev, [id]: prev[id] ?? '' }));
-                      setRemedyExtras(prev => ({ ...prev, [id]: prev[id] ?? { potencyType: '', notes: '' } }));
-                    }}
-                    className="ml-2 px-2 py-1 rounded text-[#41463B]"
-                  >
-                    {/* Keep current primary remedy as first option if it's not in the list */}
-                    {primaryRemedyId && !remediesList.find(r => r.id === primaryRemedyId) && (
-                      <option value={primaryRemedyId}>{primaryRemedyName}</option>
-                    )}
-                    {remediesList.map(r => (
-                      <option key={r.id} value={r.id}>{r.name}</option>
-                    ))}
-                  </select>
-                </span>
 
+                <span className="inline-block ml-2 relative">
+                  <div ref={remedyDropdownRef} className="relative max-w-[300px] inline-block">
+                    {/* Button (selected value) */}
+                    <button
+                      type="button"
+                      onClick={() => setIsRemedyOpen(prev => !prev)}
+                      className="w-full flex items-center justify-between text-[#41463B] bg-white gap-3"
+                    >
+                      <span className="truncate">
+                        {primaryRemedyName || "Belladonna"}
+                      </span>
+
+                      <svg className={`h-3 w-3 transition-transform ${isRemedyOpen ? "rotate-180" : "rotate-0"}`} width="11" height="7" viewBox="0 0 11 7" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5.30333 4.125L9.42833 0L10.6067 1.17833L5.30333 6.48167L0 1.17833L1.17833 0L5.30333 4.125Z" fill="#20231E" />
+                      </svg>
+
+                    </button>
+
+                    {/* Dropdown List */}
+                    {isRemedyOpen && (
+                      <ul className="absolute z-20 mt-1 left-0 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-auto">
+
+                        {/* Keep current primary remedy if it's not in list */}
+                        {primaryRemedyId &&
+                          !remediesList.find(r => r.id === primaryRemedyId) && (
+                            <li
+                              onClick={() => setIsRemedyOpen(false)}
+                              className="px-3 py-2 text-sm cursor-pointer hover:bg-[#6c746333]"
+                            >
+                              {primaryRemedyName}
+                            </li>
+                          )}
+
+                        {remediesList.map(r => (
+                          <li
+                            key={r.id}
+                            onClick={() => {
+                              setPrimaryRemedyId(r.id);
+                              setPrimaryRemedyName(r.name);
+
+                              // same logic as tamara select ma hati
+                              setRemedyPotencies(prev => ({ ...prev, [r.id]: prev[r.id] ?? '' }));
+                              setRemedyExtras(prev => ({
+                                ...prev,
+                                [r.id]: prev[r.id] ?? { potencyType: '', notes: '' }
+                              }));
+
+                              setIsRemedyOpen(false);
+                            }}
+                            className={`px-3 py-2 text-sm cursor-pointer transition-colors ${primaryRemedyId === r.id
+                              ? "bg-[#6C7463] text-white font-medium"
+                              : "text-gray-700 hover:bg-[#6c746333]"
+                              }`}
+                          >
+                            {r.name}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </span>
               </p>
+
 
               {/* Line 2 */}
               <p className="font-montserrat font-medium text-[16px] leading-[24px] text-[#41463B] flex items-center gap-1">
-                Select multiple if used in combination 
+                Select multiple if used in combination
                 <span className="font-montserrat font-normal text-[12px] leading-[20px] text-[#41463B]">
                   (optional)
                 </span>

@@ -148,9 +148,9 @@ export default function TopRemedies({
                       <li
                         key={option}
                         onClick={() => handleSelect(option)}
-                        className={`px-3 py-2 text-sm cursor-pointer hover:bg-blue-100 hover:text-blue-700 transition-colors ${sortBy === option
-                            ? "bg-blue-100 text-blue-700 font-medium"
-                            : "text-gray-700"
+                        className={`px-3 py-2 text-sm cursor-pointertransition-colors ${sortBy === option
+                          ? "bg-[#6C7463] text-white font-medium hover:bg-[#6C7463] hover:text-white"
+                          : "text-gray-700 hover:bg-[#6c746333] hover:text-black "
                           }`}
                       >
                         {option}
@@ -206,7 +206,7 @@ export default function TopRemedies({
                         ? remedy.rating.toFixed(1)
                         : "N/A"}{" "}
                       ({remedy.reviewCount}{" "}
-                      {remedy.reviewCount === 1 ? "review" : "reviews"} for {ailmentSlug}) 
+                      {remedy.reviewCount === 1 ? "review" : "reviews"} for {ailmentSlug})
                     </span>
                   </div>
                   {/* Description */}
