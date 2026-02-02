@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo, ReactNode } from 'react';
+import React, { useState, useMemo, ReactNode, useRef } from 'react';
 import Link from 'next/link';
 import { Remedy } from "@/types";
 import Breadcrumb from "./Breadcrumb";
@@ -21,6 +21,9 @@ export default function RemedyListPage({
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [sortBy, setSortBy] = useState<string>(""); // "" | "az" | "most-reviewed"
+  const [isSortOpen, setIsSortOpen] = useState(false);
+  const sortDropdownRef = useRef<HTMLDivElement | null>(null);
+
 
   const filteredRemedies = useMemo(() => {
     if (!searchQuery) return initialRemedies;
@@ -134,40 +137,87 @@ export default function RemedyListPage({
             </p>
           </div>
 
-          {/* Search Results Info */}
-          {searchQuery && (
-            <div className="mb-6 text-gray-600">
-              Found {filteredRemedies.length} remedy{filteredRemedies.length !== 1 ? 's' : ''} matching &quot;{searchQuery}&quot;
-              {filteredRemedies.length > ITEMS_PER_PAGE && (
-                <span className="ml-2">
-                  (Showing {startIndex + 1}-{Math.min(endIndex, filteredRemedies.length)})
-                </span>
-              )}
-            </div>
-          )}
+          <div className='flex items-center justify-between'>
+            {/* Search Results Info */}
+            {searchQuery && (
+              <div className="mb-6 text-gray-600">
+                Found {filteredRemedies.length} remedy{filteredRemedies.length !== 1 ? 's' : ''} matching &quot;{searchQuery}&quot;
+                {filteredRemedies.length > ITEMS_PER_PAGE && (
+                  <span className="ml-2">
+                    (Showing {startIndex + 1}-{Math.min(endIndex, filteredRemedies.length)})
+                  </span>
+                )}
+              </div>
+            )}
 
-          {!searchQuery && filteredRemedies.length > ITEMS_PER_PAGE && (
-            <div className="mb-6 text-gray-600">
-              Showing {startIndex + 1}-{Math.min(endIndex, filteredRemedies.length)} of {filteredRemedies.length} remedies
-            </div>
-          )}
+            {!searchQuery && filteredRemedies.length > ITEMS_PER_PAGE && (
+              <div className="mb-6 text-gray-600">
+                Showing {startIndex + 1}-{Math.min(endIndex, filteredRemedies.length)} of {filteredRemedies.length} remedies
+              </div>
+            )}
 
-          {/* Sort control */}
-          <div className="mb-6 flex items-center gap-3 justify-end">
-            <label className="text-base font-medium text-[#2B2E28]">Sort by:</label>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="text-[#2B2E28] text-base font-normal"
-            >
-              <option value="">Default</option>
-              <option value="az">A - Z</option>
-              <option value="most-reviewed">Most Reviewed</option>
-            </select>
+            {/* Sort control */}
+            {/* Sort control */}
+            <div className="mb-6 flex items-center gap-3 justify-end">
+              <label className="text-base font-medium text-[#2B2E28]">Sort by:</label>
+
+              <div ref={sortDropdownRef} className="relative">
+                {/* Button */}
+                <button
+                  type="button"
+                  onClick={() => setIsSortOpen(prev => !prev)}
+                  className="flex items-center gap-1 text-[#2B2E28] text-base font-normal"
+                >
+                  <span>
+                    {sortBy === "az"
+                      ? "A - Z"
+                      : sortBy === "most-reviewed"
+                        ? "Most Reviewed"
+                        : "Default"}
+                  </span>
+
+                  <svg
+                    className={`h-4 w-4 transition-transform ${isSortOpen ? "rotate-180" : "rotate-0"}`}
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                  </svg>
+                </button>
+
+                {/* Dropdown */}
+                {isSortOpen && (
+                  <ul className="absolute right-0 mt-1 w-[160px] bg-white border border-gray-300 rounded-md shadow-lg z-20 overflow-hidden">
+                    {[
+                      { label: "Default", value: "" },
+                      { label: "A - Z", value: "az" },
+                      { label: "Most Reviewed", value: "most-reviewed" }
+                    ].map(opt => (
+                      <li
+                        key={opt.value}
+                        onClick={() => {
+                          setSortBy(opt.value);
+                          setIsSortOpen(false);
+                        }}
+                        className={`px-3 py-2 text-sm cursor-pointer transition-colors ${sortBy === opt.value
+                          ? "bg-[#6C7463] text-white font-medium"
+                          : "text-gray-700 hover:bg-[#6c746333]"
+                          }`}
+                      >
+                        {opt.label}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+
           </div>
 
-           {/* Sort By */}
-            {/* <div className="flex items-center justify-end gap-2 w-full sm:w-auto mt-2 sm:mt-0 justify-center relative" ref={dropdownRef}>
+
+          {/* Sort By */}
+          {/* <div className="flex items-center justify-end gap-2 w-full sm:w-auto mt-2 sm:mt-0 justify-center relative" ref={dropdownRef}>
               <span className="sm:font-semibold font-regular text-[#2B2E28] text-base leading-[24px]  whitespace-nowrap text-montserrat">Sort by:</span>
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}

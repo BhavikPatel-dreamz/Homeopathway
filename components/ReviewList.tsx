@@ -419,12 +419,12 @@ export default function ReviewListPage({
                 </button>
 
                 {isDropdownOpen && (
-                  <div className="absolute z-10 top-full left-0  bg-white border border-gray-300 rounded-md shadow-lg">
+                  <div className="absolute z-10 top-full left-0  bg-white border border-gray-300 rounded-md shadow-lg overflow-hidden">
                     {sortOptions.map((opt) => (
                       <button
                         key={opt.value}
                         onClick={() => { setSortBy(opt.value); setIsDropdownOpen(false); }}
-                        className={`px-3 py-2 w-full text-sm text-start hover:bg-[#6c74631f] font-medium hover:text-[#6C7463] transition ${sortBy === opt.value ? "bg-[#6c74631f] text-[#6C7463] font-semibold" : "text-gray-700"}`}
+                        className={`px-3 py-2 w-full text-sm text-start transition ${sortBy === opt.value ? "bg-[#6C7463] text-white font-medium" : "text-gray-700 hover:bg-[#6c74631f] font-medium hover:text-[#6C7463]"}`}
                       >
                         {opt.label}
                       </button>
