@@ -3,7 +3,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { X } from 'lucide-react';
+import { X, Search } from 'lucide-react';
+import { useRef } from 'react';
 import { getCurrentUser } from '@/lib/auth';
 import Image from 'next/image';
 import RemedyMultiSelect from './RemedyMultiSelect';
@@ -31,6 +32,9 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [ailments, setAilments] = useState<Ailment[]>([]);
   const [selectedAilment, setSelectedAilment] = useState<string>(ailmentId || '');
+  const [ailmentQuery, setAilmentQuery] = useState<string>('');
+  const [ailmentActiveIndex, setAilmentActiveIndex] = useState<number>(-1);
+  const ailmentInputRef = useRef<HTMLInputElement | null>(null);
   const [showRequestAilmentModal, setShowRequestAilmentModal] = useState(false);
   const [showRequestRemedyModal, setShowRequestRemedyModal] = useState(false);
   const [ailmentsLoading, setAilmentsLoading] = useState(true);
@@ -366,19 +370,77 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
               <p className="font-montserrat font-medium text-[14px] leading-[24px] text-[#20231E] mb-2">
                 Select Ailment
               </p>
-              <select
-                value={selectedAilment}
-                onChange={(e) => setSelectedAilment(e.target.value)}
-                disabled={ailmentsLoading}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2C3E3E] text-[#0B0C0A] bg-white"
-              >
-                <option value="">Choose an ailment...</option>
-                {ailments.map((ailment) => (
-                  <option key={ailment.id} value={ailment.id}>
-                    {ailment.icon} {ailment.name}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <Search className="absolute left-3 top-3 w-5 h-5 text-[#9A9A96] pointer-events-none z-10" />
+
+                <input
+                  ref={ailmentInputRef}
+                  value={ailmentQuery}
+                  onChange={(e) => {
+                    setAilmentQuery(e.target.value);
+                    setAilmentActiveIndex(-1);
+                  }}
+                  onKeyDown={(e) => {
+                    const filtered = ailmentQuery.trim().length === 0
+                      ? []
+                      : ailments.filter(a => a.name.toLowerCase().includes(ailmentQuery.toLowerCase()));
+
+                    if (!filtered.length) return;
+                    if (e.key === 'ArrowDown') {
+                      e.preventDefault();
+                      setAilmentActiveIndex(prev => (prev < filtered.length - 1 ? prev + 1 : 0));
+                    }
+                    if (e.key === 'ArrowUp') {
+                      e.preventDefault();
+                      setAilmentActiveIndex(prev => (prev > 0 ? prev - 1 : filtered.length - 1));
+                    }
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      const pick = filtered[ailmentActiveIndex >= 0 ? ailmentActiveIndex : 0];
+                      if (pick) {
+                        setSelectedAilment(pick.id);
+                        setAilmentQuery('');
+                      }
+                    }
+                  }}
+                  placeholder={ailmentsLoading ? 'Loading ailments...' : 'Search ailments...'}
+                  disabled={ailmentsLoading}
+                  className="w-full h-[44px] rounded-[8px] border-2 border-[#F8F6F2] pl-10 pr-4 text-[14px] text-[#41463B] font-medium placeholder:text-[#9A9A96] focus:outline-none focus:border-[#6C7463]"
+                />
+
+                {/* Dropdown */}
+                {ailmentQuery && (
+                  <div className="border border-[#E6E6E3] rounded-[12px] bg-white shadow-[0px_0px_12px_-4px_rgba(26,26,26,0.16)] overflow-hidden mt-2">
+                    <div className="max-h-[120px] overflow-y-auto pl-1 pr-4 py-1 scrollbar">
+                      {!ailmentsLoading && ailments.filter(a => a.name.toLowerCase().includes(ailmentQuery.toLowerCase())).length === 0 && (
+                        <p className="text-sm text-center py-3 text-[#8E8E8A]">No ailments found</p>
+                      )}
+
+                      {ailments.filter(a => a.name.toLowerCase().includes(ailmentQuery.toLowerCase())).map((a, idx) => (
+                        <button
+                          key={a.id}
+                          type="button"
+                          onClick={() => { setSelectedAilment(a.id); setAilmentQuery(''); }}
+                          className={`w-full flex items-center gap-3 px-2 py-1 rounded-[8px] text-left transition ${idx === ailmentActiveIndex ? 'bg-[#F3F4F0] border border-[#6C7463]' : 'hover:bg-[#F7F7F5]'}`}
+                        >
+                          <span className="w-[24px] h-[24px] bg-[#F9F7F2] rounded-[45px] flex items-center justify-center text-[16px]">{a.icon || '🌿'}</span>
+                          <span className="flex-1 font-medium text-[16px] leading-[24px] text-[#0B0C0A]">{a.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Selected chip */}
+                {selectedAilment && (
+                  <div className="mt-3">
+                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-[4px] bg-[#F5F3ED] font-medium text-[14px] text-[#41463B]">
+                      {ailments.find(a => a.id === selectedAilment)?.name || 'Selected'}
+                      <button type="button" onClick={() => setSelectedAilment('')} className="text-[#8E8E8A] hover:text-[#0B0C0A]">×</button>
+                    </span>
+                  </div>
+                )}
+              </div>
               <p className="text-sm text-[#41463B] font-normal text-center gap-2">
                 Can&apos;t find what you&apos;re looking for?{" "}
                 <button
