@@ -46,7 +46,7 @@ export default function ContactUsSection() {
               <div className="text-[14px] text-[#41463B] space-y-2"> {/* space-y-2 for spacing between email lines */}
                 <p className="leading-5"> 
                   <span className="font-medium text-[#0B0C0A]">Email:</span>{' '}
-                  support@homeopathway.com
+                  hello@homeopathway.com
                 </p>
                 <p className="leading-5"> 
                   <span className="font-medium text-[#0B0C0A]">

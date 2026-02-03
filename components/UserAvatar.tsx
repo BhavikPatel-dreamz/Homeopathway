@@ -35,6 +35,7 @@ export default function UserAvatar({ className = "" }: UserAvatarProps) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [showDropdown, setShowDropdown] = useState(false);
+  const pathname = usePathname();
 
   // Helper function to check if cache is valid
   const isCacheValid = (timestamp: number): boolean => {
@@ -158,9 +159,6 @@ export default function UserAvatar({ className = "" }: UserAvatarProps) {
 
   if (!user || !profile) {
     // Guest user - show a generic icon
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const pathname = usePathname();
-    
     const isHome = pathname === "/";
     const borderColor = isHome ? "#fff" : "#20231E";
     const textColor = isHome ? "#fff" : "#20231E";

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { Ailment } from "@/types";
 import Breadcrumb from "./Breadcrumb";
@@ -63,6 +63,9 @@ export default function AilmentListPage({
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [sortBy, setSortBy] = useState<string>(""); // "" | "az" | "most-reviewed"
+  const [isSortOpen, setIsSortOpen] = useState(false);
+  const sortDropdownRef = useRef<HTMLDivElement | null>(null);
+
 
   const filteredAilments = useMemo(() => {
     if (!searchQuery) return ailments;
@@ -172,17 +175,60 @@ export default function AilmentListPage({
 
           {/* Sort control */}
           <div className="mb-6 flex items-center gap-3 justify-end">
-            <label className="text-sm text-gray-700">Sort:</label>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="px-3 py-1 border border-gray-300 rounded-md bg-white text-gray-700"
-            >
-              <option value="">Default</option>
-              <option value="az">A - Z</option>
-              <option value="most-reviewed">Most Reviewed</option>
-            </select>
+            <label className="text-base font-medium text-[#2B2E28]">Sort by:</label>
+
+            <div ref={sortDropdownRef} className="relative">
+              {/* Button */}
+              <button
+                type="button"
+                onClick={() => setIsSortOpen(prev => !prev)}
+                className="flex items-center gap-1 text-[#2B2E28] text-base font-normal"
+              >
+                <span>
+                  {sortBy === "az"
+                    ? "A - Z"
+                    : sortBy === "most-reviewed"
+                      ? "Most Reviewed"
+                      : "Default"}
+                </span>
+
+                <svg
+                  className={`h-4 w-4 transition-transform ${isSortOpen ? "rotate-180" : "rotate-0"}`}
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                </svg>
+              </button>
+
+              {/* Dropdown Menu */}
+              {isSortOpen && (
+                <ul className="absolute right-0 mt-1 w-[160px] bg-white border border-gray-300 rounded-md shadow-lg z-20 overflow-hidden">
+                  {[
+                    { label: "Default", value: "" },
+                    { label: "A - Z", value: "az" },
+                    { label: "Most Reviewed", value: "most-reviewed" }
+                  ].map(opt => (
+                    <li
+                      key={opt.value}
+                      onClick={() => {
+                        setSortBy(opt.value);
+                        setIsSortOpen(false);
+                      }}
+                      className={`px-3 py-2 text-sm cursor-pointer transition-colors ${sortBy === opt.value
+                        ? "bg-[#6C7463] text-white font-medium"
+                        : "text-gray-700 hover:bg-[#6c746333]"
+                        }`}
+                    >
+                      {opt.label}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
+
 
           {/* Ailments Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-6 gap-3">

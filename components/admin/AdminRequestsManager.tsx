@@ -60,7 +60,8 @@ export default function AdminRequestsManager() {
           .eq('is_user_submission', true)
           .order('created_at', { ascending: false });
 
-        if (filter !== 'all') {
+        // Only filter by status when explicitly showing pending requests
+        if (filter === 'pending') {
           ailmentsQuery = ailmentsQuery.eq('status', filter);
         }
 
@@ -75,7 +76,8 @@ export default function AdminRequestsManager() {
           .eq('is_user_submission', true)
           .order('created_at', { ascending: false });
 
-        if (filter !== 'all') {
+        // Only filter by status when explicitly showing pending requests
+        if (filter === 'pending') {
           remediesQuery = remediesQuery.eq('status', filter);
         }
 
@@ -199,6 +201,30 @@ export default function AdminRequestsManager() {
     } catch (error) {
       console.error('Error declining request:', error);
       showToast('error', 'Failed to decline request');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDelete = async (requestId: string, type: 'ailment' | 'remedy') => {
+    try {
+      setActionLoading(requestId);
+
+      const tableName = type === 'ailment' ? 'ailments' : 'remedies';
+      const { error } = await supabase
+        .from(tableName)
+        .delete()
+        .eq('id', requestId);
+
+      if (error) throw error;
+
+      setRequests(requests.filter((r) => r.id !== requestId));
+      if (editingRequest?.id === requestId) setEditingRequest(null);
+
+      showToast('success', 'Request deleted');
+    } catch (error) {
+      console.error('Error deleting request:', error);
+      showToast('error', 'Failed to delete request');
     } finally {
       setActionLoading(null);
     }
@@ -388,31 +414,20 @@ export default function AdminRequestsManager() {
 
                 {/* Actions */}
                 <div className="flex gap-2">
-                  {request.status === 'pending' && (
-                    <>
-                      {/* <button
-                        onClick={() => handleApprove(request)}
-                        disabled={actionLoading === request.id}
-                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded transition-colors disabled:opacity-50"
-                      >
-                        {actionLoading === request.id ? 'Processing...' : 'Approve'}
-                      </button>
-                      <button
-                        onClick={() => handleDecline(request.id, request.type)}
-                        disabled={actionLoading === request.id}
-                        className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded transition-colors disabled:opacity-50"
-                      >
-                        Decline
-                      </button> */}
-                      <button
-                        onClick={() => handleEdit(request)}
-                        disabled={actionLoading === request.id}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded transition-colors disabled:opacity-50"
-                      >
-                        Edit
-                      </button>
-                    </>
-                  )}
+                  <button
+                    onClick={() => handleEdit(request)}
+                    disabled={actionLoading === request.id}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded transition-colors disabled:opacity-50"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(request.id, request.type)}
+                    disabled={actionLoading === request.id}
+                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded transition-colors disabled:opacity-50"
+                  >
+                    {actionLoading === request.id ? 'Processing...' : 'Delete'}
+                  </button>
                 </div>
               </div>
             </div>

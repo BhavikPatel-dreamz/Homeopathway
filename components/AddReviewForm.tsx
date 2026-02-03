@@ -3,7 +3,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { X } from 'lucide-react';
+import { X, Search } from 'lucide-react';
+import { useRef } from 'react';
 import { getCurrentUser } from '@/lib/auth';
 import Image from 'next/image';
 import RemedyMultiSelect from './RemedyMultiSelect';
@@ -31,10 +32,15 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [ailments, setAilments] = useState<Ailment[]>([]);
   const [selectedAilment, setSelectedAilment] = useState<string>(ailmentId || '');
+  const [ailmentQuery, setAilmentQuery] = useState<string>('');
+  const [ailmentActiveIndex, setAilmentActiveIndex] = useState<number>(-1);
+  const ailmentInputRef = useRef<HTMLInputElement | null>(null);
+  const remedyDropdownRef = useRef<HTMLDivElement | null>(null);
   const [showRequestAilmentModal, setShowRequestAilmentModal] = useState(false);
   const [showRequestRemedyModal, setShowRequestRemedyModal] = useState(false);
   const [ailmentsLoading, setAilmentsLoading] = useState(true);
   const [remediesList, setRemediesList] = useState<{ id: string; name: string }[]>([]);
+  const [isRemedyOpen, setIsRemedyOpen] = useState(false);
 
   // Allow selecting primary remedy instead of forcing the incoming prop
   const [primaryRemedyId, setPrimaryRemedyId] = useState<string>(remedyId);
@@ -366,19 +372,77 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
               <p className="font-montserrat font-medium text-[14px] leading-[24px] text-[#20231E] mb-2">
                 Select Ailment
               </p>
-              <select
-                value={selectedAilment}
-                onChange={(e) => setSelectedAilment(e.target.value)}
-                disabled={ailmentsLoading}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2C3E3E] text-[#0B0C0A] bg-white"
-              >
-                <option value="">Choose an ailment...</option>
-                {ailments.map((ailment) => (
-                  <option key={ailment.id} value={ailment.id}>
-                    {ailment.icon} {ailment.name}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <Search className="absolute left-3 top-3 w-5 h-5 text-[#9A9A96] pointer-events-none z-10" />
+
+                <input
+                  ref={ailmentInputRef}
+                  value={ailmentQuery}
+                  onChange={(e) => {
+                    setAilmentQuery(e.target.value);
+                    setAilmentActiveIndex(-1);
+                  }}
+                  onKeyDown={(e) => {
+                    const filtered = ailmentQuery.trim().length === 0
+                      ? []
+                      : ailments.filter(a => a.name.toLowerCase().includes(ailmentQuery.toLowerCase()));
+
+                    if (!filtered.length) return;
+                    if (e.key === 'ArrowDown') {
+                      e.preventDefault();
+                      setAilmentActiveIndex(prev => (prev < filtered.length - 1 ? prev + 1 : 0));
+                    }
+                    if (e.key === 'ArrowUp') {
+                      e.preventDefault();
+                      setAilmentActiveIndex(prev => (prev > 0 ? prev - 1 : filtered.length - 1));
+                    }
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      const pick = filtered[ailmentActiveIndex >= 0 ? ailmentActiveIndex : 0];
+                      if (pick) {
+                        setSelectedAilment(pick.id);
+                        setAilmentQuery('');
+                      }
+                    }
+                  }}
+                  placeholder={ailmentsLoading ? 'Loading ailments...' : 'Search ailments...'}
+                  disabled={ailmentsLoading}
+                  className="w-full h-[44px] rounded-[8px] border-2 border-[#F8F6F2] pl-10 pr-4 text-[14px] text-[#41463B] font-medium placeholder:text-[#9A9A96] focus:outline-none focus:border-[#6C7463]"
+                />
+
+                {/* Dropdown */}
+                {ailmentQuery && (
+                  <div className="border border-[#E6E6E3] rounded-[12px] bg-white shadow-[0px_0px_12px_-4px_rgba(26,26,26,0.16)] overflow-hidden mt-2">
+                    <div className="max-h-[120px] overflow-y-auto pl-1 pr-4 py-1 scrollbar">
+                      {!ailmentsLoading && ailments.filter(a => a.name.toLowerCase().includes(ailmentQuery.toLowerCase())).length === 0 && (
+                        <p className="text-sm text-center py-3 text-[#8E8E8A]">No ailments found</p>
+                      )}
+
+                      {ailments.filter(a => a.name.toLowerCase().includes(ailmentQuery.toLowerCase())).map((a, idx) => (
+                        <button
+                          key={a.id}
+                          type="button"
+                          onClick={() => { setSelectedAilment(a.id); setAilmentQuery(''); }}
+                          className={`w-full flex items-center gap-3 px-2 py-1 rounded-[8px] text-left transition ${idx === ailmentActiveIndex ? 'bg-[#F3F4F0] border border-[#6C7463]' : 'hover:bg-[#F7F7F5]'}`}
+                        >
+                          <span className="w-[24px] h-[24px] bg-[#F9F7F2] rounded-[45px] flex items-center justify-center text-[16px]">{a.icon || '🌿'}</span>
+                          <span className="flex-1 font-medium text-[16px] leading-[24px] text-[#0B0C0A]">{a.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Selected chip */}
+                {selectedAilment && (
+                  <div className="mt-3">
+                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-[4px] bg-[#F5F3ED] font-medium text-[14px] text-[#41463B]">
+                      {ailments.find(a => a.id === selectedAilment)?.name || 'Selected'}
+                      <button type="button" onClick={() => setSelectedAilment('')} className="text-[#8E8E8A] hover:text-[#0B0C0A]">×</button>
+                    </span>
+                  </div>
+                )}
+              </div>
               <p className="text-sm text-[#41463B] font-normal text-center gap-2">
                 Can&apos;t find what you&apos;re looking for?{" "}
                 <button
@@ -397,37 +461,77 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
             <div className="space-y-2">
 
               {/* Line 1 */}
-              <p className="font-montserrat font-medium sm:text-[20px] text-[16px] leading-[28px] text-[#4B544A]">
-                Select Remedy:
-                <span className="font-montserrat font-medium sm:text-[16px] text-[14px] leading-[24px] text-[#41463B] mb-3">
-                  <select
-                    value={primaryRemedyId}
-                    onChange={(e) => {
-                      const id = e.target.value;
-                      setPrimaryRemedyId(id);
-                      const found = remediesList.find(r => r.id === id);
-                      setPrimaryRemedyName(found ? found.name : '');
-                      // ensure default entries exist
-                      setRemedyPotencies(prev => ({ ...prev, [id]: prev[id] ?? '' }));
-                      setRemedyExtras(prev => ({ ...prev, [id]: prev[id] ?? { potencyType: '', notes: '' } }));
-                    }}
-                    className="ml-2 px-2 py-1 rounded text-[#41463B]"
-                  >
-                    {/* Keep current primary remedy as first option if it's not in the list */}
-                    {primaryRemedyId && !remediesList.find(r => r.id === primaryRemedyId) && (
-                      <option value={primaryRemedyId}>{primaryRemedyName}</option>
-                    )}
-                    {remediesList.map(r => (
-                      <option key={r.id} value={r.id}>{r.name}</option>
-                    ))}
-                  </select>
-                </span>
+              {/* Line 1 */}
+              <div className="font-montserrat font-medium sm:text-[20px] text-[16px] leading-[28px] text-[#4B544A]">
+                <div className="inline-block">Select Remedy:</div>
 
-              </p>
+                <span className="inline-block ml-2 relative w-[50%]">
+                  <div ref={remedyDropdownRef} className="relative max-w-[300px] inline-block">
+                    {/* Button (selected value) */}
+                    <button
+                      type="button"
+                      onClick={() => setIsRemedyOpen(prev => !prev)}
+                      className="w-full flex items-center justify-between text-[#41463B] bg-white gap-3"
+                    >
+                      <span className="truncate">
+                        {primaryRemedyName || "Belladonna"}
+                      </span>
+
+                      <svg className={`h-3 w-3 transition-transform ${isRemedyOpen ? "rotate-180" : "rotate-0"}`} width="11" height="7" viewBox="0 0 11 7" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5.30333 4.125L9.42833 0L10.6067 1.17833L5.30333 6.48167L0 1.17833L1.17833 0L5.30333 4.125Z" fill="#20231E" />
+                      </svg>
+
+                    </button>
+
+                    {/* Dropdown List */}
+                    {isRemedyOpen && (
+                      <ul className="absolute z-20 mt-1 left-0 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-auto w-[250px]">
+
+                        {/* Keep current primary remedy if it's not in list */}
+                        {primaryRemedyId &&
+                          !remediesList.find(r => r.id === primaryRemedyId) && (
+                            <li
+                              onClick={() => setIsRemedyOpen(false)}
+                              className="px-3 py-2 text-sm cursor-pointer hover:bg-[#6c746333] whitespace-nowrap"
+                            >
+                              {primaryRemedyName}
+                            </li>
+                          )}
+
+                        {remediesList.map(r => (
+                          <li
+                            key={r.id}
+                            onClick={() => {
+                              setPrimaryRemedyId(r.id);
+                              setPrimaryRemedyName(r.name);
+
+                              // same logic as tamara select ma hati
+                              setRemedyPotencies(prev => ({ ...prev, [r.id]: prev[r.id] ?? '' }));
+                              setRemedyExtras(prev => ({
+                                ...prev,
+                                [r.id]: prev[r.id] ?? { potencyType: '', notes: '' }
+                              }));
+
+                              setIsRemedyOpen(false);
+                            }}
+                            className={`px-3 py-2 text-sm cursor-pointer transition-colors whitespace-nowrap ${primaryRemedyId === r.id
+                              ? "bg-[#6C7463] text-white font-medium"
+                              : "text-gray-700 hover:bg-[#6c746333]"
+                              }`}
+                          >
+                            {r.name}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </span>
+              </div>
+
 
               {/* Line 2 */}
               <p className="font-montserrat font-medium text-[16px] leading-[24px] text-[#41463B] flex items-center gap-1">
-                Select multiple if used in combination 
+                Select multiple if used in combination
                 <span className="font-montserrat font-normal text-[12px] leading-[20px] text-[#41463B]">
                   (optional)
                 </span>

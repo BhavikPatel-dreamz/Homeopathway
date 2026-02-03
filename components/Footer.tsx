@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react'
+import Link from 'next/link'
 
 export default function Footer() {
   return (
@@ -10,9 +11,9 @@ export default function Footer() {
         <div className="col-span-12 md:col-span-6 lg:col-span-7 flex items-center">
           <div className="flex items-start lg:items-center gap-3  flex-col lg:flex-row">
             <div className='mb-3 w-26 h-28 md:w-39 md:h-39 lg:w-40 lg:h-40 '>
-              <a href="/">
+              <Link href="/">
                 <img className="object-contain w-full h-full" src="/home-banner-logo.svg" alt="" />
-              </a>
+              </Link>
             </div>
             <div>
               <p className="text-[#D3D6D1] font-[500] max-w-[380px]">Your trusted guide to natural homeopathic healing, connecting you with remedies that work.</p>
@@ -33,11 +34,11 @@ export default function Footer() {
         <div  className="col-span-12 md:col-span-3 lg:col-span-3 lg:col-start-11">
           <p className="text-[#fff] text-[16px] font-[600] mb-5 ">About</p>
           <ul className="space-y-4 text-sm text-gray-300">
-            <li><a href="/what-homeopathy" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">What is HomeoPathway?</a></li>
-            <li><a href="/safety-and-research" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">Safety & Research</a></li>
-            <li><a href="/getting-started" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">Getting Started</a></li>
-            <li><a href="/faq" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">FAQ</a></li>
-            <li><a href="/contact-us" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">Contact Us</a></li>
+            <li><Link href="/what-homeopathy" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">What is HomeoPathway?</Link></li>
+            <li><Link href="/safety-and-research" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">Safety & Research</Link></li>
+            <li><Link href="/getting-started" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">Getting Started</Link></li>
+            <li><Link href="/faq" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">FAQ</Link></li>
+            <li><Link href="/contact-us" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">Contact Us</Link></li>
           </ul>
         </div>
 
@@ -48,17 +49,20 @@ export default function Footer() {
         <p className="text-[12px] text-[#D3D6D1] font-[500]">© 2025 HomeoPathway. All Rights Reserved.</p>
         <div className="flex items-center gap-4">
           <div className="text-[#D3D6D1] font-[500]">Follow Us</div>
-          <a href="https://www.facebook.com" target="_blank" className="w-6 h-6">
+          <a href="https://www.facebook.com/HomeoPathway" target="_blank" className="w-6 h-6">
             <img className="w-full h-full object-contain hover:opacity-50 transition-all duration-500" src="/facebook.svg" alt="" />
           </a>
-          <a href="https://x.com" target="_blank" className="w-6 h-6 ">
+          {/* <a href="https://x.com" target="_blank" className="w-6 h-6 ">
             <img className="w-full h-full object-contain hover:opacity-50 transition-all duration-500" src="/x.svg" alt="" />
-          </a>
-          <a href="https://www.instagram.com" target="_blank" className="w-6 h-6">
+          </a> */}
+          <a href="https://www.instagram.com/Homeo.Pathway" target="_blank" className="w-6 h-6">
             <img className="w-full h-full object-contain hover:opacity-50 transition-all duration-500" src="/instagram.svg" alt="" />
           </a>
-          <a href="https://www.youtube.com" target="_blank" className="w-6 h-6">
+          {/* <a href="https://www.youtube.com" target="_blank" className="w-6 h-6">
             <img className="w-full h-full object-contain hover:opacity-50 transition-all duration-500" src="/youtube.svg" alt="" />
+          </a> */}
+          <a href="https://share.upscrolled.com/en/user/96ba5dcf-f67b-4747-8a54-e35aef0e3e13" target="_blank" className="w-6 h-6">
+            <img className="w-full h-full object-contain hover:opacity-50 transition-all duration-500" src="/upscrolled.svg" alt="" />
           </a>
         </div>
       </div>
