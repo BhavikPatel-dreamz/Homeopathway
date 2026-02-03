@@ -3,11 +3,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { checkIsUserLoggedIn } from "@/lib/userUtils";
+import { supabase } from '@/lib/supabaseClient';
 import HeaderLogin from "./HeaderLogin";
 import HeaderInner from "./HeaderInner";
 
 export default function Header() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const pathname = usePathname();
 
   // check if current page is home
@@ -19,6 +20,12 @@ export default function Header() {
       setIsLoggedIn(loggedIn);
     };
     checkUser();
+    // Listen for auth state changes so header updates when session is restored
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session?.user);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   // ✅ if inner page → show HeaderInner only
@@ -31,7 +38,10 @@ export default function Header() {
     <header className='sticky top-0 left-0 w-full px-6 py-[17px] text-white z-50 '>
       <div className="max-w-7xl mx-auto px-0 lg:px-5 flex justify-end items-center">
         <div className="flex items-center gap-3">
-          {isLoggedIn ? (
+          {isLoggedIn === null ? (
+            // auth state still loading — render a small placeholder to avoid showing Login briefly
+            <div style={{ width: 96, height: 40 }} />
+          ) : isLoggedIn ? (
             <HeaderLogin />
           ) : (
             <>
