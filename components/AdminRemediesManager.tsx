@@ -19,7 +19,8 @@ import { Remedy } from "@/types";
 
 export default function AdminRemediesManager() {
   const [remedies, setRemedies] = useState<Remedy[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [loadDuration, setLoadDuration] = useState<number | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -197,6 +198,7 @@ export default function AdminRemediesManager() {
 
 
   const fetchRemedies = useCallback(async () => {
+    const tStart = performance.now();
     setLoading(true);
     try {
       // Calculate offset for pagination
@@ -214,16 +216,25 @@ export default function AdminRemediesManager() {
         query = query.or(`name.ilike.%${searchTerm}%`);
       }
 
+      const qStart = performance.now();
       const { data, error, count } = await query;
+      const qEnd = performance.now();
+      console.log(`adminRemedies:query: ${qEnd - qStart} ms`);
 
       if (error) throw error;
 
       setRemedies(data || []);
       setTotalRemedies(count || 0);
       setTotalPages(Math.ceil((count || 0) / itemsPerPage));
+      const tEnd = performance.now();
+      const duration = Math.round(tEnd - tStart);
+      setLoadDuration(duration);
+      console.log(`adminRemedies:total: ${tEnd - tStart} ms`);
     } catch (error: unknown) {
       console.error('Error fetching remedies:', error);
       setMessage({ type: 'error', text: 'Failed to load remedies' });
+      const tEnd = performance.now();
+      setLoadDuration(Math.round(tEnd - tStart));
     } finally {
       setLoading(false);
     }
@@ -409,6 +420,12 @@ export default function AdminRemediesManager() {
               <span className="text-gray-600">Total: </span>
               <span className="font-semibold text-gray-900">{totalRemedies}</span>
             </div>
+            {loadDuration !== null && (
+              <div className="text-xs text-gray-500 flex items-center">
+                <span>Loaded in </span>
+                <span className="font-mono ml-1">{loadDuration}ms</span>
+              </div>
+            )}
             {remedies.length > 0 && (
               <div>
                 <span className="text-gray-600">Showing: </span>
@@ -475,58 +492,64 @@ export default function AdminRemediesManager() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {remedies.map((remedy) => (
-                <tr key={remedy.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="w-10 h-10 flex items-center justify-center">
-                      {remedy.image_url ? (
-                        <Image
-                          src={remedy.image_url}
-                          alt={remedy.name}
-                          width={40}
-                          height={40}
-                          className="w-10 h-10 object-cover rounded-lg border border-gray-200"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = 'none';
-                          }}
-                        />
-                      ) : remedy.icon ? (
-                        <span className="text-2xl">{remedy.icon}</span>
-                      ) : (
-                        <div className="w-8 h-8 bg-gray-100 rounded border border-gray-200 flex items-center justify-center">
-                          <span className="text-gray-400 text-xs">No</span>
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="font-medium text-gray-900">{remedy.name}</div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center">
-                      <span className="text-sm font-medium text-gray-500 block w-[50px] text-center">{remedy.average_rating.toFixed(1)}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="text-sm text-gray-600 block w-[50px] text-center">{remedy.review_count}</span>
-                  </td>
-                  <td className="px-6 py-4 text-right space-x-2">
-                    <Link
-                      href={`/admin/remedies/edit/${remedy.id}`}
-                      className="text-teal-600 hover:text-teal-800 font-medium text-sm"
-                    >
-                      Edit
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(remedy.id!)}
-                      disabled={loading}
-                      className="text-red-600 hover:text-red-800 font-medium text-sm disabled:opacity-50"
-                    >
-                      Delete
-                    </button>
-                  </td>
+              {loading ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-12 text-center text-gray-500">Loading remedies...</td>
                 </tr>
-              ))}
+              ) : (
+                remedies.map((remedy) => (
+                  <tr key={remedy.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="w-10 h-10 flex items-center justify-center">
+                        {remedy.image_url ? (
+                          <Image
+                            src={remedy.image_url}
+                            alt={remedy.name}
+                            width={40}
+                            height={40}
+                            className="w-10 h-10 object-cover rounded-lg border border-gray-200"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                        ) : remedy.icon ? (
+                          <span className="text-2xl">{remedy.icon}</span>
+                        ) : (
+                          <div className="w-8 h-8 bg-gray-100 rounded border border-gray-200 flex items-center justify-center">
+                            <span className="text-gray-400 text-xs">No</span>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="font-medium text-gray-900">{remedy.name}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center">
+                        <span className="text-sm font-medium text-gray-500 block w-[50px] text-center">{remedy.average_rating.toFixed(1)}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-sm text-gray-600 block w-[50px] text-center">{remedy.review_count}</span>
+                    </td>
+                    <td className="px-6 py-4 text-right space-x-2">
+                      <Link
+                        href={`/admin/remedies/edit/${remedy.id}`}
+                        className="text-teal-600 hover:text-teal-800 font-medium text-sm"
+                      >
+                        Edit
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(remedy.id!)}
+                        disabled={loading}
+                        className="text-red-600 hover:text-red-800 font-medium text-sm disabled:opacity-50"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

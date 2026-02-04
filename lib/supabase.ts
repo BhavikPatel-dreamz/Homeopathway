@@ -1,6 +1,7 @@
-import { createClient } from '@supabase/supabase-js'
+// Re-export the browser Supabase client so client components use
+// a single, consistent instance that handles cookies/localStorage.
+import { supabase as browserSupabase } from './supabaseClient';
 
-export const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+export const supabase = browserSupabase;
+
+export default supabase;

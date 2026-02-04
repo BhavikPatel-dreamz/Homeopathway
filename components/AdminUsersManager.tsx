@@ -148,15 +148,32 @@ export default function AdminUsersManager() {
     try {
       // Note: You'll need to set up proper user deletion in Supabase
       // This should also delete the auth user, not just the profile
-      const { error } = await supabase
+      const { data: deletedData, error } = await supabase
         .from('profiles')
         .delete()
         .eq('id', id);
 
       if (error) throw error;
 
-      setUsers(users.filter(u => u.id !== id));
-      setMessage({ type: 'success', text: 'User deleted successfully!' });
+      // Verify deletion — some setups may return no rows on delete without error.
+      const { data: verifyData, error: verifyError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', id)
+        .maybeSingle();
+
+      if (verifyError) {
+        console.error('Error verifying deletion:', verifyError);
+      }
+
+      if (verifyData) {
+        // Still exists on server — treat as failure
+        console.error('Deletion did not remove profile from DB, verify response:', deletedData, verifyData);
+        setMessage({ type: 'error', text: 'Failed to delete user from server. Check permissions.' });
+      } else {
+        setUsers(users.filter(u => u.id !== id));
+        setMessage({ type: 'success', text: 'User deleted successfully!' });
+      }
       setTimeout(() => setMessage(null), 3000);
     } catch (error: unknown) {
       console.error('Error deleting user:', error);
@@ -329,11 +346,11 @@ export default function AdminUsersManager() {
                     <td className="px-6 py-4">
                       <div className="flex items-center">
                         <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
-                          {(user.first_name?.[0] || user.email[0]).toUpperCase()}
+                          {(user.first_name?.[0] ?? user.email?.[0] ?? '').toUpperCase()}
                         </div>
                         <div className="ml-3">
                           <div className="font-medium text-gray-900">
-                            {user.first_name} {user.last_name}
+                            {user.first_name || ''} {user.last_name || ''}
                           </div>
                         </div>
                       </div>

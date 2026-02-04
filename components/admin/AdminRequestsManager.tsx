@@ -33,8 +33,12 @@ export default function AdminRequestsManager() {
     type: "success" | "error" | "info";
     text: string;
   } | null>(null);
-  const [filter, setFilter] = useState<'all' | 'pending' | 'ailment' | 'remedy'>('all');
+  const [filter, setFilter] = useState<'all' | 'ailment' | 'remedy'>('all');
   const [editingRequest, setEditingRequest] = useState<EditingRequest | null>(null);
+
+  // Pagination for admin requests list
+  const itemsPerPage = 5;
+  const [adminPage, setAdminPage] = useState(1);
 
   useEffect(() => {
     if (toast) {
@@ -53,64 +57,78 @@ export default function AdminRequestsManager() {
       try {
         setLoading(true);
 
-        // Fetch from ailments table
-        let ailmentsQuery = supabase
+        // Build queries for ailments and remedies to run in parallel.
+        // Include the requester's email using the related `profiles(email)` select
+        // to avoid N+1 lookups which slow initial loading.
+        // Start timing for debug/perf measurement using monotonic timestamps
+        const tStart = performance.now();
+
+        const ailmentsQuery = supabase
           .from('ailments')
           .select('id, requested_by_user_id, name, icon, slug, description, status, created_at, is_user_submission')
           .eq('is_user_submission', true)
           .order('created_at', { ascending: false });
 
-        // Only filter by status when explicitly showing pending requests
-        if (filter === 'pending') {
-          ailmentsQuery = ailmentsQuery.eq('status', filter);
-        }
-
-        const { data: ailmentRequests, error: ailmentsError } = await ailmentsQuery;
-
-        if (ailmentsError) throw ailmentsError;
-
-        // Fetch from remedies table
-        let remediesQuery = supabase
+        const remediesQuery = supabase
           .from('remedies')
           .select('id, requested_by_user_id, name, icon, slug, description, status, created_at, is_user_submission, key_symptoms')
           .eq('is_user_submission', true)
           .order('created_at', { ascending: false });
 
-        // Only filter by status when explicitly showing pending requests
-        if (filter === 'pending') {
-          remediesQuery = remediesQuery.eq('status', filter);
-        }
+        // Run both queries in parallel and measure duration
+        const qStart = performance.now();
+        const [
+          { data: ailmentRequests, error: ailmentsError },
+          { data: remedyRequests, error: remediesError },
+        ] = await Promise.all([ailmentsQuery, remediesQuery] as const);
+        const qEnd = performance.now();
+        console.log(`adminRequests:queries: ${qEnd - qStart} ms`);
 
-        const { data: remedyRequests, error: remediesError } = await remediesQuery;
-
+        if (ailmentsError) throw ailmentsError;
         if (remediesError) throw remediesError;
 
-        // Combine requests
+        // Collect unique requester IDs to fetch emails in a single query
+        const combined = [...(ailmentRequests || []), ...(remedyRequests || [])] as any[];
+        const userIds = Array.from(new Set(combined.map((r) => r.requested_by_user_id).filter(Boolean)));
+
+        let profilesMap: Record<string, string> = {};
+        if (userIds.length > 0) {
+          const pStart = performance.now();
+          const { data: profilesData, error: profilesError } = await supabase
+            .from('profiles')
+            .select('id, email')
+            .in('id', userIds);
+          const pEnd = performance.now();
+          console.log(`adminRequests:profiles: ${pEnd - pStart} ms`);
+
+          if (profilesError) {
+            console.warn('Failed to fetch profile emails in bulk:', profilesError);
+          } else if (profilesData) {
+            profilesMap = (profilesData as any[]).reduce((acc, p) => {
+              acc[p.id] = p.email || 'Unknown';
+              return acc;
+            }, {} as Record<string, string>);
+          }
+        }
+
+        // Map emails into requests and set type
         const allRequests: RequestRecord[] = [
-          ...(ailmentRequests || []).map((a) => ({
+          ...((ailmentRequests || []).map((a: any) => ({
             ...a,
             type: 'ailment' as const,
             key_symptoms: null,
-          })),
-          ...(remedyRequests || []).map((r) => ({
+            user_email: profilesMap[a.requested_by_user_id] || 'Unknown',
+          })) as RequestRecord[]),
+          ...((remedyRequests || []).map((r: any) => ({
             ...r,
             type: 'remedy' as const,
-          })),
+            user_email: profilesMap[r.requested_by_user_id] || 'Unknown',
+          })) as RequestRecord[]),
         ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
-        // Fetch user emails for each request
-        const requestsWithEmails = await Promise.all(
-          allRequests.map(async (req) => {
-            const { data: userData } = await supabase
-              .from('profiles')
-              .select('email')
-              .eq('id', req.requested_by_user_id)
-              .single();
-            return { ...req, user_email: userData?.email || 'Unknown' };
-          })
-        );
-
-        setRequests(requestsWithEmails);
+        setRequests(allRequests);
+        const tEnd = performance.now();
+        console.log(`adminRequests:total: ${tEnd - tStart} ms`);
       } catch (error) {
         console.error('Error fetching requests:', error);
         showToast('error', 'Failed to load requests');
@@ -303,11 +321,23 @@ export default function AdminRequestsManager() {
     }
   };
 
-  const filteredRequests = filter === 'all' 
-    ? requests 
-    : filter === 'pending'
-    ? requests.filter(r => r.status === 'pending')
-    : requests.filter(r => r.type === filter);
+  const filteredRequests = filter === 'all' ? requests : requests.filter(r => r.type === filter);
+
+  const totalAdminPages = Math.max(1, Math.ceil(filteredRequests.length / itemsPerPage));
+
+  useEffect(() => {
+    // Reset to page 1 when filter changes
+    setAdminPage(1);
+  }, [filter]);
+
+  // Ensure current page stays within range when total pages change.
+  useEffect(() => {
+    if (adminPage > totalAdminPages) {
+      setAdminPage(totalAdminPages);
+    }
+    // Only respond to changes in totalAdminPages to avoid cascading renders.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [totalAdminPages]);
 
   return (
     <div className="space-y-6">
@@ -377,8 +407,10 @@ export default function AdminRequestsManager() {
         </div>
       ) : (
         <div className="space-y-4">
-          {filteredRequests.map((request) => (
-            <div key={request.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+          {filteredRequests
+            .slice((adminPage - 1) * itemsPerPage, adminPage * itemsPerPage)
+            .map((request) => (
+              <div key={request.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
@@ -417,14 +449,14 @@ export default function AdminRequestsManager() {
                   <button
                     onClick={() => handleEdit(request)}
                     disabled={actionLoading === request.id}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded transition-colors disabled:opacity-50"
+                    className="text-teal-600 hover:text-teal-800 font-medium text-sm cursor-pointer"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(request.id, request.type)}
                     disabled={actionLoading === request.id}
-                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded transition-colors disabled:opacity-50"
+                    className="text-red-600 hover:text-red-800 font-medium text-sm disabled:opacity-50 cursor-pointer"
                   >
                     {actionLoading === request.id ? 'Processing...' : 'Delete'}
                   </button>
@@ -432,6 +464,42 @@ export default function AdminRequestsManager() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Pagination controls for admin requests */}
+      {filteredRequests.length > itemsPerPage && (
+        <div className="mt-4 flex justify-center items-center gap-3">
+          <button
+            onClick={() => setAdminPage((p) => Math.max(1, p - 1))}
+            className="p-1 text-[#0B0C0A] hover:text-[#6C7463]"
+            aria-label="Previous requests page"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          {Array.from({ length: totalAdminPages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              onClick={() => setAdminPage(page)}
+              className={`w-[40px] h-[40px] rounded-full text-xs font-medium transition-colors flex items-center justify-center ${page === adminPage
+                ? 'bg-[#6C7463] text-white'
+                : 'bg-[#F5F3ED] text-[#41463B] hover:bg-[#6C7463] hover:text-white'
+                }`}
+            >
+              {page}
+            </button>
+          ))}
+          <button
+            onClick={() => setAdminPage((p) => Math.min(totalAdminPages, p + 1))}
+            className="p-1 text-[#0B0C0A] hover:text-[#6C7463]"
+            aria-label="Next requests page"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
         </div>
       )}
 

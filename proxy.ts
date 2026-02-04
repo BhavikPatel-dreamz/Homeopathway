@@ -73,7 +73,13 @@ export async function proxy(req: NextRequest) {
   // Check if the user is accessing admin routes
   if (req.nextUrl.pathname.startsWith('/admin')) {
     if (!user) {
-      // Not logged in, redirect to login
+      // Not logged in. For API calls return JSON 401 so client fetches
+      // do not receive a server-rendered page (Flight/RSC payload).
+      if (req.nextUrl.pathname.startsWith('/api')) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+
+      // For regular navigation, redirect to login page.
       const redirectUrl = new URL('/login', req.url);
       return NextResponse.redirect(redirectUrl);
     }
@@ -87,7 +93,13 @@ export async function proxy(req: NextRequest) {
 
     // Allow both 'admin' and 'moderator' roles to access admin routes
     if (profile?.role !== 'admin' && profile?.role !== 'moderator') {
-      // Not authorized, redirect to home
+      // Not authorized. For API calls return 403 JSON to avoid returning
+      // a server-rendered page to fetch/XHR clients.
+      if (req.nextUrl.pathname.startsWith('/api')) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
+
+      // For regular navigation, redirect to home
       const redirectUrl = new URL('/', req.url);
       return NextResponse.redirect(redirectUrl);
     }

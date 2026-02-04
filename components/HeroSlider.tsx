@@ -130,7 +130,7 @@ const CustomSlider = ({ slides }: { slides: string[] }) => {
               setCurrentIndex(index + 1);
               pauseAutoPlay();
             }}
-            className={`rounded-full transition-all duration-300 ${currentIndex === index + 1
+            className={`rounded-full transition-all duration-300 cursor-pointer  ${currentIndex === index + 1
               ? "bg-white w-10 h-2"
               : "bg-white/50 w-10 h-2"
               }`}

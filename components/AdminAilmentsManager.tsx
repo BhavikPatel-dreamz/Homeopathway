@@ -24,6 +24,7 @@ export default function AdminAilmentsManager() {
     remedies_count: 0,
   });
   const [loading, setLoading] = useState(false);
+  const [loadDuration, setLoadDuration] = useState<number | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -268,6 +269,7 @@ export default function AdminAilmentsManager() {
 
 
   const fetchAilments = useCallback(async () => {
+    const tStart = performance.now();
     setLoading(true);
     try {
       // Calculate offset for pagination
@@ -292,9 +294,15 @@ export default function AdminAilmentsManager() {
       setAilments(data || []);
       setTotalAilments(count || 0);
       setTotalPages(Math.ceil((count || 0) / itemsPerPage));
+
+      const tEnd = performance.now();
+      const duration = Math.round(tEnd - tStart);
+      setLoadDuration(duration);
     } catch (error: unknown) {
       console.error('Error fetching ailments:', error);
       setMessage({ type: 'error', text: 'Failed to fetch ailments.' });
+      const tEnd = performance.now();
+      setLoadDuration(Math.round(tEnd - tStart));
     } finally {
       setLoading(false);
     }
@@ -525,6 +533,12 @@ export default function AdminAilmentsManager() {
               <span className="text-gray-600">Total: </span>
               <span className="font-semibold text-gray-900">{totalAilments}</span>
             </div>
+            {loadDuration !== null && (
+              <div className="text-xs text-gray-500 flex items-center">
+                <span>Loaded in </span>
+                <span className="font-mono ml-1">{loadDuration}ms</span>
+              </div>
+            )}
             {ailments.length > 0 && (
               <div>
                 <span className="text-gray-600">Showing: </span>
@@ -571,7 +585,11 @@ export default function AdminAilmentsManager() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {ailments.length === 0 ? (
+            {loading ? (
+              <tr>
+                <td colSpan={5} className="px-6 py-12 text-center text-gray-500">Loading ailments...</td>
+              </tr>
+            ) : ailments.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
                   {searchTerm ? 'No ailments match your search.' : 'No ailments found. Click "Add Ailment" to create one.'}
