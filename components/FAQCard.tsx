@@ -5,7 +5,7 @@ import FAQItem from './FAQItem'
 const FAQS = [
   {
     q: 'Is homeopathy safe?',
-    a: 'You can explore remedies commonly used by other people with similar symptoms and read their experiences on HomeoPathway.',
+    a: 'Homeopathic remedies are widely regarded as safe because of their high dilutions and long history of use around the world. Many people use them for mild, everyday concerns, while emergencies and serious medical conditions require professional medical care.',
   },
   {
     q: 'How do I know which remedy to choose?',
@@ -13,19 +13,23 @@ const FAQS = [
   },
   {
     q: 'How long does it take for a remedy to work?',
-    a: 'You can explore remedies commonly used by other people with similar symptoms and read their experiences on HomeoPathway.',
+    a: 'Some people report improvement within hours, while others notice changes over several days. It depends on the condition and the person.',
   },
   {
     q: 'Can I take a remedy while on medication?',
-    a: 'You can explore remedies commonly used by other people with similar symptoms and read their experiences on HomeoPathway.',
+    a: 'Homeopathic remedies rarely interact with medications, but it is always wise to ask a healthcare professional if you are unsure.',
   },
   {
     q: 'Can children take homeopathic remedies?',
-    a: 'You can explore remedies commonly used by other people with similar symptoms and read their experiences on HomeoPathway.',
+    a: 'Many remedies are used for children, but it is best to follow professional guidance and use appropriate potencies.',
+  },
+  {
+    q: 'What potency should I use?',
+    a: 'Beginners often start with 6C, 12C, or 30C. Potency choice can vary depending on symptom intensity and personal preference.',
   },
   {
     q: 'Does HomeoPathway give medical advice?',
-    a: 'You can explore remedies commonly used by other people with similar symptoms and read their experiences on HomeoPathway.',
+    a: 'No, we provide community insights and structured information. For diagnosis or treatment decisions, consult a qualified healthcare professional.',
   },
 ]
 
