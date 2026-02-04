@@ -372,11 +372,12 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B7B5E] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed text-gray-500"
             >
               <option value="">All Effectiveness</option>
-              {[5, 4, 3, 2, 1].map(eff => (
-                <option key={eff} value={eff}>
-                  {eff}/5 Effective
-                </option>
-              ))}
+              <option value="5">Completely resolved symptoms</option>
+              <option value="4">Significantly improved</option>
+              <option value="3">Moderately improved</option>
+              <option value="2">Slightly improved</option>
+              <option value="1">No change</option>
+              <option value="0">Symptoms worsened</option>
             </select>
           </div>
 

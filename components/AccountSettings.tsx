@@ -437,7 +437,7 @@ z-50 animate-in slide-in-from-top-2
         <Breadcrumb
           items={[
             { label: "Home", href: "/" },
-            { label: "Account Settings", isActive: true },
+            { label: "Settings", isActive: true },
           ]}
         />
       </div>
@@ -447,8 +447,8 @@ z-50 animate-in slide-in-from-top-2
         <div className="aliment-table-card py-6 px-4 sm:py-9 sm:px-6 bg-white rounded-lg shadow-md">
           {/* Header */}
           <div className="flex items-center justify-between mb-4 sm:mb-6">
-            <h1 className="text-4xl font-normal text-[#20231E]">
-              Account Settings
+            <h1 className="text-[28px] lg:text-[40px] font-normal text-[#0B0C0A]">
+               Settings
             </h1>
             {!isEditing && (
               <button
@@ -902,8 +902,7 @@ z-50 animate-in slide-in-from-top-2
             className="w-full flex items-center justify-between text-left hover:bg-gray-50 p-4 rounded-lg transition-colors"
           >
             <div>
-              <h3 className="text-4xl font-normal text-[#20231E]">My Requests</h3>
-              <p className="text-gray-600 text-sm mt-1">View all your submitted ailments and remedy requests</p>
+              <h3 className="text-[28px] lg:text-[40px] font-normal text-[#0B0C0A]">My Request</h3>
             </div>
             <svg
               className="w-6 h-6 text-gray-400 flex-shrink-0 ml-4"

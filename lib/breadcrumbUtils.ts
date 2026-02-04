@@ -8,7 +8,7 @@ export const breadcrumbPaths = {
   
   profile: (): BreadcrumbItem[] => [
     { label: "Home", href: "/" },
-    { label: "Account Settings", isActive: true }
+    { label: "Settings", isActive: true }
   ],
   
   ailments: (): BreadcrumbItem[] => [

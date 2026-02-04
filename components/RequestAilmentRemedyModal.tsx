@@ -35,6 +35,25 @@ export default function RequestAilmentRemedyModal({
     key_symptoms: "",
   });
 
+  // Reset internal state when modal opens so reopening shows the form (not the previous success state)
+  useEffect(() => {
+    if (isOpen) {
+      setSuccess(false);
+      setError(null);
+      setLoading(false);
+      setShowEmojiPicker(false);
+      setFormData({
+        name: "",
+        emoji: "😊",
+        slug: "",
+        description: "",
+        key_symptoms: "",
+      });
+      // default requestType when modal opens according to prop
+      setRequestType(type === "ailment" ? "ailment" : type === "remedy" ? "remedy" : "ailment");
+    }
+  }, [isOpen, type]);
+
   // Auto-generate slug when name changes
   useEffect(() => {
     const generateSlug = async () => {

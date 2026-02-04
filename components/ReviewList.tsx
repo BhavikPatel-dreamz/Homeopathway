@@ -183,7 +183,7 @@ export default function ReviewListPage({
   const [totalReviews, setTotalReviews] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
-  const [reviewsPerPage] = useState(15);
+  const [reviewsPerPage] = useState(3);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const [isInitialLoading, setIsInitialLoading] = useState(true);
@@ -592,29 +592,40 @@ export default function ReviewListPage({
                 })}
 
                 {totalReviews > reviewsPerPage && (
-                  <div className="flex items-center justify-center gap-1 sm:gap-2 mt-6 sm:mt-8">
+                  <div className="mt-6 flex justify-center items-center gap-3">
                     <button
                       onClick={() => handlePageChange(currentPage - 1)}
                       disabled={currentPage === 1}
-                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-[#F5F3ED] border border-gray-300 text-gray-700 disabled:opacity-50"
+                      className="p-1 text-[#0B0C0A] hover:text-[#6C7463] disabled:opacity-50"
+                      aria-label="Previous reviews page"
                     >
-                      <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 rotate-90" />
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
                     </button>
+
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                       <button
                         key={page}
                         onClick={() => handlePageChange(page)}
-                        className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full text-xs sm:text-sm font-semibold ${currentPage === page ? "bg-[#6C7463] text-white" : "bg-[#F5F3ED] border border-gray-300 text-gray-700 hover:bg-gray-50"}`}
+                        className={`w-[40px] h-[40px] rounded-full text-xs font-medium transition-colors flex items-center justify-center ${currentPage === page
+                          ? 'bg-[#6C7463] text-white'
+                          : 'bg-[#F5F3ED] text-[#41463B] hover:bg-[#6C7463] hover:text-white'
+                          }`}
                       >
                         {page}
                       </button>
                     ))}
+
                     <button
                       onClick={() => handlePageChange(currentPage + 1)}
                       disabled={currentPage === totalPages}
-                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-[#F5F3ED] border border-gray-300 text-gray-700 disabled:opacity-50"
+                      className="p-1 text-[#0B0C0A] hover:text-[#6C7463] disabled:opacity-50"
+                      aria-label="Next reviews page"
                     >
-                      <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 -rotate-90" />
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
                     </button>
                   </div>
                 )}

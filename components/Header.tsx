@@ -15,17 +15,36 @@ export default function Header() {
   const isHome = pathname === "/";
 
   useEffect(() => {
+    let falseTimer: ReturnType<typeof setTimeout> | null = null;
     const checkUser = async () => {
       const loggedIn = await checkIsUserLoggedIn();
-      setIsLoggedIn(loggedIn);
+      // If loggedIn is true set immediately. If false, wait briefly to allow
+      // the auth subscription to restore a session on client-side navigation.
+      if (loggedIn) {
+        setIsLoggedIn(true);
+      } else {
+        // Delay setting to false so we don't flash the Login button when
+        // navigating from admin -> site before Supabase restores session.
+        falseTimer = setTimeout(() => {
+          setIsLoggedIn(false);
+        }, 700);
+      }
     };
     checkUser();
+
     // Listen for auth state changes so header updates when session is restored
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (falseTimer) {
+        clearTimeout(falseTimer);
+        falseTimer = null;
+      }
       setIsLoggedIn(!!session?.user);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      if (falseTimer) clearTimeout(falseTimer);
+      subscription.unsubscribe();
+    };
   }, []);
 
   // ✅ if inner page → show HeaderInner only

@@ -43,6 +43,25 @@ export default function MyRequests() {
     text: string;
   } | null>(null);
 
+  // Pagination
+  const itemsPerPage = 5;
+  const [ailmentPage, setAilmentPage] = useState(1);
+  const [remedyPage, setRemedyPage] = useState(1);
+
+  const ailments = requests.filter((r) => r.type === 'ailment');
+  const remedies = requests.filter((r) => r.type === 'remedy');
+
+  const ailmentTotalPages = Math.max(1, Math.ceil(ailments.length / itemsPerPage));
+  const remedyTotalPages = Math.max(1, Math.ceil(remedies.length / itemsPerPage));
+
+  useEffect(() => {
+    if (ailmentPage > ailmentTotalPages) setAilmentPage(ailmentTotalPages);
+  }, [ailmentPage, ailmentTotalPages]);
+
+  useEffect(() => {
+    if (remedyPage > remedyTotalPages) setRemedyPage(remedyTotalPages);
+  }, [remedyPage, remedyTotalPages]);
+
   // Auto-hide toast after 5 seconds
   useEffect(() => {
     if (toast) {
@@ -59,16 +78,20 @@ export default function MyRequests() {
 
   // Fetch user requests from ailments and remedies tables
   useEffect(() => {
-    const fetchRequests = async () => {
+    let mounted = true;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let subscription: any = null;
+
+    const fetchRequestsForUser = async (userId: string) => {
       try {
-        setRequestsLoading(true);
-        const { data: { user: authUser } } = await supabase.auth.getUser();
+        // keep loading state true while fetching
+        if (mounted) setRequestsLoading(true);
 
         // Fetch from ailments table where is_user_submission = true
         const { data: ailmentRequests, error: ailmentsError } = await supabase
           .from('ailments')
           .select('id, name, icon, slug, description, status, created_at, is_user_submission')
-          .eq('requested_by_user_id', authUser?.id || '')
+          .eq('requested_by_user_id', userId)
           .eq('is_user_submission', true)
           .order('created_at', { ascending: false });
 
@@ -78,7 +101,7 @@ export default function MyRequests() {
         const { data: remedyRequests, error: remediesError } = await supabase
           .from('remedies')
           .select('id, name, icon, slug, description, status, created_at, is_user_submission, key_symptoms')
-          .eq('requested_by_user_id', authUser?.id || '')
+          .eq('requested_by_user_id', userId)
           .eq('is_user_submission', true)
           .order('created_at', { ascending: false });
 
@@ -96,16 +119,66 @@ export default function MyRequests() {
           })),
         ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
-        setRequests(allRequests);
+        if (mounted) setRequests(allRequests);
       } catch (error) {
         console.error('Error fetching requests:', error);
-        showToast("error", "Failed to load requests");
+        if (mounted) showToast("error", "Failed to load requests");
       } finally {
-        setRequestsLoading(false);
+        if (mounted) setRequestsLoading(false);
       }
     };
 
-    fetchRequests();
+    const init = async () => {
+      // attempt to read current user
+      try {
+        setRequestsLoading(true);
+        const { data } = await supabase.auth.getUser();
+        const authUser = data?.user ?? null;
+
+        if (authUser) {
+          await fetchRequestsForUser(authUser.id);
+          return;
+        }
+
+        // If no user yet, listen for auth state change (supabase restores session asynchronously)
+        const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+          const user = session?.user ?? null;
+          if (user) {
+            fetchRequestsForUser(user.id);
+            // unsubscribe once we got user
+            try {
+              sub?.subscription?.unsubscribe?.();
+            } catch (e) {
+              // ignore
+            }
+          }
+        });
+
+        subscription = sub?.subscription ?? null;
+
+        // Safety fallback: if auth not restored within 5s, stop loading to avoid spinner hang
+        setTimeout(() => {
+          if (mounted && !subscription) setRequestsLoading(false);
+        }, 5000);
+      } catch (error) {
+        console.error('Error initializing requests fetch:', error);
+        if (mounted) {
+          showToast("error", "Failed to load requests");
+          setRequestsLoading(false);
+        }
+      }
+    };
+
+    init();
+
+    return () => {
+      mounted = false;
+      try {
+        subscription?.unsubscribe?.();
+      } catch (e) {
+        // ignore
+      }
+    };
   }, []);
 
   const handleEditClick = (request: Request) => {
@@ -259,7 +332,7 @@ z-50 animate-in slide-in-from-top-2
         <Breadcrumb
           items={[
             { label: "Home", href: "/" },
-            { label: "Account Settings", href: "/profile" },
+            { label: "Settings", href: "/profile" },
             { label: "My Requests", isActive: true },
           ]}
         />
@@ -298,7 +371,7 @@ z-50 animate-in slide-in-from-top-2
                     <table className="w-full">
                       <thead>
                         <tr className="border-b-8 border-b-[#F5F3ED] bg-white">
-                          <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-left sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[120px] w-[120px]">Req No 1</th>
+                          <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-left sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[120px] w-[120px]">Req No</th>
                           <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[200px] w-[200px]">Ailment Name</th>
                           <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[100px] w-[100px]">Emoji</th>
                           <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[100px] w-[100px]">Slug</th>
@@ -308,13 +381,13 @@ z-50 animate-in slide-in-from-top-2
                         </tr>
                       </thead>
                       <tbody className="bg-white">
-                        {requests.filter(r => r.type === 'ailment').map((request, index) => (
+                        {ailments.slice((ailmentPage - 1) * itemsPerPage, ailmentPage * itemsPerPage).map((request, idx) => (
                           <tr key={request.id} className="border-1 border-b-2 border-[#F5F3ED] hover:bg-gray-50">
-                            <td className="border-r border-r-[#D3D6D1] px-4 py-4 sm:text-base text-sm text-[#2B2E28] font-medium w-[120px]">Req #{index + 1}</td>
+                            <td className="border-r border-r-[#D3D6D1] px-4 py-4 sm:text-base text-sm text-[#2B2E28] font-medium w-[120px]">Req #{(ailmentPage - 1) * itemsPerPage + idx + 1}</td>
                             <td className="border-r border-r-[#D3D6D1] px-4 py-4 sm:text-base text-sm text-center text-[#0B0C0A] w-[200px]">{request.name}</td>
                             <td className="border-r border-r-[#D3D6D1] px-4 py-4 text-center text-lg w-[100px]">{request.icon}</td>
-                            <td className="border-r border-r-[#D3D6D1] px-4 py-4 text-center sm:text-base text-sm text-[#2B2E28] font-medium w-[100px]">N/A</td>
-                            <td className="border-r border-r-[#D3D6D1] px-4 py-4 sm:text-base text-sm text-[#2B2E28] font-medium w-[300px]">Lorem ipsum...</td>
+                            <td className="border-r border-r-[#D3D6D1] px-4 py-4 text-center sm:text-base text-sm text-[#2B2E28] font-medium w-[100px]">{request.slug || 'N/A'}</td>
+                            <td className="border-r border-r-[#D3D6D1] px-4 py-4 sm:text-base text-sm text-[#2B2E28] font-medium w-[300px]">NA</td>
                             <td className="border-r border-r-[#D3D6D1] px-4 py-4 text-center w-[115px]">
                               <span className={`sm:text-sm text-xs font-medium px-2 py-1 rounded-full ${request.status === 'approved' ? 'text-[#175F3D] bg-[#E9F5F0]' :
                                 request.status === 'declined' ? 'sm:text-sm text-xs font-medium px-2 py-1 rounded-full text-[#B62E31] bg-[#FCEBEC]' :
@@ -379,15 +452,19 @@ z-50 animate-in slide-in-from-top-2
                     </table>
                   </div>
                   <div className="mt-6 flex justify-center items-center gap-3">
-                    <button className="p-1 text-[#0B0C0A] hover:text-[#6C7463]">
+                    <button
+                      onClick={() => setAilmentPage((p) => Math.max(1, p - 1))}
+                      className="p-1 text-[#0B0C0A] hover:text-[#6C7463]"
+                    >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                       </svg>
                     </button>
-                    {[1, 2, 3, 4].map((page) => (
+                    {Array.from({ length: ailmentTotalPages }, (_, i) => i + 1).map((page) => (
                       <button
                         key={page}
-                        className={`w-[40px] h-[40px] rounded-full text-xs font-medium transition-colors flex items-center justify-center ${page === 1
+                        onClick={() => setAilmentPage(page)}
+                        className={`w-[40px] h-[40px] rounded-full text-xs font-medium transition-colors flex items-center justify-center ${page === ailmentPage
                           ? 'bg-[#6C7463] text-white'
                           : 'bg-[#F5F3ED] text-[#41463B] hover:bg-[#6C7463] hover:text-white'
                           }`}
@@ -395,7 +472,10 @@ z-50 animate-in slide-in-from-top-2
                         {page}
                       </button>
                     ))}
-                    <button className="p-1 text-[#0B0C0A] hover:text-[#6C7463]">
+                    <button
+                      onClick={() => setAilmentPage((p) => Math.min(ailmentTotalPages, p + 1))}
+                      className="p-1 text-[#0B0C0A] hover:text-[#6C7463]"
+                    >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
@@ -412,7 +492,7 @@ z-50 animate-in slide-in-from-top-2
                     <table className="w-full">
                       <thead>
                         <tr className="border-b-8 border-b-[#F5F3ED] bg-white">
-                          <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-left sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[120px] w-[120px]">Req No 1</th>
+                          <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-left sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[120px] w-[120px]">Req No</th>
                           <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[200px] w-[200px]">Remedy Name</th>
                           <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[100px] w-[100px]">Emoji</th>
                           <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[100px] w-[100px]">Slug</th>
@@ -422,13 +502,13 @@ z-50 animate-in slide-in-from-top-2
                         </tr>
                       </thead>
                       <tbody className="bg-white">
-                        {requests.filter(r => r.type === 'remedy').map((request, index) => (
+                        {remedies.slice((remedyPage - 1) * itemsPerPage, remedyPage * itemsPerPage).map((request, idx) => (
                           <tr key={request.id} className="border-1 border-b-2 border-[#F5F3ED] hover:bg-gray-50">
-                            <td className="font-medium border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 sm:text-base text-sm text-[#2B2E28] min-w-[120px] w-[120px]">Req #{index + 1}</td>
+                            <td className="font-medium border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 sm:text-base text-sm text-[#2B2E28] min-w-[120px] w-[120px]">Req #{(remedyPage - 1) * itemsPerPage + idx + 1}</td>
                             <td className="font-medium border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 sm:text-base text-sm text-[#2B2E28] text-center min-w-[200px] w-[200px]">{request.name}</td>
                             <td className="font-medium border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center text-lg min-w-[100px] w-[100px]">{request.icon}</td>
-                            <td className="font-medium border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 sm:text-base text-sm text-[#2B2E28] text-center min-w-[100px] w-[100px]">N/A</td>
-                            <td className="font-medium border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 sm:text-base text-sm text-[#2B2E28] min-w-[300px] w-[300px]">Lorem ipsum...</td>
+                            <td className="font-medium border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 sm:text-base text-sm text-[#2B2E28] text-center min-w-[100px] w-[100px]">{request.slug || 'N/A'}</td>
+                            <td className="font-medium border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 sm:text-base text-sm text-[#2B2E28] min-w-[300px] w-[300px]">NA</td>
                             <td className="font-medium border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm text-[#2B2E28] min-w-[115px] w-[115px]">
                               <span className={`sm:text-sm text-xs font-medium px-2 py-1 rounded-full ${request.status === 'approved' ? 'text-[#175F3D] bg-[#E9F5F0]' :
                                 request.status === 'declined' ? 'text-red-600' :
@@ -494,15 +574,19 @@ z-50 animate-in slide-in-from-top-2
                     </table>
                   </div>
                   <div className="mt-6 flex justify-center items-center gap-3">
-                    <button className="p-1 text-[#0B0C0A] hover:text-[#6C7463]">
+                    <button
+                      onClick={() => setRemedyPage((p) => Math.max(1, p - 1))}
+                      className="p-1 text-[#0B0C0A] hover:text-[#6C7463]"
+                    >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                       </svg>
                     </button>
-                    {[1, 2, 3, 4].map((page) => (
+                    {Array.from({ length: remedyTotalPages }, (_, i) => i + 1).map((page) => (
                       <button
                         key={page}
-                        className={`w-[40px] h-[40px] rounded-full text-xs font-medium transition-colors flex items-center justify-center ${page === 1
+                        onClick={() => setRemedyPage(page)}
+                        className={`w-[40px] h-[40px] rounded-full text-xs font-medium transition-colors flex items-center justify-center ${page === remedyPage
                           ? 'bg-[#6C7463] text-white'
                           : 'bg-[#F5F3ED] text-[#41463B] hover:bg-[#6C7463] hover:text-white'
                           }`}
@@ -510,7 +594,10 @@ z-50 animate-in slide-in-from-top-2
                         {page}
                       </button>
                     ))}
-                    <button className="p-1 text-[#0B0C0A] hover:text-[#6C7463]">
+                    <button
+                      onClick={() => setRemedyPage((p) => Math.min(remedyTotalPages, p + 1))}
+                      className="p-1 text-[#0B0C0A] hover:text-[#6C7463]"
+                    >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>

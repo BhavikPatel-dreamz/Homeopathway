@@ -118,7 +118,7 @@ export default function AddRemedyForm() {
           )}
 
           {/* Basic Information */}
-          <div className="border-b pb-6">
+          <div >
             <div className="space-y-4">
               {/* Name */}
               <div>
@@ -272,7 +272,7 @@ export default function AddRemedyForm() {
           </div>
 
           {/* Clinical Information */}
-          <div className="border-b pb-6">
+          <div>
 
             <div className="space-y-4">
               {/* Key Symptoms */}
