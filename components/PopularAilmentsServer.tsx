@@ -10,9 +10,9 @@ interface PopularAilmentsServerProps {
   searchQuery?: string;
 }
 
-export default function PopularAilmentsServer({ 
-  ailments, 
-  searchQuery = "" 
+export default function PopularAilmentsServer({
+  ailments,
+  searchQuery = ""
 }: PopularAilmentsServerProps) {
   const [isMobile, setIsMobile] = useState(false);
 
@@ -38,7 +38,7 @@ export default function PopularAilmentsServer({
       <div className="max-w-7xl px-0 lg:px-5 mx-auto">
         <div className="flex items-center gap-3 mb-6">
           <img className="w-[40px] h-[40px] lg:w-[60px] lg:h-[60px]" src="/ailments-icon.svg" alt="" />
-          <h3 className="text-[28px] lg:text-[40px] text-[#0B0C0A]">
+          <h3 className="text-3xl sm:text-2xl md:text-3xl lg:text-[40px] leading-tight font-normal text-[#0B0C0A]">
             {searchQuery.trim() ? "Ailment Results" : "Popular Ailments"}
           </h3>
         </div>

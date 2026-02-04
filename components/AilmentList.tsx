@@ -160,13 +160,13 @@ export default function AilmentListPage({
       />
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-0 lg:px-5 py-8">
+      <main className="max-w-7xl mx-auto px-4 lg:px-5 py-8">
         {/* Ailments Section */}
-        <div className="bg-white rounded-2xl p-8 shadow-sm">
+        <div className="bg-white rounded-2xl sm:p-8 p-4 shadow-sm">
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-2">
               <img className="w-[40px] h-[40px] sm:w-[50px] sm:h-[50px] lg:w-[60px] lg:h-[60px]" alt="" src="/ailments-icon.svg" />
-              <h1 className="text-4xl font-serif text-gray-900">All Ailments</h1>
+              <h1 className="text-3xl lg:text-4xl font-normal text-[#0B0C0A] leading-tight">All Ailments</h1>
             </div>
             <p className="text-gray-600 mt-2">
               Browse through our comprehensive collection of ailments and find the right homeopathic remedies for you.
@@ -175,14 +175,14 @@ export default function AilmentListPage({
 
           {/* Sort control */}
           <div className="mb-6 flex items-center gap-3 justify-end">
-            <label className="text-base font-medium text-[#2B2E28]">Sort by:</label>
+            <label className="sm:text-base text-sm font-medium text-[#2B2E28]">Sort by:</label>
 
             <div ref={sortDropdownRef} className="relative">
               {/* Button */}
               <button
                 type="button"
                 onClick={() => setIsSortOpen(prev => !prev)}
-                className="flex items-center gap-1 text-[#2B2E28] text-base font-normal"
+                className="flex items-center gap-1 text-[#2B2E28] sm:text-base text-sm font-normal cursor-pointer focus:outline-none"
               >
                 <span>
                   {sortBy === "az"
@@ -237,10 +237,10 @@ export default function AilmentListPage({
                 <Link href={`/${ailment.slug}`} key={ailment.slug}>
                   <div className="bg-white rounded-xl sm:p-6 p-3 border border-gray-200 hover:shadow-lg  transition-all text-left h-full flex flex-col justify-between group cursor-pointer">
                     <div>
-                      <div className="text-5xl mb-3">{ailment.icon}</div>
-                      <h4 className="font-semibold text-lg mb-2 text-gray-900 group-hover:text-[#2C5F4F] transition-colors">
+                      <div className="md:text-5xl text-3xl mb-3">{ailment.icon}</div>
+                      <p className=" font- text-[15px] sm:text-[16px] font-semibold text-[#0B0C0A] whitespace-normal break-words  mb-2 group-hover:text-[#2C5F4F] transition-colors">
                         {ailment.name}
-                      </h4>
+                      </p>
                     </div>
                     {/* <p className="text-sm text-gray-500 mt-3 flex items-center gap-1">
                       <span>🔬</span>
@@ -272,9 +272,11 @@ export default function AilmentListPage({
                 <button
                   onClick={goToPrevious}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                  className="md:w-[40px] w-[30px] md:h-[40px] h-[30px] cursor-pointer flex items-center justify-center rounded-full bg-[#F5F3ED] hover:bg-[#ECE9E0] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
                 >
-                  Previous
+                  <svg width="8" height="13" viewBox="0 0 8 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2.828 6.364L7.778 11.314L6.364 12.728L0 6.364L6.364 0L7.778 1.414L2.828 6.364Z" fill="#0B0C0A" />
+                  </svg>
                 </button>
 
                 {getPageNumbers().map((page, index) => (
@@ -282,9 +284,9 @@ export default function AilmentListPage({
                     <button
                       key={index}
                       onClick={() => goToPage(page)}
-                      className={`px-4 py-2 rounded-lg transition-colors font-medium ${currentPage === page
-                        ? 'bg-[#4B544A] text-white'
-                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      className={`md:w-[40px] w-[30px] md:h-[40px] h-[30px] cursor-pointer flex items-center justify-center rounded-full transition-all transition-duration-300 font-medium ${currentPage === page
+                        ? 'bg-[#6C7463] text-white'
+                        : 'bg-[#F5F3ED] text-[#41463B] hover:bg-[#6C7463] hover:text-white '
                         }`}
                     >
                       {page}
@@ -299,15 +301,17 @@ export default function AilmentListPage({
                 <button
                   onClick={goToNext}
                   disabled={currentPage === totalPages}
-                  className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                  className="md:w-[40px] w-[30px] md:h-[40px] h-[30px] cursor-pointer flex items-center justify-center p-0 rounded-full bg-[#F5F3ED] hover:bg-[#ECE9E0] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
                 >
-                  Next
+                  <svg width="8" height="13" viewBox="0 0 8 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4.95 6.364L0 1.414L1.414 0L7.778 6.364L1.414 12.728L0 11.314L4.95 6.364Z" fill="#0B0C0A" />
+                  </svg>
                 </button>
               </div>
 
-              <div className="text-center mt-4 text-sm text-gray-600">
+              {/* <div className="text-center mt-4 text-sm text-gray-600">
                 Page {currentPage} of {totalPages}
-              </div>
+              </div> */}
             </div>
           )}
         </div>
