@@ -341,10 +341,10 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
   return (
     <div className="fixed inset-0 bg-[rgba(0,0,0,0.6)] backdrop-blur-[5.5px] flex items-center justify-center p-3 sm:p-4 z-[9999]">
       <div className="bg-white rounded-xl w-full max-w-lg relative max-h-[95vh] overflow-y-auto">
-        {/* Close Button */}
+        {/* Close Button -comment icon by Zankhana bcz 2 close icon shown on front end*/}
         <button
           onClick={handleClose}
-          className="absolute top-4 right-4 sm:top-6 sm:right-6 text-gray-400 hover:text-gray-600 transition-colors z-[9999]"
+          className="zzzzzzzzzzzzzzzzz absolute top-4 right-4 sm:top-6 sm:right-6 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
         >
           <X size={20} className="sm:hidden" />
           <X size={24} className="hidden sm:block" />

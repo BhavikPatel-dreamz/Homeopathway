@@ -49,7 +49,7 @@ export default function HeaderInner() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowShareModal(true)}
-            className="flex items-center justify-center w-[25px] h-[25px] md:w-[35px] md:h-[35px] lg:w-[44px] lg:h-[44px] hover:bg-gray-200 rounded-full transition-colors"
+            className="flex items-center justify-center w-[25px] h-[25px] md:w-[35px] md:h-[35px] lg:w-[44px] lg:h-[44px] hover:bg-gray-200 rounded-full transition-colors cursor-pointer"
             title="Share this page"
           >
             <Image height={20} width={20} src="/share-icon.svg" alt="Share" />
