@@ -25,9 +25,11 @@ export default function Header() {
       } else {
         // Delay setting to false so we don't flash the Login button when
         // navigating from admin -> site before Supabase restores session.
+        // Increase the delay to give Supabase more time to restore cookies
+        // during client-side navigation (prevents brief Login flash).
         falseTimer = setTimeout(() => {
           setIsLoggedIn(false);
-        }, 700);
+        }, 1500);
       }
     };
     checkUser();

@@ -207,6 +207,17 @@ export default function SearchBar() {
                 <p className="text-sm mt-1">
                   Try searching for different keywords
                 </p>
+                <div className="mt-4">
+                  <button
+                    onClick={() => {
+                      setShowRequestModal(true);
+                      setShowSuggestions(false);
+                    }}
+                    className="px-3 py-2 bg-white hover:bg-[#4a5f56] text-[#2B2E28] hover:text-white border border-black rounded-full font-semibold text-sm transition-colors"
+                  >
+                    Request a new Ailment or Remedy
+                  </button>
+                </div>
               </div>
             )}
           </div>
