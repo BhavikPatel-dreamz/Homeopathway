@@ -81,14 +81,14 @@ export default function TopRatedRemediesServer({
           </div>
 
           {/* Sort control */}
-          <div className="flex items-center gap-3 justify-end">
+          <div className="flex flex-wrap items-center gap-3 justify-end">
             <label className="text-sm font-medium text-[#2B2E28]">Sort by:</label>
 
             <div className="relative" ref={sortDropdownRef}>
               <button
                 type="button"
                 onClick={() => setIsSortOpen((p) => !p)}
-                className="flex items-center gap-1 text-[#2B2E28] text-sm font-normal cursor-pointer focus:outline-none"
+                className="flex items-center gap-1 text-[#20231E] text-sm font-normal cursor-pointer focus:outline-none"
               >
                 <span>
                   {sortBy === "rating"
