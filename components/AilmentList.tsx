@@ -96,6 +96,23 @@ export default function AilmentListPage({
     setCurrentPage(1);
   }, [searchQuery]);
 
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        sortDropdownRef.current &&
+        !sortDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsSortOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   // Reset to page 1 when sort changes
   React.useEffect(() => {
     setCurrentPage(1);
@@ -175,14 +192,14 @@ export default function AilmentListPage({
 
           {/* Sort control */}
           <div className="mb-6 flex items-center gap-3 justify-end">
-            <label className="sm:text-base text-sm font-medium text-[#2B2E28]">Sort by:</label>
+            <label className="text-sm font-medium text-[#2B2E28]">Sort by:</label>
 
             <div ref={sortDropdownRef} className="relative">
               {/* Button */}
               <button
                 type="button"
                 onClick={() => setIsSortOpen(prev => !prev)}
-                className="flex items-center gap-1 text-[#2B2E28] sm:text-base text-sm font-normal cursor-pointer focus:outline-none"
+                className="flex items-center gap-1 text-[#2B2E28] text-sm font-normal cursor-pointer focus:outline-none"
               >
                 <span>
                   {sortBy === "az"
