@@ -387,11 +387,11 @@ export default function ReviewListPage({
 
   return (
     <div>
-      <section id="Reviews" className="bg-white rounded-2xl md:p-4 sm:py-8 ">
+      <section id="Reviews" className="bg-white rounded-2xl md:px-4">
         <div className="grid grid-cols-1 lg:grid-cols-3 md:gap-6 sm:gap-10">
           {/* Left Panel – Ratings Summary */}
-          <aside className="col-span-1 mb-6 lg:mb-0">
-            <div className="flex flex-col text-left md:p-3 sm:p-6">
+          <aside className="col-span-1 mb-6 lg:mb-0 lg:max-w-[262px]">
+            <div className="flex flex-col text-left">
               <p className="text-base sm:text-[20px] text-[#0B0C0A] font-semibold mb-2">Reviews</p>
               <div className="flex items-center gap-2 sm:gap-3">
                 <Image src="/star.svg" alt="Star" width={36} height={36} className="sm:w-12 sm:h-12" />
@@ -411,10 +411,10 @@ export default function ReviewListPage({
                     <button
                       key={star}
                       onClick={() => setFilters((prev) => ({ ...prev, rating: prev.rating.includes(star) ? [] : [star] }))}
-                      className={`flex items-center text-sm sm:text-sm w-full rounded-md  hover:bg-[#6C74631A] px-3 py-2 transition ${isActive ? "bg-[#6C74631A]" : "border-[#6C74631A]/10 "} `} >
+                      className={`flex items-center text-sm sm:text-sm w-full rounded-lg  hover:bg-[#6C74631A] px-3 py-2 transition ${isActive ? "bg-[#6C74631A]" : "border-[#6C74631A]/10 "} `} >
                       <Image src="/star.svg" alt={`${star} Star`} width={15} height={15} className="sm:w-4 sm:h-4 mr-1" />
-                      <span className="w-3 text-gray-700 font-medium mr-5">{star}</span>
-                      <div className="flex-1 h-2 bg-[#4B544A]/20 rounded-xl overflow-hidden">
+                      <span className="w-3 text-gray-700 font-medium mr-3">{star}</span>
+                      <div className="flex-1 h-2 bg-[#4B544A]/20 rounded-xl overflow-hidden w-[196px]">
                         <div className="h-full transition-all duration-300 rounded-xl bg-[#6C7463]" style={{ width: `${percentage}%` }} />
                       </div>
                     </button>

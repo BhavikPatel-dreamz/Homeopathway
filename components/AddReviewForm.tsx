@@ -838,9 +838,11 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
               <div className="bg-white w-[368px] h-[312] sm:w-[495px] sm:h-[328px] rounded-xl shadow-2xl w-full max-w-md relative text-center p-10 animate-fadeIn scale-100">
                 <button
                   onClick={onClose}
-                  className="absolute top-4 right-4 text-[#41463B] hover:[#41463B]"
+                  className="absolute top-5 right-5 text-[#41463B] hover:[#41463B] cursor-pointer group"
                 >
-                  <X size={24} />
+                  <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10.6067 8.25L18.8567 0L21.2133 2.35667L12.9633 10.6067L21.2133 18.8567L18.8567 21.2133L10.6067 12.9633L2.35667 21.2133L0 18.8567L8.25 10.6067L0 2.35667L2.35667 0L10.6067 8.25Z" fill="#83857D" className="transition-all duration-300 group-hover:fill-[#41463B]" />
+                  </svg>
                 </button>
 
                 <div className="flex flex-col items-center space-y-3">
@@ -856,7 +858,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                     Thanks for Sharing!
                   </h2>
 
-                  <p className="text-[#41463B] text-[16px] sm:text-[15px] leading-relaxed">
+                  <p className="text-[#41463B] text-base font-medium leading-relaxed">
                     Your review goes a long way to helping the homeopathic community.
                   </p>
                 </div>
