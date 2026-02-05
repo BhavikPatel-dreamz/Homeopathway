@@ -63,6 +63,23 @@ export default function RemedyListPage({
     setCurrentPage(1);
   }, [sortBy]);
 
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        sortDropdownRef.current &&
+        !sortDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsSortOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const goToPage = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -151,7 +168,7 @@ export default function RemedyListPage({
             )}
 
             {!searchQuery && filteredRemedies.length > ITEMS_PER_PAGE && (
-              <div className="mb-6 text-[#2B2E28] font-medium sm:text-base text-sm">
+              <div className="mb-6 text-[#2B2E28] font-medium text-sm">
                 Showing {startIndex + 1}-{Math.min(endIndex, filteredRemedies.length)} of {filteredRemedies.length} remedies
               </div>
             )}
@@ -159,14 +176,14 @@ export default function RemedyListPage({
             {/* Sort control */}
             {/* Sort control */}
             <div className="mb-6 flex items-center gap-3 justify-end">
-              <label className="sm:text-base text-sm font-medium text-[#2B2E28]">Sort by:</label>
+              <label className="text-sm font-medium text-[#2B2E28]">Sort by:</label>
 
               <div ref={sortDropdownRef} className="relative">
                 {/* Button */}
                 <button
                   type="button"
                   onClick={() => setIsSortOpen(prev => !prev)}
-                  className="flex items-center gap-1 text-[#2B2E28] sm:text-base text-sm font-normal cursor-pointer focus:outline-none"
+                  className="flex items-center gap-1 text-[#2B2E28] text-sm font-normal cursor-pointer focus:outline-none"
                 >
                   <span>
                     {sortBy === "az"

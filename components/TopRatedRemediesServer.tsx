@@ -49,7 +49,7 @@ export default function TopRatedRemediesServer({
             height={60}
           />
           <h3 className="text-3xl sm:text-2xl md:text-3xl lg:text-[40px] leading-tight font-normal text-[#0B0C0A]">
-            {searchQuery.trim() ? "Remedy Results" : "Popular Remedies"}
+            {searchQuery.trim() ? "Remedy Results" : "Top Rated Remedies"}
           </h3>
         </div>
 
