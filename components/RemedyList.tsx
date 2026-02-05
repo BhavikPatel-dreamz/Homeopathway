@@ -63,6 +63,23 @@ export default function RemedyListPage({
     setCurrentPage(1);
   }, [sortBy]);
 
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        sortDropdownRef.current &&
+        !sortDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsSortOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const goToPage = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -115,12 +132,12 @@ export default function RemedyListPage({
       />
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-0 lg:px-5 py-8">
+      <main className="max-w-7xl mx-auto px-4 lg:px-5 py-8">
         {/* Remedies Section */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm">
+        <div className="bg-white rounded-2xl sm:p-6 px-4 py-6 shadow-sm">
           {/* Header */}
           <div className="mb-8">
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex flex-wrap items-center gap-3 mb-2">
               <Image
                 className="w-[40px] h-[40px] sm:w-[50px] sm:h-[50px] lg:w-[60px] lg:h-[60px]"
                 src="/top-remedies.svg"
@@ -128,7 +145,7 @@ export default function RemedyListPage({
                 width={60}
                 height={60}
               />
-              <h1 className="text-4xl font-serif text-gray-900">
+              <h1 className="text-3xl lg:text-4xl font-normal text-[#0B0C0A] leading-tight">
                 All Remedies
               </h1>
             </div>
@@ -137,10 +154,10 @@ export default function RemedyListPage({
             </p>
           </div>
 
-          <div className='flex items-center justify-between'>
+          <div className='flex flex-wrap items-center justify-between'>
             {/* Search Results Info */}
             {searchQuery && (
-              <div className="mb-6 text-gray-600">
+              <div className="mb-6 text-[#0B0C0A] font-medium">
                 Found {filteredRemedies.length} remedy{filteredRemedies.length !== 1 ? 's' : ''} matching &quot;{searchQuery}&quot;
                 {filteredRemedies.length > ITEMS_PER_PAGE && (
                   <span className="ml-2">
@@ -151,7 +168,7 @@ export default function RemedyListPage({
             )}
 
             {!searchQuery && filteredRemedies.length > ITEMS_PER_PAGE && (
-              <div className="mb-6 text-gray-600">
+              <div className="mb-6 text-[#2B2E28] font-medium text-sm">
                 Showing {startIndex + 1}-{Math.min(endIndex, filteredRemedies.length)} of {filteredRemedies.length} remedies
               </div>
             )}
@@ -159,14 +176,14 @@ export default function RemedyListPage({
             {/* Sort control */}
             {/* Sort control */}
             <div className="mb-6 flex items-center gap-3 justify-end">
-              <label className="text-base font-medium text-[#2B2E28]">Sort by:</label>
+              <label className="text-sm font-medium text-[#2B2E28]">Sort by:</label>
 
               <div ref={sortDropdownRef} className="relative">
                 {/* Button */}
                 <button
                   type="button"
                   onClick={() => setIsSortOpen(prev => !prev)}
-                  className="flex items-center gap-1 text-[#2B2E28] text-base font-normal"
+                  className="flex items-center gap-1 text-[#2B2E28] text-sm font-normal cursor-pointer focus:outline-none"
                 >
                   <span>
                     {sortBy === "az"
@@ -242,7 +259,7 @@ export default function RemedyListPage({
             </div> */}
 
           {/* Remedies Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-6 gap-3">
+          <div className="grid max-[380px]:grid-cols-1 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-6 gap-3">
             {paginatedRemedies.length > 0 ? (
               paginatedRemedies.map((remedy) => {
                 const avg = Number(remedy.rating ?? remedy.average_rating ?? 0);
@@ -254,14 +271,14 @@ export default function RemedyListPage({
                       className="bg-white rounded-xl sm:p-6 p-3 border border-gray-200 hover:shadow-lg  transition-all text-left h-full flex flex-col justify-between group cursor-pointer"
                     >
                       <div>
-                        <div className="text-5xl mb-3">{remedy.icon || '🌿'}</div>
-                        <h4 className="font-semibold text-lg mb-2 text-gray-900 group-hover:text-[#2C5F4F] transition-colors">
+                        <div className="md:text-5xl text-3xl mb-3">{remedy.icon || '🌿'}</div>
+                        <p className="font-semibold sm:text-xl text-lg mb-2 text-[#0B0C0A] group-hover:text-[#2C5F4F] transition-colors">
                           {remedy.name}
-                        </h4>
+                        </p>
                         <p className="text-sm text-gray-600 line-clamp-2">{remedy.description}</p>
                       </div>
-                      <div className="sm:text-sm text-xs text-gray-500 mt-3 flex sm:flex-nowrap flex-wrap  items-center gap-2">
-                        <span className="flex items-center gap-1 text-[#E69E29]">
+                      <div className="text-sm text-[#2B2E28] mt-3 flex sm:flex-nowrap flex-wrap  items-center gap-2">
+                        <span className="flex items-center gap-1 font-medium text-[#E69E29]">
                           <Image src="/star.svg" alt="Star" width={16} height={16} />
                           <span>{avg.toFixed(1)}</span>
                         </span>
@@ -295,9 +312,11 @@ export default function RemedyListPage({
                 <button
                   onClick={goToPrevious}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                  className="md:w-[40px] w-[30px] md:h-[40px] h-[30px] cursor-pointer flex items-center justify-center rounded-full bg-[#F5F3ED] hover:bg-[#ECE9E0] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
                 >
-                  Previous
+                  <svg width="8" height="13" viewBox="0 0 8 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2.828 6.364L7.778 11.314L6.364 12.728L0 6.364L6.364 0L7.778 1.414L2.828 6.364Z" fill="#0B0C0A" />
+                  </svg>
                 </button>
 
                 {getPageNumbers().map((page, index) => (
@@ -305,9 +324,9 @@ export default function RemedyListPage({
                     <button
                       key={index}
                       onClick={() => goToPage(page)}
-                      className={`px-4 py-2 rounded-lg transition-colors font-medium ${currentPage === page
-                        ? 'bg-[#4B544A] text-white'
-                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      className={`md:w-[40px] w-[30px] md:h-[40px] h-[30px] cursor-pointer flex items-center justify-center rounded-full transition-all transition-duration-300 font-medium ${currentPage === page
+                        ? 'bg-[#6C7463] text-white'
+                        : 'bg-[#F5F3ED] text-[#41463B] hover:bg-[#6C7463] hover:text-white'
                         }`}
                     >
                       {page}
@@ -322,15 +341,17 @@ export default function RemedyListPage({
                 <button
                   onClick={goToNext}
                   disabled={currentPage === totalPages}
-                  className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                  className="md:w-[40px] w-[30px] md:h-[40px] h-[30px] cursor-pointer flex items-center justify-center p-0 rounded-full bg-[#F5F3ED] hover:bg-[#ECE9E0] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
                 >
-                  Next
+                  <svg width="8" height="13" viewBox="0 0 8 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4.95 6.364L0 1.414L1.414 0L7.778 6.364L1.414 12.728L0 11.314L4.95 6.364Z" fill="#0B0C0A" />
+                  </svg>
                 </button>
               </div>
 
-              <div className="text-center mt-4 text-sm text-gray-600">
+              {/* <div className="text-center mt-4 text-sm text-gray-600">
                 Page {currentPage} of {totalPages}
-              </div>
+              </div> */}
             </div>
           )}
         </div>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import * as XLSX from 'xlsx'
@@ -36,7 +37,12 @@ export async function POST(req: Request) {
     }
 
     const arrayBuffer = await file.arrayBuffer()
-    const workbook = XLSX.read(arrayBuffer, { type: 'array' })
+    // If the uploaded file is a CSV, decode as UTF-8 text first so
+    // characters like emoji are preserved correctly when parsed.
+    const isCSV = typeof (file as any).name === 'string' && (file as any).name.toLowerCase().endsWith('.csv')
+    const workbook = isCSV
+      ? XLSX.read(new TextDecoder('utf-8').decode(arrayBuffer), { type: 'string' })
+      : XLSX.read(arrayBuffer, { type: 'array' })
 
     // Try to find a sheet named 'Remedies', otherwise fall back to the first sheet (works for CSV)
     let sheet = workbook.Sheets['Remedies']

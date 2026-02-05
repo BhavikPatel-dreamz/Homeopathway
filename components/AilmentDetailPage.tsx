@@ -4,7 +4,7 @@ import Header from "./Header";
 import Breadcrumb from "./Breadcrumb";
 import TopRemedies from "./TopRemedies";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AddReviewForm from "./AddReviewForm";
 
 interface Remedy {
@@ -36,6 +36,12 @@ interface AilmentDetailPageProps {
 
 export default function AilmentDetailPage({ ailment, remedies }: AilmentDetailPageProps) {
   const [showAddReviewForm, setShowAddReviewForm] = useState(false);
+  useEffect(() => {
+    // Ensure the page starts at the top when navigating to an ailment
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    }
+  }, []);
   const breadcrumbItems = [
     { label: "Home", href: "/" },
     // { label: "Ailments", href: "/ailments" },

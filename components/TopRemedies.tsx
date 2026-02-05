@@ -105,7 +105,7 @@ export default function TopRemedies({
         <div className="flex items-center gap-3">
           <img src="/top-remedies.svg" alt="Top Remedies" className="w-8 sm:w-10 lg:w-12" />
 
-          <h2 className="text-xl sm:text-3xl lg:text-4xl font-normal max-w-[100px] md:max-w-[300px] text-[#0B0C0A] leading-tight">
+          <h2 className="text-3xl lg:text-4xl font-normal max-w-[100px] md:max-w-[300px] text-[#0B0C0A] leading-tight">
             Top Remedies
           </h2>
         </div>
@@ -125,7 +125,7 @@ export default function TopRemedies({
               <button
                 id="sort-remedies"
                 onClick={() => setIsOpen((prev) => !prev)}
-                className="flex items-center justify-between gap-1 text-sm text-[#20231E] transition"
+                className="flex items-center justify-between gap-1 text-sm text-[#20231E] transition cursor-pointer"
               >
                 <span className="truncate">{sortBy}</span>
 
@@ -148,7 +148,7 @@ export default function TopRemedies({
                       <li
                         key={option}
                         onClick={() => handleSelect(option)}
-                        className={`px-3 py-2 text-sm cursor-pointertransition-colors ${sortBy === option
+                        className={`px-3 py-2 text-sm cursor-pointer transition-colors ${sortBy === option
                           ? "bg-[#6C7463] text-white font-medium hover:bg-[#6C7463] hover:text-white"
                           : "text-gray-700 hover:bg-[#6c746333] hover:text-black "
                           }`}
@@ -170,9 +170,9 @@ export default function TopRemedies({
         {sortedRemedies.map((remedy, index) => (
           <Link
             href={
-              ailmentSlug
-                ? `/${ailmentSlug}/${remedy.slug}`
-                : `/remedies/${remedy.slug}`
+                  ailmentSlug
+                    ? `/${encodeURIComponent(ailmentSlug)}/${encodeURIComponent(remedy.slug)}`
+                    : `/remedies/${encodeURIComponent(remedy.slug)}`
             }
             key={remedy.slug}
           >

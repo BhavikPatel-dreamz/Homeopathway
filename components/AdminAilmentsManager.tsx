@@ -248,14 +248,18 @@ export default function AdminAilmentsManager() {
 
       await poll()
 
-      // ensure progress reaches 100 visually, wait briefly, then refresh
+      // ensure progress reaches 100 visually
       animateTo(100)
-      await new Promise(r => setTimeout(r, 700))
 
-      // refresh ailments list after import
-      await fetchAilments()
+      // Show success immediately once server reports 100% progress,
+      // then refresh the ailments list in background to avoid UI delay.
       setMessage({ type: 'success', text: 'Import completed successfully' })
       setTimeout(() => setMessage(null), 4000)
+
+      // refresh ailments list after import (do not await to keep UI responsive)
+      fetchAilments().catch((e) => {
+        console.error('Failed to refresh ailments after import:', e)
+      })
     } catch (err) {
       console.error(err);
       setMessage({ type: 'error', text: 'Import failed. Please check the CSV or XLSX file.'});

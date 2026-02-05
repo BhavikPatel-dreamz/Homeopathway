@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Remedy } from "@/types";
@@ -15,6 +15,9 @@ export default function TopRatedRemediesServer({
   searchQuery = ""
 }: TopRatedRemediesServerProps) {
   const [isMobile, setIsMobile] = useState(false);
+  const [sortBy, setSortBy] = useState<string>(""); // "" | "rating" | "most-reviewed" | "az"
+  const [isSortOpen, setIsSortOpen] = useState(false);
+  const sortDropdownRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -31,29 +34,111 @@ export default function TopRatedRemediesServer({
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
+  // Close sort dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (sortDropdownRef.current && !sortDropdownRef.current.contains(event.target as Node)) {
+        setIsSortOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const displayCount = isMobile ? 5 : topRemedies.length;
-  
-  // Just use the original remedy data - no need to refetch stats
-  // The stats are already calculated and stored in the remedies table
-  const remediesWithStats = topRemedies.slice(0, displayCount);
+
+  // Prepare remedies and apply client-side sorting based on selection
+  const sortedRemedies = (() => {
+    const list = [...topRemedies];
+    if (sortBy === 'rating') {
+      list.sort((a, b) => (b.average_rating ?? 0) - (a.average_rating ?? 0));
+    } else if (sortBy === 'most-reviewed') {
+      list.sort((a, b) => (b.reviewCount ?? b.review_count ?? 0) - (a.reviewCount ?? a.review_count ?? 0));
+    } else if (sortBy === 'az') {
+      list.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    }
+    return list;
+  })();
+
+  const remediesWithStats = sortedRemedies.slice(0, displayCount);
 
   return (
     <section className="px-4 py-6 lg:py-10 bg-[#f5f3ed]">
       <div className="max-w-7xl px-0 lg:px-5 mx-auto">
-        <div className="flex items-center gap-3 mb-8">
-          <Image
-            className="w-[40px] h-[40px] lg:w-[60px] lg:h-[60px]"
-            src="/top-remedies.svg"
-            alt="Top Remedies Icon"
-            width={60}
-            height={60}
-          />
-          <h3 className="text-[28px] lg:text-[40px] text-[#0B0C0A]">
-            {searchQuery.trim() ? "Remedy Results" : "Popular Remedies"}
-          </h3>
+        <div className="flex items-center justify-between gap-3 mb-8">
+          <div className="flex items-center gap-3">
+            <Image
+              className="w-[40px] h-[40px] lg:w-[60px] lg:h-[60px]"
+              src="/top-remedies.svg"
+              alt="Top Remedies Icon"
+              width={60}
+              height={60}
+            />
+            <h3 className="text-3xl sm:text-2xl md:text-3xl lg:text-[40px] leading-tight font-normal text-[#0B0C0A]">
+              {searchQuery.trim() ? "Remedy Results" : "Top Rated Remedies"}
+            </h3>
+          </div>
+
+          {/* Sort control */}
+          <div className="flex items-center gap-3 justify-end">
+            <label className="text-sm font-medium text-[#2B2E28]">Sort by:</label>
+
+            <div className="relative" ref={sortDropdownRef}>
+              <button
+                type="button"
+                onClick={() => setIsSortOpen((p) => !p)}
+                className="flex items-center gap-1 text-[#2B2E28] text-sm font-normal cursor-pointer focus:outline-none"
+              >
+                <span>
+                  {sortBy === "rating"
+                    ? "Overall Rating"
+                    : sortBy === "most-reviewed"
+                      ? "Most Reviewed"
+                      : sortBy === "az"
+                        ? "A - Z"
+                        : "Default"}
+                </span>
+
+                <svg
+                  className={`h-4 w-4 transition-transform ${isSortOpen ? "rotate-180" : "rotate-0"}`}
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                </svg>
+              </button>
+
+              {isSortOpen && (
+                <ul className="absolute right-0 mt-1 w-[180px] bg-white border border-gray-300 rounded-md shadow-lg z-20 overflow-hidden">
+                  {[
+                    { label: "Default", value: "" },
+                    { label: "Overall Rating", value: "rating" },
+                    { label: "Most Reviewed", value: "most-reviewed" },
+                    { label: "A - Z", value: "az" }
+                  ].map(opt => (
+                    <li
+                      key={opt.value}
+                      onClick={() => {
+                        setSortBy(opt.value);
+                        setIsSortOpen(false);
+                      }}
+                      className={`px-3 py-2 text-sm cursor-pointer transition-colors ${sortBy === opt.value
+                        ? "bg-[#6C7463] text-white font-medium"
+                        : "text-gray-700 hover:bg-[#6c746333]"
+                        }`}
+                    >
+                      {opt.label}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 lg:gap-6">
           {remediesWithStats.map((remedy, index) => (
             <Link
               key={remedy.id || index}

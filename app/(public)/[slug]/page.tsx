@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { notFound } from 'next/navigation';
 import AilmentDetailPage from '../../../components/AilmentDetailPage';
@@ -26,14 +27,72 @@ interface Ailment {
 }
 
 async function getAilmentData(slug: string) {
-  // Fetch ailment by slug column instead of converting name
-  const { data: ailmentData, error: ailmentError } = await supabase
-    .from('ailments')
-    .select('*')
-    .eq('slug', slug) // Direct slug match
-    .single();
-  if (ailmentError || !ailmentData) {
-    console.error('Error fetching ailment:', ailmentError?.message);
+  // Normalize slug and attempt multiple safe matches to handle encoding/special chars
+  const slugToMatch = decodeURIComponent(String(slug)).trim();
+
+  // Try exact match first
+  let ailmentData: any = null;
+  let ailmentError: any = null;
+
+  const normalizedSlug = slugToMatch
+  .trim()
+  .toLowerCase();
+
+const tryQueries = [
+  // Exact
+  { method: 'eq', value: normalizedSlug },
+
+  // Case-insensitive
+  { method: 'ilike', value: normalizedSlug },
+
+  // Replace common special chars
+  { method: 'ilike', value: normalizedSlug.replace(/&/g, 'and') },
+  { method: 'ilike', value: normalizedSlug.replace(/\//g, '-') },
+  { method: 'ilike', value: normalizedSlug.replace(/\s+/g, '-') },
+
+  // Remove problematic characters
+  { method: 'ilike', value: normalizedSlug.replace(/[()#'":]/g, '') },
+
+  // Clean all except letters numbers dash
+  { method: 'ilike', value: normalizedSlug.replace(/[^\w-]+/g, '') },
+
+  // Wildcard safe search (IMPORTANT)
+  { method: 'ilike', value: `%${normalizedSlug}%` },
+
+  { method: 'ilike', value: `%${normalizedSlug.replace(/[^\w-]+/g, '')}%` },
+];
+
+
+
+  for (const q of tryQueries) {
+  let res;
+
+  if (q.method === 'eq') {
+    res = await supabase
+      .from('ailments')
+      .select('*')
+      .eq('slug', q.value)
+      .limit(1);
+  } else {
+    res = await supabase
+      .from('ailments')
+      .select('*')
+      .ilike('slug', q.value)
+      .limit(1);
+  }
+
+  ailmentError = res.error;
+
+  if (!ailmentError && res.data && res.data.length > 0) {
+    ailmentData = res.data[0]; // ALWAYS single object
+    break;
+  }
+}
+
+
+  const ailmentRecord = ailmentData;
+  if (ailmentError || !ailmentRecord) {
+    console.error('Error fetching ailment for slug:', slugToMatch, 'error:', ailmentError?.message);
     return null;
   }
 
@@ -55,20 +114,20 @@ async function getAilmentData(slug: string) {
         icon
       )
     `)
-    .eq('ailment_id', ailmentData.id);
+    .eq('ailment_id', ailmentRecord.id);
 
   if (remediesError) {
     console.error('Error fetching remedies:', remediesError.message);
   }
 
   const ailment: Ailment = {
-    id: ailmentData.id,
-    name: ailmentData.name,
-    slug: ailmentData.slug,
-    icon: ailmentData.icon || '🩺',
-    remedies_count: ailmentData.remedies_count || 0,
-    description: ailmentData.description || 'No description available.',
-    personalized_approach: ailmentData.personalized_approach || 'The beauty of homeopathic treatment lies in its individualized approach. Two people with the same condition may receive different remedies based on their unique symptoms.',
+    id: ailmentRecord.id,
+    name: ailmentRecord.name,
+    slug: ailmentRecord.slug,
+    icon: ailmentRecord.icon || '🩺',
+    remedies_count: ailmentRecord.remedies_count || 0,
+    description: ailmentRecord.description || 'No description available.',
+    personalized_approach: ailmentRecord.personalized_approach || 'The beauty of homeopathic treatment lies in its individualized approach. Two people with the same condition may receive different remedies based on their unique symptoms.',
   };
 
   const remedies: Remedy[] = (remediesData || []).map((ar: unknown) => {

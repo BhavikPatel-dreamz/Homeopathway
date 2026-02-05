@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Search, Loader2, ChevronDown, SlidersHorizontal } from "lucide-react";
 import Image from "next/image";
+import supabase from '@/lib/supabaseClient';
 import {
   getReviews,
   getReviewFilterOptions,
@@ -190,6 +192,46 @@ export default function ReviewListPage({
   const [isPageLoading, setIsPageLoading] = useState(false);
   const [allReviesList, setAllReviewsList] = useState<ReviewType[]>([]);
 
+  const [ailmentMap, setAilmentMap] = useState<Record<string, { name: string; icon?: string }>>({});
+
+  // Fetch ailment names/icons for any ailment ids present in fetched reviews
+  useEffect(() => {
+    const idsToFetch = new Set<string>();
+    (allReviesList || []).forEach((review: any) => {
+      const aid = review?.ailment_id ?? (typeof review?.ailment === 'string' ? review.ailment : review?.ailment?.id);
+      if (aid && !ailmentMap[aid]) idsToFetch.add(String(aid));
+    });
+
+    const ids = Array.from(idsToFetch);
+    if (ids.length === 0) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('ailments')
+          .select('id, name, icon')
+          .in('id', ids);
+        if (error) {
+          console.error('Error fetching ailments:', error);
+          return;
+        }
+        if (cancelled) return;
+        setAilmentMap(prev => {
+          const copy = { ...prev };
+          (data || []).forEach((a: any) => {
+            if (a?.id && (a?.name || a?.icon)) copy[a.id] = { name: a.name || '', icon: a.icon || '' };
+          });
+          return copy;
+        });
+      } catch (err) {
+        console.error('Error fetching ailments:', err);
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [allReviesList, ailmentMap]);
+
 
   // ---------------------------
   // Fetch Reviews + Stats
@@ -213,6 +255,19 @@ export default function ReviewListPage({
 
       let allReviews = reviewsData || [];
       setAllReviewsList(reviewsData ?? []);
+
+      // Build a simple ailment map from incoming reviews to resolve ids->names/icons
+      const aMap: Record<string, { name: string; icon?: string }> = {};
+      (reviewsData || []).forEach((rev: any) => {
+        const aObj = rev?.ailment && typeof rev.ailment === 'object' ? rev.ailment : undefined;
+        const aid = rev?.ailment_id ?? (typeof rev?.ailment === 'string' ? rev.ailment : aObj?.id);
+        const name = aObj?.name || rev?.ailment_name || rev?.ailmentName || aObj?.label || '';
+        const icon = aObj?.icon || rev?.ailment_icon || rev?.ailmentIcon || aObj?.emoji || '';
+        if (aid && (name || icon)) {
+          aMap[String(aid)] = { name: name || '', icon: icon || '' };
+        }
+      });
+      setAilmentMap((prev) => ({ ...aMap, ...prev }));
 
       allReviews = allReviews.filter((review) => {
         if (activeFilters.dosage.length > 0) {
@@ -332,11 +387,11 @@ export default function ReviewListPage({
 
   return (
     <div>
-      <section id="Reviews" className="bg-white rounded-2xl md:p-4 sm:py-8 ">
+      <section id="Reviews" className="bg-white rounded-2xl md:px-4">
         <div className="grid grid-cols-1 lg:grid-cols-3 md:gap-6 sm:gap-10">
           {/* Left Panel – Ratings Summary */}
-          <aside className="col-span-1 mb-6 lg:mb-0">
-            <div className="flex flex-col text-left md:p-3 sm:p-6">
+          <aside className="col-span-1 mb-6 lg:mb-0 lg:max-w-[262px]">
+            <div className="flex flex-col text-left">
               <p className="text-base sm:text-[20px] text-[#0B0C0A] font-semibold mb-2">Reviews</p>
               <div className="flex items-center gap-2 sm:gap-3">
                 <Image src="/star.svg" alt="Star" width={36} height={36} className="sm:w-12 sm:h-12" />
@@ -356,10 +411,10 @@ export default function ReviewListPage({
                     <button
                       key={star}
                       onClick={() => setFilters((prev) => ({ ...prev, rating: prev.rating.includes(star) ? [] : [star] }))}
-                      className={`flex items-center text-sm sm:text-sm w-full rounded-md  hover:bg-[#6C74631A] px-3 py-2 transition ${isActive ? "bg-[#6C74631A]" : "border-[#6C74631A]/10 "} `} >
+                      className={`flex items-center text-sm sm:text-sm w-full rounded-lg  hover:bg-[#6C74631A] px-3 py-2 transition ${isActive ? "bg-[#6C74631A]" : "border-[#6C74631A]/10 "} `} >
                       <Image src="/star.svg" alt={`${star} Star`} width={15} height={15} className="sm:w-4 sm:h-4 mr-1" />
-                      <span className="w-3 text-gray-700 font-medium mr-5">{star}</span>
-                      <div className="flex-1 h-2 bg-[#4B544A]/20 rounded-xl overflow-hidden">
+                      <span className="w-3 text-gray-700 font-medium mr-3">{star}</span>
+                      <div className="flex-1 h-2 bg-[#4B544A]/20 rounded-xl overflow-hidden w-[196px]">
                         <div className="h-full transition-all duration-300 rounded-xl bg-[#6C7463]" style={{ width: `${percentage}%` }} />
                       </div>
                     </button>
@@ -410,10 +465,10 @@ export default function ReviewListPage({
 
               {/* Sort By */}
               <div className="flex items-center justify-end gap-2 w-full sm:w-auto mt-2 sm:mt-0 justify-center relative" ref={dropdownRef}>
-                <span className="sm:font-semibold font-regular text-[#2B2E28] text-base leading-[24px]  whitespace-nowrap text-montserrat">Sort by:</span>
+                <span className="sm:font-semibold font-regular text-[#2B2E28] sm:text-base text-sm leading-[24px]  whitespace-nowrap text-montserrat">Sort by:</span>
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="appearance-none sm:pl-1 pr-5 py-2 text-base leading-[24px] min-w-[130px] text-[#20231E] font-medium focus:outline-none" >
+                  className="cursor-pointer appearance-none sm:pl-1 pr-5 py-2 sm:text-base text-sm leading-[24px] min-w-[130px] text-[#20231E] font-medium focus:outline-none" >
                   {sortOptions.find((opt) => opt.value === sortBy)?.label}
                   <ChevronDown className={`absolute right-0 sm:right-0 top-1/2 -translate-y-1/2 w-4 h-4 text-[#20231E] pointer-events-none transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`} />
                 </button>
@@ -424,7 +479,7 @@ export default function ReviewListPage({
                       <button
                         key={opt.value}
                         onClick={() => { setSortBy(opt.value); setIsDropdownOpen(false); }}
-                        className={`px-3 py-2 w-full text-sm text-start transition ${sortBy === opt.value ? "bg-[#6C7463] text-white font-medium" : "text-gray-700 hover:bg-[#6c74631f] font-medium hover:text-[#6C7463]"}`}
+                        className={`cursor-pointer px-3 py-2 w-full text-sm text-start transition ${sortBy === opt.value ? "bg-[#6C7463] text-white font-medium" : "text-gray-700 hover:bg-[#6c74631f] font-medium hover:text-[#6C7463]"}`}
                       >
                         {opt.label}
                       </button>
@@ -462,6 +517,27 @@ export default function ReviewListPage({
                   const user_name = review.profiles?.user_name;
                   const profile_image = review.profiles?.profile_img;
                   const secondaryRemedies = review.secondary_remedies || [];
+
+                  // Resolve ailment display (icon + name) with fallbacks (cast to any to avoid strict Review typing)
+                  let ailmentIcon = (review as any)?.ailment?.icon ?? (review as any)?.ailment_icon ?? (review as any)?.ailmentIcon ?? (review as any)?.ailment?.emoji ?? null;
+
+                  let ailmentName = (review as any)?.ailment?.name ?? (review as any)?.ailment_name ?? (review as any)?.ailmentName ?? (review as any)?.ailment?.label ?? null;
+
+                  const ailmentIdRaw = (review as any)?.ailment_id ?? (typeof (review as any)?.ailment === 'string' ? (review as any).ailment : (review as any)?.ailment?.id);
+                  const ailmentId = ailmentIdRaw ? String(ailmentIdRaw) : null;
+
+                  // Use prebuilt ailmentMap (populated from fetched reviews) when available
+                  if (ailmentId && ailmentMap[ailmentId]) {
+                    const fetched = ailmentMap[ailmentId];
+                    ailmentName = ailmentName || fetched.name || null;
+                    ailmentIcon = ailmentIcon || fetched.icon || null;
+                  }
+
+                  // fallback to surrounding context's ailment if available
+                  if ((!ailmentName || !ailmentIcon) && ailmentContext) {
+                    ailmentName = ailmentName || ailmentContext.name;
+                    ailmentIcon = ailmentIcon || null;
+                  }
 
                   const usageTags = processUsageTags([
                     review.dosage,
@@ -510,7 +586,7 @@ export default function ReviewListPage({
                             onClick={() =>
                               setOpenMenuId(openMenuId === review.id ? null : review.id)
                             }
-                            className="p-1 rounded-full hover:bg-gray-100"
+                            className="p-1 rounded-full hover:bg-gray-100 cursor-pointer"
                           >
                             <span className="text-lg leading-none">
                               <svg width="4" height="18" viewBox="0 0 4 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -527,7 +603,7 @@ export default function ReviewListPage({
                                   setOpenMenuId(null);
                                   console.log("Edit", user_name);
                                 }}
-                                className="w-full px-4 py-2 flex items-center gap-3 text-sm text-[#20231E] hover:bg-gray-100 font-semibold"
+                                className="w-full px-4 py-2 flex items-center gap-3 text-sm text-[#20231E] hover:bg-gray-100 font-semibold cursor-pointer"
                               >
                                 <span className="w-[16px] h-[16px]">
                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -542,7 +618,7 @@ export default function ReviewListPage({
                                   setOpenMenuId(null);
                                   console.log("Delete", review.id);
                                 }}
-                                className="w-full px-4 py-2 flex items-center gap-3 text-sm text-[#20231E] hover:bg-gray-100 font-semibold"
+                                className="w-full px-4 py-2 flex items-center gap-3 text-sm text-[#20231E] hover:bg-gray-100 font-semibold cursor-pointer"
                               >
                                 <span className="w-[16px] h-[16px]">
                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -555,6 +631,19 @@ export default function ReviewListPage({
                           )}
                         </div>
                       </div>
+
+                      {/* Ailment (icon + name) - shown above combination, matching UserReview styling */}
+                      {ailmentName && (
+                        <div className="flex items-center gap-1 mb-2">
+                          <span className="text-xs text-[#2B2E28] font-medium">Ailment:</span>
+                          {ailmentIcon && (typeof ailmentIcon === 'string' && (ailmentIcon.startsWith('http') || ailmentIcon.startsWith('/'))) ? (
+                            <span className="rounded-full w-[24px] h-[24px] bg-[#F5F3ED] flex justify-center items-center"><img src={ailmentIcon} alt={ailmentName} className="w-[16px] h-[16px]" /></span>
+                          ) : (
+                            <span className="text-xs font-medium leading-none rounded-full w-[24px] h-[24px] bg-[#F5F3ED] flex justify-center items-center">{ailmentIcon ?? '🌿'}</span>
+                          )}
+                          <span className="font-medium bg-[#F5F3ED] px-2 py-1 text-xs text-[#0B0C0A]"> {ailmentName}</span>
+                        </div>
+                      )}
 
                       {/* UPDATED: Single grey container with increased spacing between bracketed remedies */}
                       <div className="flex flex-wrap items-center gap-2 mt-2 mb-3">

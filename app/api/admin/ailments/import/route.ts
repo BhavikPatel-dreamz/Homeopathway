@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import * as XLSX from 'xlsx'
@@ -48,31 +49,26 @@ export async function POST(req: Request) {
 
     let rows: Array<AilmentImportRow | AlignmentRow> = []
 
-    // READ CSV
+    // READ CSV: decode as UTF-8 and let XLSX parse CSV/quoted fields correctly
     if (f.name.toLowerCase().endsWith('.csv')) {
-      const text = await f.text()
-      const lines = text.split('\n').filter(l => l.trim())
+      const arrayBuffer = await f.arrayBuffer()
+      const decoded = new TextDecoder('utf-8').decode(arrayBuffer)
+      const workbook = XLSX.read(decoded, { type: 'string' })
+      const sheet = workbook.Sheets['Alignments'] || workbook.Sheets[workbook.SheetNames[0]]
 
-      if (lines.length < 2) {
+      if (!sheet) {
         return NextResponse.json({ error: 'CSV file is empty or invalid' }, { status: 400 })
       }
 
-      const headers = lines[0]
-        .split(',')
-        .map(h => h.trim().toLowerCase())
-
-      rows = lines.slice(1).map(line => {
-        const values = line
-          .split(',')
-          .map(v => v.replace(/^"|"$/g, '').trim())
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const row: any = {}
-        headers.forEach((h, i) => {
-          row[h] = values[i]
+      // parse as plain objects and normalize keys (same as XLSX flow)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      rows = XLSX.utils.sheet_to_json<any>(sheet).map((r: any) => {
+        const normalized: any = {}
+        Object.keys(r).forEach(k => {
+          const key = String(k).trim().toLowerCase().replace(/\s+/g, '_')
+          normalized[key] = r[k]
         })
-
-        return row as AilmentImportRow | AlignmentRow
+        return normalized as AilmentImportRow | AlignmentRow
       })
     }
 

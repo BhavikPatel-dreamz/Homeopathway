@@ -154,10 +154,10 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
         <p className="text-gray-600 mt-2">Update the ailment information and manage related remedies</p>
       </div>
 
-      {/* Error Message */}
+      {/* Error Message - show only the message (hide any separate "Error" label) */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-600">{error}</p>
+        <div aria-live="polite">
+          <p className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-600 m-0">{error}</p>
         </div>
       )}
 

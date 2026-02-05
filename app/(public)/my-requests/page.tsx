@@ -38,6 +38,10 @@ export default function MyRequests() {
   });
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; type: 'ailment' | 'remedy' } | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const deleteTargetRequest = deleteTarget ? requests.find(r => r.id === deleteTarget.id) ?? null : null;
   const [toast, setToast] = useState<{
     type: "success" | "error";
     text: string;
@@ -269,6 +273,27 @@ export default function MyRequests() {
     }
   };
 
+  const openDeleteModal = (requestId: string, type: 'ailment' | 'remedy') => {
+    setDeleteTarget({ id: requestId, type });
+    setShowDeleteModal(true);
+  };
+
+  const closeDeleteModal = () => {
+    setShowDeleteModal(false);
+    setDeleteTarget(null);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      setDeleting(true);
+      await handleDeleteRequest(deleteTarget.id, deleteTarget.type);
+      closeDeleteModal();
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#F5F1E8]">
       {/* Toast Notification */}
@@ -387,7 +412,7 @@ z-50 animate-in slide-in-from-top-2
                             <td className="border-r border-r-[#D3D6D1] px-4 py-4 sm:text-base text-sm text-center text-[#0B0C0A] w-[200px]">{request.name}</td>
                             <td className="border-r border-r-[#D3D6D1] px-4 py-4 text-center text-lg w-[100px]">{request.icon}</td>
                             <td className="border-r border-r-[#D3D6D1] px-4 py-4 text-center sm:text-base text-sm text-[#2B2E28] font-medium w-[100px]">{request.slug || 'N/A'}</td>
-                            <td className="border-r border-r-[#D3D6D1] px-4 py-4 sm:text-base text-sm text-[#2B2E28] font-medium w-[300px]">NA</td>
+                            <td className="border-r border-r-[#D3D6D1] px-4 py-4 sm:text-base text-sm text-[#2B2E28] font-medium w-[300px]">{request.description || 'N/A'}</td>
                             <td className="border-r border-r-[#D3D6D1] px-4 py-4 text-center w-[115px]">
                               <span className={`sm:text-sm text-xs font-medium px-2 py-1 rounded-full ${request.status === 'approved' ? 'text-[#175F3D] bg-[#E9F5F0]' :
                                 request.status === 'declined' ? 'sm:text-sm text-xs font-medium px-2 py-1 rounded-full text-[#B62E31] bg-[#FCEBEC]' :
@@ -422,17 +447,9 @@ z-50 animate-in slide-in-from-top-2
                                   </svg>
                                 </button>
                                 <button
-                                  onClick={() => handleDeleteRequest(request.id, request.type)}
-                                  disabled={request.status === 'approved'}
-                                  className={`p-1 transition-colors ${request.status === 'approved'
-                                    ? 'cursor-not-allowed fill-[#83857D]'
-                                    : 'hover:fill-red-700 fill-[#B62E31]'
-                                    }`}
-                                  title={
-                                    request.status === 'approved'
-                                      ? 'Cannot delete approved requests'
-                                      : 'Delete'
-                                  }
+                                  onClick={() => openDeleteModal(request.id, request.type)}
+                                  className={`p-1 transition-colors hover:fill-red-700 fill-[#B62E31] cursor-pointer`}
+                                  title={'Delete'}
                                 >
                                   <svg
                                     className="sm:w-4.5 sm:h-4.5 w-3 h-3"
@@ -508,7 +525,7 @@ z-50 animate-in slide-in-from-top-2
                             <td className="font-medium border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 sm:text-base text-sm text-[#2B2E28] text-center min-w-[200px] w-[200px]">{request.name}</td>
                             <td className="font-medium border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center text-lg min-w-[100px] w-[100px]">{request.icon}</td>
                             <td className="font-medium border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 sm:text-base text-sm text-[#2B2E28] text-center min-w-[100px] w-[100px]">{request.slug || 'N/A'}</td>
-                            <td className="font-medium border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 sm:text-base text-sm text-[#2B2E28] min-w-[300px] w-[300px]">NA</td>
+                            <td className="font-medium border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 sm:text-base text-sm text-[#2B2E28] min-w-[300px] w-[300px]">{request.description || 'N/A'}</td>
                             <td className="font-medium border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm text-[#2B2E28] min-w-[115px] w-[115px]">
                               <span className={`sm:text-sm text-xs font-medium px-2 py-1 rounded-full ${request.status === 'approved' ? 'text-[#175F3D] bg-[#E9F5F0]' :
                                 request.status === 'declined' ? 'text-red-600' :
@@ -543,17 +560,9 @@ z-50 animate-in slide-in-from-top-2
                                   </svg>
                                 </button>
                                 <button
-                                  onClick={() => handleDeleteRequest(request.id, request.type)}
-                                  disabled={request.status === 'approved'}
-                                  className={`p-1 transition-colors ${request.status === 'approved'
-                                    ? 'cursor-not-allowed fill-[#83857D]'
-                                    : 'hover:fill-red-700 fill-[#B62E31]'
-                                    }`}
-                                  title={
-                                    request.status === 'approved'
-                                      ? 'Cannot delete approved requests'
-                                      : 'Delete'
-                                  }
+                                  onClick={() => openDeleteModal(request.id, request.type)}
+                                  className={`p-1 transition-colors hover:fill-red-700 fill-[#B62E31]`}
+                                  title={'Delete'}
                                 >
                                   <svg
                                     className="sm:w-4.5 sm:h-4.5 w-3 h-3"
@@ -738,6 +747,39 @@ z-50 animate-in slide-in-from-top-2
                         Cancel
                       </button>
                     </form>
+                  </div>
+                </div>
+              )}
+
+              {/* Delete Confirmation Modal */}
+              {showDeleteModal && deleteTarget && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                  <div className="bg-white rounded-lg w-full max-w-md p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <h3 className="text-xl font-semibold text-[#0B0C0A]">Confirm Delete</h3>
+                      <button onClick={closeDeleteModal} className="text-gray-400 hover:text-gray-600">✕</button>
+                    </div>
+                    <p className="text-sm text-gray-700 mb-6">
+                      Are you sure you want to delete <strong>{deleteTargetRequest?.name ?? 'this request'}</strong>? This action cannot be undone.
+                    </p>
+                    <div className="flex gap-3 justify-end">
+                      <button
+                        type="button"
+                        onClick={closeDeleteModal}
+                        className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-black font-semibold"
+                        disabled={deleting}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={confirmDelete}
+                        disabled={deleting}
+                        className="px-4 py-2 bg-[#6C7463] hover:bg-[#4a5f56] text-white rounded-lg"
+                      >
+                        {deleting ? 'Deleting...' : 'Delete'}
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}

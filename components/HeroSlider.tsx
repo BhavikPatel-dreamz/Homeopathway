@@ -132,7 +132,7 @@ const CustomSlider = ({ slides }: { slides: string[] }) => {
             }}
             className={`rounded-full transition-all duration-300 cursor-pointer  ${currentIndex === index + 1
               ? "bg-white w-10 h-2"
-              : "bg-white/50 w-10 h-2"
+              : "bg-[#4B544A99] w-10 h-2"
               }`}
           />
         ))}
@@ -328,7 +328,7 @@ export default function HeroSlider() {
             </div>
           </div>
 
-          <div className="relative">
+          <div className="relative mx-auto max-w-[870px]">
             <img
               src="/search.svg"
               className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none z-10"

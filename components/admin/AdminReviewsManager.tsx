@@ -700,9 +700,12 @@ function ReviewRow({
                 onChange={(e) => setEditData(prev => ({ ...prev, effectiveness: parseInt(e.target.value) }))}
                 className="text-sm border border-gray-300 rounded px-2 py-1 ml-2 text-gray-700"
               >
-                {[1, 2, 3, 4, 5].map(eff => (
-                  <option key={eff} value={eff}>Eff: {eff}/5</option>
-                ))}
+                <option value={5}>Completely resolved symptoms</option>
+                <option value={4}>Significantly improved</option>
+                <option value={3}>Moderately improved</option>
+                <option value={2}>Slightly improved</option>
+                <option value={1}>No change</option>
+                <option value={0}>Symptoms worsened</option>
               </select>
             </div>
           ) : (

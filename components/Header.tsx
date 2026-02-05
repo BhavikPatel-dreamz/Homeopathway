@@ -17,7 +17,27 @@ export default function Header() {
   useEffect(() => {
     let falseTimer: ReturnType<typeof setTimeout> | null = null;
     const checkUser = async () => {
-      const loggedIn = await checkIsUserLoggedIn();
+      // First try a fast local cache check to avoid flashing Login when
+      // navigating between admin and site. This mirrors the UserAvatar
+      // `user_profile_cache` mechanism and uses a 5 minute expiry.
+      let loggedIn = false;
+      try {
+        const cached = localStorage.getItem('user_profile_cache');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          const age = Date.now() - (parsed.timestamp || 0);
+          const FIVE_MIN = 5 * 60 * 1000;
+          if (age < FIVE_MIN && parsed.user) {
+            loggedIn = true;
+          }
+        }
+      } catch (e) {
+        // ignore cache parse errors and fall back to checkIsUserLoggedIn
+      }
+
+      if (!loggedIn) {
+        loggedIn = await checkIsUserLoggedIn();
+      }
       // If loggedIn is true set immediately. If false, wait briefly to allow
       // the auth subscription to restore a session on client-side navigation.
       if (loggedIn) {

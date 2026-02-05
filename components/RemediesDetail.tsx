@@ -256,9 +256,9 @@ export default function RemediesDetailPage({
       <Breadcrumb
         items={
           ailmentContext
-            ? [
+              ? [
               { label: "Home", href: "/" },
-              { label: ailmentContext.name, href: `/${ailmentContext.slug}` },
+              { label: ailmentContext.name, href: `/${encodeURIComponent(ailmentContext.slug)}` },
               { label: remedy.name, isActive: true },
             ]
             : breadcrumbPaths.remedyDetail(remedy.name, "All Remedies", "/remedies")
@@ -289,7 +289,7 @@ export default function RemediesDetailPage({
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 md:py-10 space-y-4 sm:space-y-6 md:space-y-10">
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-4 sm:py-6 md:py-10 space-y-4 sm:space-y-6 md:space-y-10">
         {/* Overview Section */}
         <section
           ref={overviewRef}
@@ -313,7 +313,14 @@ export default function RemediesDetailPage({
                 <div className="text-[14px] leading-3.5  flex items-center gap-2 mb-4 sm:mb-6 flex-wrap">
                   {renderStars(remedy.average_rating)}
                   <span className="text-[#41463B] text-xs sm:text-sm">
-                    {remedy.average_rating.toFixed(1)} ({remedy.review_count} {remedy.review_count === 1 ? "review" : "reviews"})
+                    {
+                      (() => {
+                        const count = remedy.review_count || 0;
+                        const formatted = new Intl.NumberFormat().format(count);
+                        const ailmentSuffix = ailmentContext ? ` for ${ailmentContext.name.toLowerCase()}` : "";
+                        return `${remedy.average_rating.toFixed(1)} (${formatted} ${count === 1 ? 'review' : 'reviews'}${ailmentSuffix})`;
+                      })()
+                    }
                   </span>
                 </div>
 
