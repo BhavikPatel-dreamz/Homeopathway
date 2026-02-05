@@ -465,10 +465,10 @@ export default function ReviewListPage({
 
               {/* Sort By */}
               <div className="flex items-center justify-end gap-2 w-full sm:w-auto mt-2 sm:mt-0 justify-center relative" ref={dropdownRef}>
-                <span className="sm:font-semibold font-regular text-[#2B2E28] text-base leading-[24px]  whitespace-nowrap text-montserrat">Sort by:</span>
+                <span className="sm:font-semibold font-regular text-[#2B2E28] sm:text-base text-sm leading-[24px]  whitespace-nowrap text-montserrat">Sort by:</span>
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="appearance-none sm:pl-1 pr-5 py-2 text-base leading-[24px] min-w-[130px] text-[#20231E] font-medium focus:outline-none" >
+                  className="cursor-pointer appearance-none sm:pl-1 pr-5 py-2 sm:text-base text-sm leading-[24px] min-w-[130px] text-[#20231E] font-medium focus:outline-none" >
                   {sortOptions.find((opt) => opt.value === sortBy)?.label}
                   <ChevronDown className={`absolute right-0 sm:right-0 top-1/2 -translate-y-1/2 w-4 h-4 text-[#20231E] pointer-events-none transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`} />
                 </button>
@@ -479,7 +479,7 @@ export default function ReviewListPage({
                       <button
                         key={opt.value}
                         onClick={() => { setSortBy(opt.value); setIsDropdownOpen(false); }}
-                        className={`px-3 py-2 w-full text-sm text-start transition ${sortBy === opt.value ? "bg-[#6C7463] text-white font-medium" : "text-gray-700 hover:bg-[#6c74631f] font-medium hover:text-[#6C7463]"}`}
+                        className={`cursor-pointer px-3 py-2 w-full text-sm text-start transition ${sortBy === opt.value ? "bg-[#6C7463] text-white font-medium" : "text-gray-700 hover:bg-[#6c74631f] font-medium hover:text-[#6C7463]"}`}
                       >
                         {opt.label}
                       </button>
@@ -586,7 +586,7 @@ export default function ReviewListPage({
                             onClick={() =>
                               setOpenMenuId(openMenuId === review.id ? null : review.id)
                             }
-                            className="p-1 rounded-full hover:bg-gray-100"
+                            className="p-1 rounded-full hover:bg-gray-100 cursor-pointer"
                           >
                             <span className="text-lg leading-none">
                               <svg width="4" height="18" viewBox="0 0 4 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -603,7 +603,7 @@ export default function ReviewListPage({
                                   setOpenMenuId(null);
                                   console.log("Edit", user_name);
                                 }}
-                                className="w-full px-4 py-2 flex items-center gap-3 text-sm text-[#20231E] hover:bg-gray-100 font-semibold"
+                                className="w-full px-4 py-2 flex items-center gap-3 text-sm text-[#20231E] hover:bg-gray-100 font-semibold cursor-pointer"
                               >
                                 <span className="w-[16px] h-[16px]">
                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -618,7 +618,7 @@ export default function ReviewListPage({
                                   setOpenMenuId(null);
                                   console.log("Delete", review.id);
                                 }}
-                                className="w-full px-4 py-2 flex items-center gap-3 text-sm text-[#20231E] hover:bg-gray-100 font-semibold"
+                                className="w-full px-4 py-2 flex items-center gap-3 text-sm text-[#20231E] hover:bg-gray-100 font-semibold cursor-pointer"
                               >
                                 <span className="w-[16px] h-[16px]">
                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">

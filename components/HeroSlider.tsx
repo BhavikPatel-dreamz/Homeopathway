@@ -132,7 +132,7 @@ const CustomSlider = ({ slides }: { slides: string[] }) => {
             }}
             className={`rounded-full transition-all duration-300 cursor-pointer  ${currentIndex === index + 1
               ? "bg-white w-10 h-2"
-              : "bg-white/50 w-10 h-2"
+              : "bg-[#4B544A99] w-10 h-2"
               }`}
           />
         ))}

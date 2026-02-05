@@ -32,7 +32,7 @@ export default function TopRatedRemediesServer({
   }, []);
 
   const displayCount = isMobile ? 5 : topRemedies.length;
-  
+
   // Just use the original remedy data - no need to refetch stats
   // The stats are already calculated and stored in the remedies table
   const remediesWithStats = topRemedies.slice(0, displayCount);
@@ -48,12 +48,12 @@ export default function TopRatedRemediesServer({
             width={60}
             height={60}
           />
-          <h3 className="text-[28px] lg:text-[40px] text-[#0B0C0A]">
+          <h3 className="text-3xl sm:text-2xl md:text-3xl lg:text-[40px] leading-tight font-normal text-[#0B0C0A]">
             {searchQuery.trim() ? "Remedy Results" : "Popular Remedies"}
           </h3>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 lg:gap-6">
           {remediesWithStats.map((remedy, index) => (
             <Link
               key={remedy.id || index}
