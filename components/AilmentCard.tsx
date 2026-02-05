@@ -15,7 +15,7 @@ export default function AilmentCard({ ailment }: AilmentCardProps) {
 
   return (
     <Link href={`/${slug}`} className="block h-full">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center bg-white rounded-xl pr-3 pl-3 pt-4 pb-4 sm:pr-4 sm:pl-4 sm:pt-7 sm:pb-7 transition-shadow hover:shadow-lg transition-all duration-500 cursor-pointer h-full">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center bg-white rounded-lg pr-3 pl-3 pt-4 pb-4 sm:pr-4 sm:pl-4 sm:pt-4 sm:pb-4 transition-shadow hover:shadow-lg transition-all duration-500 cursor-pointer h-full">
 
         {/* ICON */}
         <div className="text-2xl sm:text-3xl mb-2 sm:mb-2 mr-0 sm:mr-[16px] w-[28px] h-[28px] sm:w-[32px] sm:h-[32px] flex-shrink-0 flex items-center justify-center">
