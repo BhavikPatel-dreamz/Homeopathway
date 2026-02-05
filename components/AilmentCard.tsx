@@ -14,7 +14,7 @@ export default function AilmentCard({ ailment }: AilmentCardProps) {
   const slug = ailment.slug || nameToSlug(ailment.name);
 
   return (
-    <Link href={`/${slug}`} className="block h-full">
+    <Link href={`/${encodeURIComponent(slug)}`} className="block h-full">
       <div className="flex flex-col sm:flex-row items-start sm:items-center bg-white rounded-xl pr-3 pl-3 pt-4 pb-4 sm:pr-4 sm:pl-4 sm:pt-7 sm:pb-7 transition-shadow hover:shadow-lg transition-all duration-500 cursor-pointer h-full">
 
         {/* ICON */}

@@ -34,34 +34,61 @@ async function getAilmentData(slug: string) {
   let ailmentData: any = null;
   let ailmentError: any = null;
 
-  const tryQueries = [
-    { method: 'eq', value: slugToMatch },
-    { method: 'ilike', value: slugToMatch },
-    { method: 'ilike', value: slugToMatch.replace(/&/g, 'and') },
-  ];
+  const normalizedSlug = slugToMatch
+  .trim()
+  .toLowerCase();
+
+const tryQueries = [
+  // Exact
+  { method: 'eq', value: normalizedSlug },
+
+  // Case-insensitive
+  { method: 'ilike', value: normalizedSlug },
+
+  // Replace common special chars
+  { method: 'ilike', value: normalizedSlug.replace(/&/g, 'and') },
+  { method: 'ilike', value: normalizedSlug.replace(/\//g, '-') },
+  { method: 'ilike', value: normalizedSlug.replace(/\s+/g, '-') },
+
+  // Remove problematic characters
+  { method: 'ilike', value: normalizedSlug.replace(/[()#'":]/g, '') },
+
+  // Clean all except letters numbers dash
+  { method: 'ilike', value: normalizedSlug.replace(/[^\w-]+/g, '') },
+
+  // Wildcard safe search (IMPORTANT)
+  { method: 'ilike', value: `%${normalizedSlug}%` },
+
+  { method: 'ilike', value: `%${normalizedSlug.replace(/[^\w-]+/g, '')}%` },
+];
+
+
 
   for (const q of tryQueries) {
-    if (q.method === 'eq') {
-      ({ data: ailmentData, error: ailmentError } = await supabase
-        .from('ailments')
-        .select('*')
-        .eq('slug', q.value));
-    } else if (q.method === 'ilike') {
-      ({ data: ailmentData, error: ailmentError } = await supabase
-        .from('ailments')
-        .select('*')
-        .ilike('slug', q.value));
-    }
+  let res;
 
-    const ailmentRecordCandidate = Array.isArray(ailmentData) ? (ailmentData[0] || null) : ailmentData;
-    if (!ailmentError && ailmentRecordCandidate) {
-      ailmentData = ailmentData;
-      ailmentError = null;
-      // use the candidate
-      ailmentData = ailmentRecordCandidate;
-      break;
-    }
+  if (q.method === 'eq') {
+    res = await supabase
+      .from('ailments')
+      .select('*')
+      .eq('slug', q.value)
+      .limit(1);
+  } else {
+    res = await supabase
+      .from('ailments')
+      .select('*')
+      .ilike('slug', q.value)
+      .limit(1);
   }
+
+  ailmentError = res.error;
+
+  if (!ailmentError && res.data && res.data.length > 0) {
+    ailmentData = res.data[0]; // ALWAYS single object
+    break;
+  }
+}
+
 
   const ailmentRecord = ailmentData;
   if (ailmentError || !ailmentRecord) {

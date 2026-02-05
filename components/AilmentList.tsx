@@ -234,7 +234,7 @@ export default function AilmentListPage({
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-6 gap-3">
             {paginatedAilments.length > 0 ? (
               paginatedAilments.map((ailment) => (
-                <Link href={`/${ailment.slug}`} key={ailment.slug}>
+                <Link href={`/${encodeURIComponent(ailment.slug)}`} key={ailment.slug}>
                   <div className="bg-white rounded-xl sm:p-6 p-3 border border-gray-200 hover:shadow-lg  transition-all text-left h-full flex flex-col justify-between group cursor-pointer">
                     <div>
                       <div className="md:text-5xl text-3xl mb-3">{ailment.icon}</div>

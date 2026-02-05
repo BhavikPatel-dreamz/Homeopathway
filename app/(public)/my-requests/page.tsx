@@ -387,7 +387,7 @@ z-50 animate-in slide-in-from-top-2
                             <td className="border-r border-r-[#D3D6D1] px-4 py-4 sm:text-base text-sm text-center text-[#0B0C0A] w-[200px]">{request.name}</td>
                             <td className="border-r border-r-[#D3D6D1] px-4 py-4 text-center text-lg w-[100px]">{request.icon}</td>
                             <td className="border-r border-r-[#D3D6D1] px-4 py-4 text-center sm:text-base text-sm text-[#2B2E28] font-medium w-[100px]">{request.slug || 'N/A'}</td>
-                            <td className="border-r border-r-[#D3D6D1] px-4 py-4 sm:text-base text-sm text-[#2B2E28] font-medium w-[300px]">NA</td>
+                            <td className="border-r border-r-[#D3D6D1] px-4 py-4 sm:text-base text-sm text-[#2B2E28] font-medium w-[300px]">{request.description || 'N/A'}</td>
                             <td className="border-r border-r-[#D3D6D1] px-4 py-4 text-center w-[115px]">
                               <span className={`sm:text-sm text-xs font-medium px-2 py-1 rounded-full ${request.status === 'approved' ? 'text-[#175F3D] bg-[#E9F5F0]' :
                                 request.status === 'declined' ? 'sm:text-sm text-xs font-medium px-2 py-1 rounded-full text-[#B62E31] bg-[#FCEBEC]' :
@@ -508,7 +508,7 @@ z-50 animate-in slide-in-from-top-2
                             <td className="font-medium border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 sm:text-base text-sm text-[#2B2E28] text-center min-w-[200px] w-[200px]">{request.name}</td>
                             <td className="font-medium border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center text-lg min-w-[100px] w-[100px]">{request.icon}</td>
                             <td className="font-medium border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 sm:text-base text-sm text-[#2B2E28] text-center min-w-[100px] w-[100px]">{request.slug || 'N/A'}</td>
-                            <td className="font-medium border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 sm:text-base text-sm text-[#2B2E28] min-w-[300px] w-[300px]">NA</td>
+                            <td className="font-medium border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 sm:text-base text-sm text-[#2B2E28] min-w-[300px] w-[300px]">{request.description || 'N/A'}</td>
                             <td className="font-medium border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm text-[#2B2E28] min-w-[115px] w-[115px]">
                               <span className={`sm:text-sm text-xs font-medium px-2 py-1 rounded-full ${request.status === 'approved' ? 'text-[#175F3D] bg-[#E9F5F0]' :
                                 request.status === 'declined' ? 'text-red-600' :

@@ -170,9 +170,9 @@ export default function TopRemedies({
         {sortedRemedies.map((remedy, index) => (
           <Link
             href={
-              ailmentSlug
-                ? `/${ailmentSlug}/${remedy.slug}`
-                : `/remedies/${remedy.slug}`
+                  ailmentSlug
+                    ? `/${encodeURIComponent(ailmentSlug)}/${encodeURIComponent(remedy.slug)}`
+                    : `/remedies/${encodeURIComponent(remedy.slug)}`
             }
             key={remedy.slug}
           >

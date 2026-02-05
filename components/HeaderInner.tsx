@@ -17,6 +17,21 @@ export default function HeaderInner() {
   // ✅ Supabase auth
   useEffect(() => {
     const fetchUser = async () => {
+      // Fast-path: try reading cached user/profile to avoid flashing Login
+      try {
+        const cached = localStorage.getItem('user_profile_cache');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          const age = Date.now() - (parsed.timestamp || 0);
+          const FIVE_MIN = 5 * 60 * 1000;
+          if (age < FIVE_MIN && parsed.user) {
+            setUser(parsed.user);
+          }
+        }
+      } catch (e) {
+        // ignore cache parse errors
+      }
+
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
     };

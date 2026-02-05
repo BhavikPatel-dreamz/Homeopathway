@@ -18,6 +18,7 @@ export default function SearchBar() {
   const [filteredRemedies, setFilteredRemedies] = useState<Remedy[]>([]);
   const searchRef = useRef<HTMLDivElement>(null);
   const isSelectingRef = useRef(false);
+  const cacheRef = useRef<Map<string, { ailments: Ailment[]; remedies: Remedy[] }>>(new Map());
 
   function nameToSlug(name: string) {
     return name.toLowerCase().replace(/ & /g, " and ").replace(/\s+/g, "-");
@@ -37,24 +38,35 @@ export default function SearchBar() {
 
   // Debounced auto search
   useEffect(() => {
+    // faster debounce and require at least 2 chars to reduce unnecessary queries
     const searchTimeout = setTimeout(async () => {
-      if (searchQuery.trim().length > 0) {
+      const q = searchQuery.trim();
+      if (q.length >= 1) {
         if (isSelectingRef.current) return;
         setLoading(true);
         setShowSuggestions(true);
+
+        // return cached results when available
+        const cached = cacheRef.current.get(q.toLowerCase());
+        if (cached) {
+          setFilteredAilments(cached.ailments || []);
+          setFilteredRemedies(cached.remedies || []);
+          setLoading(false);
+          return;
+        }
 
         try {
           const [ailmentsRes, remediesRes] = await Promise.all([
             supabase
               .from("ailments")
               .select("id, name, slug, icon, remedies_count")
-              .ilike("name", `%${searchQuery}%`)
+              .ilike("name", `%${q}%`)
               .order("name", { ascending: true })
               .limit(5),
             supabase
               .from("remedies")
-              .select("name, average_rating, review_count, description, icon")
-              .ilike("name", `%${searchQuery}%`)
+              .select("name, average_rating, review_count, icon, slug")
+              .ilike("name", `%${q}%`)
               .order("average_rating", { ascending: false })
               .limit(5),
           ]);
@@ -62,15 +74,19 @@ export default function SearchBar() {
           if (ailmentsRes.error) throw ailmentsRes.error;
           if (remediesRes.error) throw remediesRes.error;
 
-          setFilteredAilments(ailmentsRes.data || []);
-          setFilteredRemedies(
-            (remediesRes.data || []).map((remedy) => ({
-              ...remedy,
-              rating: remedy.average_rating,
-              reviewCount: remedy.review_count,
-              indication: "General",
-            }))
-          );
+          const ailments = ailmentsRes.data || [];
+          const remedies = (remediesRes.data || []).map((remedy) => ({
+            ...remedy,
+            rating: remedy.average_rating,
+            reviewCount: remedy.review_count,
+            indication: "General",
+          }));
+
+          // cache results for this query (lowercased key)
+          cacheRef.current.set(q.toLowerCase(), { ailments, remedies });
+
+          setFilteredAilments(ailments);
+          setFilteredRemedies(remedies);
         } catch (error) {
           console.error("Error during search:", error);
         } finally {
@@ -81,7 +97,7 @@ export default function SearchBar() {
         setFilteredAilments([]);
         setFilteredRemedies([]);
       }
-    }, 300);
+    }, 200);
 
     return () => clearTimeout(searchTimeout);
   }, [searchQuery]);
