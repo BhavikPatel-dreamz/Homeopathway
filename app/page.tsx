@@ -64,7 +64,31 @@ export default async function Home() {
     console.error("Error fetching ailments:", ailmentsError);
   }
 
-  const ailments = ailmentsData && ailmentsData.length > 0 ? ailmentsData : dummyAilments;
+  // If we have ailments from DB, compute accurate remedies_count from relation table
+  let ailments = ailmentsData && ailmentsData.length > 0 ? ailmentsData : dummyAilments;
+
+  if (ailmentsData && ailmentsData.length > 0) {
+    try {
+      const { data: relations, error: relationsError } = await supabase
+        .from('ailment_remedies')
+        .select('ailment_id');
+
+      if (!relationsError && relations) {
+        const counts: Record<string, number> = {};
+        relations.forEach((r: any) => {
+          const id = String(r.ailment_id);
+          counts[id] = (counts[id] || 0) + 1;
+        });
+
+        ailments = (ailmentsData || []).map((a: any) => ({
+          ...a,
+          remedies_count: counts[String(a.id)] ?? (a.remedies_count || 0),
+        }));
+      }
+    } catch (err) {
+      console.error('Error computing remedies_count from relations:', err);
+    }
+  }
 
   const dummyTopRemedies = [
     {

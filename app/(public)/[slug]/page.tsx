@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { notFound } from 'next/navigation';
 import AilmentDetailPage from '../../../components/AilmentDetailPage';
@@ -26,14 +27,45 @@ interface Ailment {
 }
 
 async function getAilmentData(slug: string) {
-  // Fetch ailment by slug column instead of converting name
-  const { data: ailmentData, error: ailmentError } = await supabase
-    .from('ailments')
-    .select('*')
-    .eq('slug', slug) // Direct slug match
-    .single();
-  if (ailmentError || !ailmentData) {
-    console.error('Error fetching ailment:', ailmentError?.message);
+  // Normalize slug and attempt multiple safe matches to handle encoding/special chars
+  const slugToMatch = decodeURIComponent(String(slug)).trim();
+
+  // Try exact match first
+  let ailmentData: any = null;
+  let ailmentError: any = null;
+
+  const tryQueries = [
+    { method: 'eq', value: slugToMatch },
+    { method: 'ilike', value: slugToMatch },
+    { method: 'ilike', value: slugToMatch.replace(/&/g, 'and') },
+  ];
+
+  for (const q of tryQueries) {
+    if (q.method === 'eq') {
+      ({ data: ailmentData, error: ailmentError } = await supabase
+        .from('ailments')
+        .select('*')
+        .eq('slug', q.value));
+    } else if (q.method === 'ilike') {
+      ({ data: ailmentData, error: ailmentError } = await supabase
+        .from('ailments')
+        .select('*')
+        .ilike('slug', q.value));
+    }
+
+    const ailmentRecordCandidate = Array.isArray(ailmentData) ? (ailmentData[0] || null) : ailmentData;
+    if (!ailmentError && ailmentRecordCandidate) {
+      ailmentData = ailmentData;
+      ailmentError = null;
+      // use the candidate
+      ailmentData = ailmentRecordCandidate;
+      break;
+    }
+  }
+
+  const ailmentRecord = ailmentData;
+  if (ailmentError || !ailmentRecord) {
+    console.error('Error fetching ailment for slug:', slugToMatch, 'error:', ailmentError?.message);
     return null;
   }
 
@@ -55,20 +87,20 @@ async function getAilmentData(slug: string) {
         icon
       )
     `)
-    .eq('ailment_id', ailmentData.id);
+    .eq('ailment_id', ailmentRecord.id);
 
   if (remediesError) {
     console.error('Error fetching remedies:', remediesError.message);
   }
 
   const ailment: Ailment = {
-    id: ailmentData.id,
-    name: ailmentData.name,
-    slug: ailmentData.slug,
-    icon: ailmentData.icon || '🩺',
-    remedies_count: ailmentData.remedies_count || 0,
-    description: ailmentData.description || 'No description available.',
-    personalized_approach: ailmentData.personalized_approach || 'The beauty of homeopathic treatment lies in its individualized approach. Two people with the same condition may receive different remedies based on their unique symptoms.',
+    id: ailmentRecord.id,
+    name: ailmentRecord.name,
+    slug: ailmentRecord.slug,
+    icon: ailmentRecord.icon || '🩺',
+    remedies_count: ailmentRecord.remedies_count || 0,
+    description: ailmentRecord.description || 'No description available.',
+    personalized_approach: ailmentRecord.personalized_approach || 'The beauty of homeopathic treatment lies in its individualized approach. Two people with the same condition may receive different remedies based on their unique symptoms.',
   };
 
   const remedies: Remedy[] = (remediesData || []).map((ar: unknown) => {

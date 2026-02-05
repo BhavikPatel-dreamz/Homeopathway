@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Search, Loader2, ChevronDown, SlidersHorizontal } from "lucide-react";
 import Image from "next/image";
+import supabase from '@/lib/supabaseClient';
 import {
   getReviews,
   getReviewFilterOptions,
@@ -190,6 +192,46 @@ export default function ReviewListPage({
   const [isPageLoading, setIsPageLoading] = useState(false);
   const [allReviesList, setAllReviewsList] = useState<ReviewType[]>([]);
 
+  const [ailmentMap, setAilmentMap] = useState<Record<string, { name: string; icon?: string }>>({});
+
+  // Fetch ailment names/icons for any ailment ids present in fetched reviews
+  useEffect(() => {
+    const idsToFetch = new Set<string>();
+    (allReviesList || []).forEach((review: any) => {
+      const aid = review?.ailment_id ?? (typeof review?.ailment === 'string' ? review.ailment : review?.ailment?.id);
+      if (aid && !ailmentMap[aid]) idsToFetch.add(String(aid));
+    });
+
+    const ids = Array.from(idsToFetch);
+    if (ids.length === 0) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('ailments')
+          .select('id, name, icon')
+          .in('id', ids);
+        if (error) {
+          console.error('Error fetching ailments:', error);
+          return;
+        }
+        if (cancelled) return;
+        setAilmentMap(prev => {
+          const copy = { ...prev };
+          (data || []).forEach((a: any) => {
+            if (a?.id && (a?.name || a?.icon)) copy[a.id] = { name: a.name || '', icon: a.icon || '' };
+          });
+          return copy;
+        });
+      } catch (err) {
+        console.error('Error fetching ailments:', err);
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [allReviesList, ailmentMap]);
+
 
   // ---------------------------
   // Fetch Reviews + Stats
@@ -213,6 +255,19 @@ export default function ReviewListPage({
 
       let allReviews = reviewsData || [];
       setAllReviewsList(reviewsData ?? []);
+
+      // Build a simple ailment map from incoming reviews to resolve ids->names/icons
+      const aMap: Record<string, { name: string; icon?: string }> = {};
+      (reviewsData || []).forEach((rev: any) => {
+        const aObj = rev?.ailment && typeof rev.ailment === 'object' ? rev.ailment : undefined;
+        const aid = rev?.ailment_id ?? (typeof rev?.ailment === 'string' ? rev.ailment : aObj?.id);
+        const name = aObj?.name || rev?.ailment_name || rev?.ailmentName || aObj?.label || '';
+        const icon = aObj?.icon || rev?.ailment_icon || rev?.ailmentIcon || aObj?.emoji || '';
+        if (aid && (name || icon)) {
+          aMap[String(aid)] = { name: name || '', icon: icon || '' };
+        }
+      });
+      setAilmentMap((prev) => ({ ...aMap, ...prev }));
 
       allReviews = allReviews.filter((review) => {
         if (activeFilters.dosage.length > 0) {
@@ -463,6 +518,27 @@ export default function ReviewListPage({
                   const profile_image = review.profiles?.profile_img;
                   const secondaryRemedies = review.secondary_remedies || [];
 
+                  // Resolve ailment display (icon + name) with fallbacks (cast to any to avoid strict Review typing)
+                  let ailmentIcon = (review as any)?.ailment?.icon ?? (review as any)?.ailment_icon ?? (review as any)?.ailmentIcon ?? (review as any)?.ailment?.emoji ?? null;
+
+                  let ailmentName = (review as any)?.ailment?.name ?? (review as any)?.ailment_name ?? (review as any)?.ailmentName ?? (review as any)?.ailment?.label ?? null;
+
+                  const ailmentIdRaw = (review as any)?.ailment_id ?? (typeof (review as any)?.ailment === 'string' ? (review as any).ailment : (review as any)?.ailment?.id);
+                  const ailmentId = ailmentIdRaw ? String(ailmentIdRaw) : null;
+
+                  // Use prebuilt ailmentMap (populated from fetched reviews) when available
+                  if (ailmentId && ailmentMap[ailmentId]) {
+                    const fetched = ailmentMap[ailmentId];
+                    ailmentName = ailmentName || fetched.name || null;
+                    ailmentIcon = ailmentIcon || fetched.icon || null;
+                  }
+
+                  // fallback to surrounding context's ailment if available
+                  if ((!ailmentName || !ailmentIcon) && ailmentContext) {
+                    ailmentName = ailmentName || ailmentContext.name;
+                    ailmentIcon = ailmentIcon || null;
+                  }
+
                   const usageTags = processUsageTags([
                     review.dosage,
                     review.potency,
@@ -555,6 +631,19 @@ export default function ReviewListPage({
                           )}
                         </div>
                       </div>
+
+                      {/* Ailment (icon + name) - shown above combination, matching UserReview styling */}
+                      {ailmentName && (
+                        <div className="flex items-center gap-1 mb-2">
+                          <span className="text-xs text-[#2B2E28] font-medium">Ailment:</span>
+                          {ailmentIcon && (typeof ailmentIcon === 'string' && (ailmentIcon.startsWith('http') || ailmentIcon.startsWith('/'))) ? (
+                            <span className="rounded-full w-[24px] h-[24px] bg-[#F5F3ED] flex justify-center items-center"><img src={ailmentIcon} alt={ailmentName} className="w-[16px] h-[16px]" /></span>
+                          ) : (
+                            <span className="text-xs font-medium leading-none rounded-full w-[24px] h-[24px] bg-[#F5F3ED] flex justify-center items-center">{ailmentIcon ?? '🌿'}</span>
+                          )}
+                          <span className="font-medium bg-[#F5F3ED] px-2 py-1 text-xs text-[#0B0C0A]"> {ailmentName}</span>
+                        </div>
+                      )}
 
                       {/* UPDATED: Single grey container with increased spacing between bracketed remedies */}
                       <div className="flex flex-wrap items-center gap-2 mt-2 mb-3">

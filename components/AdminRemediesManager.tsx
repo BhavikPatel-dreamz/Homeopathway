@@ -182,10 +182,15 @@ export default function AdminRemediesManager() {
 
       await poll()
 
-      // refresh remedies list after import
-      await fetchRemedies()
+      // Show success immediately once server reports 100% progress,
+      // then refresh the remedies list in background to avoid UI delay.
       setMessage({ type: 'success', text: 'Import completed successfully' })
       setTimeout(() => setMessage(null), 4000)
+
+      // refresh remedies list after import (do not await to keep UI responsive)
+      fetchRemedies().catch((e) => {
+        console.error('Failed to refresh remedies after import:', e)
+      })
     } catch (err) {
       console.error('Import error', err)
       setMessage({ type: 'error', text: 'Import failed' })
