@@ -7,7 +7,7 @@ import { X } from "lucide-react";
 import Image from 'next/image';
 import { supabase } from "@/lib/supabaseClient";
 import { healthEmojis } from "@/lib/emojiList";
-import { createUniqueSlugFromName } from "@/lib/slugUtils";
+import { createUniqueSlugFromName, generateSlug } from "@/lib/slugUtils";
 
 interface RequestAilmentRemedyModalProps {
   isOpen: boolean;
@@ -34,6 +34,7 @@ export default function RequestAilmentRemedyModal({
     description: "",
     key_symptoms: "",
   });
+  const [slugLoading, setSlugLoading] = useState(false);
 
   // Reset internal state when modal opens so reopening shows the form (not the previous success state)
   useEffect(() => {
@@ -54,25 +55,39 @@ export default function RequestAilmentRemedyModal({
     }
   }, [isOpen, type]);
 
-  // Auto-generate slug when name changes
+  // Generate slug: show immediate client-side slug, then debounce server uniqueness check
   useEffect(() => {
-    const generateSlug = async () => {
-      if (formData.name.trim()) {
-        const tableName = requestType === "ailment" ? "ailments" : "remedies";
-        const newSlug = await createUniqueSlugFromName(formData.name, tableName);
-        setFormData((prev) => ({
-          ...prev,
-          slug: newSlug,
-        }));
-      } else {
-        setFormData((prev) => ({
-          ...prev,
-          slug: "",
-        }));
-      }
-    };
+    let mounted = true;
+    let debounceId: NodeJS.Timeout | null = null;
 
-    generateSlug();
+    if (formData.name.trim()) {
+      // immediate client-side slug for instant feedback
+      const base = generateSlug(formData.name);
+      setFormData((prev) => ({ ...prev, slug: base }));
+
+      // debounce server uniqueness check
+      setSlugLoading(true);
+      debounceId = setTimeout(async () => {
+        try {
+          const tableName = requestType === "ailment" ? "ailments" : "remedies";
+          const unique = await createUniqueSlugFromName(formData.name, tableName);
+          if (!mounted) return;
+          setFormData((prev) => ({ ...prev, slug: unique }));
+        } catch (err) {
+          console.error('Error generating unique slug:', err);
+        } finally {
+          if (mounted) setSlugLoading(false);
+        }
+      }, 400);
+    } else {
+      setFormData((prev) => ({ ...prev, slug: "" }));
+      setSlugLoading(false);
+    }
+
+    return () => {
+      mounted = false;
+      if (debounceId) clearTimeout(debounceId);
+    };
   }, [formData.name, requestType]);
 
   const handleInputChange = (
@@ -113,13 +128,29 @@ export default function RequestAilmentRemedyModal({
         return;
       }
 
-      const slug = await createUniqueSlugFromName(
-        formData.name,
-        requestType === "ailment" ? "ailments" : "remedies"
-      );
-
-      // Insert into ailments or remedies table with approved status
       const tableName = requestType === "ailment" ? "ailments" : "remedies";
+
+      // Resolve slug safely: prefer a server-unique slug, but fall back to a client-generated slug
+      let slug = generateSlug(formData.name);
+
+      try {
+        if (slugLoading) {
+          // If a background uniqueness check is still running, wait up to 3s for it
+          slug = await Promise.race([
+            createUniqueSlugFromName(formData.name, tableName),
+            new Promise<string>((res) => setTimeout(() => res(slug), 3000)),
+          ]);
+        } else {
+          // Try a quick uniqueness request but timeout after 2s to avoid hanging
+          slug = await Promise.race([
+            createUniqueSlugFromName(formData.name, tableName),
+            new Promise<string>((res) => setTimeout(() => res(slug), 2000)),
+          ]);
+        }
+      } catch (slugErr) {
+        console.error('Slug generation timed out or failed, using client slug:', slugErr);
+        slug = generateSlug(formData.name);
+      }
       const insertData: any = {
         name: formData.name,
         icon: formData.emoji,
@@ -170,7 +201,7 @@ export default function RequestAilmentRemedyModal({
               </svg>
             </button>
             <h2 className="sm:text-[32px] text-3xl font-normal sm:leading-[40px] leading-8 text-[#0B0C0A]">
-              Request a new ailment or remedy
+              {type === 'both' ? 'Request a new ailment or remedy' : `Request a new ${requestType === 'ailment' ? 'Ailment' : 'Remedy'}`}
             </h2>
           </div>
         )}
@@ -213,11 +244,10 @@ export default function RequestAilmentRemedyModal({
 
         {!success && (
           <>
-            {/* Error Message */}
+            {/* Error Message - show only the message (hide the 'Error' label) */}
             {error && (
-              <div className="m-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
-                <p className="font-medium">Error</p>
-                <p className="text-sm mt-1">{error}</p>
+              <div aria-live="polite" className="m-4">
+                <p className="m-0 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{error}</p>
               </div>
             )}
 
