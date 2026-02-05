@@ -221,7 +221,7 @@ export default function AilmentListPage({
 
               {/* Dropdown Menu */}
               {isSortOpen && (
-                <ul className="absolute right-0 mt-1 w-[160px] bg-white border border-gray-300 rounded-md shadow-lg z-20 overflow-hidden">
+                <ul className="absolute right-0 mt-1 w-[140px] bg-white border border-gray-300 rounded-md shadow-lg z-20 overflow-hidden">
                   {[
                     { label: "Default", value: "" },
                     { label: "A - Z", value: "az" },
