@@ -73,9 +73,11 @@ export default function PopularAilmentsServer({
                 <span>
                   {sortBy === "az"
                     ? "A - Z"
-                    : sortBy === "most-reviewed"
-                      ? "Most Reviewed"
-                      : "Default"}
+                    : sortBy === "za"
+                      ? "Z - A"
+                      : sortBy === "most-reviewed"
+                        ? "Most Remedies"
+                        : "Default"}
                 </span>
 
                 <svg
@@ -93,6 +95,7 @@ export default function PopularAilmentsServer({
                   {[
                     { label: "Default", value: "" },
                     { label: "A - Z", value: "az" },
+                    { label: "Z - A", value: "za" },
                     { label: "Most Reviewed", value: "most-reviewed" }
                   ].map(opt => (
                     <li
@@ -117,9 +120,11 @@ export default function PopularAilmentsServer({
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-6 lg:grid-cols-4 gap-4 lg:gap-6">
           {(() => {
-            let list = [...ailments];
+            const list = [...ailments];
             if (sortBy === 'az') {
               list.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+            } else if (sortBy === 'za') {
+              list.sort((a, b) => (b.name || '').localeCompare(a.name || ''));
             } else if (sortBy === 'most-reviewed') {
               list.sort((a, b) => (b.remedies_count ?? 0) - (a.remedies_count ?? 0));
             }
