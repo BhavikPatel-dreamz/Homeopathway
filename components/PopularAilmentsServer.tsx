@@ -61,7 +61,7 @@ export default function PopularAilmentsServer({
           </div>
 
           {/* Sort control (matches AilmentList styles) */}
-          <div className="flex flex-wrap items-center gap-3 justify-end">
+          <div className="flex flex-wrap items-center sm:gap-3 gap-1 justify-end">
             <label className="text-sm font-medium text-[#2B2E28]">Sort by:</label>
 
             <div className="relative" ref={sortDropdownRef}>

@@ -734,7 +734,7 @@ z-50 animate-in slide-in-from-top-2
                       <button
                         type="submit"
                         disabled={editLoading}
-                        className="w-full py-3 bg-[#5D7B6F] hover:bg-[#4a5f56] disabled:bg-gray-400 text-white font-semibold rounded-lg transition-colors duration-200"
+                        className="w-full py-3 bg-[#5D7B6F] hover:bg-[#4a5f56] disabled:bg-gray-400 text-white font-semibold rounded-lg transition-colors duration-200 cursor-pointer"
                       >
                         {editLoading ? "Saving..." : "Save Changes"}
                       </button>

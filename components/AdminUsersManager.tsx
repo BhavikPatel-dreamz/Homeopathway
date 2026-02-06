@@ -225,7 +225,7 @@ export default function AdminUsersManager() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Manage Users</h2>
+          <h2 className="text-2xl font-normal text-gray-900">Manage Users</h2>
           <p className="text-gray-600 mt-1">View and manage user accounts and permissions</p>
         </div>
         <div className="flex gap-3">
@@ -403,7 +403,7 @@ export default function AdminUsersManager() {
                         onClick={() => handleDelete(user.id)}
                         disabled={loading || (currentUserRole === 'moderator' && user.role === 'admin')}
                         title={currentUserRole === 'moderator' && user.role === 'admin' ? 'Moderators cannot delete admin users' : undefined}
-                        className="text-red-600 hover:text-red-800 font-medium text-sm disabled:opacity-50"
+                        className="text-red-600 hover:text-red-800 font-medium text-sm disabled:opacity-50 cursor-pointer"
                       >
                         Delete
                       </button>

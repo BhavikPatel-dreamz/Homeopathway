@@ -83,7 +83,7 @@ export default function TopRatedRemediesServer({
           </div>
 
           {/* Sort control */}
-          <div className="flex flex-wrap items-center gap-3 justify-end">
+          <div className="flex flex-wrap items-center sm:gap-3 gap-1 justify-end">
             <label className="text-sm font-medium text-[#2B2E28]">Sort by:</label>
 
             <div className="relative" ref={sortDropdownRef}>
@@ -99,9 +99,9 @@ export default function TopRatedRemediesServer({
                       ? "Most Reviewed"
                       : sortBy === "za"
                         ? "Z - A"
-                      : sortBy === "az"
-                        ? "A - Z"
-                        : "Default"}
+                        : sortBy === "az"
+                          ? "A - Z"
+                          : "Default"}
                 </span>
 
                 <svg

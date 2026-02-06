@@ -66,6 +66,11 @@ body {
   font-family: 'Montserrat', sans-serif;
 }
 
+button,
+a {
+  cursor: pointer;
+}
+
 /* ✅ Prevent iOS bounce effect (optional) */
 body {
   position: relative;

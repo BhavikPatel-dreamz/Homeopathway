@@ -25,11 +25,11 @@ export default function ContactUsSection() {
       {/* Grid: gap-4 for mobile (16px), lg:gap-8 for desktop (32px) */}
       <div className='max-w-[1268px] mx-auto px-4'>
         <div className="bg-white rounded-[8px] border-0 md:p-6 p-4 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 items-start">
-          
+
           {/* LEFT CONTENT: Form and Contact Info */}
           {/* The gap-8 controls the space between the Title/Info block and the Form block */}
-          <div className="flex flex-col gap-8"> 
-            
+          <div className="flex flex-col gap-8">
+
             {/* TOP BLOCK: Title and Contact Info */}
             <div>
               {/* Title */}
@@ -44,11 +44,11 @@ export default function ContactUsSection() {
 
               {/* 2 & 3. CONTACT INFO: Tighter spacing for the two email lines */}
               <div className="text-[14px] text-[#41463B] space-y-2"> {/* space-y-2 for spacing between email lines */}
-                <p className="leading-5"> 
+                <p className="leading-5">
                   <span className="font-medium text-[#0B0C0A]">Email:</span>{' '}
                   hello@homeopathway.com
                 </p>
-                <p className="leading-5"> 
+                <p className="leading-5">
                   <span className="font-medium text-[#0B0C0A]">
                     Business Inquiries:
                   </span>{' '}
@@ -56,7 +56,7 @@ export default function ContactUsSection() {
                 </p>
               </div>
             </div>
-            
+
             {/* FORM BLOCK */}
             <form onSubmit={handleSubmit} className="flex flex-col gap-3">
               {/* Label */}
@@ -66,7 +66,7 @@ export default function ContactUsSection() {
 
               {/* Textarea: Background is cream color #F7F4EC */}
               <textarea
-                rows={5} 
+                rows={5}
                 placeholder="Write your message here..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
@@ -83,20 +83,19 @@ export default function ContactUsSection() {
                   focus:ring-2 focus:ring-[#6B705C]/40
                   bg-[#F1F2F0] {/* Textarea background: Cream color */}
                 "
-                style={{ minHeight: '120px' }} 
+                style={{ minHeight: '120px' }}
               />
 
               {/* Submit Button */}
               <button
                 type="submit"
                 className="
-                  w-fit
                   bg-[#6C7463] 
                   text-white
                   text-[16px]
                   font-semibold
                   px-6
-                  py-[10px] 
+                  py-2.5 
                   rounded-full 
                   hover:opacity-90
                   transition-opacity

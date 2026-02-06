@@ -175,7 +175,7 @@ export default function RemedyListPage({
 
             {/* Sort control */}
             {/* Sort control */}
-            <div className="mb-6 flex flex-wrap items-center gap-3 justify-end">
+            <div className="mb-6 flex flex-wrap items-center sm:gap-3 gap-1 justify-end">
               <label className="text-sm font-medium text-[#2B2E28]">Sort by:</label>
 
               <div ref={sortDropdownRef} className="relative">

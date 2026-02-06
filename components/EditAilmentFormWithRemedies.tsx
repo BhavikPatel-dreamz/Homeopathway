@@ -150,7 +150,7 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
         >
           ← Back to Ailments
         </Link>
-        <h1 className="text-3xl font-serif text-gray-900">Edit Ailment</h1>
+        <h1 className="text-3xl font-serif text-gray-900 font-normal">Edit Ailment</h1>
         <p className="text-gray-600 mt-2">Update the ailment information and manage related remedies</p>
       </div>
 
@@ -347,7 +347,7 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="flex-1 bg-teal-600 text-white py-3 rounded-lg hover:bg-teal-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors"
+                      className="flex-1 bg-teal-600 text-white py-3 rounded-lg hover:bg-teal-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors cursor-pointer"
                     >
                       {loading ? 'Updating...' : 'Update Ailment'}
                     </button>
@@ -363,7 +363,7 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
 
               {/* Preview */}
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                <h2 className="text-lg font-normal text-gray-900 mb-4">
                   Preview
                 </h2>
                 <div className="border border-gray-200 rounded-lg p-4">
@@ -372,7 +372,7 @@ export default function EditAilmentForm({ ailmentId }: EditAilmentFormProps) {
                       {formData.icon || '❓'}
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      <h3 className="text-lg font-normal text-gray-900 mb-2">
                         {formData.name || 'Ailment Name'}
                       </h3>
                       <p className="text-sm text-gray-600 mb-2">
