@@ -55,6 +55,8 @@ export default function TopRatedRemediesServer({
       list.sort((a, b) => (b.average_rating ?? 0) - (a.average_rating ?? 0));
     } else if (sortBy === 'most-reviewed') {
       list.sort((a, b) => (b.reviewCount ?? b.review_count ?? 0) - (a.reviewCount ?? a.review_count ?? 0));
+    } else if (sortBy === 'za') {
+      list.sort((a, b) => (b.name || '').localeCompare(a.name || ''));
     } else if (sortBy === 'az') {
       list.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
     }
@@ -95,6 +97,8 @@ export default function TopRatedRemediesServer({
                     ? "Overall Rating"
                     : sortBy === "most-reviewed"
                       ? "Most Reviewed"
+                      : sortBy === "za"
+                        ? "Z - A"
                       : sortBy === "az"
                         ? "A - Z"
                         : "Default"}
@@ -116,7 +120,8 @@ export default function TopRatedRemediesServer({
                     { label: "Default", value: "" },
                     { label: "Overall Rating", value: "rating" },
                     { label: "Most Reviewed", value: "most-reviewed" },
-                    { label: "A - Z", value: "az" }
+                    { label: "A - Z", value: "az" },
+                    { label: "Z - A", value: "za" }
                   ].map(opt => (
                     <li
                       key={opt.value}
