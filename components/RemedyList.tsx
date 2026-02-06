@@ -175,7 +175,7 @@ export default function RemedyListPage({
 
             {/* Sort control */}
             {/* Sort control */}
-            <div className="mb-6 flex items-center gap-3 justify-end">
+            <div className="mb-6 flex flex-wrap items-center gap-3 justify-end">
               <label className="text-sm font-medium text-[#2B2E28]">Sort by:</label>
 
               <div ref={sortDropdownRef} className="relative">
@@ -183,7 +183,7 @@ export default function RemedyListPage({
                 <button
                   type="button"
                   onClick={() => setIsSortOpen(prev => !prev)}
-                  className="flex items-center gap-1 text-[#2B2E28] text-sm font-normal cursor-pointer focus:outline-none"
+                  className="flex items-center gap-1 text-[#20231E] text-sm font-normal cursor-pointer focus:outline-none"
                 >
                   <span>
                     {sortBy === "az"
@@ -205,7 +205,7 @@ export default function RemedyListPage({
 
                 {/* Dropdown */}
                 {isSortOpen && (
-                  <ul className="absolute right-0 mt-1 w-[160px] bg-white border border-gray-300 rounded-md shadow-lg z-20 overflow-hidden">
+                  <ul className="absolute right-0 mt-1 w-[140px] bg-white border border-gray-300 rounded-md shadow-lg z-20 overflow-hidden">
                     {[
                       { label: "Default", value: "" },
                       { label: "A - Z", value: "az" },
