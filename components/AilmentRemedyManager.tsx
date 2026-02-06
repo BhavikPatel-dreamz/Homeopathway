@@ -225,7 +225,7 @@ export default function AilmentRemedyManager({
       {/* Header */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className="text-lg font-normal text-gray-900">
             Manage Related Remedies
           </h3>
         </div>
@@ -318,7 +318,7 @@ export default function AilmentRemedyManager({
                       className="mt-1 h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded"
                     />
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-medium text-gray-900">
+                      <h4 className="text-sm font-normal text-gray-900">
                         {remedy.name}
                       </h4>
                       {remedy.scientific_name && (

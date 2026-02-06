@@ -218,7 +218,7 @@ export default function AddAilmentForm() {
         >
           ← Back to Ailments
         </Link>
-        <h1 className="text-3xl font-serif text-gray-900">Add New Ailment</h1>
+        <h1 className="text-3xl font-serif text-gray-900 font-normal">Add New Ailment</h1>
         <p className="text-gray-600 mt-2">Create a new health condition or ailment</p>
       </div>
 
@@ -465,12 +465,12 @@ export default function AddAilmentForm() {
       {/* Preview Card */}
       {(formData.name || formData.icon) && (
         <div className="bg-white rounded-lg shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Preview</h3>
+          <h3 className="text-lg font-normal text-gray-900 mb-4">Preview</h3>
           <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-4">
               <div className="text-4xl">{formData.icon || '❓'}</div>
               <div className="flex-1">
-                <h4 className="text-lg font-semibold text-gray-900">
+                <h4 className="text-lg font-normal text-gray-900">
                   {formData.name || 'Ailment Name'}
                 </h4>
                 <p className="text-sm text-gray-600 mt-1">

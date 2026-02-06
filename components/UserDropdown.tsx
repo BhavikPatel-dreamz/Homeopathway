@@ -91,7 +91,7 @@ export default function UserDropdown({ isOpen, onClose, user, profile }: UserDro
         />
 
         <div className="min-w-0">
-          <p className="text-sm font-medium text-gray-900 truncate">
+          <p className="text-sm font-normal text-gray-900 truncate">
             {profile.first_name} {profile.last_name}
           </p>
           <p className="text-sm text-gray-500 truncate">

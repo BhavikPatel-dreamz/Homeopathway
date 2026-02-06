@@ -84,7 +84,7 @@ export default function ReviewsWithFilter({
     <>
       <div className="bg-white rounded-2xl shadow-sm p-8 mb-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-serif text-gray-900">Reviews</h2>
+          <h2 className="text-2xl font-serif text-gray-900 font-normal">Reviews</h2>
           <button
             onClick={() => setIsFilterOpen(true)}
             className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"

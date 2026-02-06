@@ -72,7 +72,7 @@ export default function AddUserForm() {
 
       // Success - redirect back to users page
       router.push('/admin/users');
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error('Error adding user:', err);
       setError(err.message || 'Failed to add user');
@@ -117,7 +117,7 @@ export default function AddUserForm() {
         >
           ← Back to Users
         </Link>
-        <h1 className="text-3xl font-bold text-gray-900">Add New User</h1>
+        <h1 className="text-3xl font-normal text-gray-900">Add New User</h1>
         <p className="text-gray-600 mt-2">Create a new user account</p>
       </div>
 
@@ -133,8 +133,8 @@ export default function AddUserForm() {
 
           {/* Personal Information */}
           <div className="border-b pb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Personal Information</h3>
-            
+            <h3 className="text-lg font-normal text-gray-900 mb-4">Personal Information</h3>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* First Name */}
               <div>
@@ -174,8 +174,8 @@ export default function AddUserForm() {
 
           {/* Account Information */}
           <div className="border-b pb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Account Information</h3>
-            
+            <h3 className="text-lg font-normal text-gray-900 mb-4">Account Information</h3>
+
             <div className="space-y-4">
               {/* Email */}
               <div>
@@ -257,7 +257,7 @@ export default function AddUserForm() {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-teal-600 text-white py-3 px-6 rounded-lg hover:bg-teal-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors"
+              className="flex-1 bg-teal-600 text-white py-3 px-6 rounded-lg hover:bg-teal-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors cursor-pointer"
             >
               {loading ? 'Creating...' : 'Create User'}
             </button>
