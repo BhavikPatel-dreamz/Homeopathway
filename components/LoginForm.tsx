@@ -101,7 +101,7 @@ export default function LoginForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F5F3ED] px-4">
-      <div className="bg-white rounded-[12px] pt-6 pb-6 pl-4 pr-4 md:pt-12 md:pb-12 md:pl-10 md:pr-10 w-full max-w-md">
+      <div className="bg-white rounded-xl pt-6 pb-6 pl-4 pr-4 md:pt-12 md:pb-12 md:pl-10 md:pr-10 w-full max-w-md">
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <div className="w-25 h-22">
@@ -113,7 +113,7 @@ export default function LoginForm() {
 
         {/* Heading */}
         <h1 className=" font-serif text-center mb-2 text-3xl sm:text-2xl md:text-3xl lg:text-[32px] leading-tight font-normal text-[#0B0C0A]">Welcome Back!</h1>
-        <p className="text-[#41463B] text-center text-[16px] font-[500] mb-6">
+        <p className="text-[#41463B] text-center text-[16px] font-medium mb-6">
           Glad to see you again.<br />
           Login to your account below.
         </p>
@@ -121,7 +121,7 @@ export default function LoginForm() {
         {/* Error Message */}
         {error && (
           <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-            <svg className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-5 h-5 text-red-600 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
             </svg>
             <div className="flex-1">
@@ -141,7 +141,7 @@ export default function LoginForm() {
         {/* Success Message */}
         {success && (
           <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3">
-            <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-5 h-5 text-green-600 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
             </svg>
             <p className="text-sm font-medium text-green-800">{success}</p>
@@ -164,7 +164,7 @@ export default function LoginForm() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
-                className="w-full pl-9 pr-4 py-2.5 placeholder-[#41463B] font-[500] placeholder:font-[400] text-[16px] text-[#41463B] bg-[#F1F2F0] hover:bg-[#D3D6D1] focus:bg-[#ffffff] border border-[#D3D6D1] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#6C7463] focus:border-transparent transition-all duration-500"
+                className="w-full pl-9 pr-4 py-2.5 placeholder-[#41463B] font-medium placeholder:font-normal text-base text-[#41463B] bg-[#F1F2F0] hover:bg-[#D3D6D1] focus:bg-[#ffffff] border border-[#D3D6D1] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#6C7463] focus:border-transparent transition-all duration-500"
                 required
                 autoFocus
               />
@@ -185,7 +185,7 @@ export default function LoginForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
-                className="w-full pl-9 pr-12 py-2.5 placeholder-[#41463B] font-[500] placeholder:font-[400] text-[16px] text-[#41463B] bg-[#F1F2F0] hover:bg-[#D3D6D1] focus:bg-[#ffffff] border border-[#D3D6D1] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#6C7463] focus:border-transparent transition-all duration-500"
+                className="w-full pl-9 pr-12 py-2.5 placeholder-[#41463B] font-medium placeholder:font-normal text-base text-[#41463B] bg-[#F1F2F0] hover:bg-[#D3D6D1] focus:bg-[#ffffff] border border-[#D3D6D1] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#6C7463] focus:border-transparent transition-all duration-500"
                 required
               />
               <button
@@ -204,7 +204,7 @@ export default function LoginForm() {
 
           {/* Forgot Password */}
           <div className="text-right mb-6">
-            <Link href="/forgot-password" className="text-xs text-[#4B544A] hover:text-[#0B0C0A] underline font-[500] transition-all duration-500">
+            <Link href="/forgot-password" className="text-xs text-[#4B544A] hover:text-[#0B0C0A] underline font-medium transition-all duration-500">
               Forgot Password?
             </Link>
           </div>
@@ -213,15 +213,15 @@ export default function LoginForm() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#6C7463] text-white py-3 font-[600] rounded-full hover:bg-[#565D4F] transition-colors cursor-pointer transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-[#6C7463] text-white py-3 font-semibold rounded-full hover:bg-[#565D4F] cursor-pointer transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Signing in...' : 'Login'}
           </button>
 
           {/* Signup Link */}
-          <p className="text-center text-sm text-[#83857D] font-[500] mb-6">
+          <p className="text-center text-sm text-[#83857D] font-medium mb-6">
             Don't have an account?{' '}
-            <Link href="/register" className="text-[#4B544A] hover:text-[#20231E] font-[600] underline hover:underline transition-all duration-500">
+            <Link href="/register" className="text-[#4B544A] hover:text-[#20231E] font-medium underline hover:underline transition-all duration-500">
               Signup
             </Link>
           </p>
@@ -231,7 +231,7 @@ export default function LoginForm() {
             type="button"
             onClick={handleGoogle}
             disabled={loading}
-            className="w-full bg-[#F1F2F0] border border-[#D3D6D1] text-[16px] text-[#41463B] py-2.5 rounded-[8px] font-medium hover:bg-[#D3D6D1] transition-colors flex items-center cursor-pointer justify-center gap-2 transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-[#F1F2F0] border border-[#D3D6D1] text-[16px] text-[#41463B] py-2.5 rounded-lg font-medium hover:bg-[#D3D6D1] transition-colors flex items-center cursor-pointer justify-center gap-2 duration-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />

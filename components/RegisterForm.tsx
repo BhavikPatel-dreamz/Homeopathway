@@ -146,7 +146,7 @@ export default function RegisterForm() {
 
           {/* Heading */}
           <h1 className="font-serif text-center mb-2 text-3xl sm:text-2xl md:text-3xl lg:text-[32px] leading-tight font-normal text-[#0B0C0A]">Signup</h1>
-          <p className="text-[#41463B] text-center text-[16px] font-[500] mb-8">
+          <p className="text-[#41463B] text-center text-[16px] font-medium mb-8">
             Enter your details below to create your<br />
             account and get started.
           </p>
@@ -167,7 +167,7 @@ export default function RegisterForm() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="Mack Smith"
-                  className="w-full pl-9 pr-4 py-[9px] text-[16px] text-[#41463B] font-[500] placeholder-[#41463B] placeholder:font-[400] border border-[#20231E] bg-[#fff] focus:bg-[#ffffff] hover:bg-[#D3D6D1]  rounded-lg shadow-[0_0_8px_-2px_#1A1A1A1F]  focus:outline-none  transition-all duration-500"
+                  className="w-full pl-9 pr-4 py-[9px] text-[16px] text-[#41463B] font-medium placeholder-[#41463B] placeholder:font-normal border border-[#20231E] bg-white focus:bg-[#ffffff] hover:bg-[#D3D6D1]  rounded-lg shadow-[0_0_8px_-2px_#1A1A1A1F]  focus:outline-none  transition-all duration-500"
                   required
                   autoFocus
                 />
@@ -188,7 +188,7 @@ export default function RegisterForm() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="mack100@gmail.com"
-                  className="w-full pl-9 pr-4 py-[9px] text-[16px] text-[#41463B] font-[500] placeholder-[#41463B] placeholder:font-[400] border border-[#20231E] bg-[#fff] focus:bg-[#ffffff] hover:bg-[#D3D6D1]  rounded-lg shadow-[0_0_8px_-2px_#1A1A1A1F]  focus:outline-none  transition-all duration-500"
+                  className="w-full pl-9 pr-4 py-[9px] text-[16px] text-[#41463B] font-medium placeholder-[#41463B] placeholder:font-normal border border-[#20231E] bg-white focus:bg-[#ffffff] hover:bg-[#D3D6D1]  rounded-lg shadow-[0_0_8px_-2px_#1A1A1A1F]  focus:outline-none  transition-all duration-500"
                   required
                 />
               </div>
@@ -208,7 +208,7 @@ export default function RegisterForm() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="aL4652523#"
-                  className="w-full pl-9 pr-4 py-[9px] text-[16px] text-[#41463B] font-[500] placeholder-[#41463B] placeholder:font-[400] border border-[#20231E] bg-[#ffffff] focus:bg-[#ffffff] hover:bg-[#D3D6D1]  rounded-lg shadow-[0_0_8px_-2px_#1A1A1A1F]  focus:outline-none  transition-all duration-500"
+                  className="w-full pl-9 pr-4 py-[9px] text-[16px] text-[#41463B] font-medium placeholder-[#41463B] placeholder:font-normal border border-[#20231E] bg-[#ffffff] focus:bg-[#ffffff] hover:bg-[#D3D6D1]  rounded-lg shadow-[0_0_8px_-2px_#1A1A1A1F]  focus:outline-none  transition-all duration-500"
                   required
                 />
                 <button
@@ -239,7 +239,7 @@ export default function RegisterForm() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="aL4652523#"
-                  className="w-full pl-9 pr-4 py-[9px] text-[16px] text-[#41463B] font-[500] placeholder-[#41463B] placeholder:font-[400] border border-[#20231E] bg-[#ffffff] focus:bg-[#ffffff] hover:bg-[#D3D6D1]  rounded-lg shadow-[0_0_8px_-2px_#1A1A1A1F]  focus:outline-none  transition-all duration-500"
+                  className="w-full pl-9 pr-4 py-[9px] text-[16px] text-[#41463B] font-medium placeholder-[#41463B] placeholder:font-normal border border-[#20231E] bg-[#ffffff] focus:bg-[#ffffff] hover:bg-[#D3D6D1]  rounded-lg shadow-[0_0_8px_-2px_#1A1A1A1F]  focus:outline-none  transition-all duration-500"
                   required
                 />
                 <button
@@ -260,7 +260,7 @@ export default function RegisterForm() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-[8px] bg-[#6C7463] text-white py-3 font-[600] rounded-full  hover:bg-[#565D4F] transition-colors  cursor-pointer transition-all duration-500"
+              className="w-full mt-2 bg-[#6C7463] text-white py-3 font-semibold rounded-full  hover:bg-[#565D4F] cursor-pointer transition-all duration-500"
             >
               {loading ? 'Creating account...' : 'Signup'}
             </button>
@@ -273,9 +273,9 @@ export default function RegisterForm() {
             )}
 
             {/* Login Link */}
-            <p className="text-center text-sm text-[#83857D] font-[500] placeholder:font-[400] mb-6">
+            <p className="text-center text-sm text-[#83857D] font-medium placeholder:font-normal mb-6">
               Already have an account?{' '}
-              <Link href="/login" className="text-[#4B544A] hover:text-[#20231E] font-[600] underline hover:underline transition-all duration-500">
+              <Link href="/login" className="text-[#4B544A] hover:text-[#20231E] font-semibold underline hover:underline transition-all duration-500">
                 Login
               </Link>
             </p>
@@ -336,8 +336,8 @@ export default function RegisterForm() {
                     }
                   }}
                   placeholder="@mack_60"
-                  className={`w-full pl-2 pr-4 py-[9px] text-[16px] font-[500] 
-            placeholder:font-[400]
+                  className={`w-full pl-2 pr-4 py-[9px] text-[16px] font-medium 
+            placeholder:font-normal
             border shadow-[0_0_8px_-2px_#1A1A1A1F]
             focus:outline-none transition-all duration-500
             rounded-lg
@@ -357,7 +357,7 @@ export default function RegisterForm() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full mt-[8px] bg-[#6C7463] text-white py-3 font-[600] 
+                className="w-full mt-[8px] bg-[#6C7463] text-white py-3 font-semibold 
           rounded-full hover:bg-[#565D4F] transition-colors duration-500 cursor-pointer
           disabled:opacity-50 disabled:cursor-not-allowed"
               >

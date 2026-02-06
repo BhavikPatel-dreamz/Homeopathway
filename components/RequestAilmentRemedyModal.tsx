@@ -262,7 +262,7 @@ export default function RequestAilmentRemedyModal({
                       value="ailment"
                       checked={requestType === "ailment"}
                       onChange={(e) => setRequestType(e.target.value as "ailment" | "remedy")}
-                      className="peer w-[16px] h-[16px] border-2 border-[#B5B6B1] cursor-pointer appearance-none
+                      className="peer w-4 h-4 border-2 border-[#B5B6B1] cursor-pointer appearance-none
                         checked:bg-[#83857D] checked:border-[#83857D] rounded-full
                         transition"
                     />
@@ -285,7 +285,7 @@ export default function RequestAilmentRemedyModal({
                       value="remedy"
                       checked={requestType === "remedy"}
                       onChange={(e) => setRequestType(e.target.value as "ailment" | "remedy")}
-                      className="peer w-[16px] h-[16px] border-2 border-[#B5B6B1] cursor-pointer appearance-none
+                      className="peer w-4 h-4 border-2 border-[#B5B6B1] cursor-pointer appearance-none
                         checked:bg-[#83857D] checked:border-[#83857D] rounded-full
                         transition"
                     />

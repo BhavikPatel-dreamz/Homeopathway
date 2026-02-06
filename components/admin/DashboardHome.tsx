@@ -24,7 +24,7 @@ export default function DashboardHome({
             </div>
             <span className="text-xs text-gray-500">Total</span>
           </div>
-          <div className="text-2xl font-bold text-gray-900">{remediesCount.toLocaleString()}</div>
+          <div className="text-2xl font-normal text-gray-900">{remediesCount.toLocaleString()}</div>
           <div className="text-sm text-gray-600">Remedies</div>
         </div>
 
@@ -35,7 +35,7 @@ export default function DashboardHome({
             </div>
             <span className="text-xs text-gray-500">Categories</span>
           </div>
-          <div className="text-2xl font-bold text-gray-900">{ailmentsCount.toLocaleString()}</div>
+          <div className="text-2xl font-normal text-gray-900">{ailmentsCount.toLocaleString()}</div>
           <div className="text-sm text-gray-600">Ailments</div>
         </div>
 
@@ -46,7 +46,7 @@ export default function DashboardHome({
             </div>
             <span className="text-xs text-gray-500">Total Users</span>
           </div>
-          <div className="text-2xl font-bold text-gray-900">{usersCount.toLocaleString()}</div>
+          <div className="text-2xl font-normal text-gray-900">{usersCount.toLocaleString()}</div>
           <div className="text-sm text-gray-600">Users</div>
         </div>
 
@@ -57,7 +57,7 @@ export default function DashboardHome({
             </div>
             <span className="text-xs text-gray-500">Average</span>
           </div>
-          <div className="text-2xl font-bold text-gray-900">{averageRating}</div>
+          <div className="text-2xl font-normal text-gray-900">{averageRating}</div>
           <div className="text-sm text-gray-600">Total Reviews</div>
         </div>
       </div>
@@ -69,7 +69,7 @@ export default function DashboardHome({
           className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
         >
           <img className="text-3xl mb-3" src="/ailments-icon.svg" alt="" />
-          <h3 className="text-lg font-semibold mb-1">Add Ailment</h3>
+          <h3 className="text-lg font-normal mb-1">Add Ailment</h3>
           <p className="text-sm text-blue-100">Create a new ailment category</p>
         </Link>
 
@@ -78,7 +78,7 @@ export default function DashboardHome({
           className="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
         >
           <img className="text-3xl mb-3" src="/top-remedies.svg" alt="" />
-          <h3 className="text-lg font-semibold mb-1">Add Remedy</h3>
+          <h3 className="text-lg font-normal mb-1">Add Remedy</h3>
           <p className="text-sm text-green-100">Add a new homeopathic remedy</p>
         </Link>
 
@@ -87,7 +87,7 @@ export default function DashboardHome({
           className="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
         >
           <div className="text-3xl mb-3">👥</div>
-          <h3 className="text-lg font-semibold mb-1">Manage Users</h3>
+          <h3 className="text-lg font-normal mb-1">Manage Users</h3>
           <p className="text-sm text-purple-100">View and manage user accounts</p>
         </Link>
       </div>

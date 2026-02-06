@@ -103,7 +103,7 @@ export default function AddRemedyForm() {
         >
           ← Back to Remedies
         </Link>
-        <h1 className="text-3xl font-bold text-gray-900">Add New Remedy</h1>
+        <h1 className="text-3xl font-normal text-gray-900">Add New Remedy</h1>
         <p className="text-gray-600 mt-2">Create a new homeopathic remedy</p>
       </div>
 
@@ -302,7 +302,7 @@ export default function AddRemedyForm() {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-teal-600 text-white py-3 px-6 rounded-lg hover:bg-teal-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors"
+              className="flex-1 bg-teal-600 text-white py-3 px-6 rounded-lg hover:bg-teal-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors cursor-pointer"
             >
               {loading ? 'Adding...' : 'Add Remedy'}
             </button>
@@ -319,7 +319,7 @@ export default function AddRemedyForm() {
       {/* Preview Card */}
       {formData.name && (
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Preview</h3>
+          <h3 className="text-lg font-normal text-gray-900 mb-4">Preview</h3>
           <div className="border border-gray-200 rounded-lg p-4">
             <div className="flex items-start gap-4">
               {/* Icon/Image Section */}
@@ -348,7 +348,7 @@ export default function AddRemedyForm() {
 
               {/* Content Section */}
               <div className="flex-1">
-                <h4 className="text-xl font-bold text-gray-900">{formData.name}</h4>
+                <h4 className="text-xl font-normal text-gray-900">{formData.name}</h4>
 
                 {formData.description && (
                   <p className="text-gray-700 mt-3">{formData.description}</p>
