@@ -249,7 +249,7 @@ if (allSecondaryIds.length) {
       r.profiles?.user_name?.toLowerCase().includes(q)
     );
   }
-
+console.log("Enriched reviews after merging profiles and remedies:", enrichedReviews);
   return { data: enrichedReviews, error: null };
 }
 
