@@ -269,7 +269,7 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-serif text-gray-900">Reviews Management</h1>
+          <h1 className="text-3xl font-serif text-gray-900 font-normal">Reviews Management</h1>
           <p className="text-gray-600 mt-1">
             Manage and moderate user reviews ({reviews.length} of {total})
           </p>
@@ -287,11 +287,11 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
       {/* Filters */}
       <div className="bg-white rounded-lg shadow-sm p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
+          <h3 className="text-lg font-normal text-gray-900">Filters</h3>
           <button
             onClick={clearFilters}
             disabled={loading}
-            className="text-sm text-[#6B7B5E] hover:text-[#5a6b4f] font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className="text-sm text-[#6B7B5E] hover:text-[#9b0909] font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             Clear All
           </button>
@@ -567,7 +567,7 @@ export default function AdminReviewsManager({ initialReviews, remedies, totalCou
                             onClick={() => setFilters(prev => ({ ...prev, page: i }))}
                             disabled={loading}
                             className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50 ${currentPage === i
-                              ? 'z-10 bg-indigo-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600'
+                              ? 'z-10 bg-teal-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-teal-600'
                               : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
                               }`}
                           >
@@ -651,7 +651,7 @@ function ReviewRow({
     <tr className="hover:bg-gray-50">
       <td className="px-6 py-4 whitespace-nowrap">
         <div>
-          <div className="text-sm font-medium text-gray-900">
+          <div className="text-sm font-normal text-gray-900">
             {(() => {
               const userProfile = review.profiles || review.user_profile;
               return `${userProfile?.first_name || ''} ${userProfile?.last_name || ''}`.trim() || 'Anonymous';
@@ -689,7 +689,7 @@ function ReviewRow({
               <select
                 value={editData.star_count}
                 onChange={(e) => setEditData(prev => ({ ...prev, star_count: parseInt(e.target.value) }))}
-                className="text-sm border border-gray-300 rounded px-2 py-1 text-gray-700"
+                className="text-sm border border-gray-300 rounded px-2 py-1 text-gray-700 cursor-pointer"
               >
                 {[1, 2, 3, 4, 5].map(rating => (
                   <option key={rating} value={rating}>{rating} Stars</option>
@@ -698,7 +698,7 @@ function ReviewRow({
               <select
                 value={editData.effectiveness}
                 onChange={(e) => setEditData(prev => ({ ...prev, effectiveness: parseInt(e.target.value) }))}
-                className="text-sm border border-gray-300 rounded px-2 py-1 ml-2 text-gray-700"
+                className="text-sm border border-gray-300 rounded px-2 py-1 ml-2 text-gray-700 cursor-pointer"
               >
                 <option value={5}>Completely resolved symptoms</option>
                 <option value={4}>Significantly improved</option>
@@ -729,21 +729,21 @@ function ReviewRow({
               placeholder="Potency"
               value={editData.potency}
               onChange={(e) => setEditData(prev => ({ ...prev, potency: e.target.value }))}
-              className="w-full text-sm border border-gray-300 rounded px-2 py-1 text-gray-700"
+              className="w-full text-sm border border-gray-300 rounded px-2 py-1 text-gray-700 cursor-pointer"
             />
             <input
               type="text"
               placeholder="Dosage"
               value={editData.dosage}
               onChange={(e) => setEditData(prev => ({ ...prev, dosage: e.target.value }))}
-              className="w-full text-sm border border-gray-300 rounded px-2 py-1 text-gray-700"
+              className="w-full text-sm border border-gray-300 rounded px-2 py-1 text-gray-700 cursor-pointer"
             />
             <input
               type="text"
               placeholder="Duration"
               value={editData.duration_used}
               onChange={(e) => setEditData(prev => ({ ...prev, duration_used: e.target.value }))}
-              className="w-full text-sm border border-gray-300 rounded px-2 py-1 text-gray-700"
+              className="w-full text-sm border border-gray-300 rounded px-2 py-1 text-gray-700 cursor-pointer"
             />
           </div>
         ) : (
@@ -765,31 +765,31 @@ function ReviewRow({
             <button
               onClick={handleSave}
               disabled={loading}
-              className="text-green-600 hover:text-green-900 disabled:opacity-50"
+              className="text-green-600 hover:text-green-900 disabled:opacity-50 cursor-pointer"
             >
-              ✅ Save
+              Save
             </button>
             <button
               onClick={handleCancel}
               disabled={loading}
-              className="text-gray-600 hover:text-gray-900 disabled:opacity-50"
+              className="text-red-600 hover:text-red-800 font-medium text-sm disabled:opacity-50 cursor-pointer"
             >
-              ❌ Cancel
+              Cancel
             </button>
           </div>
         ) : (
           <div className="flex gap-2">
             <button
               onClick={onStartEdit}
-              className="text-blue-600 hover:text-blue-900"
+              className="text-teal-600 hover:text-teal-800 font-medium text-sm cursor-pointer"
             >
-              ✏️ Edit
+              Edit
             </button>
             <button
               onClick={onDelete}
-              className="text-red-600 hover:text-red-900"
+              className="text-red-600 hover:text-red-800 font-medium text-sm disabled:opacity-50 cursor-pointer"
             >
-              🗑️ Delete
+              Delete
             </button>
           </div>
         )}

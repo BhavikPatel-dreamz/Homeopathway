@@ -448,7 +448,7 @@ z-50 animate-in slide-in-from-top-2
           {/* Header */}
           <div className="flex items-center justify-between mb-4 sm:mb-6">
             <h1 className="text-[28px] lg:text-[40px] font-normal text-[#0B0C0A]">
-               Settings
+              Settings
             </h1>
             {!isEditing && (
               <button
@@ -896,10 +896,10 @@ z-50 animate-in slide-in-from-top-2
         </div>
 
         {/* My Request Link */}
-        <div className="mt-8 bg-white rounded-lg shadow-sm p-4 sm:p-6">
+        <div className="mt-8 bg-white rounded-lg shadow-sm px-4 py-6 sm:px-6 sm:py-8.5">
           <button
             onClick={() => router.push('/my-requests')}
-            className="w-full flex items-center justify-between text-left hover:bg-gray-50 p-4 rounded-lg transition-colors"
+            className="w-full flex items-center justify-between text-left cursor-pointer"
           >
             <div>
               <h3 className="text-[28px] lg:text-[40px] font-normal text-[#0B0C0A]">My Request</h3>

@@ -18,7 +18,7 @@ export default function EditRemedyForm({ remedyId }: EditRemedyFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [rating, setRating] = useState<number>(0);
-const [reviewCount, setReviewCount] = useState<number>(0);
+  const [reviewCount, setReviewCount] = useState<number>(0);
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
@@ -49,16 +49,16 @@ const [reviewCount, setReviewCount] = useState<number>(0);
         }
 
         setFormData({
-  name: data.name || '',
-  slug: data.slug || '',
-  description: data.description || '',
-  key_symptoms: Array.isArray(data.key_symptoms) ? data.key_symptoms.join(', ') : '',
-  icon: data.icon || '',
-});
+          name: data.name || '',
+          slug: data.slug || '',
+          description: data.description || '',
+          key_symptoms: Array.isArray(data.key_symptoms) ? data.key_symptoms.join(', ') : '',
+          icon: data.icon || '',
+        });
 
-// ✅ NEW
-setRating(data.average_rating || 0);
-setReviewCount(data.review_count || 0);
+        // ✅ NEW
+        setRating(data.average_rating || 0);
+        setReviewCount(data.review_count || 0);
 
       } catch (err: unknown) {
         console.error('Error fetching remedy:', err);
@@ -73,20 +73,20 @@ setReviewCount(data.review_count || 0);
   }, [remedyId]);
 
   const renderStars = (value: number) => {
-  const rounded = Math.round(value);
-  return (
-    <div className="flex items-center gap-1">
-      {[1, 2, 3, 4, 5].map((i) => (
-        <span
-          key={i}
-          className={i <= rounded ? 'text-yellow-400' : 'text-gray-300'}
-        >
-          ★
-        </span>
-      ))}
-    </div>
-  );
-};
+    const rounded = Math.round(value);
+    return (
+      <div className="flex items-center gap-1">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <span
+            key={i}
+            className={i <= rounded ? 'text-yellow-400' : 'text-gray-300'}
+          >
+            ★
+          </span>
+        ))}
+      </div>
+    );
+  };
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -178,7 +178,7 @@ setReviewCount(data.review_count || 0);
         >
           ← Back to Remedies
         </Link>
-        <h1 className="text-3xl font-bold text-gray-900">Edit Remedy</h1>
+        <h1 className="text-3xl font-normal text-gray-900">Edit Remedy</h1>
         <p className="text-gray-600 mt-2">Update the remedy information</p>
       </div>
 
@@ -377,7 +377,7 @@ setReviewCount(data.review_count || 0);
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-teal-600 text-white py-3 px-6 rounded-lg hover:bg-teal-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors"
+              className="flex-1 bg-teal-600 text-white py-3 px-6 rounded-lg hover:bg-teal-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors cursor-pointer"
             >
               {loading ? 'Updating...' : 'Update Remedy'}
             </button>
@@ -393,49 +393,49 @@ setReviewCount(data.review_count || 0);
 
       {/* Preview Card */}
       {/* Preview Card */}
-{formData.name && (
-  <div className="bg-white rounded-lg shadow-md p-6">
-    <h3 className="text-lg font-semibold text-gray-900 mb-4">Preview</h3>
+      {formData.name && (
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h3 className="text-lg font-normal text-gray-900 mb-4">Preview</h3>
 
-    <div className="border border-gray-200 rounded-xl p-5 flex items-center gap-5">
-      {/* Icon */}
-      <div className="flex-shrink-0">
-        <div className="w-16 h-16 flex items-center justify-center rounded-full bg-teal-50 text-3xl">
-          {formData.icon || '💊'}
+          <div className="border border-gray-200 rounded-xl p-5 flex items-center gap-5">
+            {/* Icon */}
+            <div className="flex-shrink-0">
+              <div className="w-16 h-16 flex items-center justify-center rounded-full bg-teal-50 text-3xl">
+                {formData.icon || '💊'}
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1">
+              <h4 className="text-xl font-normal text-gray-900">
+                {formData.name}
+              </h4>
+
+              {/* Subtitle (first key symptom like 2nd image) */}
+              {formData.key_symptoms && (
+                <p className="text-sm text-gray-500 mt-1 capitalize">
+                  {formData.key_symptoms.split(',')[0].trim()}
+                </p>
+              )}
+
+              {/* Rating */}
+              <div className="flex items-center gap-2 mt-2">
+                {renderStars(rating)}
+                <span className="text-sm text-gray-500">
+                  {rating.toFixed(1)} ({reviewCount} reviews)
+                </span>
+              </div>
+
+              {/* Description */}
+              {formData.description && (
+                <p className="text-gray-700 mt-2 text-sm">
+                  {formData.description}
+                </p>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
-
-      {/* Content */}
-      <div className="flex-1">
-        <h4 className="text-xl font-bold text-gray-900">
-          {formData.name}
-        </h4>
-
-        {/* Subtitle (first key symptom like 2nd image) */}
-        {formData.key_symptoms && (
-          <p className="text-sm text-gray-500 mt-1 capitalize">
-            {formData.key_symptoms.split(',')[0].trim()}
-          </p>
-        )}
-
-        {/* Rating */}
-        <div className="flex items-center gap-2 mt-2">
-          {renderStars(rating)}
-          <span className="text-sm text-gray-500">
-            {rating.toFixed(1)} ({reviewCount} reviews)
-          </span>
-        </div>
-
-        {/* Description */}
-        {formData.description && (
-          <p className="text-gray-700 mt-2 text-sm">
-            {formData.description}
-          </p>
-        )}
-      </div>
-    </div>
-  </div>
-)}
+      )}
     </div>
   );
 }

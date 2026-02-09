@@ -67,35 +67,33 @@ export default function AdminRemediesManager() {
 
 
   const SortArrows = ({
-  active,
-  order,
-}: {
-  active: boolean;
-  order: 'asc' | 'desc';
-}) => {
-  return (
-    <span className="ml-2 inline-flex flex-col items-center justify-center leading-none flex-shrink-0">
-      <span
-        className={`text-[9px] ${
-          active && order === 'asc'
+    active,
+    order,
+  }: {
+    active: boolean;
+    order: 'asc' | 'desc';
+  }) => {
+    return (
+      <span className="ml-2 inline-flex flex-col items-center justify-center leading-none flex-shrink-0">
+        <span
+          className={`text-[9px] ${active && order === 'asc'
             ? 'text-gray-900'
             : 'text-gray-500'
-        }`}
-      >
-        ▲
-      </span>
-      <span
-        className={`text-[9px] -mt-[1px] ${
-          active && order === 'desc'
+            }`}
+        >
+          ▲
+        </span>
+        <span
+          className={`text-[9px] -mt-[1px] ${active && order === 'desc'
             ? 'text-gray-900'
             : 'text-gray-500'
-        }`}
-      >
-        ▼
+            }`}
+        >
+          ▼
+        </span>
       </span>
-    </span>
-  );
-};
+    );
+  };
 
 
   const handleSort = (column: 'name' | 'average_rating' | 'review_count') => {
@@ -113,7 +111,7 @@ export default function AdminRemediesManager() {
     formData.append('file', file);
 
     // small client-generated import id so server can report processing progress
-    const importId = `${Date.now()}-${Math.random().toString(36).slice(2,9)}`
+    const importId = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
     formData.append('importId', importId)
 
     setImportProgress(0)
@@ -293,7 +291,7 @@ export default function AdminRemediesManager() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900">Manage Remedies</h2>
+          <h2 className="text-3xl font-normal text-gray-900">Manage Remedies</h2>
           <p className="text-gray-600 mt-1">
             Add, edit, or remove homeopathic remedies
           </p>
@@ -483,7 +481,7 @@ export default function AdminRemediesManager() {
                   className="px-6 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider cursor-pointer select-none whitespace-nowrap"
                 >
                   <div className="inline-flex items-center">
-                      Review Count
+                    Review Count
                     <SortArrows
                       active={sortBy === 'review_count'}
                       order={sortOrder}
@@ -547,7 +545,7 @@ export default function AdminRemediesManager() {
                       <button
                         onClick={() => handleDelete(remedy.id!)}
                         disabled={loading}
-                        className="text-red-600 hover:text-red-800 font-medium text-sm disabled:opacity-50"
+                        className="text-red-600 hover:text-red-800 font-medium text-sm disabled:opacity-50 cursor-pointer"
                       >
                         Delete
                       </button>

@@ -54,7 +54,7 @@ export default function EditUserForm({ userId }: EditUserFormProps) {
         role: data.role || 'user',
       });
       setIsTargetAdmin(data.role === 'admin');
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error('Error fetching user:', err);
       setError(err.message || 'Failed to load user');
@@ -103,7 +103,7 @@ export default function EditUserForm({ userId }: EditUserFormProps) {
 
       // Success - redirect back to users page
       router.push('/admin/users');
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error('Error updating user:', err);
       setError(err.message || 'Failed to update user');
@@ -139,7 +139,7 @@ export default function EditUserForm({ userId }: EditUserFormProps) {
         >
           ← Back to Users
         </Link>
-        <h1 className="text-3xl font-bold text-gray-900">Edit User</h1>
+        <h1 className="text-3xl font-normal text-gray-900">Edit User</h1>
         <p className="text-gray-600 mt-2">Update user information and permissions</p>
       </div>
 
@@ -155,8 +155,8 @@ export default function EditUserForm({ userId }: EditUserFormProps) {
 
           {/* Personal Information */}
           <div className="border-b pb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Personal Information</h3>
-            
+            <h3 className="text-lg font-normal text-gray-900 mb-4">Personal Information</h3>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* First Name */}
               <div>
@@ -196,8 +196,8 @@ export default function EditUserForm({ userId }: EditUserFormProps) {
 
           {/* Account Information */}
           <div className="border-b pb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Account Information</h3>
-            
+            <h3 className="text-lg font-normal text-gray-900 mb-4">Account Information</h3>
+
             <div className="space-y-4">
               {/* Email (Read-only) */}
               <div>
@@ -249,7 +249,7 @@ export default function EditUserForm({ userId }: EditUserFormProps) {
               <div>
                 <h4 className="text-sm font-semibold text-blue-900 mb-1">Password Changes</h4>
                 <p className="text-sm text-blue-700">
-                  Users can change their own password from their profile page. 
+                  Users can change their own password from their profile page.
                   Password resets can be initiated through the forgot password flow.
                 </p>
               </div>
@@ -261,7 +261,7 @@ export default function EditUserForm({ userId }: EditUserFormProps) {
             <button
               type="submit"
               disabled={loading || (currentUserRole === 'moderator' && isTargetAdmin)}
-              className="flex-1 bg-teal-600 text-white py-3 px-6 rounded-lg hover:bg-teal-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors"
+              className="flex-1 bg-teal-600 text-white py-3 px-6 rounded-lg hover:bg-teal-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors cursor-pointer"
             >
               {loading ? 'Updating...' : 'Update User'}
             </button>
@@ -277,21 +277,20 @@ export default function EditUserForm({ userId }: EditUserFormProps) {
 
       {/* Preview Card */}
       <div className="bg-white rounded-lg shadow-md p-6 max-w-2xl">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Preview</h3>
+        <h3 className="text-lg font-normal text-gray-900 mb-4">Preview</h3>
         <div className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg">
           <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-2xl font-semibold">
             {(formData.first_name?.[0] || formData.email[0]).toUpperCase()}
           </div>
           <div className="flex-1">
-            <h4 className="text-lg font-semibold text-gray-900">
+            <h4 className="text-lg font-normal text-gray-900">
               {formData.first_name} {formData.last_name}
             </h4>
             <p className="text-sm text-gray-600">{formData.email}</p>
-            <span className={`inline-block mt-2 px-3 py-1 text-xs font-medium rounded-full ${
-              formData.role === 'admin'
-                ? 'bg-purple-100 text-purple-800'
-                : 'bg-blue-100 text-blue-800'
-            }`}>
+            <span className={`inline-block mt-2 px-3 py-1 text-xs font-medium rounded-full ${formData.role === 'admin'
+              ? 'bg-purple-100 text-purple-800'
+              : 'bg-blue-100 text-blue-800'
+              }`}>
               {formData.role.charAt(0).toUpperCase() + formData.role.slice(1)}
             </span>
           </div>

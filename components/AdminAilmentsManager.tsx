@@ -177,7 +177,7 @@ export default function AdminAilmentsManager() {
     formData.append('file', file);
 
     // small client-generated import id so server can report processing progress
-    const importId = `${Date.now()}-${Math.random().toString(36).slice(2,9)}`
+    const importId = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
     formData.append('importId', importId)
 
     setImportProgress(0)
@@ -262,7 +262,7 @@ export default function AdminAilmentsManager() {
       })
     } catch (err) {
       console.error(err);
-      setMessage({ type: 'error', text: 'Import failed. Please check the CSV or XLSX file.'});
+      setMessage({ type: 'error', text: 'Import failed. Please check the CSV or XLSX file.' });
     } finally {
       setImporting(false)
       // keep 100 visible briefly then animate back to 0
@@ -408,7 +408,7 @@ export default function AdminAilmentsManager() {
       <div className="flex justify-between items-center">
         {/* LEFT: Title */}
         <div>
-          <h2 className="text-3xl font-serif text-gray-900">Manage Ailments</h2>
+          <h2 className="text-3xl font-serif text-gray-900 font-normal font-normal">Manage Ailments</h2>
           <p className="text-gray-600 mt-1">
             Add, edit, or remove ailments from your database
           </p>
@@ -740,7 +740,7 @@ export default function AdminAilmentsManager() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 px-6 py-3 bg-[#6B7B5E] text-white rounded-lg font-medium hover:bg-[#5A6A4D] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-6 py-3 bg-[#6B7B5E] text-white rounded-lg font-medium hover:bg-[#5A6A4D] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {loading ? 'Saving...' : editingAilment ? 'Update Ailment' : 'Create Ailment'}
                 </button>
