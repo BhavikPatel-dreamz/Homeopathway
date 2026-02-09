@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { supabase } from './supabaseClient';
 import type { Review , Remedy } from '../types';
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -196,6 +197,17 @@ export async function getReviews({
     .select('id, first_name, last_name, user_name, profile_img')
     .in('id', userIds);
 
+  // Build a set of existing profile IDs so we can filter out reviews
+  // belonging to users that no longer exist in the `profiles` table.
+  const existingProfileIds = new Set<string>((profiles || []).map((p: any) => p.id));
+
+  // Remove reviews that reference a deleted/non-existent user (but keep
+  // reviews where user_id is null/empty – treat as anonymous).
+  const filteredReviews = reviews.filter((r: any) => {
+    if (!r.user_id) return true; // anonymous or no user linked
+    return existingProfileIds.has(r.user_id);
+  });
+
   /* ----------------------------------------
    3️⃣ FETCH SECONDARY REMEDIES (✅ FIXED)
 ---------------------------------------- */
@@ -227,12 +239,12 @@ if (allSecondaryIds.length) {
   /* ----------------------------------------
      4️⃣ MERGE EVERYTHING
   ---------------------------------------- */
-  let enrichedReviews = reviews.map(review => ({
+  let enrichedReviews = filteredReviews.map(review => ({
     ...review,
     profiles: profiles?.find(p => p.id === review.user_id) || null,
     secondary_remedies: (review.secondary_remedy_ids || [])
-  .map((id: string) => remediesMap[id])
-  .filter(Boolean),
+      .map((id: string) => remediesMap[id])
+      .filter(Boolean),
   }));
 
   /* ----------------------------------------
@@ -486,9 +498,11 @@ export async function getReviewStats(remedyId: string, ailmentId?: string | null
   } | null;
   error: Error | null;
 }> {
+  // select star_count and user_id so we can exclude reviews whose user
+  // no longer exists in `profiles` (prevents showing reviews for deleted users)
   let query = supabase
     .from('reviews')
-    .select('star_count')
+    .select('star_count, user_id')
     .eq('remedy_id', remedyId);
 
   // AILMENT FILTER with strict AND logic (matches getReviews logic)
@@ -519,13 +533,36 @@ export async function getReviewStats(remedyId: string, ailmentId?: string | null
       error: null,
     };
   }
+  // Filter out reviews that reference deleted/non-existent profiles.
+  const userIds = [...new Set(reviews.map((r: any) => r.user_id).filter(Boolean))];
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('id')
+    .in('id', userIds);
 
-  const totalReviews = reviews.length;
-  const sumRatings = reviews.reduce((sum, review) => sum + review.star_count, 0);
+  const existingProfileIds = new Set<string>((profiles || []).map((p: any) => p.id));
+  const filtered = reviews.filter((r: any) => {
+    if (!r.user_id) return true; // anonymous review
+    return existingProfileIds.has(r.user_id);
+  });
+
+  if (!filtered || filtered.length === 0) {
+    return {
+      data: {
+        average_rating: 0,
+        total_reviews: 0,
+        rating_distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+      },
+      error: null,
+    };
+  }
+
+  const totalReviews = filtered.length;
+  const sumRatings = filtered.reduce((sum: number, review: any) => sum + review.star_count, 0);
   const averageRating = sumRatings / totalReviews;
 
   const ratingDistribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-  reviews.forEach((review) => {
+  filtered.forEach((review: any) => {
     ratingDistribution[review.star_count as keyof typeof ratingDistribution]++;
   });
 

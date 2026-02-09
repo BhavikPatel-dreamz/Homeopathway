@@ -146,8 +146,51 @@ export default function AdminUsersManager() {
 
     setLoading(true);
     try {
-      // Note: You'll need to set up proper user deletion in Supabase
-      // This should also delete the auth user, not just the profile
+      // Remove user-related data from all relevant tables first.
+      // Order: dependent rows -> profile. This runs with the anon key
+      // (browser) client; admin should consider doing this server-side
+      // using service-role key for stronger guarantees.
+
+      // 1) review likes
+      const { error: likesErr } = await supabase
+        .from('review_likes')
+        .delete()
+        .eq('user_id', id);
+      if (likesErr) console.warn('Failed to delete review_likes for user', id, likesErr.message);
+
+      // 2) review comments
+      const { error: commentsErr } = await supabase
+        .from('review_comments')
+        .delete()
+        .eq('user_id', id);
+      if (commentsErr) console.warn('Failed to delete review_comments for user', id, commentsErr.message);
+
+      // 3) reviews (the user's own reviews)
+      const { error: reviewsErr } = await supabase
+        .from('reviews')
+        .delete()
+        .eq('user_id', id);
+      if (reviewsErr) console.warn('Failed to delete reviews for user', id, reviewsErr.message);
+
+      // 4) user-submitted ailments and remedies (is_user_submission = true)
+      const { error: ailmentsErr } = await supabase
+        .from('ailments')
+        .delete()
+        .eq('requested_by_user_id', id)
+        .eq('is_user_submission', true);
+      if (ailmentsErr) console.warn('Failed to delete user-submitted ailments for user', id, ailmentsErr.message);
+
+      const { error: remediesErr } = await supabase
+        .from('remedies')
+        .delete()
+        .eq('requested_by_user_id', id)
+        .eq('is_user_submission', true);
+      if (remediesErr) console.warn('Failed to delete user-submitted remedies for user', id, remediesErr.message);
+
+      // 5) any other tables that store requested_by_user_id (best-effort)
+      // For example: if there are other custom user-owned records, add deletes here.
+
+      // Finally delete profile row
       const { data: deletedData, error } = await supabase
         .from('profiles')
         .delete()
