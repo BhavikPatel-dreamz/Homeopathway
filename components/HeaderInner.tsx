@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import useAuthSession from '@/lib/useAuthSession';
 import Logo from "./header/Logo";
 import SearchBar from "./SearchBar";
 import Image from "next/image";
@@ -11,39 +11,12 @@ import SaveButton from "./SaveButton";
 
 export default function HeaderInner() {
   const [showShareModal, setShowShareModal] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const { session, loading } = useAuthSession();
+  const user = session?.user ?? null;
   const [hasShadow, setHasShadow] = useState(false);
 
-  // ✅ Supabase auth
-  useEffect(() => {
-    const fetchUser = async () => {
-      // Fast-path: try reading cached user/profile to avoid flashing Login
-      try {
-        const cached = localStorage.getItem('user_profile_cache');
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          const age = Date.now() - (parsed.timestamp || 0);
-          const FIVE_MIN = 5 * 60 * 1000;
-          if (age < FIVE_MIN && parsed.user) {
-            setUser(parsed.user);
-          }
-        }
-      } catch (e) {
-        // ignore cache parse errors
-      }
-
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-    };
-
-    fetchUser();
-
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => listener.subscription.unsubscribe();
-  }, []);
+  // Auth session is driven by `useAuthSession`. We only use the `session`
+  // value here for conditional UI; avoid calling supabase.auth APIs directly.
 
   // ✅ Only for visual effects (no layout changes)
   useEffect(() => {
@@ -70,7 +43,7 @@ export default function HeaderInner() {
             <Image height={20} width={20} src="/share-icon.svg" alt="Share" />
           </button>
 
-          {user && (
+          {!loading && user && (
             <SaveButton className="w-[25px] h-[25px] md:w-[35px] md:h-[35px] lg:w-[44px] lg:h-[44px]" />
           )}
 

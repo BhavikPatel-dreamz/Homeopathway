@@ -8,6 +8,7 @@ import UserDropdown from "./UserDropdown";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { sha256 } from "js-sha256";
+import useAuthSession from '@/lib/useAuthSession';
 
 function getGravatarURL(email: string) {
   const address = email.trim().toLowerCase();
@@ -22,7 +23,7 @@ interface UserAvatarProps {
 }
 
 const USER_CACHE_KEY = "user_profile_cache";
-const CACHE_EXPIRY_MS = 5 * 60 * 1000; // 5 minutes
+const CACHE_EXPIRY_MS = 60 * 60 * 1000; // 1 hour (UI hint only)
 
 interface CachedUserData {
   user: User;
@@ -31,9 +32,9 @@ interface CachedUserData {
 }
 
 export default function UserAvatar({ className = "" }: UserAvatarProps) {
-  const [user, setUser] = useState<User | null>(null);
+  const { session, loading } = useAuthSession();
+  const user = session?.user ?? null;
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
   const [showDropdown, setShowDropdown] = useState(false);
   const pathname = usePathname();
 
@@ -86,70 +87,46 @@ export default function UserAvatar({ className = "" }: UserAvatarProps) {
   };
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        // First, check localStorage for cached data
-        const cachedData = getCachedData();
+    // If auth is still loading, show placeholder. Do not make auth decisions
+    // from localStorage; use cache only as a visual hint while profile loads.
+    if (loading) return;
 
-        if (cachedData) {
-          // Use cached data
-          setUser(cachedData.user);
-          setProfile(cachedData.profile);
-          setLoading(false);
-          return;
-        }
+    let mounted = true;
 
-        // If no valid cache, fetch from Supabase
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
+    const cached = getCachedData();
+    if (cached && cached.user && cached.user.id === user?.id) {
+      setProfile(cached.profile);
+    }
 
-        if (user) {
-          setUser(user);
-
-          // Fetch profile data
-          const { data: profileData, error } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("id", user.id)
-            .single();
-
-          if (profileData && !error) {
-            setProfile(profileData);
-            // Cache the data
-            setCachedData(user, profileData);
-          }
-        } else {
-          // No user logged in, clear cache
-          clearCachedData();
-        }
-      } catch (error) {
-        console.error("Error fetching user:", error);
+    const fetchProfile = async () => {
+      if (!user) {
+        setProfile(null);
         clearCachedData();
-      } finally {
-        setLoading(false);
+        return;
+      }
+
+      try {
+        const { data: profileData, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single();
+
+        if (profileData && !error && mounted) {
+          setProfile(profileData);
+          setCachedData(user, profileData);
+        }
+      } catch (err) {
+        console.error("UserAvatar: error fetching profile:", err);
       }
     };
 
-    fetchUser();
+    fetchProfile();
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN" && session?.user) {
-        setUser(session.user);
-        fetchUser();
-      } else if (event === "SIGNED_OUT") {
-        setUser(null);
-        setProfile(null);
-        clearCachedData();
-      }
-    });
+    return () => { mounted = false; };
+  }, [loading, user]);
 
-    return () => subscription.unsubscribe();
-  }, []);
-
+  // While auth is loading, render a neutral placeholder (do not render Login)
   if (loading) {
     return (
       <div className={`animate-pulse bg-gray-300 rounded-full ${className}`}>
@@ -157,7 +134,7 @@ export default function UserAvatar({ className = "" }: UserAvatarProps) {
     );
   }
 
-  if (!user || !profile) {
+  if (!user) {
     // Guest user - show a generic icon
     const isHome = pathname === "/";
     const borderColor = isHome ? "#fff" : "#20231E";
@@ -183,13 +160,11 @@ export default function UserAvatar({ className = "" }: UserAvatarProps) {
     );
   }
 
-  // Logged in user - show initials
-  const firstInitial = profile.first_name?.charAt(0)?.toUpperCase() || "";
-  const lastInitial = profile.last_name?.charAt(0)?.toUpperCase() || "";
-  const initials =
-    firstInitial + lastInitial ||
-    profile.email?.charAt(0)?.toUpperCase() ||
-    "U";
+  // Logged in user - show initials. Use safe fallbacks when `profile` is not yet loaded.
+  const firstInitial = profile?.first_name?.charAt(0)?.toUpperCase() ||
+    (user?.email ? user.email.charAt(0).toUpperCase() : "");
+  const lastInitial = profile?.last_name?.charAt(0)?.toUpperCase() || "";
+  const initials = (firstInitial + lastInitial) || (user?.email?.charAt(0)?.toUpperCase()) || "U";
 
   // Generate a consistent color based on user ID
   const colors = [
@@ -212,20 +187,20 @@ export default function UserAvatar({ className = "" }: UserAvatarProps) {
         onClick={() => setShowDropdown(!showDropdown)}
         className={`w-10 h-10 rounded-full flex items-center justify-center overflow-hidden cursor-pointer ${className}`}
         style={{
-          backgroundColor: !profile.profile_img
+          backgroundColor: !profile?.profile_img
             ? bgColor.replace("bg-", "")
             : undefined,
         }}
       >
-        {profile.profile_img ? (
+        {profile?.profile_img ? (
           <img
             src={profile.profile_img}
-            alt={`${profile.first_name || "User"}'s avatar`}
+            alt={`${profile?.first_name || "User"}'s avatar`}
             className="w-full h-full object-cover"
           />
         ) : (
           <img
-            src={getGravatarURL(profile.email)}
+            src={getGravatarURL(profile?.email ?? user?.email ?? "")}
             alt="User Avatar"
             className="w-full h-full object-cover"
           />

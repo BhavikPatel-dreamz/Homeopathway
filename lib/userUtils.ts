@@ -53,15 +53,13 @@ export const checkIsUserLoggedIn = async (): Promise<boolean> => {
 };
 
 // Check if current user is admin (no parameters needed)
-export const checkIsAdmin = async (): Promise<boolean> => {
+export const checkIsAdmin = async (user: User | null): Promise<boolean> => {
+  // This function no longer reads auth state itself. Callers must pass
+  // the current `User` (from useAuthSession) to avoid multiple callers
+  // reaching into Supabase auth APIs directly.
   try {
-    const { data: { user }, error } = await supabase.auth.getUser();
-    if (error || !user) {
-      console.error('Error getting current user for admin check:', error);
-      return false;
-    }
+    if (!user) return false;
 
-    // Get user profile to check role
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('role')
