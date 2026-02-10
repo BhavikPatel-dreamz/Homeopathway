@@ -1,10 +1,10 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session } from '@supabase/supabase-js';
+import { User } from '@supabase/supabase-js';
 import { usePathname } from 'next/navigation';
-import { supabase } from './supabaseClient';
-import { getUserProfile } from './auth';
+import { getUserProfile, signOut as signOutAuth } from './auth';
+import useAuthSession from './useAuthSession';
 
 interface AuthContextType {
   user: User | null;
@@ -21,118 +21,43 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const { session, loading } = useAuthSession();
   const [profile, setProfile] = useState<any | null>(null);
-  const [loading, setLoading] = useState(true);
   const [refreshingProfile, setRefreshingProfile] = useState(false);
   const pathname = usePathname();
+
+  const user = session?.user ?? null;
 
   useEffect(() => {
     let mounted = true;
 
-    // Get initial session and profile. Keep `loading` true until we resolve the first state.
-    const getInitialSession = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!mounted) return;
-        if (session?.user) {
-          setUser(session.user);
-          setRefreshingProfile(true);
-          const { profile } = await getUserProfile(session.user.id);
-          if (!mounted) return;
-          setProfile(profile);
-          setRefreshingProfile(false);
-        } else {
-          setUser(null);
-          setProfile(null);
-        }
-      } catch (err) {
-        console.error('Error getting initial session:', err);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-
-    getInitialSession();
-
-    // Subscribe to auth state changes to handle token refresh / sign in / sign out
-    const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (!mounted) return;
-
-      // Only react to meaningful events to avoid extra work during transient states
-      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
-        if (session?.user) {
-          setUser(session.user);
-          try {
-            setRefreshingProfile(true);
-            const { profile } = await getUserProfile(session.user.id);
-            if (!mounted) return;
-            setProfile(profile);
-          } catch (err) {
-            console.error('Error fetching profile on auth change:', err);
-          } finally {
-            if (mounted) setRefreshingProfile(false);
-          }
-        }
-      } else if (event === 'SIGNED_OUT' || session == null) {
-        setUser(null);
+    const loadProfile = async () => {
+      if (!user) {
         setProfile(null);
+        return;
       }
 
-      // After handling auth change, make sure loading is false so UI can render fallback
-      if (mounted) setLoading(false);
-    });
-
-    const subscription = data?.subscription;
-
-    // Periodic session check: ensures that long-running tabs re-sync session/profile
-    const sessionPollInterval = setInterval(async () => {
-      if (!mounted) return;
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!mounted) return;
-        if (session?.user) {
-          // if we don't have user or user id changed, refresh profile
-          if (!user || user.id !== session.user.id) {
-            setUser(session.user);
-            setRefreshingProfile(true);
-            const { profile } = await getUserProfile(session.user.id);
-            if (!mounted) return;
-            setProfile(profile);
-            setRefreshingProfile(false);
-          }
-        } else {
-          // no session
-          if (user) {
-            setUser(null);
-            setProfile(null);
-          }
-        }
-      } catch (err) {
-        console.error('Error during session polling:', err);
-      }
-    }, 4 * 60 * 1000); // every 4 minutes
-
-    // Re-fetch profile when route changes (helps when session refreshed in background)
-    const handleRouteChange = async () => {
-      if (!mounted) return;
-      if (!user) return;
       try {
         setRefreshingProfile(true);
         const { profile } = await getUserProfile(user.id);
         if (!mounted) return;
         setProfile(profile);
       } catch (err) {
-        console.error('Error reloading profile on route change:', err);
+        console.error('Error fetching profile in AuthProvider:', err);
       } finally {
         if (mounted) setRefreshingProfile(false);
       }
     };
 
-    // Watch pathname changes
-    const unwatch = () => { /* placeholder to satisfy cleanup closure */ };
+    // Only load profile when session/user is available
+    if (!loading) loadProfile();
 
-    // Use a small interval to detect pathname changes and trigger profile refresh
+    // When route changes or tab visibility changes, re-fetch profile to keep data fresh
+    const handleRouteChange = () => {
+      if (!mounted || !user) return;
+      loadProfile();
+    };
+
     let prevPath = typeof window !== 'undefined' ? window.location.pathname : pathname;
     const interval = setInterval(() => {
       if (!mounted) return;
@@ -142,26 +67,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }, 500);
 
-    // Visibility change: when user returns to tab, ensure session/profile are in sync
     const onVisibility = () => {
       if (document.visibilityState === 'visible') {
-        (async () => {
-          try {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!mounted) return;
-            if (session?.user) {
-              setUser(session.user);
-              setRefreshingProfile(true);
-              const { profile } = await getUserProfile(session.user.id);
-              if (!mounted) return;
-              setProfile(profile);
-            }
-          } catch (err) {
-            console.error('Error on visibility change:', err);
-          } finally {
-            if (mounted) setRefreshingProfile(false);
-          }
-        })();
+        handleRouteChange();
       }
     };
 
@@ -169,22 +77,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => {
       mounted = false;
-      try {
-        subscription?.unsubscribe?.();
-      } catch (e) {
-        // ignore
-      }
       clearInterval(interval);
-      clearInterval(sessionPollInterval);
       document.removeEventListener('visibilitychange', onVisibility);
-      unwatch();
     };
-  }, []);
+  }, [loading, user, pathname]);
 
   const handleSignOut = async () => {
-    const { signOut } = await import('./auth');
-    await signOut();
-    setUser(null);
+    await signOutAuth();
     setProfile(null);
   };
 

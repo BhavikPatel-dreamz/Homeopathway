@@ -1,8 +1,9 @@
 
-'use client';
+"use client";
 
 import { supabase } from "@/lib/supabaseClient"
 import { checkIsAdmin } from "@/lib/userUtils"
+import useAuthSession from '@/lib/useAuthSession';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -12,21 +13,33 @@ import { useEffect, useState } from "react";
 export default function HeaderLogin() {
   const router = useRouter();
   const [isAdmin, setIsAdmin] = useState(false);
+  const { session, loading } = useAuthSession();
+  const user = session?.user ?? null;
 
   useEffect(() => {
-    const checkAdmin = async () => {
-      const adminStatus = await checkIsAdmin();
-      setIsAdmin(adminStatus);
+    let mounted = true;
+    if (loading) return;
+
+    const run = async () => {
+      try {
+        const adminStatus = await checkIsAdmin(user);
+        if (mounted) setIsAdmin(adminStatus);
+      } catch (e) {
+        console.error('HeaderLogin checkIsAdmin error:', e);
+      }
     };
-    checkAdmin();
-  }, []);
+
+    run();
+    return () => { mounted = false; };
+  }, [loading, user]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-   
     router.push('/');
-    window.location.reload();
   };
+  
+  // If auth is still loading, render nothing — parent components show placeholders
+  if (loading) return null;
     
   return (
     <>

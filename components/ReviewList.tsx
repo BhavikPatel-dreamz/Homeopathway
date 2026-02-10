@@ -252,8 +252,33 @@ export default function ReviewListPage({
         potency: filters.dosage,
         dosage: filters.form
       });
+      console.log("Fetched reviews:", reviewsData);
 
+      // If ailment-scoped fetch returned no reviews, fall back to fetching
+      // all reviews for the remedy (preserves strict AND logic but avoids
+      // showing an empty list when there are general reviews for the remedy).
       let allReviews = reviewsData || [];
+      if ((allReviews.length === 0) && (ailmentContext?.id !== undefined && ailmentContext?.id !== null)) {
+        try {
+          const { data: fallback } = await getReviews({
+            remedyId: remedy.id,
+            // no ailmentId -> fetch all reviews for the remedy
+            limit: Math.max(reviewsPerPage * 3, 50),
+            sortBy,
+            starCount: filters.rating,
+            searchQuery,
+            potency: filters.dosage,
+            dosage: filters.form,
+          });
+          console.log("Fallback fetched reviews (no ailment filter):", fallback);
+          allReviews = fallback || [];
+          setAllReviewsList(fallback || []);
+        } catch (err) {
+          console.error('Fallback fetch failed:', err);
+        }
+      } else {
+        setAllReviewsList(reviewsData ?? []);
+      }
       setAllReviewsList(reviewsData ?? []);
 
       // Build a simple ailment map from incoming reviews to resolve ids->names/icons
@@ -304,7 +329,22 @@ export default function ReviewListPage({
       const endIndex = startIndex + reviewsPerPage;
       setReviews(allReviews.slice(startIndex, endIndex));
 
-      const { data: statsData } = await getReviewStats(remedy.id, ailmentContext?.id);
+      let { data: statsData } = await getReviewStats(remedy.id, ailmentContext?.id);
+
+      // If ailment-scoped stats returned zero reviews but the remedy has
+      // reviews overall, fall back to unfiltered remedy stats so the left
+      // panel doesn't show 0.0 when there are remedy-level reviews.
+      if (statsData && statsData.total_reviews === 0 && (ailmentContext?.id !== undefined && ailmentContext?.id !== null)) {
+        try {
+          const fallback = await getReviewStats(remedy.id);
+          if (fallback && fallback.data && fallback.data.total_reviews > 0) {
+            statsData = fallback.data;
+          }
+        } catch (err) {
+          console.error('Failed to fetch fallback stats:', err);
+        }
+      }
+
       if (statsData) {
         setReviewStats(statsData);
         setTotalReviews(allReviews.length);
