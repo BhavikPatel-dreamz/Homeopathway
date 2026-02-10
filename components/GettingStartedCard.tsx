@@ -48,7 +48,7 @@ export default function GettingStartedCard() {
 
               <div className="mb-5">
                 <h3 className="font-semibold text-[#0B0C0A] font-family-montserrat text-[20px] leading-[28px] mb-3">
-                  3. Start With Common Remedies
+                  3. Start with Common Remedies
                 </h3>
                 <p>
                   Many beginners experiment with well known remedies such as Arnica,
@@ -58,7 +58,7 @@ export default function GettingStartedCard() {
 
               <div className="mb-5">
                 <h3 className="font-semibold text-[#0B0C0A] font-family-montserrat text-[20px] leading-[28px] mb-3">
-                  4. Keep It Low Risk
+                  4. Keep it Low Risk
                 </h3>
                 <p>
                   Try homeopathy for mild or everyday concerns first. Always seek
@@ -68,7 +68,7 @@ export default function GettingStartedCard() {
 
               <div>
                 <h3 className="font-semibold text-[#0B0C0A] font-family-montserrat text-[20px] leading-[28px] mb-3">
-                  5. Track Your Experience
+                  5. Track your Experience
                 </h3>
                 <p>
                   Make notes about what you tried, how often you took it, and how your
