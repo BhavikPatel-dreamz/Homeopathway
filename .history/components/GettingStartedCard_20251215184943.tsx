@@ -1,1 +1,0 @@
-GettingStartedCard.tsx

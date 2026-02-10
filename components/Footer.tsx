@@ -34,7 +34,7 @@ export default function Footer() {
           <div className="col-span-12 md:col-span-3 lg:col-span-3 lg:col-start-11">
             <p className="text-[#fff] text-[16px] font-[600] mb-5 ">About</p>
             <ul className="space-y-4 text-sm text-gray-300">
-              <li><Link href="/what-homeopathy" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">What is HomeoPathway?</Link></li>
+              <li><Link href="/what-homeopathy" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">What is Homeopathy?</Link></li>
               <li><Link href="/safety-and-research" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">Safety & Research</Link></li>
               <li><Link href="/getting-started" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">Getting Started</Link></li>
               <li><Link href="/faq" className="text-[#C4C7C1] font-[600] hover:text-[#fff] hover:text-[15px] transition-all duration-500">FAQ</Link></li>

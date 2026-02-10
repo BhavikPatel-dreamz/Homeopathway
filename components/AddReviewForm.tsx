@@ -259,6 +259,33 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
       }
 
       setShowSuccess(true);
+      // Link the ailment and remedies together in the DB
+      try {
+        if (selectedAilment) {
+          const remedyIds = Array.from(new Set([primaryRemedyId, ...selectedRemedies.map(r => r.id)]));
+          // Attempt to insert relations; ignore duplicates
+          const inserts = remedyIds.map(rid => ({
+            ailment_id: selectedAilment,
+            remedy_id: rid,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }));
+
+          const { error: relError } = await supabase
+            .from('ailment_remedies')
+            .insert(inserts);
+
+          if (relError) {
+            // ignore duplicate/unique constraint errors, log others
+            const msg = String(relError.message || relError.details || relError);
+            if (!/duplicate|already exists|unique|constraint/i.test(msg)) {
+              console.error('Failed to link ailment and remedies:', relError);
+            }
+          }
+        }
+      } catch (linkErr) {
+        console.error('Error linking ailment-remedy relations:', linkErr);
+      }
       // onClose();
     } catch (err) {
       console.error('Error submitting review:', err);
@@ -433,13 +460,22 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                   </div>
                 )}
 
-                {/* Selected chip */}
+                {/* Selected ailment (single-selection display) */}
                 {selectedAilment && (
-                  <div className="mt-3">
-                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-[4px] bg-[#F5F3ED] font-medium text-[14px] text-[#41463B]">
+                  <div className="mt-3 flex items-center gap-3">
+                    <span className="text-[16px] font-medium text-[#0B0C0A]">
                       {ailments.find(a => a.id === selectedAilment)?.name || 'Selected'}
-                      <button type="button" onClick={() => setSelectedAilment('')} className="text-[#8E8E8A] hover:text-[#0B0C0A]">×</button>
                     </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedAilment('');
+                        if (ailmentInputRef?.current) ailmentInputRef.current.focus();
+                      }}
+                      className="text-[#6C7463] hover:underline text-sm font-semibold"
+                    >
+                      Change
+                    </button>
                   </div>
                 )}
               </div>
@@ -585,7 +621,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
               {/* Form Type */}
               <div>
                 <p className="text-[#20231E] sm:text-xl text-sm font-medium mb-3">
-                  What form was the combined remedy?
+                  What form was the remedy?
                 </p>
                 <div className="flex gap-2">
                   {['Liquid', 'Pellets', 'Ointment'].map(type => (
@@ -810,6 +846,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
               disabled={
                 loading ||
                 (step === 0 && !selectedAilment) ||
+                (step === 1 && !primaryRemedyId) ||
                 (step === 2 && formData.rating === 0) ||
                 (step === 3 &&
                   (

@@ -12,6 +12,7 @@ import {
   getReviewStats,
 } from "@/lib/review";
 import { getCurrentUser } from "@/lib/auth";
+import { useAuth } from '@/lib/authContext';
 import ReviewFilterModal from "./ReviewFilterModal";
 import { ReviewFilters } from "@/types";
 import AddReviewForm from "./AddReviewForm";
@@ -193,6 +194,7 @@ export default function ReviewListPage({
   const [allReviesList, setAllReviewsList] = useState<ReviewType[]>([]);
 
   const [ailmentMap, setAilmentMap] = useState<Record<string, { name: string; icon?: string }>>({});
+  const { user } = useAuth();
 
   // Fetch ailment names/icons for any ailment ids present in fetched reviews
   useEffect(() => {
@@ -423,6 +425,39 @@ export default function ReviewListPage({
     { label: "Lowest Rated", value: "lowest_rated" },
   ];
 
+  // Delete a review (owner only) via server API and update local state
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+
+  const openDeleteModal = (reviewId: string) => {
+    setPendingDeleteId(reviewId);
+    setIsDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setPendingDeleteId(null);
+    setIsDeleteModalOpen(false);
+  };
+
+  const performDeleteConfirmed = async (reviewId: string) => {
+    try {
+      const res = await fetch(`/api/reviews/${reviewId}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.error || 'Failed to delete review');
+      }
+
+      // remove from visible lists
+      setReviews(prev => prev.filter(r => r.id !== reviewId));
+      setAllReviewsList(prev => prev.filter(r => r.id !== reviewId));
+      setTotalReviews(prev => Math.max(0, prev - 1));
+    } catch (err: any) {
+      console.error('Error deleting review:', err);
+      alert('Failed to delete review: ' + (err?.message || err));
+    }
+  };
+
   if (!remedy) return <div>Loading remedy details...</div>;
 
   return (
@@ -557,6 +592,20 @@ export default function ReviewListPage({
                   const user_name = review.profiles?.user_name;
                   const profile_image = review.profiles?.profile_img;
                   const secondaryRemedies = review.secondary_remedies || [];
+                  // Derive a stable list of combination remedy names from several possible shapes
+                  const combinationNames: string[] = ((): string[] => {
+                    if (Array.isArray(secondaryRemedies) && secondaryRemedies.length > 0) {
+                      return secondaryRemedies.map((r: any) => (typeof r === 'string' ? r : r?.name || r?.label || '')).filter(Boolean);
+                    }
+                    if (Array.isArray((review as any).secondary_remedy_names) && (review as any).secondary_remedy_names.length > 0) {
+                      return (review as any).secondary_remedy_names.map((n: any) => String(n)).filter(Boolean);
+                    }
+                    if (Array.isArray((review as any).secondary_remedy_ids) && (review as any).secondary_remedy_ids.length > 0) {
+                      // As a last resort, show the raw ids (better than empty UI). Ideally these are enriched by the server.
+                      return (review as any).secondary_remedy_ids.map((id: any) => String(id)).filter(Boolean);
+                    }
+                    return [];
+                  })();
 
                   // Resolve ailment display (icon + name) with fallbacks (cast to any to avoid strict Review typing)
                   let ailmentIcon = (review as any)?.ailment?.icon ?? (review as any)?.ailment_icon ?? (review as any)?.ailmentIcon ?? (review as any)?.ailment?.emoji ?? null;
@@ -621,53 +670,57 @@ export default function ReviewListPage({
                             {formatTimeAgo(review.created_at)}
                           </p>
 
-                          {/* 3-dot button */}
-                          <button
-                            onClick={() =>
-                              setOpenMenuId(openMenuId === review.id ? null : review.id)
-                            }
-                            className="p-1 rounded-full hover:bg-gray-100 cursor-pointer"
-                          >
-                            <span className="text-lg leading-none">
-                              <svg width="4" height="18" viewBox="0 0 4 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M2 0C0.9 0 0 0.9 0 2C0 3.1 0.9 4 2 4C3.1 4 4 3.1 4 2C4 0.9 3.1 0 2 0ZM2 14C0.9 14 0 14.9 0 16C0 17.1 0.9 18 2 18C3.1 18 4 17.1 4 16C4 14.9 3.1 14 2 14ZM2 7C0.9 7 0 7.9 0 9C0 10.1 0.9 11 2 11C3.1 11 4 10.1 4 9C4 7.9 3.1 7 2 7Z" fill="#41463B" />
-                              </svg>
-                            </span>
-                          </button>
-
-                          {/* Dropdown */}
-                          {openMenuId === review.id && (
-                            <div className="absolute right-0 top-7 w-44 bg-white rounded-lg shadow-lg border border-gray-200 z-20 py-2">
+                          {user && user.id === review.user_id && (
+                            <>
+                              {/* 3-dot button */}
                               <button
-                                onClick={() => {
-                                  setOpenMenuId(null);
-                                  console.log("Edit", user_name);
-                                }}
-                                className="w-full px-4 py-2 flex items-center gap-3 text-sm text-[#20231E] hover:bg-gray-100 font-semibold cursor-pointer"
+                                onClick={() =>
+                                  setOpenMenuId(openMenuId === review.id ? null : review.id)
+                                }
+                                className="p-1 rounded-full hover:bg-gray-100 cursor-pointer"
                               >
-                                <span className="w-[16px] h-[16px]">
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                    <path d="M11.1713 2.00039L9.838 3.33372H3.33333V12.6671H12.6667V6.16239L14 4.82906V13.3337C14 13.5105 13.9298 13.6801 13.8047 13.8051C13.6797 13.9302 13.5101 14.0004 13.3333 14.0004H2.66667C2.48986 14.0004 2.32029 13.9302 2.19526 13.8051C2.07024 13.6801 2 13.5105 2 13.3337V2.66706C2 2.49025 2.07024 2.32068 2.19526 2.19565C2.32029 2.07063 2.48986 2.00039 2.66667 2.00039H11.1713V2.00039ZM13.6567 1.40039L14.6 2.34439L8.472 8.47239L7.53067 8.47439L7.52933 7.52972L13.6567 1.40039V1.40039Z" fill="#20231E" />
+                                <span className="text-lg leading-none">
+                                  <svg width="4" height="18" viewBox="0 0 4 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2 0C0.9 0 0 0.9 0 2C0 3.1 0.9 4 2 4C3.1 4 4 3.1 4 2C4 0.9 3.1 0 2 0ZM2 14C0.9 14 0 14.9 0 16C0 17.1 0.9 18 2 18C3.1 18 4 17.1 4 16C4 14.9 3.1 14 2 14ZM2 7C0.9 7 0 7.9 0 9C0 10.1 0.9 11 2 11C3.1 11 4 10.1 4 9C4 7.9 3.1 7 2 7Z" fill="#41463B" />
                                   </svg>
                                 </span>
-                                Edit
                               </button>
 
-                              <button
-                                onClick={() => {
-                                  setOpenMenuId(null);
-                                  console.log("Delete", review.id);
-                                }}
-                                className="w-full px-4 py-2 flex items-center gap-3 text-sm text-[#20231E] hover:bg-gray-100 font-semibold cursor-pointer"
-                              >
-                                <span className="w-[16px] h-[16px]">
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                    <path d="M11.333 3.99967H14.6663V5.33301H13.333V13.9997C13.333 14.1765 13.2628 14.3461 13.1377 14.4711C13.0127 14.5961 12.8432 14.6663 12.6663 14.6663H3.33301C3.1562 14.6663 2.98663 14.5961 2.8616 14.4711C2.73658 14.3461 2.66634 14.1765 2.66634 13.9997V5.33301H1.33301V3.99967H4.66634V1.99967C4.66634 1.82286 4.73658 1.65329 4.8616 1.52827C4.98663 1.40325 5.1562 1.33301 5.33301 1.33301H10.6663C10.8432 1.33301 11.0127 1.40325 11.1377 1.52827C11.2628 1.65329 11.333 1.82286 11.333 1.99967V3.99967ZM11.9997 5.33301H3.99967V13.333H11.9997V5.33301ZM5.99967 7.33301H7.33301V11.333H5.99967V7.33301ZM8.66634 7.33301H9.99967V11.333H8.66634V7.33301ZM5.99967 2.66634V3.99967H9.99967V2.66634H5.99967Z" fill="#20231E" />
-                                  </svg>
-                                </span>
-                                Delete
-                              </button>
-                            </div>
+                              {/* Dropdown */}
+                              {openMenuId === review.id && (
+                                <div className="absolute right-0 top-7 w-44 bg-white rounded-lg shadow-lg border border-gray-200 z-20 py-2">
+                                  <button
+                                    onClick={() => {
+                                      setOpenMenuId(null);
+                                      console.log("Edit", user_name);
+                                    }}
+                                    className="w-full px-4 py-2 flex items-center gap-3 text-sm text-[#20231E] hover:bg-gray-100 font-semibold cursor-pointer"
+                                  >
+                                    <span className="w-[16px] h-[16px]">
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                        <path d="M11.1713 2.00039L9.838 3.33372H3.33333V12.6671H12.6667V6.16239L14 4.82906V13.3337C14 13.5105 13.9298 13.6801 13.8047 13.8051C13.6797 13.9302 13.5101 14.0004 13.3333 14.0004H2.66667C2.48986 14.0004 2.32029 13.9302 2.19526 13.8051C2.07024 13.6801 2 13.5105 2 13.3337V2.66706C2 2.49025 2.07024 2.32068 2.19526 2.19565C2.32029 2.07063 2.48986 2.00039 2.66667 2.00039H11.1713V2.00039ZM13.6567 1.40039L14.6 2.34439L8.472 8.47239L7.53067 8.47439L7.52933 7.52972L13.6567 1.40039V1.40039Z" fill="#20231E" />
+                                      </svg>
+                                    </span>
+                                    Edit
+                                  </button>
+
+                                  <button
+                                    onClick={() => {
+                                      setOpenMenuId(null);
+                                      openDeleteModal(review.id);
+                                    }}
+                                    className="w-full px-4 py-2 flex items-center gap-3 text-sm text-[#20231E] hover:bg-gray-100 font-semibold cursor-pointer"
+                                  >
+                                    <span className="w-[16px] h-[16px]">
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                        <path d="M11.333 3.99967H14.6663V5.33301H13.333V13.9997C13.333 14.1765 13.2628 14.3461 13.1377 14.4711C13.0127 14.5961 12.8432 14.6663 12.6663 14.6663H3.33301C3.1562 14.6663 2.98663 14.5961 2.8616 14.4711C2.73658 14.3461 2.66634 14.1765 2.66634 13.9997V5.33301H1.33301V3.99967H4.66634V1.99967C4.66634 1.82286 4.73658 1.65329 4.8616 1.52827C4.98663 1.40325 5.1562 1.33301 5.33301 1.33301H10.6663C10.8432 1.33301 11.0127 1.40325 11.1377 1.52827C11.2628 1.65329 11.333 1.82286 11.333 1.99967V3.99967ZM11.9997 5.33301H3.99967V13.333H11.9997V5.33301ZM5.99967 7.33301H7.33301V11.333H5.99967V7.33301ZM8.66634 7.33301H9.99967V11.333H8.66634V7.33301ZM5.99967 2.66634V3.99967H9.99967V2.66634H5.99967Z" fill="#20231E" />
+                                      </svg>
+                                    </span>
+                                    Delete
+                                  </button>
+                                </div>
+                              )}
+                            </>
                           )}
                         </div>
                       </div>
@@ -676,29 +729,24 @@ export default function ReviewListPage({
                       {ailmentName && (
                         <div className="flex items-center gap-1 mb-2">
                           <span className="text-xs text-[#2B2E28] font-medium">Ailment:</span>
-                          {ailmentIcon && (typeof ailmentIcon === 'string' && (ailmentIcon.startsWith('http') || ailmentIcon.startsWith('/'))) ? (
-                            <span className="rounded-full w-[24px] h-[24px] bg-[#F5F3ED] flex justify-center items-center"><img src={ailmentIcon} alt={ailmentName} className="w-[16px] h-[16px]" /></span>
-                          ) : (
-                            <span className="text-xs font-medium leading-none rounded-full w-[24px] h-[24px] bg-[#F5F3ED] flex justify-center items-center">{ailmentIcon ?? '🌿'}</span>
-                          )}
                           <span className="font-medium bg-[#F5F3ED] px-2 py-1 text-xs text-[#0B0C0A]"> {ailmentName}</span>
                         </div>
                       )}
 
                       {/* UPDATED: Single grey container with increased spacing between bracketed remedies */}
-                      <div className="flex flex-wrap items-center gap-2 mt-2 mb-3">
-                        <span className="text-[13px] font-medium text-[#2B2E28] mr-1">
-                          Used in Combination with:
-                        </span>
+                      {combinationNames.length > 0 && (
+                        <div className="flex flex-wrap items-center gap-2 mt-2 mb-3">
+                          <span className="text-[13px] font-medium text-[#2B2E28] mr-1">
+                            Used in Combination with:
+                          </span>
 
-                        <div className="text-[12px] px-3 py-1 rounded-[4px] bg-[#F1F2F0] text-[#41463B] font-medium">
-                          {secondaryRemedies.map((r) => (
-                            <span key={r.name} className="mr-[10px]">
-                              [{r.name}]
-                            </span>
-                          ))}
+                          <div className="text-[12px] px-3 py-1 rounded-[4px] bg-[#F1F2F0] text-[#41463B] font-medium">
+                            {combinationNames.map((name) => (
+                              <span key={name} className="mr-[10px]">[{name}]</span>
+                            ))}
+                          </div>
                         </div>
-                      </div>
+                      )}
 
 
                       {/* Pill Containers - Usage details like "Pellet", "6C" */}
@@ -783,6 +831,35 @@ export default function ReviewListPage({
           condition={ailmentContext?.name || "your condition"}
           ailmentId={ailmentContext?.id}
         />
+      )}
+
+      {/* Delete confirmation modal */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40" onClick={closeDeleteModal} />
+          <div className="bg-white rounded-lg shadow-lg z-50 w-full max-w-md p-6 mx-4">
+            <h3 className="text-lg font-semibold text-[#0B0C0A] mb-2">Delete review</h3>
+            <p className="text-sm text-[#41463B] mb-4">Are you sure you want to delete this review? This action cannot be undone.</p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={closeDeleteModal}
+                className="px-4 py-2 rounded-md border border-[#B5B6B1] text-[#41463B] bg-white"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  if (!pendingDeleteId) return;
+                  await performDeleteConfirmed(pendingDeleteId);
+                  closeDeleteModal();
+                }}
+                className="px-4 py-2 rounded-md bg-red-600 text-white font-semibold"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

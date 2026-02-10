@@ -48,12 +48,7 @@ export default function ContactUsSection() {
                   <span className="font-medium text-[#0B0C0A]">Email:</span>{' '}
                   hello@homeopathway.com
                 </p>
-                <p className="leading-5">
-                  <span className="font-medium text-[#0B0C0A]">
-                    Business Inquiries:
-                  </span>{' '}
-                  partnerships@homeopathway.com
-                </p>
+                {/* Business partnerships contact removed per request */}
               </div>
             </div>
 

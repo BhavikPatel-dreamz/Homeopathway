@@ -66,7 +66,7 @@ export default function AilmentDetailPage({ ailment, remedies }: AilmentDetailPa
             </div>
             <div className="flex-1 ">
               <p className="text-[#7D5C4E] text-[16px] font-medium flex items-center justify-end">
-                <Image className="mr-1" src="/remedies.svg" alt="remedies icon" width={16} height={16} /> {ailment.remedies_count} remedies
+                <Image className="mr-1" src="/remedies.svg" alt="remedies icon" width={16} height={16} /> { (remedies && remedies.length) ? remedies.length : ailment.remedies_count } remedies
               </p>
             </div>
           </div>
@@ -81,7 +81,7 @@ export default function AilmentDetailPage({ ailment, remedies }: AilmentDetailPa
         <div className="flex justify-end mb-4 lg:mb-10">
           <button
             onClick={() => setShowAddReviewForm(true)}
-            className="text-montserrat px-5 py-[9px] border border-[#6C7463] text-[#2B2E28] rounded-full font-semibold text-base leading-[24px] cursor-pointer transition-all duration-500 hover:bg-gray-300 hover:text-black hover:border-black"
+            className="text-montserrat px-5 py-[9px] bg-[#6C7463] text-white border border-[#6C7463] rounded-full font-semibold text-base leading-[24px] cursor-pointer transition-all duration-500 hover:bg-[#5A6B5D]"
           >
             Review a Remedy
           </button>

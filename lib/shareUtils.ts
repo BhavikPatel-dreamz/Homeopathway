@@ -57,8 +57,8 @@ export const shareOnSocialMedia = {
   // Copy to clipboard
   copyToClipboard: async (data: ShareData) => {
     try {
-      const textToShare = data.text ? `${data.title}\n${data.text}\n${data.url}` : `${data.title}\n${data.url}`;
-      await navigator.clipboard.writeText(textToShare);
+      // Only copy the URL to the clipboard (avoid including site title or description)
+      await navigator.clipboard.writeText(data.url);
       return true;
     } catch (error) {
       console.log('Error copying to clipboard:', error);

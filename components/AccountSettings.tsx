@@ -902,7 +902,7 @@ z-50 animate-in slide-in-from-top-2
             className="w-full flex items-center justify-between text-left cursor-pointer"
           >
             <div>
-              <h3 className="text-[28px] lg:text-[40px] font-normal text-[#0B0C0A]">My Request</h3>
+              <h3 className="text-[28px] lg:text-[40px] font-normal text-[#0B0C0A]">{user?.id ? 'My Requests' : 'My Request'}</h3>
             </div>
             <svg
               className="w-6 h-6 text-gray-400 flex-shrink-0 ml-4"

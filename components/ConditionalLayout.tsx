@@ -1,5 +1,6 @@
 import { headers } from 'next/headers';
 import Header from '@/components/Header';
+import ScrollToTop from '@/components/ScrollToTop';
 import Footer from '@/components/Footer';
 import { isPageCheckerSSR } from '@/lib/userUtils';
 
@@ -15,6 +16,7 @@ export default async function ConditionalLayout({ children }: ConditionalLayoutP
   const isAuthPage = isPageCheckerSSR(pathname, ['/login', '/register', '/forgot-password','/admin']);
   return (
     <div className="min-h-screen bg-[#2C3E3E]">
+      <ScrollToTop />
       {!isAuthPage && <Header />}
       {children}
       {!isAuthPage && <Footer />}
