@@ -34,7 +34,8 @@ const FAQS = [
 ]
 
 export default function FAQCard() {
-  const [openIndex, setOpenIndex] = useState<number | null>(1)
+  const [openIndex, setOpenIndex] = useState<number | null>(null)
+
 
   return (
     <section

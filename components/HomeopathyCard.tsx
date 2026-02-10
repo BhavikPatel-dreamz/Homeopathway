@@ -92,7 +92,7 @@ export default function HomeopathyPage() {
               {/* TEXT */}
               <div className="space-y-6">
                 <ContentBlock title="Used worldwide">
-                  Homeopathy is practiced in many parts of the world, including Europe, South Asia, South America, and the United States. Some people use it for common everyday concerns, while others take a more classical approach and integrate it with conventional care.
+                  Homeopathy is practiced in many parts of the world, including Europe, South Asia, South America, and the United States. Some people use it for common everyday concerns, while others take a more classical, individualized approach.
                 </ContentBlock>
 
                 <ContentBlock title="Non toxic and gentle">
