@@ -43,9 +43,7 @@ export default function HeaderInner() {
             <Image height={20} width={20} src="/share-icon.svg" alt="Share" />
           </button>
 
-          {!loading && user && (
-            <SaveButton className="w-[25px] h-[25px] md:w-[35px] md:h-[35px] lg:w-[44px] lg:h-[44px]" />
-          )}
+          <SaveButton className="flex items-center justify-center w-[25px] h-[25px] md:w-[35px] md:h-[35px] lg:w-[44px] lg:h-[44px]" />
 
           <UserAvatar className="w-[28px] h-[28px] md:w-[35px] md:h-[35px] lg:w-[44px] lg:h-[44px]" />
         </div>

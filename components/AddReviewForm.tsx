@@ -42,12 +42,10 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
   const [remediesList, setRemediesList] = useState<{ id: string; name: string }[]>([]);
   const [isRemedyOpen, setIsRemedyOpen] = useState(false);
 
-  // Allow selecting primary remedy instead of forcing the incoming prop
-  const [primaryRemedyId, setPrimaryRemedyId] = useState<string>(remedyId);
-  const [primaryRemedyName, setPrimaryRemedyName] = useState<string>(remedyName);
-  const [remedyPotencies, setRemedyPotencies] = useState<Record<string, string>>({
-    [primaryRemedyId]: ''
-  });
+  // No preselected primary: first pick becomes primary, further picks become secondary
+  const [primaryRemedyId, setPrimaryRemedyId] = useState<string>('');
+  const [primaryRemedyName, setPrimaryRemedyName] = useState<string>('');
+  const [remedyPotencies, setRemedyPotencies] = useState<Record<string, string>>({});
 
   const [formData, setFormData] = useState({
     remedy: remedyName,
@@ -67,33 +65,27 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
     notes: string;
   };
 
-  const [remedyExtras, setRemedyExtras] = useState<Record<string, RemedyExtra>>({
-    [primaryRemedyId]: {
-      potencyType: '',
-      notes: ''
-    }
-  });
+  const [remedyExtras, setRemedyExtras] = useState<Record<string, RemedyExtra>>({});
 
   const totalSteps = 8;
-  const allRemedies = [
-    { id: primaryRemedyId, name: primaryRemedyName },
-    ...selectedRemedies
-  ];
+  const allRemedies = primaryRemedyId ? [{ id: primaryRemedyId, name: primaryRemedyName }, ...selectedRemedies] : [...selectedRemedies];
 
 
   useEffect(() => {
-    const allRemedies = [
-      { id: primaryRemedyId, name: primaryRemedyName },
-      ...selectedRemedies
-    ];
+    const list = primaryRemedyId ? [{ id: primaryRemedyId, name: primaryRemedyName }, ...selectedRemedies] : [...selectedRemedies];
 
-    allRemedies.forEach(rem => {
+    list.forEach(rem => {
+      if (!rem?.id) return;
       setRemedyExtras(prev => {
         if (prev[rem.id]) return prev;
         return {
           ...prev,
           [rem.id]: { potencyType: '', notes: '' }
         };
+      });
+      setRemedyPotencies(prev => {
+        if (rem?.id && prev[rem.id] !== undefined) return prev;
+        return { ...prev, [rem.id]: prev[rem.id] ?? '' };
       });
     });
   }, [selectedRemedies, primaryRemedyId, primaryRemedyName]);
@@ -498,71 +490,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
 
               {/* Line 1 */}
               {/* Line 1 */}
-              <div className="font-montserrat font-medium sm:text-[20px] text-[16px] leading-[28px] text-[#4B544A]">
-                <div className="inline-block">Select Remedy:</div>
-
-                <span className="inline-block ml-2 relative w-[50%]">
-                  <div ref={remedyDropdownRef} className="relative max-w-[300px] inline-block">
-                    {/* Button (selected value) */}
-                    <button
-                      type="button"
-                      onClick={() => setIsRemedyOpen(prev => !prev)}
-                      className="w-full flex items-center justify-between text-[#41463B] bg-white gap-3"
-                    >
-                      <span className="truncate">
-                        {primaryRemedyName || "Belladonna"}
-                      </span>
-
-                      <svg className={`h-3 w-3 transition-transform ${isRemedyOpen ? "rotate-180" : "rotate-0"}`} width="11" height="7" viewBox="0 0 11 7" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M5.30333 4.125L9.42833 0L10.6067 1.17833L5.30333 6.48167L0 1.17833L1.17833 0L5.30333 4.125Z" fill="#20231E" />
-                      </svg>
-
-                    </button>
-
-                    {/* Dropdown List */}
-                    {isRemedyOpen && (
-                      <ul className="absolute z-20 mt-1 left-0 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-auto w-[250px]">
-
-                        {/* Keep current primary remedy if it's not in list */}
-                        {primaryRemedyId &&
-                          !remediesList.find(r => r.id === primaryRemedyId) && (
-                            <li
-                              onClick={() => setIsRemedyOpen(false)}
-                              className="px-3 py-2 text-sm cursor-pointer hover:bg-[#6c746333] whitespace-nowrap"
-                            >
-                              {primaryRemedyName}
-                            </li>
-                          )}
-
-                        {remediesList.map(r => (
-                          <li
-                            key={r.id}
-                            onClick={() => {
-                              setPrimaryRemedyId(r.id);
-                              setPrimaryRemedyName(r.name);
-
-                              // same logic as tamara select ma hati
-                              setRemedyPotencies(prev => ({ ...prev, [r.id]: prev[r.id] ?? '' }));
-                              setRemedyExtras(prev => ({
-                                ...prev,
-                                [r.id]: prev[r.id] ?? { potencyType: '', notes: '' }
-                              }));
-
-                              setIsRemedyOpen(false);
-                            }}
-                            className={`px-3 py-2 text-sm cursor-pointer transition-colors whitespace-nowrap ${primaryRemedyId === r.id
-                              ? "bg-[#6C7463] text-white font-medium"
-                              : "text-gray-700 hover:bg-[#6c746333]"
-                              }`}
-                          >
-                            {r.name}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </span>
-              </div>
+              {/* Removed static 'Select Remedy' label as requested */}
 
 
               {/* Line 2 */}
@@ -577,7 +505,24 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                 primaryRemedyId={primaryRemedyId}
                 primaryRemedyName={primaryRemedyName}
                 selected={selectedRemedies}
-                onChange={setSelectedRemedies}
+                onChange={(items) => {
+                  // If no primary exists, promote the first picked remedy to primary
+                  if (!primaryRemedyId && items.length > 0) {
+                    const [first, ...rest] = items;
+                    setPrimaryRemedyId(first.id);
+                    setPrimaryRemedyName(first.name);
+                    setRemedyPotencies(prev => ({ ...prev, [first.id]: prev[first.id] ?? '' }));
+                    setRemedyExtras(prev => ({ ...prev, [first.id]: prev[first.id] ?? { potencyType: '', notes: '' } }));
+                    setSelectedRemedies(rest);
+                  } else {
+                    setSelectedRemedies(items);
+                  }
+                }}
+                onPrimaryRemove={() => {
+                  // allow clearing primary; keep secondaries unchanged
+                  setPrimaryRemedyId('');
+                  setPrimaryRemedyName('');
+                }}
               />
 
               <p className="text-sm font-normal text-[#41463B] mt-3 flex justify-center items-center gap-2 text-center flex-col">

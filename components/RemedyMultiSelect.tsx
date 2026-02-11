@@ -9,6 +9,7 @@ interface Props {
   primaryRemedyName: string;
   selected: RemedyOption[];
   onChange: (items: RemedyOption[]) => void;
+  onPrimaryRemove?: () => void;
 }
 
 export default function RemedyMultiSelect({
@@ -16,6 +17,7 @@ export default function RemedyMultiSelect({
   primaryRemedyName,
   selected,
   onChange,
+  onPrimaryRemove,
 }: Props) {
   const [query, setQuery] = useState("");
   const [remedies, setRemedies] = useState<RemedyOption[]>([]);
@@ -178,9 +180,35 @@ export default function RemedyMultiSelect({
       )}
 
 
-      {/* SELECTED CHIPS (MATCH IMAGE) */}
-      {selected.length > 0 && (
+      {/* SELECTED CHIPS (include primary as a normal chip) */}
+      {(primaryRemedyId || selected.length > 0) && (
         <div className="flex flex-wrap gap-2">
+          {primaryRemedyId && primaryRemedyName && (
+            <span
+              key={primaryRemedyId}
+              className="
+                flex items-center gap-1
+                px-2 py-1
+                rounded-[4px]
+                bg-[#F5F3ED]
+                font-medium
+                text-[14px]
+                leading-[22px]
+                text-[#41463B] "
+            >
+              {primaryRemedyName}
+              <button
+                type="button"
+                onClick={() => {
+                  if (typeof onPrimaryRemove === 'function') onPrimaryRemove();
+                }}
+                className="text-[#8E8E8A] hover:text-[#0B0C0A] text-xl"
+              >
+                ×
+              </button>
+            </span>
+          )}
+
           {selected.map((r) => (
             <span
               key={r.id}
