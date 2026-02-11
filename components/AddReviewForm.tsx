@@ -396,9 +396,15 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
 
                 <input
                   ref={ailmentInputRef}
-                  value={ailmentQuery}
+                  value={selectedAilment ? (ailments.find(a => a.id === selectedAilment)?.name || '') : ailmentQuery}
                   onChange={(e) => {
-                    setAilmentQuery(e.target.value);
+                    // If a selection was previously made, typing should clear it and start a new query
+                    if (selectedAilment) {
+                      setSelectedAilment('');
+                      setAilmentQuery(e.target.value);
+                    } else {
+                      setAilmentQuery(e.target.value);
+                    }
                     setAilmentActiveIndex(-1);
                   }}
                   onKeyDown={(e) => {
@@ -452,17 +458,18 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                   </div>
                 )}
 
-                {/* Selected ailment (single-selection display) */}
+                {/* Show a Change button when an ailment is selected; the input displays the name */}
                 {selectedAilment && (
-                  <div className="mt-3 flex items-center gap-3">
-                    <span className="text-[16px] font-medium text-[#0B0C0A]">
-                      {ailments.find(a => a.id === selectedAilment)?.name || 'Selected'}
-                    </span>
+                  <div className="mt-3">
                     <button
                       type="button"
                       onClick={() => {
                         setSelectedAilment('');
-                        if (ailmentInputRef?.current) ailmentInputRef.current.focus();
+                        setAilmentQuery('');
+                        if (ailmentInputRef?.current) {
+                          // focus after state updates
+                          setTimeout(() => ailmentInputRef.current?.focus(), 0);
+                        }
                       }}
                       className="text-[#6C7463] hover:underline text-sm font-semibold"
                     >
@@ -496,9 +503,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
               {/* Line 2 */}
               <p className="font-montserrat font-medium text-[16px] leading-[24px] text-[#41463B] flex items-center gap-1">
                 Select multiple if used in combination
-                <span className="font-montserrat font-normal text-[12px] leading-[20px] text-[#41463B]">
-                  (optional)
-                </span>
+                
               </p>
 
               <RemedyMultiSelect
