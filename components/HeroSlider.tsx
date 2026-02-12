@@ -28,6 +28,60 @@ const CustomSlider = ({ slides }: { slides: string[] }) => {
     slides[0],
   ];
 
+  // preload images to keep them cached while tab is inactive
+  const preloaded = useRef<HTMLImageElement[]>([]);
+  useEffect(() => {
+    preloaded.current = [];
+    slides.forEach((src, i) => {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => {
+        preloaded.current[i] = img;
+      };
+      img.onerror = () => {
+        img.onerror = null;
+        img.src = "/home-slide-1.png";
+        preloaded.current[i] = img;
+      };
+    });
+  }, [slides]);
+
+  // handle tab visibility: pause autoplay when hidden, resume and ensure images reload when visible
+  useEffect(() => {
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        setIsAutoPlaying(false);
+      } else {
+        // ensure preloaded images are valid; if not, attempt to reload
+        slides.forEach((src, i) => {
+          const img = preloaded.current[i];
+          if (!img || !img.complete || img.naturalWidth === 0) {
+            const reload = new Image();
+            // use same src (browsers will use cache when available)
+            reload.src = src;
+            reload.onerror = () => {
+              reload.onerror = null;
+              reload.src = "/home-slide-1.png";
+            };
+            preloaded.current[i] = reload;
+          }
+        });
+
+        // force a re-enable of animation so transforms render correctly after background
+        setIsAnimating(false);
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => setIsAnimating(true));
+        });
+
+        // resume autoplay after a short delay
+        setTimeout(() => setIsAutoPlaying(true), 400);
+      }
+    };
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
+  }, [slides]);
+
   // autoplay
   useEffect(() => {
     if (!isAutoPlaying) return;

@@ -248,8 +248,52 @@ export default function ReviewListPage({
     else setIsInitialLoading(true);
 
     try {
-      const effectiveAilmentId = dynamicAilmentId ?? ailmentContext?.id;
+      let effectiveAilmentId = dynamicAilmentId ?? ailmentContext?.id;
+      // If the user typed an ailment name into the search box (e.g. "Eczema / Dermatitis"),
+      // try resolving that name -> id and use it as an explicit ailment filter for this fetch.
+      const q = (searchQuery || "").trim();
+      let resolvedAilmentId: string | null = null;
+      if (q) {
+        try {
+          // Try exact name match first
+          const { data: exact } = await supabase
+            .from('ailments')
+            .select('id, name')
+            .eq('name', q)
+            .maybeSingle();
+
+          let resolvedId: string | null = null;
+          if (exact && exact.id) resolvedId = exact.id;
+          else {
+            // Fallback to case-insensitive partial match
+            const { data: partial } = await supabase
+              .from('ailments')
+              .select('id, name')
+              .ilike('name', `%${q}%`)
+              .limit(1)
+              .maybeSingle();
+            if (partial && partial.id) resolvedId = partial.id;
+          }
+
+          if (resolvedId) {
+            resolvedAilmentId = resolvedId;
+            effectiveAilmentId = resolvedId;
+            // Ensure the resolved ailment name shows up in review cards even if
+            // the returned reviews don't include full ailment objects.
+            setAilmentMap((prev) => ({ ...(prev || {}), [resolvedId]: { name: q } }));
+          }
+        } catch (err) {
+          console.error('Failed to resolve ailment from search query:', err);
+        }
+      }
+
       console.log('fetchReviews -> effectiveAilmentId:', effectiveAilmentId, 'searchParam:', searchParams?.get?.('ailment'));
+
+      // If we resolved the search query to an ailment id, avoid also passing the
+      // raw `searchQuery` into `getReviews` because `getReviews` performs a
+      // local search against notes/potency/dosage/profile names which will
+      // incorrectly filter out reviews that match only by ailment.
+      const searchQueryForFetch = resolvedAilmentId ? '' : searchQuery;
 
       const { data: reviewsData } = await getReviews({
         remedyId: remedy.id,
@@ -257,7 +301,7 @@ export default function ReviewListPage({
         limit: Math.max(reviewsPerPage * 3, 50),
         sortBy,
         starCount: filters.rating,
-        searchQuery,
+        searchQuery: searchQueryForFetch,
         potency: filters.dosage,
         dosage: filters.form
       });
@@ -275,7 +319,7 @@ export default function ReviewListPage({
             limit: Math.max(reviewsPerPage * 3, 50),
             sortBy,
             starCount: filters.rating,
-            searchQuery,
+            searchQuery: searchQueryForFetch,
             potency: filters.dosage,
             dosage: filters.form,
           });
@@ -405,6 +449,30 @@ export default function ReviewListPage({
   useEffect(() => {
     fetchReviews(false);
   }, [remedy.id]);
+
+  // If the user clears the search input, remove any ailment filter that was
+  // implicitly applied by the search and show all comments for the remedy.
+  useEffect(() => {
+    if ((searchQuery || "").trim() === "") {
+      // Clear any dynamic ailment id so fetchReviews pulls all remedy reviews
+      setDynamicAilmentId(null);
+      setCurrentPage(1);
+
+      try {
+        const url = new URL(window.location.href);
+        if (url.searchParams.has('ailment')) {
+          url.searchParams.delete('ailment');
+          // Use replace to avoid creating a new history entry and avoid scrolling
+          router.replace(url.pathname + url.search, { scroll: false });
+        }
+      } catch (e) {
+        // ignore URL errors in non-browser environments
+      }
+
+      // Immediately refresh reviews to show full list
+      fetchReviews(false);
+    }
+  }, [searchQuery]);
 
   useEffect(() => {
     setActiveFilters({
@@ -602,15 +670,18 @@ export default function ReviewListPage({
                           // Special-case 'all' to clear any ailment filter and remove the URL param
                           if (opt.value === 'all') {
                             setDynamicAilmentId(null);
+                            // Clear any search text so we don't re-resolve an ailment name
+                            setSearchQuery('');
                             try {
                               const url = new URL(window.location.href);
                               url.searchParams.delete('ailment');
-                              router.push(url.pathname + url.search);
+                              // Update the URL without scrolling or adding a history entry
+                              router.replace(url.pathname + url.search, { scroll: false });
                             } catch (err) {
                               console.error('Failed to update URL when clearing ailment param:', err);
                             }
-                            // Keep default sorting (most recent)
-                            setSortBy('newest');
+                            // Keep sort state as 'all' so label reads "All comments"
+                            setSortBy('all');
                           } else {
                             setSortBy(opt.value);
                           }
@@ -800,6 +871,13 @@ export default function ReviewListPage({
                                 className="font-medium bg-[#F5F3ED] px-2 py-1 text-xs text-[#0B0C0A] cursor-pointer"
                                 onClick={(e) => {
                                   e.stopPropagation();
+                                  // Show the clicked ailment name in the search input so
+                                  // users see the selected filter immediately.
+                                  if (ailmentName) {
+                                    setSearchQuery(ailmentName);
+                                    setCurrentPage(1);
+                                  }
+
                                   // Prefer id if available; otherwise try to use slug if present on review. Fall back to name.
                                   const slug = (review as any)?.ailment?.slug ?? null;
                                   const targetId = ailmentId ?? null;
@@ -824,8 +902,8 @@ export default function ReviewListPage({
                                   const urlVal = slug || targetId;
                                   if (!urlVal) return; // don't set free-form names into the param
                                   url.searchParams.set('ailment', String(urlVal));
-                                  // Use router to update the URL without full reload
-                                  router.push(url.pathname + url.search);
+                                  // Use router to update the URL without full reload and avoid scrolling
+                                  router.push(url.pathname + url.search, { scroll: false });
                                 }}
                               > {ailmentName}</span>
                             </div>

@@ -396,15 +396,9 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
 
                 <input
                   ref={ailmentInputRef}
-                  value={selectedAilment ? (ailments.find(a => a.id === selectedAilment)?.name || '') : ailmentQuery}
+                  value={ailmentQuery}
                   onChange={(e) => {
-                    // If a selection was previously made, typing should clear it and start a new query
-                    if (selectedAilment) {
-                      setSelectedAilment('');
-                      setAilmentQuery(e.target.value);
-                    } else {
-                      setAilmentQuery(e.target.value);
-                    }
+                    setAilmentQuery(e.target.value);
                     setAilmentActiveIndex(-1);
                   }}
                   onKeyDown={(e) => {
@@ -435,6 +429,29 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                   className="w-full h-[44px] rounded-[8px] border-2 border-[#F8F6F2] pl-10 pr-4 text-[14px] text-[#41463B] font-medium placeholder:text-[#9A9A96] focus:outline-none focus:border-[#6C7463]"
                 />
 
+                {/* Selected ailment chip shown below the input, matching remedy chips */}
+                {selectedAilment && (
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    <span
+                      key={selectedAilment}
+                      className="flex items-center gap-2 px-3 py-1 rounded-[4px] bg-[#F5F3ED] font-medium text-[14px] leading-[22px] text-[#41463B]"
+                    >
+                      {ailments.find(a => a.id === selectedAilment)?.name}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedAilment('');
+                          setAilmentQuery('');
+                          if (ailmentInputRef?.current) setTimeout(() => ailmentInputRef.current?.focus(), 0);
+                        }}
+                        className="text-[#8E8E8A] hover:text-[#0B0C0A] text-xl ml-1"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  </div>
+                )}
+
                 {/* Dropdown */}
                 {ailmentQuery && (
                   <div className="border border-[#E6E6E3] rounded-[12px] bg-white shadow-[0px_0px_12px_-4px_rgba(26,26,26,0.16)] overflow-hidden mt-2">
@@ -458,25 +475,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                   </div>
                 )}
 
-                {/* Show a Change button when an ailment is selected; the input displays the name */}
-                {selectedAilment && (
-                  <div className="mt-3">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedAilment('');
-                        setAilmentQuery('');
-                        if (ailmentInputRef?.current) {
-                          // focus after state updates
-                          setTimeout(() => ailmentInputRef.current?.focus(), 0);
-                        }
-                      }}
-                      className="text-[#6C7463] hover:underline text-sm font-semibold"
-                    >
-                      Change
-                    </button>
-                  </div>
-                )}
+                
               </div>
               <p className="text-sm text-[#41463B] font-normal text-center gap-2">
                 Can&apos;t find what you&apos;re looking for?{" "}

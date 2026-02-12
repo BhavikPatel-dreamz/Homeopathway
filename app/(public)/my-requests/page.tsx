@@ -402,7 +402,7 @@ z-50 animate-in slide-in-from-top-2
                           <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[100px] w-[100px]">Slug</th>
                           <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-left sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[300px] w-[300px]">Description</th>
                           <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[115px] w-[115px]">Status</th>
-                          <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[115px] w-[115px]">Action</th>
+                          {/* <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[115px] w-[115px]">Action</th> */}
                         </tr>
                       </thead>
                       <tbody className="bg-white">
@@ -413,7 +413,7 @@ z-50 animate-in slide-in-from-top-2
                             <td className="border-r border-r-[#D3D6D1] px-4 py-4 text-center text-lg w-[100px]">{request.icon}</td>
                             <td className="border-r border-r-[#D3D6D1] px-4 py-4 text-center sm:text-base text-sm text-[#2B2E28] font-medium w-[100px]">{request.slug || 'N/A'}</td>
                             <td className="border-r border-r-[#D3D6D1] px-4 py-4 sm:text-base text-sm text-[#2B2E28] font-medium w-[300px]">{request.description || 'N/A'}</td>
-                            <td className="border-r border-r-[#D3D6D1] px-4 py-4 text-center w-[115px]">
+                            <td className="border-r-[#D3D6D1] px-4 py-4 text-center w-[115px]">
                               <span className={`sm:text-sm text-xs font-medium px-2 py-1 rounded-full ${request.status === 'approved' ? 'text-[#175F3D] bg-[#E9F5F0]' :
                                 request.status === 'declined' ? 'sm:text-sm text-xs font-medium px-2 py-1 rounded-full text-[#B62E31] bg-[#FCEBEC]' :
                                   'text-orange-600'
@@ -421,7 +421,7 @@ z-50 animate-in slide-in-from-top-2
                                 {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
                               </span>
                             </td>
-                            <td className="px-4 py-4 text-center w-[115px]">
+                            {/* <td className="px-4 py-4 text-center w-[115px]">
                               <div className="flex gap-2 justify-center">
                                 <button
                                   onClick={() => handleEditClick(request)}
@@ -462,7 +462,7 @@ z-50 animate-in slide-in-from-top-2
                                   </svg>
                                 </button>
                               </div>
-                            </td>
+                            </td> */}
                           </tr>
                         ))}
                       </tbody>
@@ -515,7 +515,7 @@ z-50 animate-in slide-in-from-top-2
                           <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[100px] w-[100px]">Slug</th>
                           <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-left sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[300px] w-[300px]">Description</th>
                           <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[115px] w-[115px]">Status</th>
-                          <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[115px] w-[115px]">Action</th>
+                          {/* <th className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-center sm:text-base text-sm font-semibold text-[#0B0C0A] min-w-[115px] w-[115px]">Action</th> */}
                         </tr>
                       </thead>
                       <tbody className="bg-white">
@@ -534,7 +534,7 @@ z-50 animate-in slide-in-from-top-2
                                 {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
                               </span>
                             </td>
-                            <td className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-right w-[115px]">
+                            {/* <td className="border-r border-r-[#D3D6D1] last:border-r-0 px-4 py-4 text-right w-[115px]">
                               <div className="flex gap-2 justify-center">
                                 <button
                                   onClick={() => handleEditClick(request)}
@@ -576,7 +576,7 @@ z-50 animate-in slide-in-from-top-2
                                 </button>
 
                               </div>
-                            </td>
+                            </td> */}
                           </tr>
                         ))}
                       </tbody>

@@ -573,11 +573,12 @@ export default function UserReviewListPage({ user }: any) {
                                 <div className="flex items-center gap-1">
                                   {/* If icon is a URL, show image; otherwise render emoji/text */}
                                   <span className="text-xs text-[#2B2E28] font-medium">Ailment:</span>
+                                  {/* Ailment icon intentionally hidden in chips per UI request
                                   {ailmentIcon && (typeof ailmentIcon === 'string' && (ailmentIcon.startsWith('http') || ailmentIcon.startsWith('/'))) ? (
                                      <span className="rounded-full w-[24px] h-[24px] bg-[#F5F3ED] flex justify-center items-center"><img src={ailmentIcon} alt={ailmentName} className="w-[16px] h-[16px]" /></span>
                                   ) : (
                                     <span className="text-xs font-medium leading-none rounded-full w-[24px] h-[24px] bg-[#F5F3ED] flex justify-center items-center">{ailmentIcon ?? '🌿'}</span>
-                                  )}
+                                  )} */}
                                   <span className="font-medium bg-[#F5F3ED] px-2 py-1 text-xs"> {ailmentName}</span>
                                 </div>
                               )}                              
@@ -586,13 +587,14 @@ export default function UserReviewListPage({ user }: any) {
                                 {primaryRemedyName && (
                                   <div className="flex items-center gap-2">
                                     <span className="text-xs font-medium text-[#2B2E28]">Primary Remedy:</span>
+                                    {/* Primary remedy icon hidden in chips per UI request
                                     <span className="rounded-full w-[24px] h-[24px] bg-[#F5F3ED] flex justify-center items-center">
                                       {primaryRemedyIcon && (typeof primaryRemedyIcon === 'string' && (primaryRemedyIcon.startsWith('http') || primaryRemedyIcon.startsWith('/'))) ? (
                                         <img src={primaryRemedyIcon} alt={primaryRemedyName || 'remedy'} className="w-[16px] h-[16px]" />
                                       ) : (
                                         <span className="text-sm">{primaryRemedyIcon ?? '🌿'}</span>
                                       )}
-                                    </span>
+                                    </span> */}
                                     <span className="px-2 py-1 bg-[#F5F3ED] text-[#2B2E28] text-xs font-medium">{primaryRemedyName}</span>
                                   </div>
                                 )}
