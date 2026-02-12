@@ -115,6 +115,14 @@ const CustomSlider = ({ slides }: { slides: string[] }) => {
             <img
               src={slide}
               alt=""
+              loading="eager"
+              decoding="async"
+              fetchPriority="high"
+              onError={(e) => {
+                const img = e.currentTarget as HTMLImageElement;
+                img.onerror = null;
+                img.src = "/home-slide-1.png";
+              }}
               className="absolute inset-0 w-full h-full object-cover"
             />
           </div>

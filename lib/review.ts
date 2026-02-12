@@ -138,7 +138,7 @@ export async function getReviews({
 }: {
   remedyId?: string;
   ailmentId?: string | null;
-  sortBy?: 'newest' | 'oldest' | 'highest_rated' | 'lowest_rated';
+  sortBy?: 'newest' | 'oldest' | 'highest_rated' | 'lowest_rated' | 'all';
   limit?: number;
   starCount?: number[];
   potency?: string[];
@@ -201,8 +201,25 @@ export async function getReviews({
   // belonging to users that no longer exist in the `profiles` table.
   const existingProfileIds = new Set<string>((profiles || []).map((p: any) => p.id));
 
-  // Remove reviews that reference a deleted/non-existent user (but keep
+  // Identify reviews that reference a deleted/non-existent user (but keep
   // reviews where user_id is null/empty – treat as anonymous).
+  const orphaned = reviews.filter((r: any) => r.user_id && !existingProfileIds.has(r.user_id));
+
+  // If there are orphaned reviews, delete them from the DB so counts stay
+  // consistent (requested behaviour). This operation may fail if the
+  // client lacks DELETE permissions; we catch and log errors but continue.
+  if (orphaned.length > 0) {
+    try {
+      const orphanIds = orphaned.map((r: any) => r.id).filter(Boolean);
+      if (orphanIds.length) {
+        await supabase.from('reviews').delete().in('id', orphanIds);
+        console.log('Deleted orphaned reviews:', orphanIds);
+      }
+    } catch (delErr) {
+      console.error('Failed to delete orphaned reviews:', delErr);
+    }
+  }
+
   const filteredReviews = reviews.filter((r: any) => {
     if (!r.user_id) return true; // anonymous or no user linked
     return existingProfileIds.has(r.user_id);

@@ -96,7 +96,7 @@ export default function PopularAilmentsServer({
                     { label: "Default", value: "" },
                     { label: "A - Z", value: "az" },
                     { label: "Z - A", value: "za" },
-                    { label: "Most Reviewed", value: "most-reviewed" }
+                    { label: "Most Remedies", value: "most-reviewed" }
                   ].map(opt => (
                     <li
                       key={opt.value}

@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Search, Loader2, ChevronDown, SlidersHorizontal } from "lucide-react";
 import Image from "next/image";
 import supabase from '@/lib/supabaseClient';
@@ -127,7 +127,7 @@ const renderStars = (rating: number) => {
     </div>
   );
 };
-type SortBy = "newest" | "oldest" | "highest_rated" | "lowest_rated";
+type SortBy = "newest" | "oldest" | "highest_rated" | "lowest_rated" | "all";
 
 // ---------------------------
 // Main Component
@@ -184,6 +184,8 @@ export default function ReviewListPage({
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 
   const [totalReviews, setTotalReviews] = useState(0);
+  // `totalReviewsAll` tracks the unfiltered total (for left-panel stats)
+  const [totalReviewsAll, setTotalReviewsAll] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [reviewsPerPage] = useState(3);
@@ -195,6 +197,8 @@ export default function ReviewListPage({
 
   const [ailmentMap, setAilmentMap] = useState<Record<string, { name: string; icon?: string }>>({});
   const { user } = useAuth();
+  const searchParams = useSearchParams();
+  const [dynamicAilmentId, setDynamicAilmentId] = useState<string | null>(null);
 
   // Fetch ailment names/icons for any ailment ids present in fetched reviews
   useEffect(() => {
@@ -244,9 +248,12 @@ export default function ReviewListPage({
     else setIsInitialLoading(true);
 
     try {
+      const effectiveAilmentId = dynamicAilmentId ?? ailmentContext?.id;
+      console.log('fetchReviews -> effectiveAilmentId:', effectiveAilmentId, 'searchParam:', searchParams?.get?.('ailment'));
+
       const { data: reviewsData } = await getReviews({
         remedyId: remedy.id,
-        ailmentId: ailmentContext?.id,
+        ailmentId: effectiveAilmentId,
         limit: Math.max(reviewsPerPage * 3, 50),
         sortBy,
         starCount: filters.rating,
@@ -331,27 +338,24 @@ export default function ReviewListPage({
       const endIndex = startIndex + reviewsPerPage;
       setReviews(allReviews.slice(startIndex, endIndex));
 
-      let { data: statsData } = await getReviewStats(remedy.id, ailmentContext?.id);
-
-      // If ailment-scoped stats returned zero reviews but the remedy has
-      // reviews overall, fall back to unfiltered remedy stats so the left
-      // panel doesn't show 0.0 when there are remedy-level reviews.
-      if (statsData && statsData.total_reviews === 0 && (ailmentContext?.id !== undefined && ailmentContext?.id !== null)) {
-        try {
-          const fallback = await getReviewStats(remedy.id);
-          if (fallback && fallback.data && fallback.data.total_reviews > 0) {
-            statsData = fallback.data;
-          }
-        } catch (err) {
-          console.error('Failed to fetch fallback stats:', err);
+      // Always show remedy-level (unfiltered) stats and total counts in the
+      // left panel — filtering should not change the overall counts the user
+      // sees. The list on the right remains filtered by ailment/other filters.
+      try {
+        const { data: unfilteredStats } = await getReviewStats(remedy.id);
+        if (unfilteredStats) {
+          setReviewStats(unfilteredStats);
+          setTotalReviewsAll(unfilteredStats.total_reviews || 0);
         }
+      } catch (err) {
+        console.error('Failed to fetch unfiltered review stats:', err);
+        // keep totalReviewsAll at 0 (or previous)
       }
 
-      if (statsData) {
-        setReviewStats(statsData);
-        setTotalReviews(allReviews.length);
-        setTotalPages(Math.ceil(allReviews.length / reviewsPerPage));
-      }
+      // For pagination and the visible pages, use the filtered count
+      const filteredCount = allReviews.length;
+      setTotalReviews(filteredCount);
+      setTotalPages(Math.max(1, Math.ceil(filteredCount / reviewsPerPage)));
 
       const { data: filterData } = await getReviewFilterOptions(remedy.id);
       if (filterData) setFilterOptions(filterData);
@@ -362,6 +366,38 @@ export default function ReviewListPage({
       setIsPageLoading(false);
     }
   };
+
+  // Watch URL `?ailment=` param and resolve to an ailment id when needed
+  useEffect(() => {
+    const param = searchParams?.get?.("ailment") ?? null;
+    if (!param) {
+      setDynamicAilmentId(null);
+      return;
+    }
+
+    // If the param looks like a UUID (standard 8-4-4-4-12 form), assume it's an id and use directly
+    const uuidLike = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(param);
+    if (uuidLike) {
+      setDynamicAilmentId(param);
+      return;
+    }
+
+    // Otherwise try resolving slug -> id
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data } = await supabase.from('ailments').select('id, slug').eq('slug', param).single();
+        if (cancelled) return;
+        if (data && data.id) setDynamicAilmentId(data.id);
+        else setDynamicAilmentId(null);
+      } catch (err) {
+        console.error('Failed to resolve ailment slug to id:', err);
+        setDynamicAilmentId(null);
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [searchParams]);
 
   // ---------------------------
   // Effects
@@ -382,13 +418,19 @@ export default function ReviewListPage({
   useEffect(() => {
     fetchReviews(false);
     setCurrentPage(1);
-  }, [filters, sortBy, searchQuery, activeFilters]);
+  }, [filters, sortBy, searchQuery, activeFilters, dynamicAilmentId]);
 
   useEffect(() => {
     if (currentPage > 1 || totalReviews > reviewsPerPage) {
       fetchReviews(true);
     }
   }, [currentPage]);
+
+  // When the selected ailment (from URL) changes, reset pagination and fetch
+  useEffect(() => {
+    setCurrentPage(1);
+    fetchReviews(false);
+  }, [dynamicAilmentId]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -419,6 +461,7 @@ export default function ReviewListPage({
   const refreshReviews = () => fetchReviews(false);
 
   const sortOptions: { label: string; value: SortBy }[] = [
+    { label: "All comments", value: "all" },
     { label: "Most Recent", value: "newest" },
     { label: "Oldest", value: "oldest" },
     { label: "Highest Rated", value: "highest_rated" },
@@ -451,7 +494,9 @@ export default function ReviewListPage({
       // remove from visible lists
       setReviews(prev => prev.filter(r => r.id !== reviewId));
       setAllReviewsList(prev => prev.filter(r => r.id !== reviewId));
+      // Decrement both filtered and unfiltered totals conservatively
       setTotalReviews(prev => Math.max(0, prev - 1));
+      setTotalReviewsAll(prev => Math.max(0, prev - 1));
     } catch (err: any) {
       console.error('Error deleting review:', err);
       alert('Failed to delete review: ' + (err?.message || err));
@@ -553,7 +598,24 @@ export default function ReviewListPage({
                     {sortOptions.map((opt) => (
                       <button
                         key={opt.value}
-                        onClick={() => { setSortBy(opt.value); setIsDropdownOpen(false); }}
+                        onClick={() => {
+                          // Special-case 'all' to clear any ailment filter and remove the URL param
+                          if (opt.value === 'all') {
+                            setDynamicAilmentId(null);
+                            try {
+                              const url = new URL(window.location.href);
+                              url.searchParams.delete('ailment');
+                              router.push(url.pathname + url.search);
+                            } catch (err) {
+                              console.error('Failed to update URL when clearing ailment param:', err);
+                            }
+                            // Keep default sorting (most recent)
+                            setSortBy('newest');
+                          } else {
+                            setSortBy(opt.value);
+                          }
+                          setIsDropdownOpen(false);
+                        }}
                         className={`cursor-pointer px-3 py-2 w-full text-sm text-start transition ${sortBy === opt.value ? "bg-[#6C7463] text-white font-medium" : "text-gray-700 hover:bg-[#6c74631f] font-medium hover:text-[#6C7463]"}`}
                       >
                         {opt.label}
@@ -635,15 +697,17 @@ export default function ReviewListPage({
                     review.duration_used
                   ]);
 
-                  return (
+                    return (
                     <div
                       key={review.id}
-                      onClick={() => router.push(`/user/${user_name}`)}
-                      className="border-b border-[#B5B6B1]/50 w-full py-4 sm:py-6 cursor-pointer sm:last:border-b-0 mobile-hide-last-two"
+                      className="border-b border-[#B5B6B1]/50 w-full py-4 sm:py-6 sm:last:border-b-0 mobile-hide-last-two"
                     >
                       <div className="flex custom-320 flex-row items-start justify-between mb-2 sm:mb-3 gap-2 sm:gap-0">
                         <div className="flex items-start gap-2 sm:gap-3">
-                          <div className="flex items-center justify-center w-11 h-11 sm:w-[44px] sm:h-[44px] rounded-full bg-[#4B544A] text-white font-semibold text-lg sm:text-base shadow-sm overflow-hidden">
+                          <div
+                            className="flex items-center justify-center w-11 h-11 sm:w-[44px] sm:h-[44px] rounded-full bg-[#4B544A] text-white font-semibold text-lg sm:text-base shadow-sm overflow-hidden cursor-pointer"
+                            onClick={(e) => { e.stopPropagation(); router.push(`/user/${review.profiles?.user_name || review.profiles?.id}`); }}
+                          >
                             {profile_image ? (
                               <img src={profile_image} alt={userName} className="w-full h-full object-cover" />
                             ) : (
@@ -651,7 +715,10 @@ export default function ReviewListPage({
                             )}
                           </div>
                           <div>
-                            <p className="font-semibold text-[#0B0C0A] hover:underline text-[16px] sm:text-base">{userName}</p>
+                            <p
+                              className="font-semibold text-[#0B0C0A] hover:underline text-[16px] sm:text-base cursor-pointer"
+                              onClick={(e) => { e.stopPropagation(); router.push(`/user/${review.profiles?.user_name || review.profiles?.id}`); }}
+                            >{userName}</p>
                             <div className="flex items-center gap-1">
                               {renderStars(review.star_count)}
                               <span className="ml-1 text-[16px] text-[#20231E] font-medium">{review.star_count.toFixed(1)}</span>
@@ -727,10 +794,41 @@ export default function ReviewListPage({
 
                       {/* Ailment (icon + name) - shown above combination, matching UserReview styling */}
                       {ailmentName && (
-                        <div className="flex items-center gap-1 mb-2">
-                          <span className="text-xs text-[#2B2E28] font-medium">Ailment:</span>
-                          <span className="font-medium bg-[#F5F3ED] px-2 py-1 text-xs text-[#0B0C0A]"> {ailmentName}</span>
-                        </div>
+                            <div className="flex items-center gap-1 mb-2">
+                              <span className="text-xs text-[#2B2E28] font-medium">Ailment:</span>
+                              <span
+                                className="font-medium bg-[#F5F3ED] px-2 py-1 text-xs text-[#0B0C0A] cursor-pointer"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  // Prefer id if available; otherwise try to use slug if present on review. Fall back to name.
+                                  const slug = (review as any)?.ailment?.slug ?? null;
+                                  const targetId = ailmentId ?? null;
+
+                                  // If we have an immediate id, set it so filtering happens right away
+                                  if (targetId) setDynamicAilmentId(targetId);
+
+                                  // If no id but we have a slug, start a lookup and set dynamicAilmentId when resolved
+                                  if (!targetId && slug) {
+                                    (async () => {
+                                      try {
+                                        const { data } = await supabase.from('ailments').select('id').eq('slug', slug).single();
+                                        if (data && data.id) setDynamicAilmentId(data.id);
+                                      } catch (err) {
+                                        console.error('Failed to resolve clicked ailment slug:', err);
+                                      }
+                                    })();
+                                  }
+
+                                  const url = new URL(window.location.href);
+                                  // Prefer using slug in URL when available for readability, otherwise use id.
+                                  const urlVal = slug || targetId;
+                                  if (!urlVal) return; // don't set free-form names into the param
+                                  url.searchParams.set('ailment', String(urlVal));
+                                  // Use router to update the URL without full reload
+                                  router.push(url.pathname + url.search);
+                                }}
+                              > {ailmentName}</span>
+                            </div>
                       )}
 
                       {/* UPDATED: Single grey container with increased spacing between bracketed remedies */}
