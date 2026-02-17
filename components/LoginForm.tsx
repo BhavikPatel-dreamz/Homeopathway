@@ -1,7 +1,7 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { signInWithEmail, signInWithGoogle, getUserProfile } from '../lib/auth';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 export default function LoginForm() {
@@ -12,6 +12,7 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const searchParams = useSearchParams();
 
   async function handleEmailLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -98,6 +99,18 @@ export default function LoginForm() {
     // Note: Google OAuth redirect is handled by Supabase
     setLoading(false);
   }
+
+  useEffect(() => {
+    try {
+      const registered = searchParams?.get('registered');
+      const msg = searchParams?.get('msg');
+      if (registered) {
+        setSuccess(msg ? decodeURIComponent(msg) : 'Registration successful. Please login.');
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, [searchParams]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F5F3ED] px-4">

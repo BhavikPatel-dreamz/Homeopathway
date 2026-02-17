@@ -2,10 +2,12 @@
 import { useState } from 'react';
 import { signUpWithEmail, signInWithGoogle } from '../lib/auth';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import supabase from '@/lib/supabaseClient';
 // Make sure to import supabase
 
 export default function RegisterForm() {
+  const router = useRouter();
   const [step, setStep] = useState<"signup" | "username">("signup");
 
   const [fullName, setFullName] = useState('');
@@ -123,7 +125,9 @@ export default function RegisterForm() {
       });
 
       setLoading(false);
-      setMessage('Registration successful. Please check your email to confirm.');
+      // Redirect to login page and show a success message there
+      const msg = encodeURIComponent('Registration successful.');
+      router.push(`/login?registered=1&msg=${msg}`);
     } catch (err) {
       console.error('Username update error:', err);
       setMessage('Failed to save username. Please try again.');
