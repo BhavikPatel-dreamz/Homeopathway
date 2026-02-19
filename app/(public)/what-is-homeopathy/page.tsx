@@ -10,7 +10,7 @@ export default function HomeopathyPage() {
       <Breadcrumb
         items={[
           { label: "Home", href: "/" },
-          { label: "What-is-Homeopathy", isActive: true } // Corrected label for better readability
+          { label: "What is Homeopathy", isActive: true } // Corrected label for better readability
         ]}
       />
 

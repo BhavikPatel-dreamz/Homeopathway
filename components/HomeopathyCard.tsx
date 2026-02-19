@@ -1,7 +1,7 @@
 import React from "react";
 
 const IMAGE_REMEDIES = "spoon-medi.png";
-const IMAGE_HAND = "/sunflower.png";
+const IMAGE_HAND = "/bowl-yellow.png";
 
 // Body text
 const BODY_TEXT =

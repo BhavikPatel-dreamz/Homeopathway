@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { supabase } from './supabaseClient';
 
 // Light wrappers around Supabase auth and profile operations.
@@ -5,50 +6,27 @@ import { supabase } from './supabaseClient';
 // to your Supabase schema and RLS policies.
 
 export async function signUpWithEmail({ email, password, firstName, lastName }: { email: string; password: string; firstName?: string; lastName?: string }) {
-  // 1) Sign up the user
-  const { data, error } = await supabase.auth.signUp({ 
-    email, 
-    password,
-    options: {
-      data: {
-        first_name: firstName,
-        last_name: lastName,
-      }
-    }
-  });
-  if (error) return { error };
-
-  // 2) If the signup succeeded and user is available, create a profile row.
-  // Assumes you have a `profiles` table with columns: id (uuid same as auth user id), email, first_name, last_name, role
+  // Use a server-side admin route to create the user without sending
+  // a confirmation email. The server route will also create the profile
+  // row using the service role key.
   try {
-    const user = data.user;
-    const userName = [firstName, lastName]
-  .filter(Boolean)
-  .join('-')
-  .toLowerCase();
-    if (user) {
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert({ 
-          id: user.id,
-          email: user.email,
-          first_name: firstName ?? null, 
-          last_name: lastName ?? null, 
-          role: 'user' ,
-          user_name:userName
-        });
-      
-      if (profileError) {
-        console.warn('Profile insert failed:', profileError);
-      }
-    }
-  } catch (err) {
-    // Non-fatal here; profile creation may be blocked by RLS depending on your setup.
-    // Surface the auth result and log the profile insert error in the console.
-    console.warn('profile insert failed', err);
-  }
+    const res = await fetch('/api/auth/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, firstName, lastName }),
+    });
 
-  return { data, error: null };
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const message = json?.error?.message || json?.error || 'Signup failed';
+      return { error: new Error(message) };
+    }
+
+    // Return the created user object under `data.user` to match previous shape
+    return { data: { user: json.user }, error: null };
+  } catch (err) {
+    return { error: new Error(String(err)) };
+  }
 }
 
 export async function signInWithEmail({ email, password }: { email: string; password: string }) {

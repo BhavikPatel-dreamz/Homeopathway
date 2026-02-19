@@ -1,7 +1,7 @@
 "use client";
 import { useState } from 'react';
 import { signInWithEmail, signInWithGoogle, getUserProfile } from '../lib/auth';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 export default function LoginForm() {
@@ -11,7 +11,11 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const registeredParam = searchParams?.get('registered');
+  const msgParam = searchParams?.get('msg');
+  const initialSuccess = registeredParam ? (msgParam ? decodeURIComponent(msgParam) : 'Registration successful. Please login.') : null;
+  const [success, setSuccess] = useState<string | null>(initialSuccess);
 
   async function handleEmailLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -63,8 +67,20 @@ export default function LoginForm() {
         // Success! Set success message briefly before redirect
         setSuccess('Login successful! Redirecting...');
 
-        // Redirect based on role
+        // Redirect based on role or `next` param
         setTimeout(() => {
+          const nextParam = searchParams?.get('next');
+          if (nextParam) {
+            try {
+              const decoded = decodeURIComponent(nextParam);
+              console.log('➡️ Redirecting to next:', decoded);
+              router.push(decoded);
+              return;
+            } catch (e) {
+              console.warn('Failed to decode next param:', e);
+            }
+          }
+
           if (profile?.role === 'admin' || profile?.role === 'moderator') {
             console.log('👑 Redirecting admin/moderator to dashboard');
             router.push('/admin');
@@ -78,6 +94,7 @@ export default function LoginForm() {
         setError('Sign in failed. Please try again.');
       }
     } catch (err) {
+      console.error(err);
       setLoading(false);
       setError('An unexpected error occurred. Please try again.');
     }
@@ -87,7 +104,7 @@ export default function LoginForm() {
     setError(null);
     setSuccess(null);
     setLoading(true);
-    const { data, error: googleError } = await signInWithGoogle();
+    const { error: googleError } = await signInWithGoogle();
 
     if (googleError) {
       setLoading(false);
@@ -98,6 +115,12 @@ export default function LoginForm() {
     // Note: Google OAuth redirect is handled by Supabase
     setLoading(false);
   }
+
+  // `success` is derived from `searchParams` on initial render to avoid
+  // synchronously calling setState inside an effect which can cause
+  // cascading renders. If `searchParams` changes while this component is
+  // mounted, Next's navigation will cause a rerender and the initial
+  // computed value above will reflect the latest params.
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F5F3ED] px-4">
@@ -220,7 +243,7 @@ export default function LoginForm() {
 
           {/* Signup Link */}
           <p className="text-center text-sm text-[#83857D] font-medium mb-6">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link href="/register" className="text-[#4B544A] hover:text-[#20231E] font-medium underline hover:underline transition-all duration-500">
               Signup
             </Link>

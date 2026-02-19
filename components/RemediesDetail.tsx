@@ -9,6 +9,7 @@ import { breadcrumbPaths } from "@/lib/breadcrumbUtils";
 
 import { Remedy } from "@/types";
 import ReviewListPage from "./ReviewList";
+import SaveButton from "./SaveButton";
 
 // ---------------------------
 // Type Definitions
@@ -322,6 +323,12 @@ export default function RemediesDetailPage({
                       })()
                     }
                   </span>
+                  <div className="ml-3">
+                    <SaveButton
+                      className="w-[36px] h-[36px]"
+                      pageData={{ id: remedy.id, title: remedy.name, url: typeof window !== 'undefined' ? window.location.href : `/remedies/${remedy.slug}` }}
+                    />
+                  </div>
                 </div>
 
                 <h4 className="text-base sm:text-lg md:text-[20px] text-[#2B2E28] font-bold mb-3 sm:mb-5 text-montserrat">

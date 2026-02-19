@@ -120,6 +120,13 @@ export default function RequestAilmentRemedyModal({
         return;
       }
 
+      // For remedies, ensure key symptoms are provided (required)
+      if (requestType === 'remedy' && formData.key_symptoms.trim().length === 0) {
+        setError('Key symptoms are required for remedies');
+        setLoading(false);
+        return;
+      }
+
       const { data: { user: authUser } } = await supabase.auth.getUser();
 
       if (!authUser) {
@@ -228,7 +235,7 @@ export default function RequestAilmentRemedyModal({
               Request Submitted Successfully!
             </h2>
             <p className="text-base font-medium text-[#41463B] text-center mb-8">
-              Your {requestType} is under review.<br></br> We’ll notify you once it’s approved.
+              Your {requestType} is under review.
             </p>
             <button
               onClick={() => {
@@ -386,20 +393,7 @@ export default function RequestAilmentRemedyModal({
                 </div>
               )}
 
-              {/* Slug Field (optional) */}
-              <div>
-                <label className="block text-sm font-medium text-[#0B0C0A] mb-2">
-                  {requestType === "ailment" ? "Ailment" : "Remedy"} Slug <span className="text-xs font-normal text-[#41463B]">(optional)</span>
-                </label>
-                <input
-                  type="text"
-                  name="slug"
-                  value={formData.slug}
-                  readOnly
-                  placeholder="auto-generated from name"
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none text-[#0B0C0A] bg-gray-50 cursor-not-allowed"
-                />
-              </div>
+              {/* Slug is auto-generated server-side; not shown to end users */}
 
               {/* Description Field */}
               <div>
