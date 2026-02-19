@@ -915,6 +915,8 @@ z-50 animate-in slide-in-from-top-2
           </button>
         </div>
 
+        {/* Bookmarks moved to dropdown */}
+
 
         <div className="flex justify-center mt-6 px-3">
           <button

@@ -124,6 +124,17 @@ export default function UserDropdown({ isOpen, onClose, user, profile }: UserDro
         My Profile
       </Link>
 
+      <Link
+        href="/my-wishlist"
+        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+        onClick={onClose}
+      >
+        <svg className="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M5 3a2 2 0 00-2 2v12l7-3 7 3V5a2 2 0 00-2-2H5z" />
+        </svg>
+        Bookmarks
+      </Link>
+
       {(profile.role === 'admin' || profile.role === 'moderator') && (
         <Link
           href="/admin"

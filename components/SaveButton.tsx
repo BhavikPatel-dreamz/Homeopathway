@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { savePageUtils } from '@/lib/savePageUtils';
-import Image from 'next/image';
+import { supabase } from '@/lib/supabaseClient';
 
 interface SaveButtonProps {
   className?: string;
@@ -17,24 +18,100 @@ interface SaveButtonProps {
 export default function SaveButton({ className = "", pageData }: SaveButtonProps) {
   const [isSaved, setIsSaved] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
-    // Check if current page is saved
-    setIsSaved(savePageUtils.isPageSaved(pageData?.id));
-  }, [pageData?.id]);
+    // Check if current page is saved. Use current pathname from router so header button updates on navigation.
+    const pageId = pageData?.id || (pathname || '');
+
+    let mounted = true;
+
+    const init = async () => {
+      // Start with localStorage quick check
+      const localSaved = savePageUtils.isPageSaved(pageData?.id || pathname);
+      if (mounted) setIsSaved(localSaved);
+
+      try {
+        const { data } = await supabase.auth.getUser();
+        const authUser = data?.user ?? null;
+        if (!authUser) return;
+
+        const { data: rows, error } = await supabase
+          .from('saved_pages')
+          .select('page_id')
+          .eq('user_id', authUser.id)
+          .eq('page_id', pageId)
+          .maybeSingle();
+
+        if (!mounted) return;
+        if (error) {
+          // ignore and keep local state
+          console.error('Error checking saved state:', error);
+          return;
+        }
+
+        setIsSaved(!!rows);
+      } catch (err) {
+        console.error('Error initializing save state:', err);
+      }
+    };
+
+    init();
+
+    return () => { mounted = false; };
+  }, [pageData?.id, pathname]);
 
   const handleToggleSave = async () => {
     setIsLoading(true);
-    
+
     try {
-      const newSavedState = savePageUtils.toggleSave(pageData);
-      setIsSaved(newSavedState);
-      
-      // Show a brief feedback
-      if (newSavedState) {
-        console.log('Page saved successfully');
+      // Try to persist to Supabase when user is authenticated
+      const { data } = await supabase.auth.getUser();
+      const authUser = data?.user ?? null;
+
+      const pageId = pageData?.id || (typeof window !== 'undefined' ? window.location.pathname : "");
+      const title = pageData?.title || (typeof document !== 'undefined' ? document.title : pageId);
+      const url = pageData?.url || (typeof window !== 'undefined' ? window.location.href : pageId);
+      const description = pageData?.description || (typeof document !== 'undefined' ? document.querySelector('meta[name="description"]')?.getAttribute('content') || null : null);
+
+      if (authUser) {
+        // Check existing
+        const { data: existing, error: selErr } = await supabase
+          .from('saved_pages')
+          .select('id')
+          .eq('user_id', authUser.id)
+          .eq('page_id', pageId)
+          .maybeSingle();
+
+        if (selErr) throw selErr;
+
+        if (existing) {
+          // Remove
+          const { error: delErr } = await supabase
+            .from('saved_pages')
+            .delete()
+            .eq('user_id', authUser.id)
+            .eq('page_id', pageId);
+
+          if (delErr) throw delErr;
+
+          // keep localStorage in sync
+          savePageUtils.removePage(pageId);
+          setIsSaved(false);
+        } else {
+          const { error: insErr } = await supabase
+            .from('saved_pages')
+            .insert({ user_id: authUser.id, page_id: pageId, title, url, description, saved_at: new Date().toISOString() });
+
+          if (insErr) throw insErr;
+
+          savePageUtils.savePage({ id: pageId, title, url, description });
+          setIsSaved(true);
+        }
       } else {
-        console.log('Page removed from saved');
+        // Fallback to localStorage for anonymous users
+        const newSavedState = savePageUtils.toggleSave(pageData);
+        setIsSaved(newSavedState);
       }
     } catch (error) {
       console.error('Error toggling save:', error);

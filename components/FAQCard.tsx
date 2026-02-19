@@ -47,10 +47,7 @@ export default function FAQCard() {
             FAQ
           </h1>
 
-          {/* SUBTITLE */}
-          <p className="text-[#41463B] text-[16px] leading-[24px] font-medium">
-            If you are new to homeopathy, here are simple steps to help you begin.
-          </p>
+          {/* SUBTITLE (removed) */}
 
           {/* FAQ LIST */}
           <div className="flex flex-col">

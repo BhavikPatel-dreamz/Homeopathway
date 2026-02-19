@@ -510,12 +510,38 @@ export default function ReviewListPage({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Open review form if the URL contains the openReview hash or query param
+  useEffect(() => {
+    try {
+      if (typeof window === 'undefined') return;
+      const sp = new URLSearchParams(window.location.search);
+      const hasQuery = sp.get('openReview') === '1' || sp.get('openReview') === 'true';
+      const hasHash = window.location.hash === '#openReview';
+      if (hasQuery || hasHash) {
+        setIsReviewFormOpen(true);
+        // remove the marker from the URL without adding history
+        const url = new URL(window.location.href);
+        url.hash = '';
+        url.searchParams.delete('openReview');
+        window.history.replaceState({}, '', url.toString());
+      }
+    } catch (err) {
+      // ignore
+    }
+  }, []);
+
   // ---------------------------
   // Handlers
   // ---------------------------
   const handleReviewButtonClick = async () => {
     const { user, error } = await getCurrentUser();
-    if (error || !user) return router.push("/login");
+    if (error || !user) {
+      if (typeof window !== 'undefined') {
+        const current = window.location.pathname + window.location.search + '#openReview';
+        return router.push(`/login?next=${encodeURIComponent(current)}`);
+      }
+      return router.push('/login');
+    }
     setIsReviewFormOpen(true);
   };
 
