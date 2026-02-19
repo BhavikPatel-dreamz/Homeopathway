@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import useAuthSession from "@/lib/useAuthSession";
 import { getUserProfile } from "@/lib/auth";
 import { supabase } from "@/lib/supabaseClient";
@@ -19,17 +19,16 @@ function setCookie(name: string, value: string, expiresUTC: string) {
 
 export default function CookieConsent() {
   const { session } = useAuthSession();
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
+  const [visible, setVisible] = useState<boolean>(() => {
     try {
+      if (typeof document === "undefined") return false;
       const existing = getCookie("cookie_consent");
-      setVisible(!existing);
+      return !existing;
     } catch (e) {
       // If anything fails, show the banner so user can choose
-      setVisible(true);
+      return true;
     }
-  }, []);
+  });
 
   const handleChoice = async (value: "accepted" | "rejected") => {
     // expiry exactly 2 hours from now
