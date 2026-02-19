@@ -105,7 +105,7 @@ export default function SaveButton({ className = "", pageData }: SaveButtonProps
 
           if (insErr) throw insErr;
 
-          savePageUtils.savePage({ id: pageId, title, url, description });
+          savePageUtils.savePage({ id: pageId, title, url, description: description || undefined });
           setIsSaved(true);
         }
       } else {
