@@ -115,7 +115,7 @@ export default function ContactUsSection() {
             {/* Image Container: Fixed height (336px) and rounded corners (16px) */}
             <div className="relative w-full h-[336px] rounded-[8px] overflow-hidden">
               <Image
-                src="/sunflower"
+                src="/sunflower.png"
                 alt="Contact Us"
                 fill
                 style={{ objectFit: 'cover' }}
