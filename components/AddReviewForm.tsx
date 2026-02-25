@@ -475,9 +475,9 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                   </div>
                 )}
 
-                
+
               </div>
-              <p className="text-sm text-[#41463B] font-normal text-center gap-2">
+              <p className="text-sm font-normal text-[#41463B] mt-3 flex justify-center items-center gap-2 text-center">
                 Can&apos;t find what you&apos;re looking for?{" "}
                 <button
                   type="button"
@@ -502,7 +502,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
               {/* Line 2 */}
               <p className="font-montserrat font-medium text-[16px] leading-[24px] text-[#41463B] flex items-center gap-1">
                 Select multiple if used in combination
-                
+
               </p>
 
               <RemedyMultiSelect
@@ -529,7 +529,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                 }}
               />
 
-              <p className="text-sm font-normal text-[#41463B] mt-3 flex justify-center items-center gap-2 text-center flex-col">
+              <p className="text-sm font-normal text-[#41463B] mt-3 flex justify-center items-center gap-2 text-center">
                 Can&apos;t find what you&apos;re looking for?{" "}
                 <button
                   type="button"
