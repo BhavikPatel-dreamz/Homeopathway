@@ -102,26 +102,44 @@ export async function getUserProfile(userId?: string) {
       if (userEmail) {
         console.log('💾 Inserting new profile:', { id: userId, email: userEmail });
         
+        // Use upsert to make profile creation idempotent and avoid
+        // duplicate-key errors when multiple requests race to create the same profile.
         const { data: newProfile, error: createError } = await supabase
           .from('profiles')
-          .insert({
+          .upsert({
             id: userId,
             email: userEmail,
             first_name: 'User',
             last_name: 'Name',
             role: 'user'
-          })
+          }, { onConflict: 'id' })
           .select()
           .single();
-        
-        console.log('💾 Insert result - data:', newProfile, 'error:', createError);
-        
+
+        console.log('💾 Upsert result - data:', newProfile, 'error:', createError);
+
         if (createError) {
-          console.error('❌ Failed to create profile:', createError);
+          // If we still receive a duplicate-key error, fetch the existing profile
+          // and return it rather than failing the whole flow.
+          if ((createError as any)?.code === '23505') {
+            console.warn('↪️ Duplicate profile detected after upsert; fetching existing profile');
+            const { data: existing, error: fetchErr } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', userId)
+              .single();
+            if (fetchErr) {
+              console.error('❌ Failed to fetch existing profile after duplicate error:', fetchErr);
+              return { profile: null, error: fetchErr };
+            }
+            return { profile: existing, error: null };
+          }
+
+          console.error('❌ Failed to create or upsert profile:', createError);
           return { profile: null, error: createError };
         }
-        
-        console.log('✅ Profile created successfully:', newProfile);
+
+        console.log('✅ Profile created/upserted successfully:', newProfile);
         return { profile: newProfile, error: null };
       } else {
         console.error('❌ No email available to create profile');
