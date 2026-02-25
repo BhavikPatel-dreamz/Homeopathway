@@ -388,9 +388,24 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
           {/* Step 0: Select Ailment */}
           {step === 0 && (
             <div className="space-y-4">
-              <p className="font-montserrat font-medium text-[14px] leading-[24px] text-[#20231E] mb-2">
-                Select Ailment
-              </p>
+              <div className="flex items-center justify-between mb-2">
+                <p className="font-montserrat font-medium text-[14px] leading-[24px] text-[#20231E]">
+                  Select Ailment
+                </p>
+                <div className="ml-3">
+                  <select
+                    value={selectedAilment}
+                    onChange={(e) => { setSelectedAilment(e.target.value); setAilmentQuery(''); }}
+                    disabled={ailmentsLoading}
+                    className="h-9 text-sm text-[#41463B] font-medium rounded-md border border-[#E6E6E3] bg-white px-3"
+                  >
+                    <option value="">Choose an ailment</option>
+                    {ailments.map((a) => (
+                      <option key={a.id} value={a.id}>{a.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
               <div className="relative">
                 <Search className="absolute left-3 top-3 w-5 h-5 text-[#9A9A96] pointer-events-none z-10" />
 
