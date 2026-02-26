@@ -388,24 +388,9 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
           {/* Step 0: Select Ailment */}
           {step === 0 && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between mb-2">
-                <p className="font-montserrat font-medium text-[14px] leading-[24px] text-[#20231E]">
-                  Select Ailment
-                </p>
-                <div className="ml-3">
-                  <select
-                    value={selectedAilment}
-                    onChange={(e) => { setSelectedAilment(e.target.value); setAilmentQuery(''); }}
-                    disabled={ailmentsLoading}
-                    className="h-9 text-sm text-[#41463B] font-medium rounded-md border border-[#E6E6E3] bg-white px-3"
-                  >
-                    <option value="">Choose an ailment</option>
-                    {ailments.map((a) => (
-                      <option key={a.id} value={a.id}>{a.name}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+              <p className="font-montserrat font-medium text-[14px] leading-[24px] text-[#20231E] mb-2">
+                Select Ailment
+              </p>
               <div className="relative">
                 <Search className="absolute left-3 top-3 w-5 h-5 text-[#9A9A96] pointer-events-none z-10" />
 
@@ -413,6 +398,8 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                   ref={ailmentInputRef}
                   value={ailmentQuery}
                   onChange={(e) => {
+                    // If user types after selecting an ailment, clear the selection
+                    if (selectedAilment) setSelectedAilment('');
                     setAilmentQuery(e.target.value);
                     setAilmentActiveIndex(-1);
                   }}
@@ -435,6 +422,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                       const pick = filtered[ailmentActiveIndex >= 0 ? ailmentActiveIndex : 0];
                       if (pick) {
                         setSelectedAilment(pick.id);
+                        // clear query and show selected as a chip instead of placing name in the input
                         setAilmentQuery('');
                       }
                     }
@@ -444,14 +432,13 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                   className="w-full h-[44px] rounded-[8px] border-2 border-[#F8F6F2] pl-10 pr-4 text-[14px] text-[#41463B] font-medium placeholder:text-[#9A9A96] focus:outline-none focus:border-[#6C7463]"
                 />
 
-                {/* Selected ailment chip shown below the input, matching remedy chips */}
-                {selectedAilment && (
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    <span
-                      key={selectedAilment}
-                      className="flex items-center gap-2 px-3 py-1 rounded-[4px] bg-[#F5F3ED] font-medium text-[14px] leading-[22px] text-[#41463B]"
-                    >
-                      {ailments.find(a => a.id === selectedAilment)?.name}
+                {/* Selected ailment chip with inline clear button */}
+                {selectedAilment && (() => {
+                  const selectedObj = ailments.find(a => a.id === selectedAilment);
+                  const name = selectedObj ? selectedObj.name : '';
+                  return (
+                    <span className="absolute left-10 top-1 flex items-center gap-2 px-3 py-1 rounded-[4px] bg-[#F5F3ED] font-medium text-[14px] leading-[22px] text-[#41463B]">
+                      <span className="truncate max-w-[180px]">{name}</span>
                       <button
                         type="button"
                         onClick={() => {
@@ -459,16 +446,17 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                           setAilmentQuery('');
                           if (ailmentInputRef?.current) setTimeout(() => ailmentInputRef.current?.focus(), 0);
                         }}
-                        className="text-[#8E8E8A] hover:text-[#0B0C0A] text-xl ml-1"
+                        className="ml-2 text-[#8E8E8A] hover:text-[#0B0C0A] text-lg"
+                        aria-label="clear selected ailment"
                       >
                         ×
                       </button>
                     </span>
-                  </div>
-                )}
+                  );
+                })()}
 
                 {/* Dropdown */}
-                {ailmentQuery && (
+                {ailmentQuery && !selectedAilment && (
                   <div className="border border-[#E6E6E3] rounded-[12px] bg-white shadow-[0px_0px_12px_-4px_rgba(26,26,26,0.16)] overflow-hidden mt-2">
                     <div className="max-h-[120px] overflow-y-auto pl-1 pr-4 py-1 scrollbar">
                       {!ailmentsLoading && ailments.filter(a => a.name.toLowerCase().includes(ailmentQuery.toLowerCase())).length === 0 && (
@@ -479,7 +467,7 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
                         <button
                           key={a.id}
                           type="button"
-                          onClick={() => { setSelectedAilment(a.id); setAilmentQuery(''); }}
+                          onClick={() => { setSelectedAilment(a.id); setAilmentQuery(a.name); setAilmentActiveIndex(-1); }}
                           className={`w-full flex items-center gap-3 px-2 py-1 rounded-[8px] text-left transition ${idx === ailmentActiveIndex ? 'bg-[#F3F4F0] border border-[#6C7463]' : 'hover:bg-[#F7F7F5]'}`}
                         >
                           <span className="w-[24px] h-[24px] bg-[#F9F7F2] rounded-[45px] flex items-center justify-center text-[16px]">{a.icon || '🌿'}</span>
