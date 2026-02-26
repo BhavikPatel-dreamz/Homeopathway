@@ -371,9 +371,9 @@ export default function HeroSlider() {
           {/* Content */}
           <div className="relative  pb-0 md:pb-5">
             <div className="flex items-center flex-col lg:flex-row justify-center mb-6  max-w-[930px] mx-auto w-full bg-[#0000004D] md:p-4 p-2">
-              <div className="w-35 h-35 md:w-40 md:h-40 lg:w-47.5 lg:h-47.5 mb-4 lg:mb-0 lg:mr-6 flex-shrink-0">
+              <div className="w-35 md:w-40 lg:w-47.5 mb-4 lg:mb-0 lg:mr-6 flex-shrink-0">
                 <img
-                  className="w-full h-full object-contain cursor-pointer"
+                  className="w-full h-auto object-contain cursor-pointer"
                   src="/homeopathway-logo.svg"
                   alt="HomeoPathway Logo"
                 />
