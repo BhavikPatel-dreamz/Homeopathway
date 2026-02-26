@@ -39,6 +39,8 @@ export default function Footer() {
               <li><Link href="/getting-started" className="text-[#C4C7C1] font-[600] hover:text-[#fff] transition-all duration-500">Getting Started</Link></li>
               <li><Link href="/faq" className="text-[#C4C7C1] font-[600] hover:text-[#fff] transition-all duration-500">FAQ</Link></li>
               <li><Link href="/contact-us" className="text-[#C4C7C1] font-[600] hover:text-[#fff] transition-all duration-500">Contact Us</Link></li>
+              <li><Link href="/privacy-policy" className="text-[#C4C7C1] font-[600] hover:text-[#fff] transition-all duration-500">Privacy Policy</Link></li>
+              <li><Link href="/terms-of-service" className="text-[#C4C7C1] font-[600] hover:text-[#fff] transition-all duration-500">Terms of Service</Link></li>
             </ul>
           </div>
 
