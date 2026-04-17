@@ -148,8 +148,8 @@ const ReviewComments: React.FC<ReviewCommentsProps> = ({ reviewId, onCommentCoun
   const renderComment = (comment: ReviewComment, isReply: boolean = false) => {
     const isEditing = editingComment === comment.id;
     const isOwner = user && user.id === comment.user_id;
-    const userInitial = comment.user_first_name?.[0] || comment.user_name?.[0] || '?';
-    const userName = `${comment.user_first_name || ''} ${comment.user_last_name || ''}`.trim() || comment.user_name || 'Anonymous';
+    const userInitial = comment.user_name?.[0] || comment.user_first_name?.[0] || '?';
+    const userName = comment.user_name || `${comment.user_first_name || ''} ${comment.user_last_name || ''}`.trim() || 'Anonymous';
 
     return (
       <div key={comment.id} className={`${isReply ? 'ml-8 border-l-2 border-gray-100 pl-4' : ''} pt-3`}>

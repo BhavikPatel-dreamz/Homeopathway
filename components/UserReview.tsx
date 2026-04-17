@@ -328,8 +328,8 @@ export default function UserReviewListPage({ user }: any) {
   }, [reviews, initialAilmentMap, ailmentMap]);
 
   const userProfile = {
-    initial: user?.first_name?.[0] || "",
-    name: `${user?.first_name || ""} ${user?.last_name || ""}`,
+    initial: user?.user_name?.[0] || user?.first_name?.[0] || "",
+    name: user?.user_name || `${user?.first_name || ""} ${user?.last_name || ""}`,
     username: user?.user_name || "",
     email: user?.email,
     followers: user?.followers || 10,

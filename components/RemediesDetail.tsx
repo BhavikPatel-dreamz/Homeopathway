@@ -78,7 +78,6 @@ export default function RemediesDetailPage({
   const [activeTab, setActiveTab] = useState("Overview");
 
   const overviewRef = useRef<HTMLDivElement>(null!);
-  const originRef = useRef<HTMLDivElement>(null!);
   const reviewsRef = useRef<HTMLDivElement>(null!);
   const relatedRef = useRef<HTMLDivElement>(null!);
 
@@ -120,7 +119,6 @@ export default function RemediesDetailPage({
     let targetRef: SectionRef | null = null;
 
     if (tabName === "Overview") targetRef = overviewRef;
-    if (tabName === "Origin") targetRef = originRef;
     if (tabName === "Reviews") targetRef = reviewsRef;
     if (tabName === "Related Remedies") targetRef = relatedRef;
 
@@ -139,7 +137,6 @@ export default function RemediesDetailPage({
 
     const sectionList = [
       { ref: overviewRef, tab: "Overview" },
-      { ref: originRef, tab: "Origin" },
       { ref: reviewsRef, tab: "Reviews" },
       { ref: relatedRef, tab: "Related Remedies" },
     ];
@@ -273,7 +270,7 @@ export default function RemediesDetailPage({
       >
         <div className="max-w-7xl mx-auto px-3 sm:px-5 md:px-6">
           <div className="border-t border-[#B5B6B1] w-full flex gap-1 sm:gap-1 lg:gap-9 overflow-x-auto scrollbar-hide snap-x snap-mandatory">
-            {["Overview", "Origin", "Reviews", "Related Remedies"].map((tab) => (
+                {["Overview", "Reviews", "Related Remedies"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => handleTabClick(tab)}
@@ -332,9 +329,9 @@ export default function RemediesDetailPage({
                 </div>
 
                 <h4 className="text-base sm:text-lg md:text-[20px] text-[#2B2E28] font-bold mb-3 sm:mb-5 text-montserrat">
-                  Key Symptoms for {remedy.name} Headaches:
+                  Key Symptoms:
                 </h4>
-                <div className="text-black" ref={originRef}></div>
+                {/* origin removed - no origin field available */}
                 <div className="grid gap-3 sm:gap-4 md:gap-y-8 md:grid-cols-2">
                   {symptoms.map((s, i) => (
                     <div key={i} className="flex gap-2 sm:gap-3 items-start">
@@ -412,33 +409,7 @@ export default function RemediesDetailPage({
 
         </section>
 
-        {/* Origin Section */}
-
-        <section className={`bg-white rounded-lg p-4 sm:p-6  ${activeTab == "Reviews" ? "mb-10" : ""}`}>
-
-          <p className="text-lg sm:text-xl md:text-[20px] text-[#0B0C0A] font-semibold mb-4">
-            Origin
-          </p>
-          <div className="flex items-center gap-2 sm:gap-3 mb-4">
-            <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-15 md:h-15 p-2 sm:p-3 bg-[#F9F7F2] rounded-full flex items-center justify-center text-2xl sm:text-3xl flex-shrink-0">
-              {remedy.icon}
-            </div>
-            <div className="min-w-0">
-              <h6 className="text-sm sm:text-base text-[#0B0C0A] font-semibold text-montserrat mb-1 break-words">
-                {remedy.scientific_name || remedy.name}
-              </h6>
-              <p className="text-xs sm:text-sm text-[#0B0C0A] font-medium">
-                Also known as {remedy.common_name}
-              </p>
-            </div>
-          </div>
-          <p className="text-sm sm:text-base text-[#41463B] font-medium mb-3 sm:mb-4">
-            {remedy.description}
-          </p>
-          <p className="text-sm sm:text-base text-[#41463B] font-medium">
-            {remedy.safety_precautions}
-          </p>
-        </section>
+        {/* Origin section removed — origin field not present on Remedy */}
 
         {/* Reviews Section */}
         <div ref={reviewsRef} className={`bg-white rounded-lg p-4 sm:py-6 ${activeTab == "Related Remedies" ? "mb-15 md:mb-0" : ""}`}>

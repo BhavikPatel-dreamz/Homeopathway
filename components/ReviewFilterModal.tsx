@@ -90,9 +90,9 @@ export default function ReviewFilterModal({
 
       // Filter by user name
       if (localFilters.userName.trim()) {
-        const userName = review.profiles?.first_name || review.profiles?.last_name
-          ? `${review.profiles?.first_name || ''} ${review.profiles?.last_name || ''}`.toLowerCase()
-          : 'anonymous';
+        const userName = (review.profiles?.user_name || (review.profiles?.first_name || review.profiles?.last_name
+          ? `${review.profiles?.first_name || ''} ${review.profiles?.last_name || ''}`
+          : 'anonymous')).toLowerCase();
         if (!userName.includes(localFilters.userName.toLowerCase())) {
           return false;
         }

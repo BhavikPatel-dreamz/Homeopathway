@@ -251,6 +251,8 @@ export default function AddReviewForm({ onClose, remedyId, remedyName, condition
       }
 
       setShowSuccess(true);
+      // Close the form so parent can refresh reviews immediately
+      onClose();
       // Link the ailment and remedies together in the DB
       try {
         if (selectedAilment) {
