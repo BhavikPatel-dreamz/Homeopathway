@@ -329,7 +329,7 @@ export default function RemediesDetailPage({
                 </div>
 
                 <h4 className="text-base sm:text-lg md:text-[20px] text-[#2B2E28] font-bold mb-3 sm:mb-5 text-montserrat">
-                  Key Symptoms for {remedy.name} Headaches:
+                  Key Symptoms:
                 </h4>
                 {/* origin removed - no origin field available */}
                 <div className="grid gap-3 sm:gap-4 md:gap-y-8 md:grid-cols-2">

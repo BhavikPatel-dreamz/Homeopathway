@@ -127,7 +127,7 @@ const tryQueries = [
     icon: ailmentRecord.icon || '🩺',
     remedies_count: ailmentRecord.remedies_count || 0,
     description: ailmentRecord.description || 'No description available.',
-    personalized_approach: ailmentRecord.personalized_approach || 'The beauty of homeopathic treatment lies in its individualized approach. Two people with the same condition may receive different remedies based on their unique symptoms.',
+    personalized_approach: ailmentRecord.personalized_approach || '',
   };
 
   const remedies: Remedy[] = (remediesData || []).map((ar: unknown) => {
