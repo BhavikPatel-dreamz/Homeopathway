@@ -744,9 +744,9 @@ export default function ReviewListPage({
                 )}
 
                 {reviews.map((review) => {
-                  const userName = review.profiles?.first_name || review.profiles?.last_name
+                  const userName = review.profiles?.user_name || (review.profiles?.first_name || review.profiles?.last_name
                     ? `${review.profiles?.first_name || ""} ${review.profiles?.last_name?.[0] || ""}.`
-                    : "Anonymous";
+                    : "Anonymous");
 
                   const user_name = review.profiles?.user_name;
                   const profile_image = review.profiles?.profile_img;
